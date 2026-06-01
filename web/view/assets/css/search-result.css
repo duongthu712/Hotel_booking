@@ -1,0 +1,245 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : May 31, 2026, 1:11:15 AM
+    Author     : Minh Thu
+*/
+
+/* ==========================================================================
+   SEARCH RESULT PAGE DESIGN (MÀU VÀNG NGÀ CỔ ĐIỂN SANG TRỌNG)
+   ========================================================================== */
+
+body {
+    background-color: #F9F5EB !important; /* Ép đồng bộ nền vàng ngà giống hệt homepage */
+}
+
+.room-list-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px 80px 20px;
+}
+
+.search-summary-text {
+    font-family: 'Montserrat', sans-serif;
+    color: #2c3e46;
+    margin-bottom: 25px;
+    font-size: 15px;
+}
+
+.search-summary-text strong {
+    color: #C8A96B;
+}
+
+/* Khu vực lưới hiển thị danh sách phòng */
+.room-list-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 35px;
+    margin-top: 30px;
+}
+
+/* Thẻ hạng phòng dạng ngang */
+/* SỬA LẠI: Thẻ hạng phòng dạng ngang */
+.room-card-horizontal {
+    display: flex;
+    background: #ffffff;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(44, 62, 70, 0.04);
+    border: 1px solid #e2e8ea;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    
+    height: 320px; /* 🔥 BẮT BUỘC THÊM CỘT NÀY: Khóa cứng chiều cao của thẻ card */
+}
+
+.room-card-horizontal:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(44, 62, 70, 0.08);
+    border-color: #C8A96B; /* Viền đổi sang màu vàng kim khi hover */
+}
+
+.room-card-img-box {
+    flex: 1.2;
+    min-height: 280px;
+}
+
+.room-card-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.room-card-details {
+    flex: 1.8;
+    padding: 35px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.room-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.room-title-text {
+    font-size: 26px;
+    color: #2c3e46;
+    margin: 0;
+    font-weight: 500;
+}
+
+.room-price-tag {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: #C8A96B;
+    font-weight: 600;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.room-price-tag span {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    color: #777;
+    font-weight: 400;
+    display: block;
+}
+
+.room-card-desc {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    text-align: justify;
+}
+
+/* Các nhãn tiện ích nhỏ bên trong phòng */
+.room-amenities-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.amenity-badge {
+    font-size: 11px;
+    background: #FDFBF7; /* Nền trắng kem nhạt */
+    color: #666;
+    padding: 5px 12px;
+    border-radius: 2px;
+    border: 1px solid #eef2f3;
+}
+
+
+
+.room-specifications {
+    display: flex;
+    gap: 20px;
+    font-size: 13px;
+    color: #555;
+}
+
+.room-specifications strong {
+    color: #2c3e46;
+}
+
+/* Nút đặt phòng màu vàng kim */
+.btn-action-book {
+    background: #C8A96B;
+    color: white !important;
+    padding: 10px 25px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-decoration: none;
+    text-transform: uppercase;
+    border-radius: 2px;
+    transition: background 0.3s ease;
+}
+
+.btn-action-book:hover {
+    background: #b5955a;
+}
+
+.empty-result-box {
+    text-align: center;
+    padding: 60px;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #e2e8ea;
+}
+
+/* Responsive cho thiết bị di động và tablet */
+@media (max-width: 768px) {
+    .room-card-horizontal { flex-direction: column; }
+    .room-card-img-box { min-height: 200px; }
+    .room-card-header { flex-direction: column; gap: 8px; }
+    .room-price-tag { text-align: left; }
+}
+/* Nút xem chi tiết dạng Outline tinh tế */
+.btn-action-view {
+    background: #FDFBF7; /* Nền kem nhạt đồng bộ background badge */
+    color: #C8A96B !important; /* Chữ màu vàng kim */
+    border: 1px solid #C8A96B; /* Viền vàng kim mảnh */
+    padding: 10px 22px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-decoration: none;
+    text-transform: uppercase;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+/* Hiệu ứng khi di chuột vào nút Xem chi tiết */
+.btn-action-view:hover {
+    background: #C8A96B; /* Đổi nền sang màu vàng kim */
+    color: white !important; /* Đổi chữ sang màu trắng */
+    box-shadow: 0 4px 12px rgba(200, 169, 107, 0.2); /* Đổ bóng nhẹ tone vàng */
+}
+.btn-action-view {
+    background: #FDFBF7;
+    color: #C8A96B !important;
+    border: 1px solid #C8A96B;
+    padding: 10px 22px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-decoration: none;
+    text-transform: uppercase;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    display: inline-block;
+    white-space: nowrap;
+
+    /* 🔥 THÊM DÒNG NÀY: Khóa cứng độ rộng tối thiểu, cấm trình duyệt co nút */
+    min-width: 140px; 
+    text-align: center; /* Căn chữ ra chính giữa nút */
+}
+
+/* 2. Cập nhật cho nút Đặt phòng */
+.btn-action-book {
+    background: #C8A96B;
+    color: white !important;
+    padding: 10px 25px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-decoration: none;
+    text-transform: uppercase;
+    border-radius: 2px;
+    transition: background 0.3s ease;
+    display: inline-block;
+    white-space: nowrap;
+
+    /* 🔥 THÊM DÒNG NÀY: Khóa cứng độ rộng tối thiểu cho đồng bộ với nút bên cạnh */
+    min-width: 140px;
+    text-align: center;
+}

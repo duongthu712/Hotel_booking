@@ -1,0 +1,337 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* Created on : May 30, 2026, 5:08:51 PM
+    Author     : Minh Thu
+*/
+
+/* ==========================================================================
+   GLOBAL RESET FONTS SYSTEM (ÉP ĐỒNG BỘ 100% CẢ TRANG)
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    background-color: #F9F5EB;
+    color: #333;
+}
+
+h1, h2, h3, h4, .navbar-logo {
+    font-family: 'Playfair Display', serif !important;
+}
+
+/* Khung chứa layout chính */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* ==========================================================================
+   HERO BANNER STRUCTURE (KHU VỰC ĐẦU TRANG)
+   ========================================================================== */
+.hero {
+    min-height: 100vh;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.hero-content {
+    padding: 0 80px;
+    margin-top: auto;
+    margin-bottom: 60px;
+    max-width: 700px;
+    color: white;
+}
+
+.hero h1 {
+    font-size: 64px;
+    font-weight: 400;
+    line-height: 1.2;
+    margin: 0 0 20px 0;
+    letter-spacing: 1px;
+}
+
+.hero-content p {
+    font-size: 18px;          
+    line-height: 1.8;          
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 35px;
+    text-align: justify;
+}
+
+/* ==========================================================================
+   CẤU HÌNH HAI NÚT BẤM TRONG SUỐT HOÀN TOÀN - HOVER/CLICK ĐỔI MÀU TRẮNG
+   ========================================================================== */
+.hero-actions {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.hero-actions .btn {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    padding: 15px 30px;
+    text-transform: uppercase;
+    border-radius: 2px;
+    display: inline-block;
+    text-decoration: none;
+    white-space: nowrap;
+    
+    /* Mặc định trong suốt 100%, viền trắng mỏng mảnh */
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+/* Hiệu ứng tương tác: Hover hoặc bấm giữ chuột hóa trắng tinh khôi */
+.hero-actions .btn:hover,
+.hero-actions .btn:active {
+    background: #ffffff !important;         
+    border-color: #ffffff !important;       
+    color: #2c3e46 !important;             
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);           
+}
+
+/* ==========================================================================
+   THANH TÌM KIẾM ĐẶT PHÒNG NHANH (MÀU XANH RÊU ĐỒNG BỘ)
+   ========================================================================== */
+.search-bar {
+    background: #2c3e46; 
+    width: calc(100% - 100px);
+    max-width: 1200px;
+    margin: 0 auto -45px auto; 
+    padding: 25px 35px;
+    border-radius: 2px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    position: relative;
+    z-index: 10;
+    
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.search-bar input,
+.search-bar select {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+    color: white;
+    font-size: 14px;
+    padding: 8px 0;
+    outline: none;
+    flex: 1;
+    transition: 0.3s ease;
+}
+
+.search-bar input:focus,
+.search-bar select:focus {
+    border-bottom-color: #C8A96B;
+}
+
+.search-bar input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.7;
+    cursor: pointer;
+}
+
+.search-bar select option {
+    background: #2c3e46;
+    color: white;
+}
+
+.search-bar button {
+    background: #C8A96B;
+    color: white;
+    border: none;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    padding: 12px 28px;
+    height: 40px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: 0.3s ease;
+    border-radius: 2px;
+    white-space: nowrap;
+}
+
+.search-bar button:hover {
+    background: #b5955a;
+}
+
+/* ==========================================================================
+   NÂNG CẤP ĐỊNH DẠNG CÁC PHÂN ĐOẠN NỘI DUNG (MAIN CONTENT)
+   ========================================================================== */
+.section {
+    padding: 100px 0 20px 0;
+}
+
+/* Căn lề khoảng cách các phân đoạn */
+main.container .section:first-of-type {
+    padding-top: 140px; /* Bù khoảng trống cho thanh kiếm phòng đè lên */
+}
+
+.section h2 {
+    font-size: 36px;
+    color: #2c3e46;
+    text-align: center;
+    margin-bottom: 45px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    position: relative;
+}
+
+/* Đường gạch trang trí nhỏ tinh tế dưới mỗi tiêu đề */
+.section h2::after {
+    content: '';
+    display: block;
+    width: 50px;
+    height: 1.5px;
+    background: #C8A96B;
+    margin: 15px auto 0 auto;
+}
+
+/* Hệ thống lưới Grid dùng chung cho cả Services và Policy */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+}
+
+/* Nâng cấp giao diện thẻ Card (Dùng cho cả Dịch vụ và Quy định) */
+.card {
+    background: #ffffff;
+    padding: 35px;
+    border: 1px solid #f0f0f0;
+    border-radius: 4px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hiệu ứng vệt màu vàng rêu mỏng ở đầu card khi di chuột vào */
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: #C8A96B;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(44, 62, 70, 0.08);
+    border-color: #e2e8ea;
+}
+
+.card:hover::before {
+    transform: scaleX(1);
+}
+
+.card h3 {
+    font-size: 22px;
+    color: #2c3e46;
+    margin: 0 0 15px 0;
+    font-weight: 500;
+}
+
+.card p {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    text-align: justify;
+}
+
+/* Kiểu chữ hiển thị giá tiền hoặc chữ Miễn phí */
+.card .price {
+    font-size: 14px;
+    color: #C8A96B;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-top: 1px dashed #eee;
+    padding-top: 15px;
+    margin-top: auto;
+}
+
+/* ==========================================================================
+   BỘ SƯU TẬP ẢNH MESH (GALLERY GRID)
+   ========================================================================== */
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+.gallery img {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+    border-radius: 4px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+    transition: transform 0.5s ease;
+}
+
+.gallery img:hover {
+    transform: scale(1.04);
+}
+
+/* ==========================================================================
+   RESPONSIVE LAYOUT (TƯƠNG THÍCH THIẾT BỊ)
+   ========================================================================== */
+@media (max-width: 992px) {
+    .search-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+        width: calc(100% - 40px);
+        margin-bottom: -80px;
+        padding: 25px;
+    }
+    .search-bar button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-content { padding: 0 30px; }
+    .hero h1 { font-size: 44px; }
+    main.container .section:first-of-type { padding-top: 110px; }
+    .section { padding: 60px 0 20px 0; }
+    .section h2 { font-size: 28px; }
+}

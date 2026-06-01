@@ -1,0 +1,86 @@
+/* ==========================================================================
+    NAVBAR DESIGN - FIXED DEEP MOSS GREEN (#2C3E46)
+   ========================================================================== */
+
+/* 1. KHUNG CHỨA BANNER THANH ĐIỀU HƯỚNG CỐ ĐỊNH */
+.navbar {
+    height: 90px;
+    background: #2c3e46 !important; /* Màu xanh giống hệt Footer */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 50px;
+    box-sizing: border-box;
+    width: 100%;
+    
+    /* KHÔNG CỐ ĐỊNH: Để thanh menu nằm trong luồng cuộn bình thường của trang */
+    position: relative; 
+    
+    /* BỎ HẾT BÓNG: Không đổ bóng để phẳng lì và tiệp màu hoàn toàn */
+    box-shadow: none ; 
+}
+
+/* 2. CHỮ LOGO HOTEL */
+.navbar-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 600;
+    color: white;
+    letter-spacing: 1px;
+    cursor: default;
+}
+
+/* 3. MENU ĐIỀU HƯỚNG (GIỮA) VÀ CÁC THÀNH PHẦN HÀNH ĐỘNG (PHẢI) */
+.navbar-menu, 
+.navbar-actions {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-menu {
+    gap: 45px; /* Khoảng cách dàn trải cho các mục chữ */
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar-actions {
+    gap: 25px; /* Khoảng cách giữa nút Login và Đặt phòng nhanh */
+}
+
+/* 4. GỘP CHUNG ĐỊNH DẠNG LINK MENU VÀ NÚT ĐĂNG NHẬP NHÂN VIÊN */
+.navbar-menu a, 
+.staff-login {
+    text-decoration: none;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    transition: opacity 0.3s ease;
+}
+
+.navbar-menu a:hover, 
+.staff-login:hover {
+    opacity: 0.7;
+}
+
+/* 5. NÚT ĐẶT PHÒNG NHANH CÓ VIỀN */
+.booking-btn {
+    display: inline-block;
+    text-decoration: none;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    padding: 10px 20px;
+    border-radius: 2px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.booking-btn:hover {
+    background: white;
+    color: #2c3e46; /* Di chuột vào nền hóa trắng, chữ đổi về màu xanh rêu đậm */
+}
