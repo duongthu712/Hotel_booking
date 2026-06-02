@@ -4,11 +4,11 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Reset Password</title>
+    <title>Forgot Password</title>
 </head>
 <body>
 
-    <h1>Reset Password</h1>
+    <h1>Forgot Password</h1>
 
     <% if (request.getAttribute("error") != null) { %>
         <p style="color:red;"><%= request.getAttribute("error") %></p>
@@ -18,16 +18,12 @@
         <p style="color:green;"><%= request.getAttribute("message") %></p>
     <% } %>
 
-    <form action="<%= request.getContextPath() %>/reset-password" method="post">
-        <label>New password:</label><br>
-        <input type="password" name="newPassword" required>
+    <form action="<%= request.getContextPath() %>/forgot-password" method="post">
+        <label>Enter your staff email:</label><br>
+        <input type="email" name="email" required>
         <br><br>
 
-        <label>Confirm password:</label><br>
-        <input type="password" name="confirmPassword" required>
-        <br><br>
-
-        <button type="submit">Reset Password</button>
+        <button type="submit">Send Code</button>
     </form>
 
     <br>

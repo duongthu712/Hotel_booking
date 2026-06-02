@@ -1,30 +1,24 @@
 package controller;
 
-import dao.StaffDAO;
-import java.io.IOException;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.*;
+import dao.StaffAccountDAO;
 import model.StaffAccount;
+import dal.PasswordUtil;
+
+import java.io.IOException;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 public class LoginController extends HttpServlet {
 
-    private final StaffDAO staffDAO = new StaffDAO();
+    private final StaffAccountDAO staffDAO = new StaffAccountDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        String action = request.getParameter("action");
-
-        if ("logout".equals(action)) {
-            HttpSession session = request.getSession(false);
-            if (session != null) session.invalidate();
-
-            response.sendRedirect(request.getContextPath()
-                    + "/view/auth/login.jsp?msg=Logged out successfully");
-            return;
-        }
-
         request.getRequestDispatcher("/view/auth/login.jsp").forward(request, response);
     }
 
@@ -34,36 +28,26 @@ public class LoginController extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        String username = request.getParameter("username");
+        String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        // authenticate trực tiếp từ DAO
-        StaffAccount user = staffDAO.authenticateStaff(username, password);
+        try {
+            StaffAccount staff = staffDAO.getStaffByEmail(email);
 
-        if (user != null) {
-
-            HttpSession session = request.getSession(true);
-            session.setAttribute("staffUser", user);
-
-            String role = user.getRole();
-
-            if ("Administrator".equals(role)) {
-                response.sendRedirect(request.getContextPath() + "/view/admin/staff-management.jsp");
-
-            } else if ("Manager".equals(role)) {
-                response.sendRedirect(request.getContextPath() + "/view/manager/dashboard.jsp");
-
-            } else if ("Receptionist".equals(role)) {
-                response.sendRedirect(request.getContextPath() + "/view/receptionist/dashboard.jsp");
-
-            } else {
-                session.invalidate();
-                response.sendRedirect(request.getContextPath() + "/view/auth/login.jsp?msg=Invalid role");
+            if (staff == null || !PasswordUtil.checkPassword(password, staff.getPasswordHash())) {
+                request.setAttribute("error", "Invalid email or password.");
+                request.getRequestDispatcher("/view/auth/login.jsp").forward(request, response);
+                return;
             }
 
-        } else {
-            request.setAttribute("errorMessage",
-                "Invalid username, password or inactive account.");
+            HttpSession session = request.getSession();
+            session.setAttribute("staff", staff);
+
+            response.sendRedirect(request.getContextPath() + "/staff/dashboard.jsp");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "System error. Please try again.");
             request.getRequestDispatcher("/view/auth/login.jsp").forward(request, response);
         }
     }
