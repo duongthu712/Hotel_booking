@@ -1,16 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
+
 import java.util.List;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 
-/**
- *
- * @author Minh Thu
- */
 public class RoomType {
+
     private int roomTypeId;
     private String typeName;
     private String description;
@@ -19,44 +14,134 @@ public class RoomType {
     private int bedCount;
     private BigDecimal areaSqm;
     private BigDecimal basePrice;
-    private String imageUrl; // Trường bổ sung để hiển thị ảnh từ bảng RoomTypeImages
-    private List<RoomService> roomServices;
+    private boolean active;
+    private List<String> imageUrl;
+    private List<String> imageCaption;
 
-    public List<RoomService> getRoomServices() {
-        return roomServices;
+    //Method addImage into room type image list
+    public void addImage(String url, String caption) {
+        if (imageUrl == null) {
+            imageUrl = new ArrayList<>();
+            imageCaption = new ArrayList<>();
+        }
+        imageUrl.add(url);
+        imageCaption.add(caption);
     }
 
-    public void setRoomServices(List<RoomService> roomServices) {
-        this.roomServices = roomServices;
+    //Method clearImages clears all image urls and captions in the list
+    public void clearImages() {
+        if (imageUrl != null) {
+            imageUrl.clear();
+        }
+        if (imageCaption != null) {
+            imageCaption.clear();
+        }
     }
 
-    public RoomType() {}
+    //Constructor
+    public RoomType() {
+    }
 
-    // Getters và Setters
-    public int getRoomTypeId() { return roomTypeId; }
-    public void setRoomTypeId(int roomTypeId) { this.roomTypeId = roomTypeId; }
+    public RoomType(int roomTypeId, String typeName, String description, 
+            int capacity, String bedType, int bedCount, BigDecimal areaSqm, 
+            BigDecimal basePrice, boolean active) {
+        this.roomTypeId = roomTypeId;
+        this.typeName = typeName;
+        this.description = description;
+        this.capacity = capacity;
+        this.bedType = bedType;
+        this.bedCount = bedCount;
+        this.areaSqm = areaSqm;
+        this.basePrice = basePrice;
+        this.active = active;
+    }
 
-    public String getTypeName() { return typeName; }
-    public void setTypeName(String typeName) { this.typeName = typeName; }
+    //Getter & Setter
+    public int getRoomTypeId() {
+        return roomTypeId;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public void setRoomTypeId(int roomTypeId) {
+        this.roomTypeId = roomTypeId;
+    }
 
-    public int getCapacity() { return capacity; }
-    public void setCapacity(int capacity) { this.capacity = capacity; }
+    public String getTypeName() {
+        return typeName;
+    }
 
-    public String getBedType() { return bedType; }
-    public void setBedType(String bedType) { this.bedType = bedType; }
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
+    }
 
-    public int getBedCount() { return bedCount; }
-    public void setBedCount(int bedCount) { this.bedCount = bedCount; }
+    public String getDescription() {
+        return description;
+    }
 
-    public BigDecimal getAreaSqm() { return areaSqm; }
-    public void setAreaSqm(BigDecimal areaSqm) { this.areaSqm = areaSqm; }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-    public BigDecimal getBasePrice() { return basePrice; }
-    public void setBasePrice(BigDecimal basePrice) { this.basePrice = basePrice; }
+    public int getCapacity() {
+        return capacity;
+    }
 
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public String getBedType() {
+        return bedType;
+    }
+
+    public void setBedType(String bedType) {
+        this.bedType = bedType;
+    }
+
+    public int getBedCount() {
+        return bedCount;
+    }
+
+    public void setBedCount(int bedCount) {
+        this.bedCount = bedCount;
+    }
+
+    public BigDecimal getAreaSqm() {
+        return areaSqm;
+    }
+
+    public void setAreaSqm(BigDecimal areaSqm) {
+        this.areaSqm = areaSqm;
+    }
+
+    public BigDecimal getBasePrice() {
+        return basePrice;
+    }
+
+    public void setBasePrice(BigDecimal basePrice) {
+        this.basePrice = basePrice;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public List<String> getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(List<String> imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public List<String> getImageCaption() {
+        return imageCaption;
+    }
+
+    public void setImageCaption(List<String> imageCaption) {
+        this.imageCaption = imageCaption;
+    }
 }
