@@ -10,13 +10,13 @@ import model.Service;
 import model.ServiceType;
 
 /**
- * Last update 03/06/2026 Class RoomServiceDAO include getAll(), getById(int
- * serviceId), create(RoomService service), update(RoomService service),
+ * Last update 03/06/2026 Class HotelServiceDAO include getAll(), getById(int
+ * serviceId), create(HotelService service), update(HotelService service),
  * delete(int serviceId)
  *
  * @author LinhLTHE200306
  */
-public class RoomServiceDAO extends DBContext {
+public class HotelServiceDAO extends DBContext {
 
     PreparedStatement stm;
     ResultSet rs;
@@ -26,7 +26,7 @@ public class RoomServiceDAO extends DBContext {
         List<Service> roomServices = new ArrayList<Service>();
         try {
             String strSQL = """
-                           select * from RoomServices
+                           select * from HotelServices
                            """;
             stm = connection.prepareStatement(strSQL);
             rs = stm.executeQuery();
@@ -38,20 +38,20 @@ public class RoomServiceDAO extends DBContext {
                 String description = rs.getString("description");
                 boolean active = rs.getBoolean("is_active");
 
-                Service newService = new Service(serviceId, serviceName, description, price, active, ServiceType.ROOM);
+                Service newService = new Service(serviceId, serviceName, description, price, active, ServiceType.HOTEL);
                 roomServices.add(newService);
             }
         } catch (Exception ex) {
-            System.out.println("GetRoomServices:" + ex.getMessage());
+            System.out.println("GetHotelServices:" + ex.getMessage());
         }
         return roomServices;
     }
 
-    public Service getRoomServicesById(int serviceId) {
+    public Service getHotelServicesById(int serviceId) {
         Service roomService = null;
         try {
             String strSQL = """
-                          select * from RoomServices rs
+                          select * from HotelServices rs
                           where rs.service_id = ?
                           """;
             stm = connection.prepareCall(strSQL);
@@ -64,23 +64,23 @@ public class RoomServiceDAO extends DBContext {
                 String description = rs.getString("description");
                 boolean active = rs.getBoolean("is_active");
 
-                roomService = new Service(serviceId, serviceName, description, price, active, ServiceType.ROOM);
+                roomService = new Service(serviceId, serviceName, description, price, active, ServiceType.HOTEL);
             }
         } catch (Exception ex) {
-            System.out.println("GetRoomServices:" + ex.getMessage());
+            System.out.println("GetHotelServices:" + ex.getMessage());
         }
         return roomService;
     }
 
-    public Service createRoomService(Service roomService) {
-        Service found = getRoomServicesById(roomService.getServiceId());
+    public Service createHotelService(Service roomService) {
+        Service found = getHotelServicesById(roomService.getServiceId());
         if (found != null) {
             return null;
         }
 
         try {
             String strSQL = """
-                            insert into RoomServices ([service_name], [description], unit_price, is_active) 
+                            insert into HotelServices ([service_name], [description], unit_price, is_active) 
                             values (?, ?, ?, ?)
                             """;
             stm = connection.prepareCall(strSQL);
@@ -92,20 +92,20 @@ public class RoomServiceDAO extends DBContext {
 
             stm.execute();
         } catch (Exception ex) {
-            System.out.println("CreateRoomServices:" + ex.getMessage());
+            System.out.println("CreateHotelServices:" + ex.getMessage());
         }
         return roomService;
     }
 
-    public Service updateRoomService(Service roomService) {
-        Service found = getRoomServicesById(roomService.getServiceId());
+    public Service updateHotelService(Service roomService) {
+        Service found = getHotelServicesById(roomService.getServiceId());
         if (found == null) {
             return null;
         }
 
         try {
             String strSQL = """
-                           update RoomServices 
+                           update HotelServices 
                            set [service_name] = ?, 
                            [description] =?, 
                            unit_price =?, 
@@ -122,26 +122,26 @@ public class RoomServiceDAO extends DBContext {
 
             stm.execute();
         } catch (Exception ex) {
-            System.out.println("UpdateRoomServices:" + ex.getMessage());
+            System.out.println("UpdateHotelServices:" + ex.getMessage());
         }
         return roomService;
     }
 
     public Service delete(int serviceId) {
-        Service found = getRoomServicesById(serviceId);
+        Service found = getHotelServicesById(serviceId);
         if (found == null) {
             return null;
         }
 
         try {
             String strSQL = """
-                           delete RoomServices where service_id = ?
+                           delete HotelServices where service_id = ?
                            """;
             stm = connection.prepareCall(strSQL);
             stm.setInt(1, serviceId);
             stm.execute();
         } catch (Exception ex) {
-            System.out.println("DeleteRoomServices:" + ex.getMessage());
+            System.out.println("DeleteHotelServices:" + ex.getMessage());
         }
         return found;
     }
