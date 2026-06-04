@@ -22,7 +22,7 @@ public class RoomServiceDAO extends DBContext {
     ResultSet rs;
 
     //
-    public List<Service> getAllRoomTypes() {
+    public List<Service> getAllRoomServices() {
         List<Service> roomServices = new ArrayList<Service>();
         try {
             String strSQL = """
