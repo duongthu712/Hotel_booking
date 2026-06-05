@@ -7,80 +7,99 @@
     height: 90px;
     background: #2c3e46 !important; /* Màu xanh giống hệt Footer */
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* Đẩy 3 khối chính dạt đều sang 3 góc cân bằng */
     align-items: center;
-    padding: 0 50px;
+    padding: 0 40px; /* Giảm nhẹ xuống 40px để mở rộng không gian bề ngang cho menu */
     box-sizing: border-box;
     width: 100%;
     
     /* KHÔNG CỐ ĐỊNH: Để thanh menu nằm trong luồng cuộn bình thường của trang */
     position: relative; 
+    z-index: 999;
     
     /* BỎ HẾT BÓNG: Không đổ bóng để phẳng lì và tiệp màu hoàn toàn */
-    box-shadow: none ; 
+    box-shadow: none; 
 }
 
-/* 2. CHỮ LOGO HOTEL */
+/* 2. CHỮ LOGO HOTEL (BÊN TRÁI VÀ ĐỨNG ĐỘC LẬP) */
 .navbar-logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 36px;
-    font-weight: 600;
+    font-family: 'Playfair Display'; /* Đồng bộ font luxury hệ thống */
+    font-size: 32px; 
+    font-weight: 500;
     color: white;
-    letter-spacing: 1px;
-    cursor: default;
+    letter-spacing: 2px;
+    text-transform: uppercase; 
+    text-decoration: none;
+    flex: 1; /* Cấp không gian vừa đủ cho cánh trái */
+    display: flex;
+    justify-content: flex-start;
+    white-space: nowrap; /* Đảm bảo logo luôn nằm trên 1 dòng */
 }
 
-/* 3. MENU ĐIỀU HƯỚNG (GIỮA) VÀ CÁC THÀNH PHẦN HÀNH ĐỘNG (PHẢI) */
-.navbar-menu, 
-.navbar-actions {
+/* 3. MENU ĐIỀU HƯỚNG CHỮ (CĂN CHÍNH GIỮA TUYỆT ĐỐI) */
+.navbar-menu {
     display: flex;
     align-items: center;
-}
-
-.navbar-menu {
-    gap: 45px; /* Khoảng cách dàn trải cho các mục chữ */
+    justify-content: center;
+    gap: 30px; /* Điều chỉnh nhẹ từ 40px xuống 30px để các mục chữ đứng gọn gàng, nhường chỗ cho cánh phải */
     list-style: none;
     margin: 0;
     padding: 0;
+    flex: 2; /* Chiếm tỷ trọng lớn để hút vào giữa trang */
 }
 
+/* 4. CÁC THÀNH PHẦN HÀNH ĐỘNG (BÊN PHẢI VÀ ĐỨNG ĐỘC LẬP) */
 .navbar-actions {
-    gap: 25px; /* Khoảng cách giữa nút Login và Đặt phòng nhanh */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 25px; /* Giảm nhẹ từ 35px xuống 25px để text đăng nhập và nút đặt phòng không bị đẩy ra ngoài */
+    flex: 1.2; /* Tăng nhẹ tỷ trọng từ 1 lên 1.2 để vùng chứa bên phải rộng rãi hơn */
 }
 
-/* 4. GỘP CHUNG ĐỊNH DẠNG LINK MENU VÀ NÚT ĐĂNG NHẬP NHÂN VIÊN */
+/* 5. ĐỊNH DẠNG LINK MENU VÀ NÚT ĐĂNG NHẬP NHÂN VIÊN */
 .navbar-menu a, 
 .staff-login {
     text-decoration: none;
-    color: white;
-    font-family: 'Poppins', sans-serif;
-    font-size: 12px;
+    color: rgba(255, 255, 255, 0.75); /* Mặc định hơi mờ nhẹ để tạo chiều sâu */
+    font-family: 'Montserrat', sans-serif !important; 
+    font-size: 13.5px; /* Hạ nhẹ 0.5px để chữ thanh thoát và vừa vặn hơn */
     font-weight: 500;
-    letter-spacing: 1px;
-    transition: opacity 0.3s ease;
+    letter-spacing: 1px; /* Điều chỉnh khoảng cách chữ vừa phải */
+    text-transform: uppercase;
+    padding: 10px 0;
+    transition: color 0.2s ease-in-out;
+    
+    /* QUAN TRỌNG: Ép chuỗi text luôn nằm trên một đường thẳng, chống rớt dòng */
+    white-space: nowrap; 
 }
 
-.navbar-menu a:hover, 
+/* Hiệu ứng sáng lên khi hover cho menu và đăng nhập */
+.navbar-menu a:hover,
 .staff-login:hover {
-    opacity: 0.7;
+    color: #ffffff;
 }
 
-/* 5. NÚT ĐẶT PHÒNG NHANH CÓ VIỀN */
+/* 6. NÚT ĐẶT PHÒNG NHANH CÓ VIỀN VÀNG PREMIUM */
 .booking-btn {
     display: inline-block;
     text-decoration: none;
     color: white;
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    padding: 10px 20px;
+    border: 1px solid #C8A96B; /* Viền vàng cát sang trọng */
+    padding: 12px 22px; /* Chỉnh nhẹ padding trái/phải để nút gọn gàng tinh tế */
     border-radius: 2px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 12px;
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 13px; 
     font-weight: 500;
     letter-spacing: 1px;
-    transition: background 0.3s ease, color 0.3s ease;
+    text-transform: uppercase;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    white-space: nowrap; /* Giữ nút luôn cố định phom dòng */
 }
 
 .booking-btn:hover {
-    background: white;
-    color: #2c3e46; /* Di chuột vào nền hóa trắng, chữ đổi về màu xanh rêu đậm */
+    background: #C8A96B; /* Hover nền hóa vàng cát */
+    color: white;
+    box-shadow: 0 4px 15px rgba(200, 169, 107, 0.25);
+    transform: translateY(-1px);
 }

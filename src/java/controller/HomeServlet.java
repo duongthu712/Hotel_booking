@@ -4,8 +4,7 @@
  */
 package controller;
 
-import dao.HotelImageDAO;
-import dao.HotelInfoDAO; // Import thêm DAO xử lý dịch vụ và thông tin khách sạn
+import dao.HotelInfoDAO;
 import java.io.IOException;
 import java.util.List;
 import jakarta.servlet.ServletException;
@@ -13,8 +12,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import model.HotelService; // Import lớp thực thể dịch vụ
-import model.HotelInfo;    // Import lớp thực thể thông tin khách sạn
+import model.Service;    // Import lớp thực thể thông tin khách sạn
 
 /**
  *
@@ -47,26 +45,24 @@ public class HomeServlet extends HttpServlet {
 
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        try {
+            // 1. Khởi tạo DAO xử lý thông tin dịch vụ
+            HotelInfoDAO hotelInfoDAO = new HotelInfoDAO();
 
-        // 1. Khởi tạo các đối tượng DAO xử lý dữ liệu
-        HotelImageDAO hotelImageDAO = new HotelImageDAO();
-        HotelInfoDAO hotelInfoDAO = new HotelInfoDAO();
+            // 2. 🔥 ĐÃ SỬA: Lấy danh sách dịch vụ theo Model Service mới gộp
+            // Dùng để hiển thị khối "Dịch vụ & tiện nghi" ở giữa trang chủ
+            List<Service> servicesList = hotelInfoDAO.getActiveHotelServices();
+            request.setAttribute("services", servicesList);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        // Giả định hotel_id của La Mer Hotel mặc định là 1 theo cấu trúc DB của bạn
-        int hotelId = 1;
-
-        String bgImage = hotelImageDAO.getLatestHotelBackgroundImage(hotelId);
-        request.setAttribute("bgImage", bgImage);
-
-        // 3. Lấy danh sách dịch vụ cao cấp từ bảng HotelServices
-        List<HotelService> servicesList = hotelInfoDAO.getActiveHotelServices();
-        request.setAttribute("services", servicesList);
-
-        // 4. Lấy thông tin tổng quan, chính sách và giờ giấc từ bảng HotelInfo
-        HotelInfo hotelDetails = hotelInfoDAO.getHotelDetails(hotelId);
-        request.setAttribute("hotelDetails", hotelDetails);
-
-        // 5. Chuyển tiếp dữ liệu đến trang hiển thị chính thức
+        // 3. Chuyển tiếp dữ liệu đến trang hiển thị chính thức
+        // (Lúc này Filter đã tự động nạp 'hotelInfo' chạy ngầm cho Footer và ảnh nền Hero rồi)
         request.getRequestDispatcher("/view/public/homepage.jsp").forward(request, response);
     }
+
+
+    
 }

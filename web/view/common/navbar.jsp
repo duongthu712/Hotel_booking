@@ -5,7 +5,7 @@
 --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <nav class="navbar">
-    <div class="navbar-logo">La Mer</div>
+    <a href="${pageContext.request.contextPath}/" class="navbar-logo" style="text-decoration: none">La Mer</a>
 
     <ul class="navbar-menu">
         <li>
@@ -16,6 +16,9 @@
         </li>
         <li>
             <a href="${pageContext.request.contextPath}/view/public/feedback-list.jsp">ĐÁNH GIÁ</a>
+        </li>
+        <li>
+            <a href="${pageContext.request.contextPath}/view/public/policy.jsp">CHÍNH SÁCH</a>
         </li>
     </ul>
 
