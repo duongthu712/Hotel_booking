@@ -126,11 +126,28 @@ public class StaffAccountDAO extends DBContext {
         StaffAccount staff = getStaffByUsername(username);
 
         if (staff == null) {
+            System.out.println("LOGIN DAO: staff not found by username = " + username);
             return null;
         }
 
-        if (PasswordUtil.checkPassword(password, staff.getPasswordHash())) {
+        System.out.println("LOGIN DAO: found staff = " + staff.getUsername());
+        System.out.println("LOGIN DAO: input password = " + password);
+        System.out.println("LOGIN DAO: stored password = " + staff.getPasswordHash());
+
+        if (password == null || staff.getPasswordHash() == null) {
+            return null;
+        }
+
+        if (password.equals(staff.getPasswordHash())) {
             return staff;
+        }
+
+        try {
+            if (PasswordUtil.checkPassword(password, staff.getPasswordHash())) {
+                return staff;
+            }
+        } catch (Exception e) {
+            System.out.println("LOGIN DAO: hash check error = " + e.getMessage());
         }
 
         return null;
@@ -392,25 +409,6 @@ public class StaffAccountDAO extends DBContext {
         }
     }
 
-    private StaffAccount mapStaff(ResultSet rs) throws Exception {
-        StaffAccount staff = new StaffAccount();
-
-        staff.setStaffId(rs.getInt("staff_id"));
-        staff.setUsername(rs.getString("username"));
-        staff.setPasswordHash(rs.getString("password_hash"));
-        staff.setFullName(rs.getString("full_name"));
-        staff.setEmail(rs.getString("email"));
-        staff.setPhone(rs.getString("phone"));
-        staff.setRole(rs.getString("role"));
-        staff.setActive(rs.getBoolean("is_active"));
-        staff.setCreatedAt(rs.getTimestamp("created_at"));
-        staff.setResetCode(rs.getString("reset_code"));
-        staff.setResetExpiry(rs.getTimestamp("reset_expiry"));
-        staff.setResetUsed(rs.getBoolean("reset_used"));
-
-        return staff;
-    }
-    
     public void updateProfile(int staffId, String fullName, String email, String phone) {
         try {
             String sql = """
@@ -430,8 +428,28 @@ public class StaffAccountDAO extends DBContext {
             stm.setInt(4, staffId);
 
             stm.executeUpdate();
+
         } catch (Exception e) {
             System.out.println("updateProfile: " + e.getMessage());
         }
+    }
+
+    private StaffAccount mapStaff(ResultSet rs) throws Exception {
+        StaffAccount staff = new StaffAccount();
+
+        staff.setStaffId(rs.getInt("staff_id"));
+        staff.setUsername(rs.getString("username"));
+        staff.setPasswordHash(rs.getString("password_hash"));
+        staff.setFullName(rs.getString("full_name"));
+        staff.setEmail(rs.getString("email"));
+        staff.setPhone(rs.getString("phone"));
+        staff.setRole(rs.getString("role"));
+        staff.setActive(rs.getBoolean("is_active"));
+        staff.setCreatedAt(rs.getTimestamp("created_at"));
+        staff.setResetCode(rs.getString("reset_code"));
+        staff.setResetExpiry(rs.getTimestamp("reset_expiry"));
+        staff.setResetUsed(rs.getBoolean("reset_used"));
+
+        return staff;
     }
 }
