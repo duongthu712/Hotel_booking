@@ -3,10 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/model/StaffAccount.java</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/dao/HotelServiceDAO.java</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/ServiceDeleteController.java</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/ServiceEditController.java</file>
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/ServiceListController.java</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/dao/RoomServiceDAO.java</file>
         </group>
     </open-files>
 </project-private>

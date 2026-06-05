@@ -13,7 +13,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import model.HotelService; // Import lớp thực thể dịch vụ
+import model.Service; // Import lớp thực thể dịch vụ
 import model.HotelInfo;    // Import lớp thực thể thông tin khách sạn
 
 /**
@@ -59,7 +59,7 @@ public class HomeServlet extends HttpServlet {
         request.setAttribute("bgImage", bgImage);
 
         // 3. Lấy danh sách dịch vụ cao cấp từ bảng HotelServices
-        List<HotelService> servicesList = hotelInfoDAO.getActiveHotelServices();
+        List<Service> servicesList = hotelInfoDAO.getActiveHotelServices();
         request.setAttribute("services", servicesList);
 
         // 4. Lấy thông tin tổng quan, chính sách và giờ giấc từ bảng HotelInfo

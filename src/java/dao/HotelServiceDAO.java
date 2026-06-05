@@ -10,18 +10,23 @@ import model.Service;
 import model.ServiceType;
 
 /**
- * Last update 03/06/2026 Class HotelServiceDAO include getAll(), getById(int
- * serviceId), create(HotelService service), update(HotelService service),
- * delete(int serviceId)
+ * HotelServiceDAO.java Data Processing Operator layer for hotel services
+ * Provides CRUD with HotelServices table
  *
  * @author LinhLTHE200306
+ * @version 1.0
+ * @since 2026-06-02
  */
 public class HotelServiceDAO extends DBContext {
 
     PreparedStatement stm;
     ResultSet rs;
 
-    //
+    /**
+     * Get list all hotel servives from database
+     *
+     * @return List of service object, return null if not have data
+     */
     public List<Service> getAllHotelServices() {
         List<Service> roomServices = new ArrayList<Service>();
         try {
@@ -38,7 +43,8 @@ public class HotelServiceDAO extends DBContext {
                 String description = rs.getString("description");
                 boolean active = rs.getBoolean("is_active");
 
-                Service newService = new Service(serviceId, serviceName, description, price, active, ServiceType.HOTEL);
+                Service newService = new Service(serviceId, serviceName, 
+                        description, price, active, ServiceType.HOTEL);
                 roomServices.add(newService);
             }
         } catch (Exception ex) {
@@ -47,6 +53,12 @@ public class HotelServiceDAO extends DBContext {
         return roomServices;
     }
 
+    /**
+     * Find a service by its ID
+     *
+     * @param serviceId
+     * @return Service object if found, if not found return null
+     */
     public Service getHotelServicesById(int serviceId) {
         Service roomService = null;
         try {
@@ -64,7 +76,8 @@ public class HotelServiceDAO extends DBContext {
                 String description = rs.getString("description");
                 boolean active = rs.getBoolean("is_active");
 
-                roomService = new Service(serviceId, serviceName, description, price, active, ServiceType.HOTEL);
+                roomService = new Service(serviceId, serviceName, description, 
+                        price, active, ServiceType.HOTEL);
             }
         } catch (Exception ex) {
             System.out.println("GetHotelServices:" + ex.getMessage());
@@ -72,31 +85,46 @@ public class HotelServiceDAO extends DBContext {
         return roomService;
     }
 
-    public Service createHotelService(Service roomService) {
-        Service found = getHotelServicesById(roomService.getServiceId());
+    /**
+     * Adding new service in system
+     *
+     * @param hotelService
+     * @return service object if add successfully, null if unsuccess
+     */
+    public Service createHotelService(Service hotelService) {
+        //Check service is exist
+        Service found = getHotelServicesById(hotelService.getServiceId());
         if (found != null) {
             return null;
         }
 
         try {
             String strSQL = """
-                            insert into HotelServices ([service_name], [description], unit_price, is_active) 
+                            insert into HotelServices ([service_name], 
+                            [description], unit_price, is_active) 
                             values (?, ?, ?, ?)
                             """;
             stm = connection.prepareCall(strSQL);
 
-            stm.setString(1, roomService.getServiceName());
-            stm.setString(2, roomService.getDescription());
-            stm.setBigDecimal(3, roomService.getUnitPrice());
-            stm.setBoolean(4, roomService.isActive());
+            stm.setString(1, hotelService.getServiceName());
+            stm.setString(2, hotelService.getDescription());
+            stm.setBigDecimal(3, hotelService.getUnitPrice());
+            stm.setBoolean(4, hotelService.isActive());
 
             stm.execute();
         } catch (Exception ex) {
             System.out.println("CreateHotelServices:" + ex.getMessage());
         }
-        return roomService;
+        return hotelService;
     }
 
+    /**
+     * Update the information for an existing hotel service.
+     *
+     * @param roomService
+     * @return The Service object will be null after the update if the ID is
+     * successful, or null if the ID is not found
+     */
     public Service updateHotelService(Service roomService) {
         Service found = getHotelServicesById(roomService.getServiceId());
         if (found == null) {
@@ -127,6 +155,13 @@ public class HotelServiceDAO extends DBContext {
         return roomService;
     }
 
+    /**
+     * Remove a service from the system based on its ID.
+     *
+     * @param serviceId
+     * @return The Service object is deleted if successful, null if the service
+     * is not found.
+     */
     public Service delete(int serviceId) {
         Service found = getHotelServicesById(serviceId);
         if (found == null) {

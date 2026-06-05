@@ -28,6 +28,18 @@
         <servlet-name>ServiceListController</servlet-name>
         <servlet-class>controller.ServiceListController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ServiceEditController</servlet-name>
+        <servlet-class>controller.ServiceEditController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ServiceDeleteController</servlet-name>
+        <servlet-class>controller.ServiceDeleteController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ServiceCreateController</servlet-name>
+        <servlet-class>controller.ServiceCreateController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>
         <url-pattern>/login</url-pattern>
@@ -67,5 +79,17 @@
     <servlet-mapping>
         <servlet-name>ServiceListController</servlet-name>
         <url-pattern>/ServiceListController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ServiceEditController</servlet-name>
+        <url-pattern>/ServiceEditController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ServiceDeleteController</servlet-name>
+        <url-pattern>/ServiceDeleteController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ServiceCreateController</servlet-name>
+        <url-pattern>/ServiceCreateController</url-pattern>
     </servlet-mapping>
 </web-app>

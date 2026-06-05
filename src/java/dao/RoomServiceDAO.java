@@ -10,18 +10,23 @@ import model.Service;
 import model.ServiceType;
 
 /**
- * Last update 03/06/2026 Class RoomServiceDAO include getAll(), getById(int
- * serviceId), create(RoomService service), update(RoomService service),
- * delete(int serviceId)
+ * RoomServiceDAO.java Data Processing Operator layer for room services
+ * Provides CRUD with RoomServices table
  *
  * @author LinhLTHE200306
+ * @version 1.0
+ * @since 2026-06-02
  */
 public class RoomServiceDAO extends DBContext {
 
     PreparedStatement stm;
     ResultSet rs;
 
-    //
+    /**
+     * Get list all room servives from database
+     *
+     * @return List of service object, return null if not have data
+     */
     public List<Service> getAllRoomServices() {
         List<Service> roomServices = new ArrayList<Service>();
         try {
@@ -38,7 +43,8 @@ public class RoomServiceDAO extends DBContext {
                 String description = rs.getString("description");
                 boolean active = rs.getBoolean("is_active");
 
-                Service newService = new Service(serviceId, serviceName, description, price, active, ServiceType.ROOM);
+                Service newService = new Service(serviceId, serviceName, 
+                        description, price, active, ServiceType.HOTEL);
                 roomServices.add(newService);
             }
         } catch (Exception ex) {
@@ -47,6 +53,12 @@ public class RoomServiceDAO extends DBContext {
         return roomServices;
     }
 
+    /**
+     * Find a service by its ID
+     *
+     * @param serviceId
+     * @return Service object if found, if not found return null
+     */
     public Service getRoomServicesById(int serviceId) {
         Service roomService = null;
         try {
@@ -64,7 +76,8 @@ public class RoomServiceDAO extends DBContext {
                 String description = rs.getString("description");
                 boolean active = rs.getBoolean("is_active");
 
-                roomService = new Service(serviceId, serviceName, description, price, active, ServiceType.ROOM);
+                roomService = new Service(serviceId, serviceName, description, 
+                        price, active, ServiceType.HOTEL);
             }
         } catch (Exception ex) {
             System.out.println("GetRoomServices:" + ex.getMessage());
@@ -72,7 +85,14 @@ public class RoomServiceDAO extends DBContext {
         return roomService;
     }
 
+    /**
+     * Adding new service in system
+     *
+     * @param roomService
+     * @return service object if add successfully, null if unsuccess
+     */
     public Service createRoomService(Service roomService) {
+        //Check service is exist
         Service found = getRoomServicesById(roomService.getServiceId());
         if (found != null) {
             return null;
@@ -80,7 +100,8 @@ public class RoomServiceDAO extends DBContext {
 
         try {
             String strSQL = """
-                            insert into RoomServices ([service_name], [description], unit_price, is_active) 
+                            insert into RoomServices ([service_name], 
+                            [description], unit_price, is_active) 
                             values (?, ?, ?, ?)
                             """;
             stm = connection.prepareCall(strSQL);
@@ -97,6 +118,13 @@ public class RoomServiceDAO extends DBContext {
         return roomService;
     }
 
+    /**
+     * Update the information for an existing room service.
+     *
+     * @param roomService
+     * @return The Service object will be null after the update if the ID is
+     * successful, or null if the ID is not found
+     */
     public Service updateRoomService(Service roomService) {
         Service found = getRoomServicesById(roomService.getServiceId());
         if (found == null) {
@@ -127,6 +155,13 @@ public class RoomServiceDAO extends DBContext {
         return roomService;
     }
 
+    /**
+     * Remove a service from the system based on its ID.
+     *
+     * @param serviceId
+     * @return The Service object is deleted if successful, null if the service
+     * is not found.
+     */
     public Service delete(int serviceId) {
         Service found = getRoomServicesById(serviceId);
         if (found == null) {
