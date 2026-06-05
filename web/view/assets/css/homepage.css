@@ -1,14 +1,3 @@
-/*
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
-*/
-/* Created on : May 30, 2026, 5:08:51 PM
-    Author     : Minh Thu
-*/
-
-/* ==========================================================================
-   GLOBAL RESET FONTS SYSTEM (ÉP ĐỒNG BỘ 100% CẢ TRANG)
-   ========================================================================== */
 * {
     margin: 0;
     padding: 0;
@@ -290,48 +279,71 @@ main.container .section:first-of-type {
 }
 
 /* ==========================================================================
-   BỘ SƯU TẬP ẢNH MESH (GALLERY GRID)
+   BỘ SƯU TẬP ẢNH PREMIUM (GALLERY GRID 3 CỘT X 2 HÀNG)
    ========================================================================== */
-.gallery {
+.gallery-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 24px;
+    margin-top: 30px;
 }
 
-.gallery img {
-    width: 100%;
-    height: 350px;
-    object-fit: cover;
+/* Khung bọc ảnh cố định chiều cao, bo góc chống tràn */
+.gallery-item {
+    position: relative;
+    height: 280px; 
     border-radius: 4px;
+    overflow: hidden;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
-    transition: transform 0.5s ease;
+    cursor: pointer;
 }
 
-.gallery img:hover {
-    transform: scale(1.04);
+/* Thiết lập cấu hình ảnh gốc */
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* ==========================================================================
-   RESPONSIVE LAYOUT (TƯƠNG THÍCH THIẾT BỊ)
-   ========================================================================== */
-@media (max-width: 992px) {
-    .search-bar {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 15px;
-        width: calc(100% - 40px);
-        margin-bottom: -80px;
-        padding: 25px;
-    }
-    .search-bar button {
-        width: 100%;
-    }
+/* Lớp phủ mờ sang trọng chuyển màu gradient nhẹ */
+.gallery-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(44, 62, 70, 0.1), rgba(32, 46, 52, 0.7));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.4s ease;
 }
 
-@media (max-width: 768px) {
-    .hero-content { padding: 0 30px; }
-    .hero h1 { font-size: 44px; }
-    main.container .section:first-of-type { padding-top: 110px; }
-    .section { padding: 60px 0 20px 0; }
-    .section h2 { font-size: 28px; }
+/* Nhãn chữ thương hiệu tinh tế */
+.gallery-overlay span {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-bottom: 2px solid #C8A96B;
+    padding-bottom: 6px;
+    transform: translateY(15px);
+    transition: transform 0.4s ease;
 }
+
+/* --- HIỆU ỨNG KHI RÊ CHUỘT (HOVER) --- */
+.gallery-item:hover img {
+    transform: scale(1.08); /* Phóng to ảnh nhẹ tinh tế */
+}
+
+.gallery-item:hover .gallery-overlay {
+    opacity: 1; /* Hiện lớp phủ tối */
+}
+
+.gallery-item:hover .gallery-overlay span {
+    transform: translateY(0); /* Đẩy chữ trồi nhẹ lên */
+}
+

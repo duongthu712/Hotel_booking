@@ -19,7 +19,7 @@ import model.RoomType;
  *
  * @author Minh Thu
  */
-@WebServlet(name = "SearchRoomServlet", urlPatterns = {"/search"})
+@WebServlet(name = "SearchRoomServlet", urlPatterns = {"/search"}) 
 public class SearchRoomServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -34,10 +34,9 @@ public class SearchRoomServlet extends HttpServlet {
 
         RoomTypeDAO roomTypeDAO = new RoomTypeDAO();
 
-        // === ĐÃ BỔ SUNG: Luôn luôn lấy tất cả loại phòng để đổ vào thanh <select> thanh search ===
+        // Luôn luôn lấy tất cả loại phòng để đổ vào thanh <select> của thanh search
         List<RoomType> allRoomTypesList = roomTypeDAO.getAllRoomTypes();
         request.setAttribute("allRoomTypesList", allRoomTypesList);
-        // ====================================================================================
 
         List<RoomType> list;
 
@@ -65,14 +64,11 @@ public class SearchRoomServlet extends HttpServlet {
             list = roomTypeDAO.searchRoomTypesByQuantity(checkIn, checkOut, roomQuantity, roomTypeId);
         }
 
-        // Gọi đúng HotelInfoDAO đã có của bạn
-        dao.HotelInfoDAO hotelInfoDAO = new dao.HotelInfoDAO();
+        // ====================================================================================
+        // 🔥 ĐÃ XÓA: Đoạn gọi HotelInfoDAO rườm rà ở đây vì đã có FooterDataFilter lo ngầm 
+        // cho cả hệ thống rồi, tránh việc ép SQL Server bắt kết nối thêm một lần vô ích.
+        // ====================================================================================
 
-        // Truyền ID = 1 để lấy thông tin khách sạn La Mer đầu tiên trong Database
-        model.HotelInfo hotelInfo = hotelInfoDAO.getHotelDetails(1);
-
-        // Đẩy dữ liệu sang Request Attribute để Footer có thể đọc được
-        request.setAttribute("hotelInfo", hotelInfo);
         // 3. Đẩy list kết quả tìm kiếm sang request attribute để trang kết quả hiển thị
         request.setAttribute("availableRoomTypes", list);
 

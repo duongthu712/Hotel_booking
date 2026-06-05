@@ -1,13 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!DOCTYPE html>
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>La Mer Hotel</title>
+        <title>${hotelInfo.hotelName} - Trang Chủ</title>
 
         <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/navbar.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/homepage.css">
@@ -35,12 +36,10 @@
 
             <form class="search-bar" action="${pageContext.request.contextPath}/search" method="GET">
                 <input type="date" name="checkIn" id="checkIn" required>
-
                 <input type="date" name="checkOut" id="checkOut" required>
                 <input type="number" name="roomQuantity" min="1" value="1" required placeholder="Số lượng phòng">
 
                 <select name="roomTypeId">
-
                     <option value="all"
                             <c:if test="${empty param.roomTypeId || param.roomTypeId eq 'all'}">
                                 selected
@@ -56,7 +55,6 @@
                             ${item.typeName}
                         </option>
                     </c:forEach>
-
                 </select>
                 <button type="submit">Tìm phòng</button>
             </form>
@@ -64,7 +62,6 @@
 
         <main class="container">
 
-            <!-- SERVICES -->
             <section class="section">
                 <h2>Dịch vụ & tiện nghi</h2>
 
@@ -99,42 +96,33 @@
                 </div>
             </section>
 
-            <!-- GALLERY -->
             <section class="section">
                 <h2>Hình ảnh tại La Mer</h2>
 
-                <div class="gallery">
-                    <img src="https://happyvivu.com/wp-content/uploads/2023/11/61683532.jpg">
-                    <img src="https://vinpearlresortvietnam.com/wp-content/uploads/Ho-boi-tai-Vinpearl-Resort-Spa-Ha-Long-01.jpg">
-                    <img src="https://nanotravel.vn/wp-content/uploads/2022/10/vinpearl-resort-spa-ha-long-9.jpg">
-                </div>
-            </section>
-
-            <!-- POLICY -->
-            <section class="section">
-                <h2>Chính sách</h2>
-
-                <div class="grid">
-                    <div class="card">
-                        <h3>Check-in / Check-out</h3>
-                        <p>
-                            <c:choose>
-                                <c:when test="${not empty hotelDetails}">
-                                    Check-in: ${hotelDetails.checkinTime} <br>
-                                    Check-out: ${hotelDetails.checkoutTime}
-                                </c:when>
-                                <c:otherwise>
-                                    Check-in 14:00 - Check-out 12:00
-                                </c:otherwise>
-                            </c:choose>
-                        </p>
+                <div class="gallery-grid">
+                    <div class="gallery-item">
+                        <img src="https://happyvivu.com/wp-content/uploads/2023/11/61683532.jpg" alt="La Mer Resort">
+                        <div class="gallery-overlay"></div>
                     </div>
-
-                    <div class="card">
-                        <h3>Quy định</h3>
-                        <p>
-                            <c:out value="${hotelDetails.policies}" default="Không hút thuốc trong phòng."/>
-                        </p>
+                    <div class="gallery-item">
+                        <img src="https://vinpearlresortvietnam.com/wp-content/uploads/Ho-boi-tai-Vinpearl-Resort-Spa-Ha-Long-01.jpg" alt="La Mer Pool">
+                        <div class="gallery-overlay"></div>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="https://i.pinimg.com/736x/72/f9/22/72f922ce30fbe13b340da97421603100.jpg" alt="La Mer View">
+                        <div class="gallery-overlay"></div>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0d/ff/4c/39/vinpearl-ha-long-bay.jpg?w=1800&h=-1&s=1" alt="La Mer Beach">
+                        <div class="gallery-overlay"></div>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="https://i.pinimg.com/736x/56/e0/d8/56e0d8ec5b706d92fe8a65a31462c4ea.jpg" alt="La Mer Luxury Room">
+                        <div class="gallery-overlay"></div>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1c/4b/61/84/img-20191227-202635-762.jpg?w=1000&h=-1&s=1">
+                        <div class="gallery-overlay"></div>
                     </div>
                 </div>
             </section>
