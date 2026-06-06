@@ -5,14 +5,6 @@
         <servlet-class>controller.HomeServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>SearchRoomServlet</servlet-name>
-        <servlet-class>controller.SearchRoomServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>RoomDetailServlet</servlet-name>
-        <servlet-class>controller.RoomDetailServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>LoginController</servlet-name>
         <servlet-class>controller.LoginController</servlet-class>
     </servlet>
@@ -25,8 +17,25 @@
         <servlet-class>controller.ChangePasswordController</servlet-class>
     </servlet>
     <servlet>
+ 
+        <servlet-name>ServiceListController</servlet-name>
+        <servlet-class>controller.ServiceListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ServiceEditController</servlet-name>
+        <servlet-class>controller.ServiceEditController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ServiceDeleteController</servlet-name>
+        <servlet-class>controller.ServiceDeleteController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ServiceCreateController</servlet-name>
+        <servlet-class>controller.ServiceCreateController</servlet-class>
+ 
         <servlet-name>HotelPolicyServlet</servlet-name>
         <servlet-class>controller.HotelPolicyServlet</servlet-class>
+ 
     </servlet>
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>
@@ -65,7 +74,24 @@
         <url-pattern>/reset-password</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+ 
+        <servlet-name>ServiceListController</servlet-name>
+        <url-pattern>/ServiceList</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ServiceEditController</servlet-name>
+        <url-pattern>/ServiceEdit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ServiceDeleteController</servlet-name>
+        <url-pattern>/ServiceDelete</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ServiceCreateController</servlet-name>
+        <url-pattern>/ServiceCreate</url-pattern>
+ 
         <servlet-name>HotelPolicyServlet</servlet-name>
         <url-pattern>/policies</url-pattern>
+ 
     </servlet-mapping>
 </web-app>

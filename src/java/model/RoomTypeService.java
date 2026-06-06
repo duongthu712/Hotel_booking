@@ -6,24 +6,34 @@ public class RoomTypeService {
     private int roomTypeId;
     private int serviceId;
     private int quantity;
-    private boolean isFree; 
-   
-    private Service service; 
+
+    private boolean isFree;
+
+    private Service service;
 
     // Constructor
     public RoomTypeService() {
     }
 
     public RoomTypeService(int roomTypeServiceId, int roomTypeId, int serviceId, int quantity, boolean isFree, Service service) {
+
         this.roomTypeServiceId = roomTypeServiceId;
         this.roomTypeId = roomTypeId;
         this.serviceId = serviceId;
         this.quantity = quantity;
         this.isFree = isFree;
+
+    }
+    // Getter & Setter
+
+    public Service getService() {
+        return service;
+    }
+
+    public void setService(Service service) {
         this.service = service;
     }
 
-    // Getter & Setter
     public int getRoomTypeServiceId() {
         return roomTypeServiceId;
     }
@@ -64,11 +74,4 @@ public class RoomTypeService {
         this.isFree = isFree;
     }
 
-    public Service getService() {
-        return service;
-    }
-
-    public void setService(Service service) {
-        this.service = service;
-    }
 }

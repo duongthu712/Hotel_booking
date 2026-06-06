@@ -24,7 +24,16 @@ public class Service {
         this.type = type;
     }
 
+    public Service(String serviceName, String description, BigDecimal unitPrice, boolean active, ServiceType type) {
+        this.serviceName = serviceName;
+        this.description = description;
+        this.unitPrice = unitPrice;
+        this.active = active;
+        this.type = type;
+    }
+
     //Getter & Setter
+    
     public int getServiceId() {
         return serviceId;
     }

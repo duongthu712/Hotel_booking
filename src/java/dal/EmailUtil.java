@@ -10,6 +10,8 @@ import jakarta.mail.internet.MimeMessage;
 
 import java.util.Properties;
 
+import java.util.Properties;
+
 public class EmailUtil {
 
     public static void sendResetCode(String toEmail, String code) throws Exception {
@@ -56,6 +58,7 @@ public class EmailUtil {
 
         message.setContent(htmlContent, "text/html; charset=UTF-8");
 
+        // Gửi mail
         Transport.send(message);
     }
 }
