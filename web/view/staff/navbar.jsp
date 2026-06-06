@@ -21,7 +21,7 @@
     <a href="roomTypeManagement">Quản lý loại phòng</a>
     <a href="roomManagement">Quản lý phòng</a>
     <a href="feedback">Đánh giá</a>
-    <a href="serviceManagement">Quản lý dịch vụ</a>
+    <a href="service-management">Quản lý dịch vụ</a>
     <a href="policyManagement">Quản lý chính sách</a>
     <%}else if("RECEPTIONIST".equals(role)){%>
 
