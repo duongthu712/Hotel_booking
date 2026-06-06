@@ -1,0 +1,38 @@
+/* 
+    Created on : Jun 6, 2026, 2:19:53 PM
+    Author     : LinhLTHE200306
+*/
+:root {
+    --bg-main: #fbf7ee;
+    --text-main: #1b1b1b;
+    --text-muted: #8e8a82;
+    --border-color: rgba(27, 27, 27, 0.15);
+    
+    --font-primary: 'Poppins', sans-serif;
+    --font-logo: 'Cormorant Garamond', serif;
+}
+
+.staff-navbar {
+/*    outline: 5px solid red !important;*/
+    display: flex;
+    gap: 32px;
+    padding: 15px 40px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+}
+
+.staff-navbar a {
+/*    outline: 5px solid red !important;*/
+    text-decoration: none;
+    color: var(--text-muted);
+    font-family: var(--font-primary);
+    font-size: 0.8rem;
+    font-weight: 530;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    transition: color 0.2s;
+}
+
+.staff-navbar a:hover {
+    color: var(--text-main);
+}
