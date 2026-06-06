@@ -2,7 +2,6 @@ package controller;
 
 import dao.HotelServiceDAO;
 import dao.RoomServiceDAO;
-import jakarta.servlet.RequestDispatcher;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -49,20 +48,6 @@ public class ServiceDeleteController extends HttpServlet {
     }
 
     /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
-
-    /**
      * Handles the HTTP <code>POST</code> method.
      *
      * @param request servlet request
@@ -75,8 +60,8 @@ public class ServiceDeleteController extends HttpServlet {
             throws ServletException, IOException {
         //Check authentication, redirect to login page if not logged in
         HttpSession session = request.getSession();
-        StaffAccount account = (StaffAccount) session.getAttribute("account");
-        if (account == null) {
+        StaffAccount  staff = (StaffAccount) session.getAttribute("staff");
+        if ( staff == null) {
             response.sendRedirect("Login");
             return;
         }
@@ -89,14 +74,14 @@ public class ServiceDeleteController extends HttpServlet {
         RoomServiceDAO rDao = new RoomServiceDAO();
 
         //Perform deletion by service type
-        if ("HOTEL".equals(type)) {
+        if (ServiceType.HOTEL.equals(type)) {
             hDao.delete(serviceId);
-        } else if ("ROOM".equals(type)) {
+        } else if (ServiceType.ROOM.equals(type)) {
             rDao.delete(serviceId);
         }
 
         //Redirect to the list view after operation
-        response.sendRedirect("serviceList");
+        response.sendRedirect("ServiceList");
     }
 
     /**
