@@ -18,7 +18,7 @@
             <a href="${pageContext.request.contextPath}/view/public/feedback-list.jsp">ĐÁNH GIÁ</a>
         </li>
         <li>
-            <a href="${pageContext.request.contextPath}/view/public/policy.jsp">CHÍNH SÁCH</a>
+            <a href="${pageContext.request.contextPath}/policies">CHÍNH SÁCH</a>
         </li>
     </ul>
 
