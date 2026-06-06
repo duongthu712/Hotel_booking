@@ -143,7 +143,6 @@ public class RoomType {
         this.imageCaption = imageCaption;
     }
 
-    // 🔄 ĐÃ ĐỔI: Getter & Setter mới cho RoomTypeServices để nhóm dễ quản lý chéo
     public List<RoomTypeService> getRoomTypeServices() {
         return roomTypeServices;
     }
