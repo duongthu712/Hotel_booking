@@ -5,34 +5,65 @@
 <head>
     <meta charset="UTF-8">
     <title>Reset Password</title>
+
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/navbar.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/footer.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/auth.css">
 </head>
 <body>
 
-    <h1>Reset Password</h1>
+    <jsp:include page="/view/common/navbar.jsp" />
 
-    <% if (request.getAttribute("error") != null) { %>
-        <p style="color:red;"><%= request.getAttribute("error") %></p>
-    <% } %>
+    <main class="auth-page">
+        <div class="auth-card">
 
-    <% if (request.getAttribute("message") != null) { %>
-        <p style="color:green;"><%= request.getAttribute("message") %></p>
-    <% } %>
+            <div class="auth-label-top">NEW PASSWORD</div>
 
-    <form action="<%= request.getContextPath() %>/reset-password" method="post">
-        <label>New password:</label><br>
-        <input type="password" name="newPassword" required>
-        <br><br>
+            <h1>Reset password</h1>
 
-        <label>Confirm password:</label><br>
-        <input type="password" name="confirmPassword" required>
-        <br><br>
+            <p class="auth-subtitle">
+                Create a new password for your staff account.
+            </p>
 
-        <button type="submit">Reset Password</button>
-    </form>
+            <% if (request.getAttribute("error") != null) { %>
+                <p class="auth-message-error">
+                    <%= request.getAttribute("error") %>
+                </p>
+            <% } %>
 
-    <br>
+            <% if (request.getAttribute("message") != null) { %>
+                <p class="auth-message-success">
+                    <%= request.getAttribute("message") %>
+                </p>
+            <% } %>
 
-    <a href="<%= request.getContextPath() %>/login?showLogin=true">Back to login</a>
+            <form class="auth-form" action="<%= request.getContextPath() %>/reset-password" method="post">
+
+                <div class="auth-form-group">
+                    <label>New password</label>
+                    <input type="password" name="newPassword" required>
+                </div>
+
+                <div class="auth-form-group">
+                    <label>Confirm password</label>
+                    <input type="password" name="confirmPassword" required>
+                </div>
+
+                <button type="submit" class="auth-btn">Reset password</button>
+            </form>
+
+            <div class="auth-link">
+                <a href="<%= request.getContextPath() %>/login">
+                    Back to sign in
+                </a>
+            </div>
+
+            <div class="auth-line"></div>
+
+        </div>
+    </main>
+
+    <jsp:include page="/view/common/footer.jsp" />
 
 </body>
 </html>
