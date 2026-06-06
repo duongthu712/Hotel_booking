@@ -41,7 +41,7 @@ public class RoomServiceDAO extends DBContext {
                 int serviceId = rs.getInt("service_id");
                 BigDecimal price = rs.getBigDecimal("unit_price");
                 String serviceName = rs.getString("service_name");
-                String description = rs.getString("description");
+                String description = rs.getString("description").trim();
                 boolean active = rs.getBoolean("is_active");
 
                 Service newService = new Service(serviceId, serviceName, 
@@ -74,7 +74,7 @@ public class RoomServiceDAO extends DBContext {
             while (rs.next()) {
                 BigDecimal price = rs.getBigDecimal("unit_price");
                 String serviceName = rs.getString("service_name");
-                String description = rs.getString("description");
+                String description = rs.getString("description").trim();
                 boolean active = rs.getBoolean("is_active");
 
                 roomService = new Service(serviceId, serviceName, description, 

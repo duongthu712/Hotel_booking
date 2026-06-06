@@ -64,15 +64,27 @@ public class ServiceListController extends HttpServlet {
         HttpSession session = request.getSession();
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
         if (staff == null) {
-            response.sendRedirect("Login");
+            response.sendRedirect("/view/auth/login.jsp");
             return;
         }
 
-        //Specify filter type (default is "ALL")
+        //Specify filter type and page (default is "ALL")
         String filterType = request.getParameter("filterType");
         if (filterType == null) {
             filterType = "ALL";
         }
+
+        int page = 1;
+        String pageParam = request.getParameter("page");
+        if (pageParam != null && !pageParam.isEmpty()) {
+            try {
+                page = Integer.parseInt(pageParam);
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
+        int recordsPerPage = 10;
+
         HotelServiceDAO hDao = new HotelServiceDAO();
         RoomServiceDAO rDao = new RoomServiceDAO();
         List<Service> serviceList = new ArrayList<>();
@@ -92,9 +104,28 @@ public class ServiceListController extends HttpServlet {
             serviceList.addAll(rServices);
         }
 
+        //Cut list 10 item in 1 page
+        int totalRecords = serviceList.size();
+        int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+
+        if (page < 1) {
+            page = 1;
+        }
+        if (page > totalPages && totalPages > 0) {
+            page = totalPages;
+        }
+
+        int start = (page - 1) * recordsPerPage;
+        int end = Math.min(start + recordsPerPage, totalRecords);
+
+        // Danh sách đã cắt để hiển thị
+        List<Service> pagedList = serviceList.subList(start, end);
+
         //Send data to jsp page
-        request.setAttribute("serviceList", serviceList);
+        request.setAttribute("serviceList", pagedList);
         request.setAttribute("filterType", filterType);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
         RequestDispatcher rd = request.getRequestDispatcher("/view/manager/service-management.jsp");
         rd.forward(request, response);
 

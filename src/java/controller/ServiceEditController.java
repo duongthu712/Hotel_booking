@@ -65,7 +65,7 @@ public class ServiceEditController extends HttpServlet {
         HttpSession session = request.getSession();
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
         if (staff == null) {
-            response.sendRedirect("Login");
+            response.sendRedirect("/view/auth/login.jsp");
             return;
         }
 
