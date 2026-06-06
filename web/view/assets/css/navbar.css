@@ -23,11 +23,12 @@
 
 /* 2. CHỮ LOGO HOTEL (BÊN TRÁI VÀ ĐỨNG ĐỘC LẬP) */
 .navbar-logo {
-    font-family: 'Playfair Display'; /* Đồng bộ font luxury hệ thống */
-    font-size: 32px; 
-    font-weight: 500;
+    /* Đã sửa: Chuyển sang phông chữ Garamond cổ điển hoài cổ */
+    font-family: 'Cormorant Garamond', 'Playfair Display', serif !important; 
+    font-size: 34px; /* Tăng nhẹ kích thước cho phông chữ có chân mảnh */
+    font-weight: 600;
     color: white;
-    letter-spacing: 2px;
+    letter-spacing: 3px; /* Tăng khoảng cách chữ để tạo cảm giác thoáng đãng, luxury */
     text-transform: uppercase; 
     text-decoration: none;
     flex: 1; /* Cấp không gian vừa đủ cho cánh trái */
@@ -41,7 +42,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 30px; /* Điều chỉnh nhẹ từ 40px xuống 30px để các mục chữ đứng gọn gàng, nhường chỗ cho cánh phải */
+    gap: 35px; /* Tăng nhẹ lên 35px để phông chữ mới có không gian hiển thị */
     list-style: none;
     margin: 0;
     padding: 0;
@@ -53,7 +54,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 25px; /* Giảm nhẹ từ 35px xuống 25px để text đăng nhập và nút đặt phòng không bị đẩy ra ngoài */
+    gap: 30px; 
     flex: 1.2; /* Tăng nhẹ tỷ trọng từ 1 lên 1.2 để vùng chứa bên phải rộng rãi hơn */
 }
 
@@ -61,14 +62,16 @@
 .navbar-menu a, 
 .staff-login {
     text-decoration: none;
-    color: rgba(255, 255, 255, 0.75); /* Mặc định hơi mờ nhẹ để tạo chiều sâu */
-    font-family: 'Montserrat', sans-serif !important; 
-    font-size: 13.5px; /* Hạ nhẹ 0.5px để chữ thanh thoát và vừa vặn hơn */
-    font-weight: 500;
-    letter-spacing: 1px; /* Điều chỉnh khoảng cách chữ vừa phải */
-    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.8); /* Tăng nhẹ độ sáng chữ */
+    
+    /* 🔥 ĐÃ SỬA: Thay Montserrat bằng Garamond in nghiêng nghệ thuật và mềm mại */
+    font-family: 'Cormorant Garamond', 'Lora', serif !important; 
+    font-size: 16px; /* Phông chữ có chân thường nhỏ hơn phông không chân nên nâng lên 16px là vừa vặn */
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: none; /* Bỏ in hoa toàn bộ để giữ nét tinh tế, uyển chuyển của chữ nghiêng */
     padding: 10px 0;
-    transition: color 0.2s ease-in-out;
+    transition: all 0.25s ease-in-out;
     
     /* QUAN TRỌNG: Ép chuỗi text luôn nằm trên một đường thẳng, chống rớt dòng */
     white-space: nowrap; 
@@ -78,6 +81,7 @@
 .navbar-menu a:hover,
 .staff-login:hover {
     color: #ffffff;
+    text-shadow: 0 0 1px rgba(255,255,255,0.3); /* Tạo hiệu ứng hào quang nhẹ khi di chuột */
 }
 
 /* 6. NÚT ĐẶT PHÒNG NHANH CÓ VIỀN VÀNG PREMIUM */
@@ -86,20 +90,23 @@
     text-decoration: none;
     color: white;
     border: 1px solid #C8A96B; /* Viền vàng cát sang trọng */
-    padding: 12px 22px; /* Chỉnh nhẹ padding trái/phải để nút gọn gàng tinh tế */
+    padding: 10px 24px; 
     border-radius: 2px;
-    font-family: 'Montserrat', sans-serif !important;
-    font-size: 13px; 
-    font-weight: 500;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+    
+    /* 🔥 ĐÃ SỬA: Đồng bộ phông chữ đứng thanh lịch, giữ nguyên nét sang trọng phương Tây */
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 14px; 
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    font-style: normal; /* Nút bấm giữ chữ đứng vững chãi */
+    
     transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
     white-space: nowrap; /* Giữ nút luôn cố định phom dòng */
 }
 
 .booking-btn:hover {
     background: #C8A96B; /* Hover nền hóa vàng cát */
-    color: white;
+    color: #2c3e46 !important; /* Đổi chữ sang màu xanh rêu đậm khi hover để nổi bật trên nền vàng */
     box-shadow: 0 4px 15px rgba(200, 169, 107, 0.25);
     transform: translateY(-1px);
 }
