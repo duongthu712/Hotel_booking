@@ -15,7 +15,6 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Quản lý dịch vụ</title>
-        <link rel="stylesheet" href="css/service-managerment.css">
     </head>
     <body data-edit-mode="${not empty serviceToEdit}">
         <%@ include file="/view/staff/header.jsp" %>
@@ -113,6 +112,5 @@
                 </div>
             </form>
         </div>
-        <script src="javascript/service-managerment.js"></script>
-    </body>
+        <script src="<%=request.getContextPath()%>/view/assets/javascript/service-management.js"></script></body>
 </html>

@@ -63,7 +63,7 @@ public class ServiceCreateController extends HttpServlet {
             throws ServletException, IOException {
         //Check authentication, redirect to login page if not logged in
         HttpSession session = request.getSession();
-        StaffAccount  staff = (StaffAccount) session.getAttribute(" staff");
+        StaffAccount  staff = (StaffAccount) session.getAttribute("staff");
         if ( staff == null) {
             response.sendRedirect("Login");
             return;
