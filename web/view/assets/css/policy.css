@@ -9,87 +9,57 @@
 
 /* Dòng giới thiệu phụ nằm dưới tiêu đề h2 */
 .policy-section .section-intro {
-    font-size: 14.5px;
+    font-size: 16px;
+    font-family: 'Cormorant Garamond', 'Lora', serif !important;
     color: #7f786d;
     text-align: center;
-    max-width: 650px;
+    max-width: 670px;
     margin: 20px auto 60px auto;
     line-height: 1.6;
     font-weight: 300;
 }
 
-/* 2. LƯỚI HIỂN THỊ CHÍNH SÁCH (CỐ ĐỊNH BAN ĐẦU 2 CỘT RỘNG RÃI) */
-.policy-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 45px 50px; /* Khoảng cách hàng cách nhau 45px, hai cột dọc cách nhau 50px */
+.policy-groups{
+    max-width:900px;
+    margin:0 auto;
 }
 
-/* 3. THẺ CẤU TRÚC CHÍNH SÁCH HÀNG NGANG (NỀN TRONG SUỐT TIỆP MÀU PAGE) */
-.policy-card-item {
-    background: transparent !important; /* Triệt tiêu hoàn toàn nền trắng của khối card cũ */
-    padding: 0 0 22px 0 !important;   /* Chỉ chừa khoảng trống đệm mượt mà bên dưới */
-    border: none !important;          /* Xóa bỏ viền khung vuông thô cứng */
-    border-radius: 0 !important;      
-    box-shadow: none !important;      /* Loại bỏ đổ bóng */
+.policy-group{
+    margin-bottom:60px;
+}
+
+.policy-group-title{
+    font-size:18px;
+    font-family: 'Cormorant Garamond', 'Lora', serif !important;
+     color: #bfa15f;
+    font-weight:600;
+    margin-bottom:25px;
+    padding-bottom:10px;
+    border-bottom:1px solid rgba(200,169,107,.3);
+}
+
+.policy-item{
+    padding:18px 0;
+    border-bottom:1px dashed rgba(44,62,70,.12);
+}
+
+.policy-item:last-child{
+    border-bottom:none;
+}
+
+.policy-item h4{
+     color: #bfa15f;
+    font-size:18px;
+    font-weight:500;
     
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    
-    /* Đường gạch ngang nét đứt trang trí mờ tinh tế dưới mỗi ô chính sách */
-    border-bottom: 1px dashed rgba(44, 62, 70, 0.15) !important;
-    position: relative;
-    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    margin-bottom:8px;
+    font-family: 'Cormorant Garamond', 'Lora', serif ;
 }
 
-/* Hiệu ứng tương tác sinh động khi lướt chuột qua cụm chính sách */
-.policy-card-item:hover {
-    transform: translateY(-2px); /* Nhấc nhẹ ô lên tạo độ thanh thoát */
-    border-bottom-color: #C8A96B !important; /* Đường gạch nét đứt hóa vàng đồng đậm */
-}
-
-.policy-info-content {
-    width: 100%;
-}
-
-/* 4. DÒNG ĐẦU CHỨA TIÊU ĐỀ VÀ PHÂN LOẠI CHÍNH SÁCH */
-.policy-header-row {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between; /* Đẩy tên chính sách dạt sang trái, loại chính sách sang phải */
-    gap: 15px;
-    margin-bottom: 10px;
-}
-
-/* Tên chính sách từ DB - Ép font Montserrat sạch sẽ, không chân */
-.policy-title {
-    font-family: 'Montserrat', sans-serif !important;
-    font-size: 17px;
-    font-weight: 600;
-    color: #2c3e46; /* Màu xanh rêu sâu thẳm đồng bộ thương hiệu */
-    margin: 0;
-    letter-spacing: 0.3px;
-    display: inline-block;
-}
-
-/* Nhãn chữ hiển thị Loại chính sách (policy_type) ở góc phải */
-.policy-badge {
-    font-family: 'Montserrat', sans-serif !important;
-    font-size: 12px;
-    font-weight: 600;
-    color: #c59d5f; /* Tone màu vàng đồng hoàng gia đặc trưng */
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    white-space: nowrap; /* Giữ nhãn phân loại luôn nằm trên 1 dòng */
-}
-
-/* 5. ĐOẠN CHỮ MÔ TẢ CHI TIẾT CHÍNH SÁCH (description) */
-.policy-desc {
-    font-family: 'Montserrat', sans-serif !important;
-    font-size: 13.5px;
-    color: #666666;
-    line-height: 1.7; /* Khoảng cách dòng thoáng đãng, dễ đọc */
-    margin: 0;
-    text-align: justify; /* Căn đều hai bên thẳng thớm, cao cấp */
+.policy-item p{
+    color:#666;
+    font-size:15px;
+    line-height:1.8;
+    margin:0;
+     font-family: 'Cormorant Garamond', 'Lora', serif ;
 }

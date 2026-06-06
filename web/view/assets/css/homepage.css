@@ -7,7 +7,7 @@
     box-sizing: border-box;
     /* Ép đồng bộ toàn bộ website về phông chữ chân mảnh đứng thẳng hoài cổ */
     font-family: 'Cormorant Garamond', 'Lora', serif !important;
-    font-style: normal !important; /* Ép toàn bộ chữ đứng thẳng, không in nghiêng */
+    font-style: normal ; /* Ép toàn bộ chữ đứng thẳng, không in nghiêng */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
