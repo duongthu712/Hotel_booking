@@ -8,62 +8,97 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Chính sách khách sạn - La Mer</title>
-
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/navbar.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/homepage.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/footer.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/policy.css?v=<%= System.currentTimeMillis() %>">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/navbar.css?v=<%= System.currentTimeMillis() %>">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/homepage.css?v=<%= System.currentTimeMillis() %>">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/footer.css?v=<%= System.currentTimeMillis() %>">
+        
     </head>
 
     <body>
 
-        <header class="policy-hero" style="background: #2c3e46; padding-bottom: 20px;">
             <jsp:include page="/view/common/navbar.jsp" />
-        </header>
 
         <main class="container">
             <section class="section policy-section">
                 <h2>Chính sách & Quy định</h2>
                 <p class="section-intro">Để đảm bảo trải nghiệm nghỉ dưỡng tuyệt vời và an toàn nhất, xin vui lòng lưu ý các quy định chung tại La Mer.</p>
 
-                <div class="policy-grid">
-                    <c:choose>
-                        <c:when test="${not empty activePoliciesList}">
-                            <c:forEach var="policy" items="${activePoliciesList}">
-                                <div class="policy-card-item">
-                                    <div class="policy-info-content">
-                                        <div class="policy-header-row">
-                                            <h3 class="policy-title">${policy.policyName}</h3>
-                                            <span class="policy-badge">${policy.policyType}</span>
-                                        </div>
-                                        <p class="policy-desc">${policy.description}</p>
-                                    </div>
-                                </div>
-                            </c:forEach>
-                        </c:when>
 
-                        <c:otherwise>
-                            <div class="policy-card-item">
-                                <div class="policy-info-content">
-                                    <div class="policy-header-row">
-                                        <h3 class="policy-title">Chính sách Nhận & Trả phòng</h3>
-                                        <span class="policy-badge">Giờ giấc</span>
-                                    </div>
-                                    <p class="policy-desc">Thời gian nhận phòng từ 14:00 và trả phòng trước 12:00 trưa ngày hôm sau. Yêu cầu nhận phòng sớm hoặc trả phòng muộn tùy thuộc vào tình trạng phòng trống và có thể tính thêm phí phụ thu.</p>
-                                </div>
-                            </div>
+                <div class="policy-groups">
 
-                            <div class="policy-card-item">
-                                <div class="policy-info-content">
-                                    <div class="policy-header-row">
-                                        <h3 class="policy-title">Quy định về Thú nuôi</h3>
-                                        <span class="policy-badge">Chung</span>
-                                    </div>
-                                    <p class="policy-desc">Để bảo vệ không gian yên tĩnh và vệ sinh chung cho tất cả các khách lưu trú, khách sạn hiện tại rất tiếc chưa thể tiếp nhận vật nuôi/thú cưng vào khu vực phòng nghỉ và khuôn viên chung.</p>
+                    <!-- NHẬN / TRẢ PHÒNG -->
+                    <div class="policy-group">
+                        <h3 class="policy-group-title">Nhận / Trả phòng</h3>
+
+                        <c:forEach var="policy" items="${fullPoliciesList}">
+                            <c:if test="${policy.policyType eq 'Nhận/Trả phòng'}">
+                                <div class="policy-item">
+                                    <h4>${policy.policyName}</h4>
+                                    <p>${policy.description}</p>
                                 </div>
-                            </div>
-                        </c:otherwise>
-                    </c:choose>
+                            </c:if>
+                        </c:forEach>
+                    </div>
+
+                    <!-- THANH TOÁN -->
+                    <div class="policy-group">
+                        <h3 class="policy-group-title">Thanh toán</h3>
+
+                        <c:forEach var="policy" items="${fullPoliciesList}">
+                            <c:if test="${policy.policyType eq 'Thanh toán'}">
+                                <div class="policy-item">
+                                    <h4>${policy.policyName}</h4>
+                                    <p>${policy.description}</p>
+                                </div>
+                            </c:if>
+                        </c:forEach>
+                    </div>
+
+                    <!-- HỦY ĐẶT PHÒNG -->
+                    <div class="policy-group">
+                        <h3 class="policy-group-title">Hủy đặt phòng</h3>
+
+                        <c:forEach var="policy" items="${fullPoliciesList}">
+                            <c:if test="${policy.policyType eq 'Hủy đặt phòng'}">
+                                <div class="policy-item">
+                                    <h4>${policy.policyName}</h4>
+                                    <p>${policy.description}</p>
+                                </div>
+                            </c:if>
+                        </c:forEach>
+                    </div>
+
+                    <!-- VẬT NUÔI & HÚT THUỐC -->
+                    <div class="policy-group">
+                        <h3 class="policy-group-title">Vật nuôi & Hút thuốc</h3>
+
+                        <c:forEach var="policy" items="${fullPoliciesList}">
+                            <c:if test="${policy.policyType eq 'Vật nuôi' || policy.policyType eq 'Hút thuốc'}">
+                                <div class="policy-item">
+                                    <h4>${policy.policyName}</h4>
+                                    <p>${policy.description}</p>
+                                </div>
+                            </c:if>
+                        </c:forEach>
+                    </div>
+
+                    <!-- QUY ĐỊNH CHUNG -->
+                    <div class="policy-group">
+                        <h3 class="policy-group-title">Quy định chung</h3>
+
+                        <c:forEach var="policy" items="${fullPoliciesList}">
+                            <c:if test="${policy.policyType eq 'Khác'}">
+                                <div class="policy-item">
+                                    <h4>${policy.policyName}</h4>
+                                    <p>${policy.description}</p>
+                                </div>
+                            </c:if>
+                        </c:forEach>
+                    </div>
+
                 </div>
+
             </section>
         </main>
 

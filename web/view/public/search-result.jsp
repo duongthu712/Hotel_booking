@@ -8,10 +8,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Kết Quả Tìm Kiếm Phòng - La Mer Hotel</title>
 
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/navbar.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/homepage.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/search-result.css"> 
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/footer.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/search-result.css?v=<%= System.currentTimeMillis() %>"> 
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/navbar.css?v=<%= System.currentTimeMillis() %>">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/homepage.css?v=<%= System.currentTimeMillis() %>">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/footer.css?v=<%= System.currentTimeMillis() %>">
     </head>
     <body>
         <jsp:include page="/view/common/navbar.jsp" />
