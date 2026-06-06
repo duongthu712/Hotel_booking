@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
     <servlet>
+        <servlet-name>HomeServlet</servlet-name>
+        <servlet-class>controller.HomeServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>LoginController</servlet-name>
         <servlet-class>controller.LoginController</servlet-class>
     </servlet>
@@ -66,18 +70,18 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ServiceListController</servlet-name>
-        <url-pattern>/ServiceListController</url-pattern>
+        <url-pattern>/ServiceList</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ServiceEditController</servlet-name>
-        <url-pattern>/ServiceEditController</url-pattern>
+        <url-pattern>/ServiceEdit</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ServiceDeleteController</servlet-name>
-        <url-pattern>/ServiceDeleteController</url-pattern>
+        <url-pattern>/ServiceDelete</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ServiceCreateController</servlet-name>
-        <url-pattern>/ServiceCreateController</url-pattern>
+        <url-pattern>/ServiceCreate</url-pattern>
     </servlet-mapping>
 </web-app>
