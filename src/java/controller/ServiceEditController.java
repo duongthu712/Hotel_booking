@@ -2,6 +2,7 @@ package controller;
 
 import dao.HotelServiceDAO;
 import dao.RoomServiceDAO;
+import jakarta.servlet.RequestDispatcher;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -60,7 +61,34 @@ public class ServiceEditController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        //Check authentication, redirect to login page if not logged in
+        HttpSession session = request.getSession();
+        StaffAccount staff = (StaffAccount) session.getAttribute("staff");
+        if (staff == null) {
+            response.sendRedirect("Login");
+            return;
+        }
+
+        //Parse input
+        int serviceId = Integer.parseInt(request.getParameter("serviceId").trim());
+        ServiceType type = ServiceType.valueOf(request.getParameter("type"));
+        
+        //Update service in database by its type
+        HotelServiceDAO hDao = new HotelServiceDAO();
+        RoomServiceDAO rDao = new RoomServiceDAO();
+        Service serviceToEdit = null;
+        
+        if (ServiceType.HOTEL.equals(type)) {
+            serviceToEdit = hDao.getHotelServicesById(serviceId);
+        } else if (ServiceType.ROOM.equals(type)) {
+            serviceToEdit = rDao.getRoomServicesById(serviceId);
+        }
+
+        request.setAttribute("serviceToEdit", serviceToEdit);
+        request.setAttribute("isEditMode", true);
+        RequestDispatcher rd = request.getRequestDispatcher("/ServiceList");
+        rd.forward(request, response);
+
     }
 
     /**
@@ -76,18 +104,18 @@ public class ServiceEditController extends HttpServlet {
             throws ServletException, IOException {
         //Check authentication, redirect to login page if not logged in
         HttpSession session = request.getSession();
-        StaffAccount account = (StaffAccount) session.getAttribute("account");
-        if (account == null) {
+        StaffAccount staff = (StaffAccount) session.getAttribute("staff");
+        if (staff == null) {
             response.sendRedirect("Login");
             return;
         }
-        
+
         //Parse input
         int serviceId = Integer.parseInt(request.getParameter("serviceId"));
         String serviceName = request.getParameter("serviceName");
         String description = request.getParameter("description");
         BigDecimal unitPrice = new BigDecimal(request.getParameter("unitPrice"));
-        boolean active = Boolean.parseBoolean(request.getParameter("active"));
+        boolean active = "true".equals(request.getParameter("active"));
         ServiceType type = ServiceType.valueOf(request.getParameter("type"));
 
         //Create new Service object with updated details
@@ -102,9 +130,9 @@ public class ServiceEditController extends HttpServlet {
         } else if (ServiceType.ROOM.equals(type)) {
             rDao.updateRoomService(service);
         }
-        
+
         //Redirect back to the service list page
-        response.sendRedirect("serviceList");
+        response.sendRedirect("ServiceList");
     }
 
     /**
