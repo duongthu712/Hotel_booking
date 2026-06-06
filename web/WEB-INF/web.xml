@@ -17,6 +17,7 @@
         <servlet-class>controller.ChangePasswordController</servlet-class>
     </servlet>
     <servlet>
+ 
         <servlet-name>ServiceListController</servlet-name>
         <servlet-class>controller.ServiceListController</servlet-class>
     </servlet>
@@ -31,6 +32,10 @@
     <servlet>
         <servlet-name>ServiceCreateController</servlet-name>
         <servlet-class>controller.ServiceCreateController</servlet-class>
+ 
+        <servlet-name>HotelPolicyServlet</servlet-name>
+        <servlet-class>controller.HotelPolicyServlet</servlet-class>
+ 
     </servlet>
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>
@@ -69,6 +74,7 @@
         <url-pattern>/reset-password</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+ 
         <servlet-name>ServiceListController</servlet-name>
         <url-pattern>/ServiceList</url-pattern>
     </servlet-mapping>
@@ -83,5 +89,9 @@
     <servlet-mapping>
         <servlet-name>ServiceCreateController</servlet-name>
         <url-pattern>/ServiceCreate</url-pattern>
+ 
+        <servlet-name>HotelPolicyServlet</servlet-name>
+        <url-pattern>/policies</url-pattern>
+ 
     </servlet-mapping>
 </web-app>

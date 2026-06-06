@@ -1,9 +1,3 @@
-<%-- 
-    Document   : search-result
-    Created on : May 27, 2026, 10:41:35 PM
-    Author     : Minh Thu
---%>
-
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -32,7 +26,6 @@
 
                     <input type="number" name="roomQuantity" value="${not empty param.roomQuantity ? param.roomQuantity : 1}" min="1" required placeholder="Số lượng phòng">
                     <select name="roomTypeId">
-
                         <option value="all"
                                 <c:if test="${empty param.roomTypeId || param.roomTypeId eq 'all'}">
                                     selected
@@ -48,7 +41,6 @@
                                 ${item.typeName}
                             </option>
                         </c:forEach>
-
                     </select>
                     <button type="submit">CẬP NHẬT TÌM KIẾM</button>
                 </form>
@@ -57,7 +49,6 @@
             <div class="search-summary-text">
                 <c:choose>
                     <c:when test="${not empty param.checkIn}">
-                        <%-- Parse ngày thô từ URL (yyyy-MM-dd) thành Date Object để format --%>
                         <fmt:parseDate value="${param.checkIn}" pattern="yyyy-MM-dd" var="parsedCheckIn" />
                         <fmt:parseDate value="${param.checkOut}" pattern="yyyy-MM-dd" var="parsedCheckOut" />
 
@@ -78,8 +69,7 @@
                             <div class="room-card-horizontal">
 
                                 <div class="room-card-img-box">
-
-                                    <img src="${room.imageUrl}" alt="${room.typeName}">
+                                    <img src="${not empty room.imageUrl ? room.imageUrl[0] : 'https://placehold.co/600x400?text=La+Mer+Room'}" alt="${room.typeName}">
                                 </div>
 
                                 <div class="room-card-details">
@@ -95,14 +85,34 @@
                                         ${room.description}
                                     </div>
 
-                                    <div class="room-amenities-group">
-                                        <c:forEach var="svc" items="${room.roomServices}">
-                                            <span class="amenity-badge">
-                                                ${svc.serviceName} (x${svc.quantity})
+                                    <div class="room-amenities-container">
+                                        <%-- Dòng 1: Chứa các thông số cốt lõi của phòng --%>
+                                        <div class="room-core-specs">
+                                            <span class="badge-core-capacity">
+                                                Sức chứa: ${room.capacity} khách
                                             </span>
-                                        </c:forEach>
-                                    </div>
+                                            <span class="badge-core-info">
+                                                Giường: ${room.bedCount} x ${room.bedType}
+                                            </span>
+                                            <span class="badge-core-info">
+                                                Diện tích: ${room.areaSqm} m²
+                                            </span>
+                                        </div>
 
+                                        <%-- Dòng 2: Duyệt danh sách dịch vụ Free đồng bộ chằn chặn --%>
+                                        <div class="room-extra-services">
+                                            <c:forEach var="rts" items="${room.roomTypeServices}">
+                                                <span class="badge-service-large">
+                                                    <c:out value="${rts.service.serviceName}" />
+                                                    <c:if test="${rts.quantity > 1}">
+                                                        (x<c:out value="${rts.quantity}" />)
+                                                    </c:if>
+                                                    <strong style="color: #2e7d32; font-size: 13px; margin-left: 6px;">[Free]</strong>
+                                                </span>
+                                            </c:forEach>
+                                        </div>
+                                    </div>
+                                    
                                     <div class="room-card-footer-bar">
                                         <div class="room-actions-group">
                                             <a href="${pageContext.request.contextPath}/room-detail?id=${room.roomTypeId}" class="btn-action-view">
@@ -129,7 +139,6 @@
         </div>
 
         <jsp:include page="/view/common/footer.jsp" />
-
         <script src="${pageContext.request.contextPath}/view/assets/javascript/booking-calendar.js"></script>
     </body>
 </html>

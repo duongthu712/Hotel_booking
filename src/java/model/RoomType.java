@@ -17,8 +17,9 @@ public class RoomType {
     private boolean active;
     private List<String> imageUrl;
     private List<String> imageCaption;
+    
+    private List<RoomTypeService> roomTypeServices; 
 
-    //Method addImage into room type image list
     public void addImage(String url, String caption) {
         if (imageUrl == null) {
             imageUrl = new ArrayList<>();
@@ -28,7 +29,6 @@ public class RoomType {
         imageCaption.add(caption);
     }
 
-    //Method clearImages clears all image urls and captions in the list
     public void clearImages() {
         if (imageUrl != null) {
             imageUrl.clear();
@@ -38,7 +38,6 @@ public class RoomType {
         }
     }
 
-    //Constructor
     public RoomType() {
     }
 
@@ -56,7 +55,6 @@ public class RoomType {
         this.active = active;
     }
 
-    //Getter & Setter
     public int getRoomTypeId() {
         return roomTypeId;
     }
@@ -143,5 +141,14 @@ public class RoomType {
 
     public void setImageCaption(List<String> imageCaption) {
         this.imageCaption = imageCaption;
+    }
+
+    // 🔄 ĐÃ ĐỔI: Getter & Setter mới cho RoomTypeServices để nhóm dễ quản lý chéo
+    public List<RoomTypeService> getRoomTypeServices() {
+        return roomTypeServices;
+    }
+
+    public void setRoomTypeServices(List<RoomTypeService> roomTypeServices) {
+        this.roomTypeServices = roomTypeServices;
     }
 }

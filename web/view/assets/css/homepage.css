@@ -1,19 +1,13 @@
-/*
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
-*/
-/* Created on : May 30, 2026, 5:08:51 PM
-    Author     : Minh Thu
-*/
-
 /* ==========================================================================
-   GLOBAL RESET FONTS SYSTEM (ÉP ĐỒNG BỘ 100% CẢ TRANG)
+   GLOBAL RESET FONTS SYSTEM (HỢP NHẤT TOÀN BỘ PHÔNG CHỮ CỔ ĐIỂN MỀM MẠI)
    ========================================================================== */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Montserrat', sans-serif;
+    /* Ép đồng bộ toàn bộ website về phông chữ chân mảnh đứng thẳng hoài cổ */
+    font-family: 'Cormorant Garamond', 'Lora', serif !important;
+    font-style: normal !important; /* Ép toàn bộ chữ đứng thẳng, không in nghiêng */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -23,8 +17,11 @@ body {
     color: #333;
 }
 
+/* Các thẻ tiêu đề lớn giữ phông đứng thanh lịch tự nhiên */
 h1, h2, h3, h4, .navbar-logo {
-    font-family: 'Playfair Display', serif !important;
+    font-family: 'Cormorant Garamond', serif !important;
+    font-weight: 600;
+    font-style: normal !important;
 }
 
 /* Khung chứa layout chính */
@@ -58,23 +55,24 @@ h1, h2, h3, h4, .navbar-logo {
 }
 
 .hero h1 {
-    font-size: 64px;
-    font-weight: 400;
+    font-size: 68px;
+    font-weight: 500;
     line-height: 1.2;
     margin: 0 0 20px 0;
     letter-spacing: 1px;
 }
 
 .hero-content p {
-    font-size: 18px;          
-    line-height: 1.8;          
-    color: rgba(255, 255, 255, 0.85);
+    font-size: 20px;
+    font-style: normal !important;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.9);
     margin-bottom: 35px;
     text-align: justify;
 }
 
 /* ==========================================================================
-   CẤU HÌNH HAI NÚT BẤM TRONG SUỐT HOÀN TOÀN - HOVER/CLICK ĐỔI MÀU TRẮNG
+   CẤU HÌNH HAI NÚT BẤM TRONG SUỐT HOÀN TOÀN - KHÔNG IN HOA, CHỮ ĐỨNG THẲNG
    ========================================================================== */
 .hero-actions {
     display: flex;
@@ -84,24 +82,24 @@ h1, h2, h3, h4, .navbar-logo {
 }
 
 .hero-actions .btn {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 2px;
-    padding: 15px 30px;
-    text-transform: uppercase;
+    font-family: 'Cormorant Garamond', 'Lora', serif !important;
+    font-size: 15px;
+    font-weight: 600;
+    font-style: normal !important;
+    text-transform: none !important;
+    letter-spacing: 1px;
+    padding: 12px 32px;
     border-radius: 2px;
     display: inline-block;
     text-decoration: none;
     white-space: nowrap;
-    
-    /* Mặc định trong suốt 100%, viền trắng mỏng mảnh */
+
     background: transparent !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     color: #ffffff !important;
     border: 1px solid rgba(255, 255, 255, 0.4) !important;
-    
+
     transition: all 0.3s ease;
     cursor: pointer;
 }
@@ -109,27 +107,27 @@ h1, h2, h3, h4, .navbar-logo {
 /* Hiệu ứng tương tác: Hover hoặc bấm giữ chuột hóa trắng tinh khôi */
 .hero-actions .btn:hover,
 .hero-actions .btn:active {
-    background: #ffffff !important;         
-    border-color: #ffffff !important;       
-    color: #2c3e46 !important;             
+    background: #ffffff !important;
+    border-color: #ffffff !important;
+    color: #2c3e46 !important;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);           
+    transform: translateY(-2px);
 }
 
 /* ==========================================================================
    THANH TÌM KIẾM ĐẶT PHÒNG NHANH (MÀU XANH RÊU ĐỒNG BỘ)
    ========================================================================== */
 .search-bar {
-    background: #2c3e46; 
+    background: #2c3e46;
     width: calc(100% - 100px);
     max-width: 1200px;
-    margin: 0 auto -45px auto; 
+    margin: 0 auto -45px auto;
     padding: 25px 35px;
     border-radius: 2px;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
     position: relative;
     z-index: 10;
-    
+
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -142,16 +140,11 @@ h1, h2, h3, h4, .navbar-logo {
     border: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.25);
     color: white;
-    font-size: 14px;
+    font-size: 15px;
     padding: 8px 0;
     outline: none;
     flex: 1;
     transition: 0.3s ease;
-}
-
-.search-bar input:focus,
-.search-bar select:focus {
-    border-bottom-color: #C8A96B;
 }
 
 .search-bar input[type="date"]::-webkit-calendar-picker-indicator {
@@ -169,13 +162,14 @@ h1, h2, h3, h4, .navbar-logo {
     background: #C8A96B;
     color: white;
     border: none;
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 1.5px;
+    font-size: 14px;
+    font-weight: 600;
+    font-style: normal !important;
+    text-transform: none !important;
+    letter-spacing: 0.5px;
     padding: 12px 28px;
-    height: 40px;
+    height: 42px;
     cursor: pointer;
-    text-transform: uppercase;
     transition: 0.3s ease;
     border-radius: 2px;
     white-space: nowrap;
@@ -194,15 +188,15 @@ h1, h2, h3, h4, .navbar-logo {
 
 /* Căn lề khoảng cách các phân đoạn */
 main.container .section:first-of-type {
-    padding-top: 140px; /* Bù khoảng trống cho thanh kiếm phòng đè lên */
+    padding-top: 140px;
 }
 
 .section h2 {
-    font-size: 36px;
+    font-size: 42px;
     color: #2c3e46;
     text-align: center;
     margin-bottom: 45px;
-    font-weight: 400;
+    font-weight: 500;
     letter-spacing: 1px;
     position: relative;
 }
@@ -217,121 +211,272 @@ main.container .section:first-of-type {
     margin: 15px auto 0 auto;
 }
 
-/* Hệ thống lưới Grid dùng chung cho cả Services và Policy */
+/* ==========================================================================
+   LƯỚI DỊCH VỤ - 3 CỘT 1 HÀNG CÓ HIỆU ỨNG ĐỘNG (HOVER EFFECT) SANG TRỌNG
+   ========================================================================== */
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 45px 40px;
+    margin-top: 30px;
 }
 
-/* Nâng cấp giao diện thẻ Card (Dùng cho cả Dịch vụ và Quy định) */
 .card {
-    background: #ffffff;
-    padding: 35px;
-    border: 1px solid #f0f0f0;
-    border-radius: 4px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+    background: transparent !important;
+    padding: 15px 15px 25px 15px !important;
+    border: none !important;
+    border-bottom: 1px dashed #ebd9b4 !important;
+    box-shadow: none !important;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    justify-content: flex-start;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
+    border-radius: 4px;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* Hiệu ứng vệt màu vàng rêu mỏng ở đầu card khi di chuột vào */
 .card::before {
     content: '';
     position: absolute;
     top: 0;
-    left: 0;
-    width: 100%;
-    height: 3px;
+    left: 15px;
+    width: calc(100% - 30px);
+    height: 2px;
     background: #C8A96B;
     transform: scaleX(0);
-    transition: transform 0.3s ease;
+    transition: transform 0.35s ease;
 }
 
 .card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(44, 62, 70, 0.08);
-    border-color: #e2e8ea;
+    transform: translateY(-6px) !important;
+    border-color: transparent !important;
+    background: #fbf9f3 !important;
+    box-shadow: 0 12px 30px rgba(44, 62, 70, 0.05) !important;
 }
 
 .card:hover::before {
-    transform: scaleX(1);
+    transform: scaleX(1) !important;
 }
 
 .card h3 {
-    font-size: 22px;
+    font-family: 'Cormorant Garamond', 'Lora', serif !important;
+    font-size: 21px;
+    font-style: normal !important;
     color: #2c3e46;
-    margin: 0 0 15px 0;
+    margin: 10px 0 12px 0;
     font-weight: 500;
+    letter-spacing: 0.5px;
 }
 
 .card p {
-    font-size: 14px;
+    font-size: 14.5px;
     color: #666;
-    line-height: 1.7;
-    margin-bottom: 20px;
+    line-height: 1.65;
+    margin-bottom: 18px;
     text-align: justify;
 }
 
-/* Kiểu chữ hiển thị giá tiền hoặc chữ Miễn phí */
 .card .price {
-    font-size: 14px;
+    display: inline-block;
+    align-self: flex-start;
+    font-size: 12px;
     color: #C8A96B;
     font-weight: 600;
+    font-style: normal !important;
+    text-transform: none !important;
     letter-spacing: 0.5px;
-    text-transform: uppercase;
-    border-top: 1px dashed #eee;
-    padding-top: 15px;
+    border-top: none !important;
+    padding-top: 0 !important;
     margin-top: auto;
+    background-color: #fbf6eb;
+    padding: 4px 12px !important;
+    border-radius: 2px;
 }
 
 /* ==========================================================================
-   BỘ SƯU TẬP ẢNH MESH (GALLERY GRID)
+   BỐ CỤC SO LE CHIA ĐÔI - KHUNG VÀNG LUXURY ĐỔ BÓNG (GOLD SHADOW FRAME)
    ========================================================================== */
-.gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 24px;
-}
-
-.gallery img {
+.gallery-split-container {
+    display: flex;
+    flex-direction: column;
+    gap: 100px;
+    margin-top: 60px;
     width: 100%;
-    height: 350px;
+}
+
+.split-row {
+    display: flex;
+    align-items: center; /* Ép khối chữ và ảnh luôn cân tâm dọc tuyệt đối */
+    justify-content: space-between;
+    gap: 90px;
+    width: 100%;
+}
+
+.split-row.reverse {
+    flex-direction: row-reverse;
+}
+
+.split-image {
+    flex: 1;
+    height: 440px;
+    position: relative;
+    overflow: visible;
+}
+
+/* Khung viền nhô ra phía sau */
+.split-image::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+
+    /* 🔥 ĐÃ SỬA: Chuyển từ viền đen xanh rêu sang viền vàng cát Luxury dày 2px */
+    border: 2px solid #C8A96B;
+
+    top: 15px;
+    left: 15px;
+    z-index: 1;
+
+    /* 🔥 ĐÃ SỬA: Chỉnh bóng đổ mờ nhẹ tông ấm để hòa quyện xuất sắc trên nền ngà */
+    box-shadow: 8px 8px 24px rgba(200, 169, 107, 0.15);
+
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.split-row.reverse .split-image::before {
+    left: -15px;
+    box-shadow: -8px 8px 24px rgba(200, 169, 107, 0.15);
+}
+
+.split-image img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    border-radius: 4px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
-    transition: transform 0.5s ease;
+    position: relative;
+    z-index: 2;
+    border-radius: 1px;
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.gallery img:hover {
-    transform: scale(1.04);
+/* --------------------------------------------------------------------------
+   ĐỊNH DẠNG KHỐI CHỮ CHUẨN TỶ LỆ TẠP CHÍ CAO CẤP
+   -------------------------------------------------------------------------- */
+.split-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0 20px;
+    height: 100%;
 }
 
-/* ==========================================================================
-   RESPONSIVE LAYOUT (TƯƠNG THÍCH THIẾT BỊ)
-   ========================================================================== */
-@media (max-width: 992px) {
-    .search-bar {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 15px;
-        width: calc(100% - 40px);
-        margin-bottom: -80px;
-        padding: 25px;
-    }
-    .search-bar button {
-        width: 100%;
-    }
+/* Dòng số thứ tự (Màu xanh rêu đậm làm điểm tựa thị giác tương phản) */
+.split-num {
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 17px;
+    color: #bfa15f;
+    font-weight: 600;
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
 }
 
-@media (max-width: 768px) {
-    .hero-content { padding: 0 30px; }
-    .hero h1 { font-size: 44px; }
-    main.container .section:first-of-type { padding-top: 110px; }
-    .section { padding: 60px 0 20px 0; }
-    .section h2 { font-size: 28px; }
+/* Tiêu đề dịch vụ lớn (Hạ tông vàng đậm tinh tế rõ nét trên nền ngà) */
+.split-title {
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 17px;
+    color: #bfa15f;
+    font-weight: 600;
+    margin: 0 0 20px 0;
+    letter-spacing: 0.5px;
+    line-height: 1.3;
 }
+
+/* Đoạn văn kể chuyện mô tả dịch vụ */
+.split-desc {
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 17px;
+    color: #444444;
+    line-height: 1.85;
+    text-align: justify;
+    margin: 0;
+    letter-spacing: 0.2px;
+}
+
+/* --------------------------------------------------------------------------
+   HIỆU ỨNG TƯƠNG TÁC KHI HOVER
+   -------------------------------------------------------------------------- */
+.split-row:hover .split-image img {
+    transform: translate(8px, 8px);
+    box-shadow: 0 15px 35px rgba(44, 62, 70, 0.12);
+}
+
+.split-row.reverse:hover .split-image img {
+    transform: translate(-8px, 8px);
+}
+
+.split-row:hover .split-image::before {
+    top: 8px;
+    left: 8px;
+    box-shadow: 4px 4px 16px rgba(200, 169, 107, 0.25);
+}
+
+.split-row.reverse:hover .split-image::before {
+    top: 8px;
+    left: -8px;
+    box-shadow: -4px 4px 16px rgba(200, 169, 107, 0.25);
+}
+.luxury-gallery-section {
+    padding: 100px 0;
+    overflow: hidden;
+}
+
+.luxury-gallery-section h2 {
+    margin-bottom: 60px;
+}
+
+.luxury-gallery {
+    display: flex;
+    height: 500px;
+    gap: 10px;
+    width: 100%;
+}
+
+.gallery-item {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+
+    transition: all 0.6s ease;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+
+    transition: all 0.6s ease;
+}
+
+/* Ảnh đang hover sẽ mở rộng */
+.luxury-gallery:hover .gallery-item {
+    flex: 1;
+}
+
+.luxury-gallery .gallery-item:hover {
+    flex: 4;
+}
+
+/* Làm tối các ảnh còn lại */
+.luxury-gallery:hover .gallery-item:not(:hover) img {
+    filter: brightness(0.6);
+}
+
+/* Zoom nhẹ ảnh được chọn */
+.gallery-item:hover img {
+    transform: scale(1.05);
+}
+

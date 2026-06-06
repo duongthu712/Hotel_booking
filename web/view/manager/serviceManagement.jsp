@@ -63,13 +63,29 @@
                 </table>
             </div>
         </main>
-        <div>
-            <div>
-                <h2>Thêm dịch vụ mới</h2>
-                <form action="serviceEdit" method="POST">
-                    <input type="text" name="serviceName" >
-                </form>
-            </div>
+
+        <div class="service-popup" id="service-modal">
+            <h2 class="service-popup-title" id="modal-title">Thêm dịch vụ mới</h2>
+            <form action="" method="POST" id="service-form">
+                <input type="hidden" name="serviceId" id="serviceId">
+                <input class="service-popup-input-field" type="text" name="serviceName" id="serviceName" placeholder="Tên dịch vụ" required>
+                <select class="service-popup-input-field" name="type" id="type">
+                    <option value="HOTEL">Khách sạn</option>
+                    <option value="ROOM">Phòng</option>
+                </select>
+
+                <textarea class="service-popup-input-field" name="description" id="description" placeholder="Mô tả"></textarea>
+                <input class="service-popup-input-field" type="number" name="unitPrice" id="unitPrice" placeholder="Đơn giá" required>
+
+                <select class="service-popup-input-field" name="active" id="active">
+                    <button class="btn-submit" ></button>
+                </select>
+
+                <div class="service-popup-action">
+                    <button class="btn-submit" type="submit">Xác nhận lưu</button>
+                    <button class="btn-close" type="button" id="btn-close">Huỷ</button>
+                </div>
+            </form>
         </div>
     </body>
 </html>
