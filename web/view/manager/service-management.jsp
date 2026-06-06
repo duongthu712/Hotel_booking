@@ -9,8 +9,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="model.StaffAccount" %>
-<%@ include file="/view/staff/header.jsp" %>
-<%@ include file="/view/staff/navbar.jsp" %>
+
 
 <!DOCTYPE html>
 <html>
@@ -20,6 +19,8 @@
         <link rel="stylesheet" href="css/service-managerment.css">
     </head>
     <body>
+        <%@ include file="/view/staff/header.jsp" %>
+        <%@ include file="/view/staff/navbar.jsp" %>
         <main class="conent-container">
             <div class="header-action">
                 <h1 class="header-title">Quản lý dịch vụ</h1>
@@ -28,9 +29,9 @@
 
             <div class="filter-bar">
                 <p class="filter-title">Bộ lọc danh mục</p>
-                <a href="serviceList?filterType=ALL" class="filter-btn active">Tất cả</a>
-                <a href="serviceList?filterType=HOTEL" class="filter-btn">Dịch vụ khách sạn</a>
-                <a href="serviceList?filterType=ROOM" class="filter-btn">Dịch vụ phòng</a>
+                <a href="ServiceList?filterType=ALL" class="filter-btn active">Tất cả</a>
+                <a href="ServiceList?filterType=HOTEL" class="filter-btn">Dịch vụ khách sạn</a>
+                <a href="ServiceList?filterType=ROOM" class="filter-btn">Dịch vụ phòng</a>
             </div>
 
             <div>
@@ -54,11 +55,15 @@
                                 <td>${srv.getUnitPrice()}</td>
                                 <td>${srv.isActive() ? 'ACTIVE':'INACTIVE'}</td>
                                 <td>
-                                    <a href="serviceEdit?serviceId=${srv.getServiceId()}">Sửa</a>
-                                    <a href="serviceDelete?serviceId=${srv.getServiceId()}">Xoá</a>
+                                    <a href="ServiceEdit?serviceId=${srv.getServiceId()}">Sửa</a>
+                                    <form action="ServiceDelete" method="post">
+                                        <input type="hidden" name="serviceId" value="${srv.getServiceId()}">
+                                        <input type="hidden" name="type" value="${srv.getType()}">
+                                        <button type="submit">Xoá</button>
+                                    </form>
                                 </td>
                             </tr>
-                        </c:forEach>
+</c:forEach>
                     </tbody>
                 </table>
             </div>
@@ -77,9 +82,10 @@
                 <textarea class="service-popup-input-field" name="description" id="description" placeholder="Mô tả"></textarea>
                 <input class="service-popup-input-field" type="number" name="unitPrice" id="unitPrice" placeholder="Đơn giá" required>
 
-                <select class="service-popup-input-field" name="active" id="active">
-                    <button class="btn-submit" ></button>
-                </select>
+                <label class="toggle-switch">
+                    <input type="checkbox" name="active" id="active" value="true">
+                    <span class="toggle-slider"></span>
+                </label>
 
                 <div class="service-popup-action">
                     <button class="btn-submit" type="submit">Xác nhận lưu</button>

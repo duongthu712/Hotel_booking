@@ -93,7 +93,7 @@ public class ServiceListController extends HttpServlet {
         }
 
         //Send data to jsp page
-        RequestDispatcher rd = request.getRequestDispatcher("views/manager/ServiceManagement.jsp");
+        RequestDispatcher rd = request.getRequestDispatcher("views/manager/service-management.jsp");
         request.setAttribute("serviceList", serviceList);
         request.setAttribute("filterType", filterType);
         rd.forward(request, response);

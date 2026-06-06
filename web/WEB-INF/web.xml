@@ -89,7 +89,7 @@
     <servlet-mapping>
         <servlet-name>ServiceCreateController</servlet-name>
         <url-pattern>/ServiceCreate</url-pattern>
- 
+
         <servlet-name>HotelPolicyServlet</servlet-name>
         <url-pattern>/policies</url-pattern>
  
