@@ -17,6 +17,19 @@ public class StaffAccount {
     private Timestamp resetExpiry;
     private boolean resetUsed;
 
+    public String getRoleEn() {
+        switch (role) {
+            case "Quản lý":
+                return "MANAGER";
+            case "Lễ tân":
+                return "RECEPTIONIST";
+            case "Quản trị viên":
+                return "ADMIN";
+            default:
+                return "UNKNOWN";
+        }
+    }
+
     public StaffAccount() {
     }
 
@@ -38,8 +51,8 @@ public class StaffAccount {
         this.resetUsed = resetUsed;
     }
 
-    public StaffAccount(int staffId, String username, String fullName, 
-            String email, String phone, String role, boolean active, 
+    public StaffAccount(int staffId, String username, String fullName,
+            String email, String phone, String role, boolean active,
             Timestamp createdAt) {
         this.staffId = staffId;
     }
@@ -75,7 +88,7 @@ public class StaffAccount {
     public void setEmail(String email) {
         this.email = email;
     }
-    
+
     public String getPhone() {
         return phone;
     }
@@ -83,7 +96,7 @@ public class StaffAccount {
     public void setPhone(String phone) {
         this.phone = phone;
     }
-    
+
     public String getRole() {
         return role;
     }
@@ -118,4 +131,29 @@ public class StaffAccount {
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
+
+    public String getResetCode() {
+        return resetCode;
+    }
+
+    public void setResetCode(String resetCode) {
+        this.resetCode = resetCode;
+    }
+
+    public Timestamp getResetExpiry() {
+        return resetExpiry;
+    }
+
+    public void setResetExpiry(Timestamp resetExpiry) {
+        this.resetExpiry = resetExpiry;
+    }
+
+    public boolean isResetUsed() {
+        return resetUsed;
+    }
+
+    public void setResetUsed(boolean resetUsed) {
+        this.resetUsed = resetUsed;
+    }
+
 }

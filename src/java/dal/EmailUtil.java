@@ -7,7 +7,6 @@ import jakarta.mail.Session;
 import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
-
 import java.util.Properties;
 
 public class EmailUtil {
@@ -56,6 +55,7 @@ public class EmailUtil {
 
         message.setContent(htmlContent, "text/html; charset=UTF-8");
 
+        // Gửi mail
         Transport.send(message);
     }
 }
