@@ -37,7 +37,7 @@ public class HotelServiceDAO extends DBContext {
             rs = stm.executeQuery();
 
             while (rs.next()) {
-                int serviceId = rs.getInt("service_id");
+                int serviceId = rs.getInt("hotel_service_id");
                 BigDecimal price = rs.getBigDecimal("unit_price");
                 String serviceName = rs.getString("service_name");
                 String description = rs.getString("description");
@@ -64,7 +64,7 @@ public class HotelServiceDAO extends DBContext {
         try {
             String strSQL = """
                           select * from HotelServices rs
-                          where rs.service_id = ?
+                          where rs.hotel_service_id = ?
                           """;
             stm = connection.prepareCall(strSQL);
             stm.setInt(1, serviceId);
@@ -138,7 +138,7 @@ public class HotelServiceDAO extends DBContext {
                            [description] =?, 
                            unit_price =?, 
                            is_active = ? 
-                           where service_id = ?
+                           where hotel_service_id = ?
                            """;
             stm = connection.prepareCall(strSQL);
 
@@ -170,7 +170,7 @@ public class HotelServiceDAO extends DBContext {
 
         try {
             String strSQL = """
-                           delete HotelServices where service_id = ?
+                           delete HotelServices where hotel_service_id = ?
                            """;
             stm = connection.prepareCall(strSQL);
             stm.setInt(1, serviceId);

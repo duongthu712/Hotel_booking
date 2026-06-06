@@ -10,7 +10,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="model.StaffAccount" %>
 
-
 <!DOCTYPE html>
 <html>
     <head>
@@ -18,7 +17,7 @@
         <title>Quản lý dịch vụ</title>
         <link rel="stylesheet" href="css/service-managerment.css">
     </head>
-    <body>
+    <body data-edit-mode="${not empty serviceToEdit}">
         <%@ include file="/view/staff/header.jsp" %>
         <%@ include file="/view/staff/navbar.jsp" %>
         <main class="conent-container">
@@ -29,9 +28,12 @@
 
             <div class="filter-bar">
                 <p class="filter-title">Bộ lọc danh mục</p>
-                <a href="ServiceList?filterType=ALL" class="filter-btn active">Tất cả</a>
-                <a href="ServiceList?filterType=HOTEL" class="filter-btn">Dịch vụ khách sạn</a>
-                <a href="ServiceList?filterType=ROOM" class="filter-btn">Dịch vụ phòng</a>
+                <a href="ServiceList?filterType=ALL" class="filter-btn active">
+                    Tất cả</a>
+                <a href="ServiceList?filterType=HOTEL" class="filter-btn">
+                    Dịch vụ khách sạn</a>
+                <a href="ServiceList?filterType=ROOM" class="filter-btn">
+                    Dịch vụ phòng</a>
             </div>
 
             <div>
@@ -55,10 +57,12 @@
                                 <td>${srv.getUnitPrice()}</td>
                                 <td>${srv.isActive() ? 'ACTIVE':'INACTIVE'}</td>
                                 <td>
-                                    <a href="ServiceEdit?serviceId=${srv.getServiceId()}">Sửa</a>
+                                    <a class="btn-edit" href="ServiceEdit?serviceId=${srv.getServiceId()}&type=${srv.getType()}">Sửa</a>
                                     <form action="ServiceDelete" method="post">
-                                        <input type="hidden" name="serviceId" value="${srv.getServiceId()}">
-                                        <input type="hidden" name="type" value="${srv.getType()}">
+                                        <input type="hidden" name="serviceId" 
+                                               value="${srv.getServiceId()}">
+                                        <input type="hidden" name="type" 
+                                               value="${srv.getType()}">
                                         <button type="submit">Xoá</button>
                                     </form>
                                 </td>
@@ -72,18 +76,34 @@
         <div class="service-popup" id="service-modal">
             <h2 class="service-popup-title" id="modal-title">Thêm dịch vụ mới</h2>
             <form action="" method="POST" id="service-form">
-                <input type="hidden" name="serviceId" id="serviceId">
-                <input class="service-popup-input-field" type="text" name="serviceName" id="serviceName" placeholder="Tên dịch vụ" required>
+                <input type="hidden" name="serviceId" id="serviceId" 
+                       value="${serviceToEdit.getServiceId()}">
+
+                <input class="service-popup-input-field" type="text" 
+                       name="serviceName" id="serviceName" 
+                       placeholder="Tên dịch vụ" 
+                       value="${serviceToEdit.getServiceName()}" required>
+
                 <select class="service-popup-input-field" name="type" id="type">
-                    <option value="HOTEL">Khách sạn</option>
-                    <option value="ROOM">Phòng</option>
+                    <option value="HOTEL" 
+                            ${serviceToEdit.getType() == 'HOTEL' ? 'selected' : ''}>
+                        Khách sạn</option>
+                    <option value="ROOM"
+                            ${serviceToEdit.getType() == 'ROOM' ? 'selected' : ''}>
+                        Phòng</option>
                 </select>
 
-                <textarea class="service-popup-input-field" name="description" id="description" placeholder="Mô tả"></textarea>
-                <input class="service-popup-input-field" type="number" name="unitPrice" id="unitPrice" placeholder="Đơn giá" required>
+                <textarea class="service-popup-input-field" name="description" 
+                          id="description" placeholder="Mô tả">
+                    ${serviceToEdit.getDescription()}</textarea>
+
+                <input class="service-popup-input-field" type="number" 
+                       name="unitPrice" id="unitPrice" placeholder="Đơn giá" 
+                       value="${serviceToEdit.getUnitPrice()}" required>
 
                 <label class="toggle-switch">
-                    <input type="checkbox" name="active" id="active" value="true">
+                    <input type="checkbox" name="active" id="active" 
+                           value="true" ${serviceToEdit.active ? 'checked' : ''}>
                     <span class="toggle-slider"></span>
                 </label>
 
@@ -93,5 +113,6 @@
                 </div>
             </form>
         </div>
+        <script src="javascript/service-managerment.js"></script>
     </body>
 </html>

@@ -62,8 +62,8 @@ public class ServiceListController extends HttpServlet {
             throws ServletException, IOException {
         //Check authentication, redirect to login page if not logged in
         HttpSession session = request.getSession();
-        StaffAccount account = (StaffAccount) session.getAttribute("account");
-        if (account == null) {
+        StaffAccount staff = (StaffAccount) session.getAttribute("staff");
+        if (staff == null) {
             response.sendRedirect("Login");
             return;
         }
@@ -93,9 +93,9 @@ public class ServiceListController extends HttpServlet {
         }
 
         //Send data to jsp page
-        RequestDispatcher rd = request.getRequestDispatcher("views/manager/service-management.jsp");
         request.setAttribute("serviceList", serviceList);
         request.setAttribute("filterType", filterType);
+        RequestDispatcher rd = request.getRequestDispatcher("/view/manager/service-management.jsp");
         rd.forward(request, response);
 
     }

@@ -32,7 +32,8 @@
     <servlet>
         <servlet-name>ServiceCreateController</servlet-name>
         <servlet-class>controller.ServiceCreateController</servlet-class>
- 
+    </servlet>
+    <servlet>
         <servlet-name>HotelPolicyServlet</servlet-name>
         <servlet-class>controller.HotelPolicyServlet</servlet-class>
  
@@ -89,7 +90,8 @@
     <servlet-mapping>
         <servlet-name>ServiceCreateController</servlet-name>
         <url-pattern>/ServiceCreate</url-pattern>
-
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>HotelPolicyServlet</servlet-name>
         <url-pattern>/policies</url-pattern>
  

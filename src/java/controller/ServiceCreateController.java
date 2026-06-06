@@ -49,19 +49,6 @@ public class ServiceCreateController extends HttpServlet {
         }
     }
 
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
 
     /**
      * Handles the HTTP <code>POST</code> method.
@@ -76,8 +63,8 @@ public class ServiceCreateController extends HttpServlet {
             throws ServletException, IOException {
         //Check authentication, redirect to login page if not logged in
         HttpSession session = request.getSession();
-        StaffAccount account = (StaffAccount) session.getAttribute("account");
-        if (account == null) {
+        StaffAccount  staff = (StaffAccount) session.getAttribute(" staff");
+        if ( staff == null) {
             response.sendRedirect("Login");
             return;
         }
@@ -86,7 +73,7 @@ public class ServiceCreateController extends HttpServlet {
         String serviceName = request.getParameter("serviceName");
         String description = request.getParameter("description");
         BigDecimal unitPrice = new BigDecimal(request.getParameter("unitPrice"));
-        boolean active = Boolean.parseBoolean(request.getParameter("active"));
+        boolean active = "true".equals(request.getParameter("active"));
         ServiceType type = ServiceType.valueOf(request.getParameter("type"));
 
         //Create new Service object
@@ -103,7 +90,7 @@ public class ServiceCreateController extends HttpServlet {
         }
 
         //Redirect to the list view after operation
-        response.sendRedirect("serviceList");
+        response.sendRedirect("ServiceList");
     }
 
     /**

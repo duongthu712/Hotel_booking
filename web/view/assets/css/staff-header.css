@@ -39,9 +39,9 @@
 }
 
 .staff-header-role {
-    /*        outline: 1px solid red !important;*/
+    /*            outline: 1px solid red !important;*/
     font-size: 1rem;
-    font-family: var(--font-primary);
+    font-family: var(--font-logo);
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.1em;
