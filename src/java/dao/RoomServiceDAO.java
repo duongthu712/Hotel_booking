@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+ 
 package dao;
 
 import dal.DBContext;
@@ -182,7 +182,7 @@ public class RoomServiceDAO extends DBContext {
         return found;
     }
 }
-=======
+ 
 //package dao;
 //
 //import dal.DBContext;
@@ -306,4 +306,4 @@ public class RoomServiceDAO extends DBContext {
 //    }
 //    
 //}
->>>>>>> origin/ThuDNM
+
