@@ -1,6 +1,5 @@
 package dal;
 
-import com.sun.jdi.connect.Transport;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
 import jakarta.mail.PasswordAuthentication;
@@ -8,9 +7,8 @@ import jakarta.mail.Session;
 import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
-import jakarta.websocket.Session;
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
+
+import java.util.Properties;
 
 import java.util.Properties;
 

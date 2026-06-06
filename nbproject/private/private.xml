@@ -3,18 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-<<<<<<< HEAD
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/assets/css/staff-header.css</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/staff/header.jsp</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/model/StaffAccount.java</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/staff/navbar.jsp</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/assets/css/navbar.css</file>
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/manager/serviceManagement.jsp</file>
-=======
-            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_iter1/web/view/auth/login.jsp</file>
-            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_iter1/web/view/common/navbar.jsp</file>
-            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_iter1/web/view/auth/verify-code.jsp</file>
-            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_iter1/web/view/assets/css/auth.css</file>
-            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_iter1/web/view/auth/forgot-password.jsp</file>
-            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_iter1/web/view/common/header.jsp</file>
-            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_iter1/web/view/common/footer.jsp</file>
-            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_iter1/src/java/controller/LoginController.java</file>
->>>>>>> GiangTTT
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/assets/css/staff-navbar.css</file>
         </group>
     </open-files>
 </project-private>

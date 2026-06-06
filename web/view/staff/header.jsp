@@ -6,18 +6,19 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="model.StaffAccount" %>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/staff-header.css" type="text/css">
 
-<% StaffAccount headeAcc = (StaffAccount)session.getAttribute("staff");%>
-<% if (headeAcc != null) { %>
-<header>
-    <div>
-        <p>La Mer</p>
-        <p><%= headeAcc.getRole()%></p>
+<% StaffAccount headAcc = (StaffAccount)session.getAttribute("staff");%>
+<% if (headAcc != null) { %>
+<header class="staff-header">
+    <div class="staff-header-info">
+        <p class="staff-header-logo">La Mer</p>
+        <p class="staff-header-role"><%= headAcc.getRole()%></p>
     </div>
-    <div>
-        <p><%= headeAcc.getFullName()%></p>
+    <div class="staff-header-user">
+        <a href="userProfile.jsp" class="staff-name"><%= headAcc.getFullName()%></a>
         <form action="logout" method="POST">
-            <button type="submit">Đăng xuất</button>
+            <button type="submit" class="logout-btn">Đăng xuất</button>
         </form>
     </div>
 </header>
