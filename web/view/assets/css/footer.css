@@ -2,11 +2,11 @@
 Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
 Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
 */
-/* 
-    Created on : May 30, 2026, 5:09:50 PM
+/* Created on : May 30, 2026, 5:09:50 PM
     Author     : Minh Thu
 */
 
+/* 🔥 ĐÃ SỬA: Mở khóa comment để code chạy được */
 .footer-container {
     background: #2c3e46; /* Đồng bộ màu xanh rêu với thanh search bar */
     color: #ffffff;
@@ -45,8 +45,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 .footer-brand-desc {
     font-family: 'Montserrat', sans-serif;
     font-size: 15px;                  
-    font-weight: 300;                 
-    line-height: 1.9;                 
+    font-weight: 300;                  
+    line-height: 1.9;                  
     color: rgba(255, 255, 255, 0.85);
     text-align: justify;
     margin: 0;
@@ -76,7 +76,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 /* Tiêu đề mục liên hệ tinh tế, không bị quá to */
 .footer-col-contact h3 {
     font-family: 'Playfair Display', serif;
-    font-size: 16px;                  /* Đưa về cỡ vừa vặn sang trọng */
+    font-size: 16px;                   /* Đưa về cỡ vừa vặn sang trọng */
     font-weight: 600;                 
     letter-spacing: 2px;
     color: #C8A96B;                   
@@ -87,11 +87,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 /* Nội dung địa chỉ, hotline, email bằng đúng 15px như bên giới thiệu */
 .contact-item {
     font-family: 'Montserrat', sans-serif;
-    font-size: 15px;                  /* Bằng tuyệt đối với bên trái */
-    font-weight: 300;                 /* Nét chữ mảnh đồng điệu */
-    line-height: 1.9;                 /* Khoảng cách dòng thoáng 1.9 khớp với bên trái */
-    color: rgba(255, 255, 255, 0.85); /* Độ sáng chữ 0.85 giống hệt bên trái */
-    margin: 0 0 18px 0;               /* Khoảng cách giữa các hàng vừa vặn */
+    font-size: 15px;                   /* Bằng tuyệt đối với bên trái */
+    font-weight: 300;                  /* Nét chữ mảnh đồng điệu */
+    line-height: 1.9;                  /* Khoảng cách dòng thoáng 1.9 khớp với bên trái */
+    color: rgba(255, 255, 255, 0.85);  /* Độ sáng chữ 0.85 giống hệt bên trái */
+    margin: 0 0 18px 0;                /* Khoảng cách giữa các hàng vừa vặn */
 }
 
 /* Phần nhãn Địa chỉ, Hotline, Email */
@@ -128,26 +128,13 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     letter-spacing: 0.5px;
 }
 
-/* Responsive co giãn mượt mà trên thiết bị di động */
-@media (max-width: 768px) {
-    .footer-container {
-        padding: 50px 30px 30px 30px;
-    }
-    .footer-content {
-        flex-direction: column;
-        gap: 40px;
-    }
-    .footer-col-contact h3 {
-        font-size: 20px;
-        margin-bottom: 20px;
-    }
-    .contact-item {
-        font-size: 16px;
-    }
-    .footer-bottom {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-        margin-top: 40px;
-    }
+.split-number {
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 36px;
+    
+    color: #C8A96B; 
+    
+    font-weight: 500;
+    margin: 0 0 18px 0;
+    letter-spacing: 0.5px;
 }
