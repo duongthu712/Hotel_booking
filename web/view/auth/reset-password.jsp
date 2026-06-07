@@ -53,7 +53,7 @@
             </form>
 
             <div class="auth-link">
-                <a href="<%= request.getContextPath() %>/login">
+                <a href="<%= request.getContextPath() %>/logout">
                     Back to sign in
                 </a>
             </div>

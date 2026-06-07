@@ -47,12 +47,15 @@
                 <button type="submit" class="auth-btn">Verify code</button>
             </form>
 
+            <form id="resendForm" action="<%= request.getContextPath() %>/verify-code" method="post" hidden>
+                <input type="hidden" name="action" value="resend">
+            </form>
+
             <div class="auth-link-row">
-                <a href="<%= request.getContextPath() %>/forgot-password">
+                <a href="#" onclick="document.getElementById('resendForm').submit(); return false;">
                     Resend code
                 </a>
-
-                <a href="<%= request.getContextPath() %>/login">
+                <a href="<%= request.getContextPath() %>/logout">
                     Back to sign in
                 </a>
             </div>
