@@ -31,9 +31,7 @@ public class AuthorizationFilter implements Filter {
 
         String contextPath = req.getContextPath();
         String uri = req.getRequestURI();
-
         HttpSession session = req.getSession(false);
-
         // kiem tra nguoi dung da dang nhap hay chua
         if (session == null || session.getAttribute("staff") == null) {
             res.sendRedirect(contextPath + "/login");
@@ -42,7 +40,6 @@ public class AuthorizationFilter implements Filter {
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
         String role = staff.getRole().trim();
         boolean allowed = false;
-        
         // admin
         if (uri.startsWith(contextPath + "/view/admin/")) {
             allowed = role.equalsIgnoreCase("Quản trị viên");

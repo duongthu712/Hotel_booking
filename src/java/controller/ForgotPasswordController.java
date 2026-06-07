@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.security.SecureRandom;
 import model.StaffAccount;
 
 public class ForgotPasswordController extends HttpServlet {
@@ -83,9 +84,17 @@ public class ForgotPasswordController extends HttpServlet {
     }
 
     private String generateCode() {
-        int code = 100000 + new Random().nextInt(900000);
-        return String.valueOf(code);
+    String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        SecureRandom random = new SecureRandom();
+    StringBuilder code = new StringBuilder("LMH");
+
+    for (int i = 0; i < 5; i++) {
+        int index = random.nextInt(chars.length());
+        code.append(chars.charAt(index));
     }
+
+    return code.toString();
+}
 
     @Override
     public String getServletInfo() {

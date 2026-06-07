@@ -70,7 +70,7 @@ public class LoginController extends HttpServlet {
 
         if (staff != null) {
             HttpSession session = request.getSession();
-            //session 1hour
+            //session remian in 1hr
             session.setMaxInactiveInterval(60 * 60);
 
             session.setAttribute("staff", staff);
@@ -85,10 +85,7 @@ public class LoginController extends HttpServlet {
 
     private void redirectByRole(HttpServletRequest request, HttpServletResponse response, StaffAccount staff)
             throws ServletException, IOException {
-
         String role = staff.getRole();
-        
-        role = role.trim();
         if (role.equalsIgnoreCase("Lễ tân")) {
             response.sendRedirect(request.getContextPath() + "/view/receptionist/dashboard.jsp");
         } else if (role.equalsIgnoreCase("Quản lý")) {

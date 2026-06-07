@@ -10,13 +10,13 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.security.SecureRandom;
 
 public class VerifyCodeController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         HttpSession session = request.getSession(false);
 
         if (session == null || session.getAttribute("pendingResetEmail") == null) {
@@ -30,19 +30,17 @@ public class VerifyCodeController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         request.setCharacterEncoding("UTF-8");
-
         HttpSession session = request.getSession(false);
+
         if (session == null || session.getAttribute("pendingResetEmail") == null) {
             response.sendRedirect(request.getContextPath() + "/forgot-password");
             return;
         }
-
         String email = (String) session.getAttribute("pendingResetEmail");
         String action = request.getParameter("action");
-
         StaffAccountDAO dao = new StaffAccountDAO();
+
         //resend code
         if ("resend".equalsIgnoreCase(action)) {
             try {
@@ -55,21 +53,21 @@ public class VerifyCodeController extends HttpServlet {
                     request.setAttribute("message", "A new reset code has been sent to your email.");
                 } catch (Exception mailError) {
                     mailError.printStackTrace();
+                    //mail loi
+                    request.setAttribute("message", "Cannot send email. Demo code: " + newCode);
                 }
-
                 request.getRequestDispatcher("/view/auth/verify-code.jsp").forward(request, response);
                 return;
+
             } catch (Exception e) {
                 e.printStackTrace();
-
                 request.setAttribute("error", "Cannot resend code. Please try again.");
                 request.getRequestDispatcher("/view/auth/verify-code.jsp").forward(request, response);
                 return;
             }
         }
-
-        // Verify code
         String code = request.getParameter("code");
+
         if (code == null || code.trim().isEmpty()) {
             request.setAttribute("error", "Please enter verification code.");
             request.getRequestDispatcher("/view/auth/verify-code.jsp").forward(request, response);
@@ -83,16 +81,23 @@ public class VerifyCodeController extends HttpServlet {
             request.getRequestDispatcher("/view/auth/verify-code.jsp").forward(request, response);
             return;
         }
-
-        //verify code thành công
         session.setAttribute("resetEmail", email);
         session.removeAttribute("pendingResetEmail");
+
         response.sendRedirect(request.getContextPath() + "/reset-password");
     }
 
     private String generateCode() {
-        int code = 100000 + new Random().nextInt(900000);
-        return String.valueOf(code);
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        SecureRandom random = new SecureRandom();
+        StringBuilder code = new StringBuilder("LMH");
+
+        for (int i = 0; i < 5; i++) {
+            int index = random.nextInt(chars.length());
+            code.append(chars.charAt(index));
+        }
+
+        return code.toString();
     }
 
     @Override
