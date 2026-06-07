@@ -100,7 +100,7 @@ public class ServiceCreateController extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Short description";
+        return "Service Management Controller";
     }
 
 }

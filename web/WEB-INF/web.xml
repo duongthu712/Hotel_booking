@@ -17,7 +17,6 @@
         <servlet-class>controller.ChangePasswordController</servlet-class>
     </servlet>
     <servlet>
- 
         <servlet-name>ServiceListController</servlet-name>
         <servlet-class>controller.ServiceListController</servlet-class>
     </servlet>
@@ -36,7 +35,18 @@
     <servlet>
         <servlet-name>HotelPolicyServlet</servlet-name>
         <servlet-class>controller.HotelPolicyServlet</servlet-class>
- 
+    </servlet>
+    <servlet>
+        <servlet-name>RoomListController</servlet-name>
+        <servlet-class>controller.RoomListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RoomEditController</servlet-name>
+        <servlet-class>controller.RoomEditController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RoomDetailController</servlet-name>
+        <servlet-class>controller.RoomDetailController</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>
@@ -75,7 +85,6 @@
         <url-pattern>/reset-password</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
- 
         <servlet-name>ServiceListController</servlet-name>
         <url-pattern>/ServiceList</url-pattern>
     </servlet-mapping>
@@ -94,6 +103,17 @@
     <servlet-mapping>
         <servlet-name>HotelPolicyServlet</servlet-name>
         <url-pattern>/policies</url-pattern>
- 
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RoomListController</servlet-name>
+        <url-pattern>/RoomList</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RoomEditController</servlet-name>
+        <url-pattern>/RoomEdit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RoomDetailController</servlet-name>
+        <url-pattern>/RoomDetail</url-pattern>
     </servlet-mapping>
 </web-app>

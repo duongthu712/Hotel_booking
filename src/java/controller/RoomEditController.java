@@ -1,28 +1,30 @@
 package controller;
 
-import dao.HotelServiceDAO;
-import dao.RoomServiceDAO;
+import dao.RoomDAO;
+import dao.RoomTypeDAO;
 import jakarta.servlet.RequestDispatcher;
-import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.math.BigDecimal;
-import model.Service;
-import model.ServiceType;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+import model.Room;
+import model.RoomType;
 import model.StaffAccount;
 
 /**
- * ServiceEditController.java Edit hotel services and room services.
+ * RoomEditController.java
+ *
+ * Update room information
  *
  * @author LinhLTHE200306
  * @version 1.0
- * @since 2026-06-03
+ * @since 2026-06-07
  */
-public class ServiceEditController extends HttpServlet {
+public class RoomEditController extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -41,15 +43,16 @@ public class ServiceEditController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ServiceEditController</title>");
+            out.println("<title>Servlet RoomEditController</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ServiceEditController at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet RoomEditController at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
     }
 
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -61,34 +64,32 @@ public class ServiceEditController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //Check authentication, redirect to login page if not logged in
         HttpSession session = request.getSession();
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
+
         if (staff == null) {
             response.sendRedirect("/view/auth/login.jsp");
             return;
         }
 
-        //Parse input
-        int serviceId = Integer.parseInt(request.getParameter("serviceId").trim());
-        ServiceType type = ServiceType.valueOf(request.getParameter("type"));
-        
-        //Update service in database by its type
-        HotelServiceDAO hDao = new HotelServiceDAO();
-        RoomServiceDAO rDao = new RoomServiceDAO();
-        Service serviceToEdit = null;
-        
-        if (ServiceType.HOTEL.equals(type)) {
-            serviceToEdit = hDao.getHotelServicesById(serviceId);
-        } else if (ServiceType.ROOM.equals(type)) {
-            serviceToEdit = rDao.getRoomServicesById(serviceId);
+        try {
+            int roomNumber = Integer.parseInt(request.getParameter("roomNumber"));
+            RoomDAO rDao = new RoomDAO();
+            RoomTypeDAO rtDao = new RoomTypeDAO();
+
+            Room editRoom = rDao.getRoomByNumber(roomNumber);
+            List <RoomType> roomTypeList = rtDao.getAllRoomTypes();
+
+            request.setAttribute("editRoom", editRoom);
+            request.setAttribute("roomTypeList", roomTypeList);
+
+            RequestDispatcher rd = request.getRequestDispatcher("/RoomList");
+            rd.forward(request, response);
+
+        } catch (Exception ex) {
+            System.out.println("RoomEditController:" + ex.getMessage());
+            response.sendRedirect("RoomList");
         }
-
-        request.setAttribute("serviceToEdit", serviceToEdit);
-        request.setAttribute("isEditMode", true);
-        RequestDispatcher rd = request.getRequestDispatcher("/ServiceList");
-        rd.forward(request, response);
-
     }
 
     /**
@@ -102,37 +103,40 @@ public class ServiceEditController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //Check authentication, redirect to login page if not logged in
+        //Check authentication
         HttpSession session = request.getSession();
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
         if (staff == null) {
-            response.sendRedirect("Login");
+            response.sendRedirect("/view/auth/login.jsp");
             return;
         }
 
-        //Parse input
-        int serviceId = Integer.parseInt(request.getParameter("serviceId"));
-        String serviceName = request.getParameter("serviceName");
-        String description = request.getParameter("description");
-        BigDecimal unitPrice = new BigDecimal(request.getParameter("unitPrice"));
-        boolean active = "true".equals(request.getParameter("active"));
-        ServiceType type = ServiceType.valueOf(request.getParameter("type"));
+        try {
+            int roomNumber = Integer.parseInt(request.getParameter("roomNumber"));
+            String status = request.getParameter("status");
+            int roomTypeId = Integer.parseInt(request.getParameter("roomTypeId"));
+            RoomDAO rDao = new RoomDAO();
+            Room oldRoom = rDao.getRoomByNumber(roomNumber);
 
-        //Create new Service object with updated details
-        Service service = new Service(serviceId, serviceName, description, unitPrice, active, type);
+            if (oldRoom == null) {
+                response.sendRedirect("RoomList");
+                return;
+            }
 
-        //Update service in database by its type
-        HotelServiceDAO hDao = new HotelServiceDAO();
-        RoomServiceDAO rDao = new RoomServiceDAO();
+            if (!"Đang bảo trì".equals(oldRoom.getStatus()) && oldRoom.getRoomTypeId() != roomTypeId) {
+                session.setAttribute("error", "Chỉ được thay đổi hạng phòng khi phòng đang bảo trì.");
+                response.sendRedirect("RoomList");
+                return;
+            }
+            Room room = new Room(roomNumber, oldRoom.getFloor(), status, roomTypeId);
 
-        if (ServiceType.HOTEL.equals(type)) {
-            hDao.updateHotelService(service);
-        } else if (ServiceType.ROOM.equals(type)) {
-            rDao.updateRoomService(service);
+            rDao.updateRoom(room);
+            session.setAttribute("success", "Cập nhật phòng thành công.");
+        } catch (Exception ex) {
+            System.out.println("RoomEditController:" + ex.getMessage());
+            session.setAttribute("error", "Có lỗi xảy ra khi cập nhật phòng.");
         }
-
-        //Redirect back to the service list page
-        response.sendRedirect("ServiceList");
+        response.sendRedirect("RoomList");
     }
 
     /**
@@ -142,7 +146,7 @@ public class ServiceEditController extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Service Management Controller";
+        return "Room Management Controller";
     }
 
 }
