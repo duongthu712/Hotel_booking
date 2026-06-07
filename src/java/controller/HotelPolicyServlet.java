@@ -19,7 +19,7 @@ import model.HotelPolicy;
  *
  * @author Minh Thu
  */
-@WebServlet(name = "HotelPolicyServlet", urlPatterns = {"/policies"}) // 🔥 ĐÃ ĐỔI: Nhìn ngắn gọn và chuyên nghiệp hơn
+@WebServlet(name = "HotelPolicyServlet", urlPatterns = {"/policies"}) 
 public class HotelPolicyServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -30,9 +30,10 @@ public class HotelPolicyServlet extends HttpServlet {
         List<HotelPolicy> fullPoliciesList = policyDAO.getAllActivePolicies();
 
         request.setAttribute("fullPoliciesList", fullPoliciesList);
+        
 
         // Chuyển tiếp sang trang giao diện chi tiết chính sách riêng
-        request.getRequestDispatcher("/view/public/policy-detail.jsp").forward(request, response);
+        request.getRequestDispatcher("/view/public/policy.jsp").forward(request, response);
     }
 
     @Override

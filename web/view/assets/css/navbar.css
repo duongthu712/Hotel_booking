@@ -15,10 +15,7 @@
     
     /* KHÔNG CỐ ĐỊNH: Để thanh menu nằm trong luồng cuộn bình thường của trang */
     position: relative; 
-    z-index: 999;
-    
-    /* BỎ HẾT BÓNG: Không đổ bóng để phẳng lì và tiệp màu hoàn toàn */
-    box-shadow: none; 
+  
 }
 
 /* 2. CHỮ LOGO HOTEL (BÊN TRÁI VÀ ĐỨNG ĐỘC LẬP) */

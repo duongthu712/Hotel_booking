@@ -5,19 +5,19 @@ public class HotelPolicy {
     private String policyName;
     private String description;
     private String policyType;
-    private boolean active;
+    private boolean is_active; 
 
     //Constructor
     public HotelPolicy() {
     }
 
     public HotelPolicy(int policyId, String policyName, String description, 
-            String policyType, boolean active) {
+            String policyType, boolean is_active) {
         this.policyId = policyId;
         this.policyName = policyName;
         this.description = description;
         this.policyType = policyType;
-        this.active = active;
+        this.is_active = is_active;
     }
     
     //Getter & Setter
@@ -53,11 +53,11 @@ public class HotelPolicy {
         this.policyType = policyType;
     }
 
-    public boolean isActive() {
-        return active;
+    public boolean isIs_active() {
+        return is_active;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setIs_active(boolean is_active) {
+        this.is_active = is_active;
     }  
 }
