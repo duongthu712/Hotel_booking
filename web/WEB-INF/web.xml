@@ -48,6 +48,26 @@
         <servlet-name>RoomDetailController</servlet-name>
         <servlet-class>controller.RoomDetailController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>StaffAccountListController</servlet-name>
+        <servlet-class>controller.StaffAccountListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>StaffAccountDetailController</servlet-name>
+        <servlet-class>controller.StaffAccountDetailController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>StaffAccountEditController</servlet-name>
+        <servlet-class>controller.StaffAccountEditController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>StaffAccountCreateController</servlet-name>
+        <servlet-class>controller.StaffAccountCreateController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>StaffAccountDeleteController</servlet-name>
+        <servlet-class>controller.StaffAccountDeleteController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>
         <url-pattern>/login</url-pattern>
@@ -115,5 +135,25 @@
     <servlet-mapping>
         <servlet-name>RoomDetailController</servlet-name>
         <url-pattern>/RoomDetail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StaffAccountListController</servlet-name>
+        <url-pattern>/StaffAccountList</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StaffAccountDetailController</servlet-name>
+        <url-pattern>/StaffAccountDetail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StaffAccountEditController</servlet-name>
+        <url-pattern>/StaffAccountEdit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StaffAccountCreateController</servlet-name>
+        <url-pattern>/StaffAccountCreate</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StaffAccountDeleteController</servlet-name>
+        <url-pattern>/StaffAccountDelete</url-pattern>
     </servlet-mapping>
 </web-app>

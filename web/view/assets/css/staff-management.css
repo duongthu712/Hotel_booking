@@ -1,0 +1,134 @@
+/* 
+    Created on : Jun 7, 2026, 8:59:01 PM
+    Author     : LinhLTHE200306
+*/
+
+.filter-form {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+}
+
+.btn-filter {
+    background-color: var(--text-main);
+    color: #ffffff;
+    padding: 10px 25px;
+    border: none;
+    border-radius: var(--radius-custom);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    font-family: var(--font-primary);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-filter:hover {
+    background: #333;
+}
+
+.col-id {
+    width: 5%;
+}
+
+.col-name {
+    width: 20%;
+}
+
+.col-username {
+    width: 15%;
+}
+
+.col-email {
+    width: 20%;
+}
+
+.col-phone {
+    width: 12%;
+}
+
+.col-role {
+    width: 10%;
+}
+
+.col-status {
+    width: 8%;
+}
+
+.col-action {
+    width: 10%;
+}
+
+.staffRole {
+    text-align: center;
+    font-size: 0.8em;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-custom);
+    padding: 6px 10px;
+    display: inline-block;
+    background-color: #fff4d8;
+    color: var(--text-muted);
+    border: 1px solid var(--text-muted);
+}
+
+.staffAct {
+    text-align: center;
+    font-size: 0.8em;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-custom);
+    padding: 6px 10px;
+    display: inline-block;
+}
+
+.staff-name-link {
+    color: var(--text-main);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+.staff-name-link:hover {
+    color: var(--accent-color);
+    text-decoration: underline;
+}
+
+.detail-row {
+    margin-bottom: 20px;
+    font-size: 1rem;
+}
+
+.detail-row strong {
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    display: block;
+    margin-bottom: 5px;
+    letter-spacing: 0.05em;
+}
+
+.modal-content {
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.create-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px 40px;
+    max-width: 900px;
+    padding: 20px 0;
+}
+
+.create-form-grid .service-popup-action {
+    grid-column: span 2;
+    justify-content: flex-start;
+}
+
+@media (max-width: 768px) {
+    .create-form-grid {
+        grid-template-columns: 1fr;
+    }
+    .create-form-grid .service-popup-action {
+        grid-column: span 1;
+    }
+}
