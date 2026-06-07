@@ -3,7 +3,6 @@ package controller;
 import dal.EmailUtil;
 import dao.StaffAccountDAO;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.util.Random;
 import jakarta.servlet.ServletException;
@@ -14,28 +13,10 @@ import jakarta.servlet.http.HttpSession;
 
 public class VerifyCodeController extends HttpServlet {
 
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        
-        response.setContentType("text/html;charset=UTF-8");
-
-        try (PrintWriter out = response.getWriter()) {
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet VerifyCodeController</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet VerifyCodeController at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         HttpSession session = request.getSession(false);
 
         if (session == null || session.getAttribute("pendingResetEmail") == null) {
@@ -49,26 +30,24 @@ public class VerifyCodeController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         request.setCharacterEncoding("UTF-8");
 
         HttpSession session = request.getSession(false);
-
         if (session == null || session.getAttribute("pendingResetEmail") == null) {
             response.sendRedirect(request.getContextPath() + "/forgot-password");
             return;
         }
 
-        String action = request.getParameter("action");
         String email = (String) session.getAttribute("pendingResetEmail");
+        String action = request.getParameter("action");
 
         StaffAccountDAO dao = new StaffAccountDAO();
-
-        if ("resend".equals(action)) {
+        //resend code
+        if ("resend".equalsIgnoreCase(action)) {
             try {
                 String newCode = generateCode();
                 LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(10);
-
                 dao.saveResetCode(email, newCode, expiryTime);
 
                 try {
@@ -76,14 +55,10 @@ public class VerifyCodeController extends HttpServlet {
                     request.setAttribute("message", "A new reset code has been sent to your email.");
                 } catch (Exception mailError) {
                     mailError.printStackTrace();
-
-                    // Dòng này giúp demo tiếp nếu mail lỗi
-                    request.setAttribute("message", "Cannot send email. Demo code: " + newCode);
                 }
 
                 request.getRequestDispatcher("/view/auth/verify-code.jsp").forward(request, response);
                 return;
-
             } catch (Exception e) {
                 e.printStackTrace();
 
@@ -93,19 +68,25 @@ public class VerifyCodeController extends HttpServlet {
             }
         }
 
+        // Verify code
         String code = request.getParameter("code");
+        if (code == null || code.trim().isEmpty()) {
+            request.setAttribute("error", "Please enter verification code.");
+            request.getRequestDispatcher("/view/auth/verify-code.jsp").forward(request, response);
+            return;
+        }
 
+        code = code.trim();
         boolean valid = dao.isValidResetCode(email, code);
-
         if (!valid) {
             request.setAttribute("error", "Invalid or expired code.");
             request.getRequestDispatcher("/view/auth/verify-code.jsp").forward(request, response);
             return;
         }
 
+        //verify code thành công
         session.setAttribute("resetEmail", email);
         session.removeAttribute("pendingResetEmail");
-
         response.sendRedirect(request.getContextPath() + "/reset-password");
     }
 

@@ -33,9 +33,7 @@ public class ResetPasswordController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
         HttpSession session = request.getSession(false);
-
         if (session == null || session.getAttribute("resetEmail") == null) {
             response.sendRedirect(request.getContextPath() + "/forgot-password");
             return;
@@ -47,7 +45,6 @@ public class ResetPasswordController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
         request.setCharacterEncoding("UTF-8");
 
         String newPassword = request.getParameter("newPassword");
@@ -61,11 +58,9 @@ public class ResetPasswordController extends HttpServlet {
         }
 
         String email = (String) session.getAttribute("resetEmail");
-
         if (newPassword == null || confirmPassword == null
                 || newPassword.trim().isEmpty()
                 || confirmPassword.trim().isEmpty()) {
-
             request.setAttribute("error", "Please fill in all fields.");
             request.getRequestDispatcher("/view/auth/reset-password.jsp").forward(request, response);
             return;
@@ -85,13 +80,9 @@ public class ResetPasswordController extends HttpServlet {
 
         try {
             StaffAccountDAO dao = new StaffAccountDAO();
-
             String newPasswordHash = PasswordUtil.hashPassword(newPassword);
-
             dao.updatePasswordAndClearReset(email, newPasswordHash);
-
             session.removeAttribute("resetEmail");
-
             response.sendRedirect(request.getContextPath() + "/login?reset=success&showLogin=true");
 
         } catch (Exception e) {
