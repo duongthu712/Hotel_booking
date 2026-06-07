@@ -90,7 +90,6 @@
                     </tbody>
                 </table>
 
-                <%-- Phân trang giống service-management --%>
                 <div class="pagination">
                     <c:forEach begin="1" end="${totalPages}" var="i">
                         <a href="StaffAccountList?searchText=${searchText}&roleFilter=${roleFilter}&page=${i}" 
@@ -102,12 +101,10 @@
             </div>
         </main>
 
-        <%-- MODAL CHI TIẾT --%>
         <div class="staff-modal" id="detail-modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2>Chi tiết nhân viên</h2>
-                    <button type="button" class="btn-close" id="btn-close-detail">Đóng</button>
                 </div>
                 <div class="modal-body">
                     <c:if test="${selectedStaff != null}">
@@ -122,18 +119,16 @@
                     </c:if>
                 </div>
                 <div class="service-popup-action">
-                    <button type="button" class="btn-close" id="btn-close-detail2">Đóng</button>
+                    <button type="button" class="btn-close" id="btn-close-detail">Đóng</button>
                     <a class="btn-submit" href="StaffAccountEdit?staffId=${selectedStaff.getStaffId()}">Sửa</a>
                 </div>
             </div>
         </div>
 
-        <%-- MODAL SỬA --%>
         <div class="staff-modal" id="edit-modal">
             <form action="StaffAccountEdit" method="post" id="edit-form" class="modal-content">
                 <div class="modal-header">
                     <h2>Chỉnh sửa nhân viên</h2>
-                    <button type="button" class="btn-close" id="btn-close-edit">Huỷ</button>
                 </div>
                 <div class="modal-body">
                     <c:if test="${editStaff != null}">
@@ -150,12 +145,12 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="input-label">Họ tên *</label>
+                            <label class="input-label">Họ tên</label>
                             <input class="service-popup-input-field" type="text" name="fullName" value="${editStaff.getFullName()}" required>
                         </div>
 
                         <div class="form-group">
-                            <label class="input-label">Email *</label>
+                            <label class="input-label">Email</label>
                             <input class="service-popup-input-field" type="email" name="email" value="${editStaff.getEmail()}" required>
                         </div>
 
@@ -165,7 +160,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="input-label">Chức vụ *</label>
+                            <label class="input-label">Chức vụ</label>
                             <select class="service-popup-input-field" name="role">
                                 <option value="Lễ tân" ${editStaff.getRole() == 'Lễ tân' ? 'selected' : ''}>Lễ tân</option>
                                 <option value="Quản lý" ${editStaff.getRole() == 'Quản lý' ? 'selected' : ''}>Quản lý</option>
@@ -183,7 +178,7 @@
                     </c:if>
                 </div>
                 <div class="service-popup-action">
-                    <button type="button" class="btn-close" id="btn-close-edit2">Huỷ</button>
+                    <button type="button" class="btn-close" id="btn-close-edit">Huỷ</button>
                     <button type="submit" class="btn-submit">Lưu thay đổi</button>
                 </div>
             </form>

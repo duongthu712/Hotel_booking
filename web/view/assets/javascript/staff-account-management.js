@@ -37,13 +37,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    if (btnCloseDetail2) {
-        btnCloseDetail2.addEventListener("click", function () {
-            toggleModal(detailModal, false);
-            window.location.href = "StaffAccountList";
-        });
-    }
-
     // Close edit modal
     if (btnCloseEdit) {
         btnCloseEdit.addEventListener("click", function () {
@@ -52,12 +45,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    if (btnCloseEdit2) {
-        btnCloseEdit2.addEventListener("click", function () {
-            toggleModal(editModal, false);
-            window.location.href = "StaffAccountList";
-        });
-    }
 });
 
 
