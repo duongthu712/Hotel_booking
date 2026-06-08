@@ -1,10 +1,10 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Reset Password</title>
+    <title>Đặt lại mật khẩu</title>
 
     <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/navbar.css">
     <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/footer.css">
@@ -17,12 +17,12 @@
     <main class="auth-page">
         <div class="auth-card">
 
-            <div class="auth-label-top">NEW PASSWORD</div>
+            <div class="auth-label-top">MẬT KHẨU MỚI</div>
 
-            <h1>Reset password</h1>
+            <h1>Đặt lại mật khẩu</h1>
 
             <p class="auth-subtitle">
-                Create a new password for your staff account.
+                Tạo mật khẩu mới cho tài khoản nhân viên của bạn.
             </p>
 
             <% if (request.getAttribute("error") != null) { %>
@@ -40,21 +40,21 @@
             <form class="auth-form" action="<%= request.getContextPath() %>/reset-password" method="post">
 
                 <div class="auth-form-group">
-                    <label>New password</label>
+                    <label>Mật khẩu mới</label>
                     <input type="password" name="newPassword" required>
                 </div>
 
                 <div class="auth-form-group">
-                    <label>Confirm password</label>
+                    <label>Nhập lại mật khẩu</label>
                     <input type="password" name="confirmPassword" required>
                 </div>
 
-                <button type="submit" class="auth-btn">Reset password</button>
+                <button type="submit" class="auth-btn">Đặt lại mật khẩu</button>
             </form>
 
             <div class="auth-link">
-                <a href="<%= request.getContextPath() %>/logout">
-                    Back to sign in
+                <a href="<%= request.getContextPath() %>/login?showLogin=true">
+                    Quay lại đăng nhập
                 </a>
             </div>
 

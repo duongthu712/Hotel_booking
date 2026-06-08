@@ -1,10 +1,10 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Verify Code</title>
+    <title>Xác minh mã</title>
 
     <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/navbar.css">
     <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/footer.css">
@@ -17,12 +17,12 @@
     <main class="auth-page">
         <div class="auth-card">
 
-            <div class="auth-label-top">VERIFICATION</div>
+            <div class="auth-label-top">XÁC MINH</div>
 
-            <h1>Verify code</h1>
+            <h1>Xác minh mã</h1>
 
             <p class="auth-subtitle">
-                Enter the verification code sent to your staff email.
+                Nhập mã xác minh đã được gửi đến email nhân viên của bạn.
             </p>
 
             <% if (request.getAttribute("error") != null) { %>
@@ -40,11 +40,11 @@
             <form class="auth-form" action="<%= request.getContextPath() %>/verify-code" method="post">
 
                 <div class="auth-form-group">
-                    <label>Code</label>
+                    <label>Mã xác minh</label>
                     <input type="text" name="code" required>
                 </div>
 
-                <button type="submit" class="auth-btn">Verify code</button>
+                <button type="submit" class="auth-btn">Xác minh mã</button>
             </form>
 
             <form id="resendForm" action="<%= request.getContextPath() %>/verify-code" method="post" hidden>
@@ -53,10 +53,11 @@
 
             <div class="auth-link-row">
                 <a href="#" onclick="document.getElementById('resendForm').submit(); return false;">
-                    Resend code
+                    Gửi lại mã
                 </a>
-                <a href="<%= request.getContextPath() %>/logout">
-                    Back to sign in
+
+                <a href="<%= request.getContextPath() %>/login?showLogin=true">
+                    Quay lại đăng nhập
                 </a>
             </div>
 

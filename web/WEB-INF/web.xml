@@ -5,6 +5,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
 
+    <!-- Filter -->
     <filter>
         <filter-name>AuthorizationFilter</filter-name>
         <filter-class>filter.AuthorizationFilter</filter-class>
@@ -26,6 +27,7 @@
     </filter-mapping>
 
 
+    <!-- Servlet declarations -->
     <servlet>
         <servlet-name>HomeServlet</servlet-name>
         <servlet-class>controller.HomeServlet</servlet-class>
@@ -35,44 +37,7 @@
         <servlet-name>LoginController</servlet-name>
         <servlet-class>controller.LoginController</servlet-class>
     </servlet>
-<<<<<<< HEAD
 
-=======
-    <servlet>
-        <servlet-name>UserProfileController</servlet-name>
-        <servlet-class>controller.UserProfileController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ChangePasswordController</servlet-name>
-        <servlet-class>controller.ChangePasswordController</servlet-class>
-    </servlet>
-    <servlet>
- 
-        <servlet-name>ServiceListController</servlet-name>
-        <servlet-class>controller.ServiceListController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ServiceEditController</servlet-name>
-        <servlet-class>controller.ServiceEditController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ServiceDeleteController</servlet-name>
-        <servlet-class>controller.ServiceDeleteController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ServiceCreateController</servlet-name>
-        <servlet-class>controller.ServiceCreateController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>HotelPolicyServlet</servlet-name>
-        <servlet-class>controller.HotelPolicyServlet</servlet-class>
- 
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>LoginController</servlet-name>
-        <url-pattern>/login</url-pattern>
-    </servlet-mapping>
->>>>>>> 48dd47d6d6a0c2f49113d4c03bc8432ab942a2d5
     <servlet>
         <servlet-name>LogoutController</servlet-name>
         <servlet-class>controller.LogoutController</servlet-class>
@@ -129,6 +94,7 @@
     </servlet>
 
 
+    <!-- Servlet mappings -->
     <servlet-mapping>
         <servlet-name>HomeServlet</servlet-name>
         <url-pattern>/home</url-pattern>
@@ -188,13 +154,16 @@
         <servlet-name>ServiceCreateController</servlet-name>
         <url-pattern>/ServiceCreate</url-pattern>
     </servlet-mapping>
-<<<<<<< HEAD
 
-=======
->>>>>>> 48dd47d6d6a0c2f49113d4c03bc8432ab942a2d5
     <servlet-mapping>
         <servlet-name>HotelPolicyServlet</servlet-name>
         <url-pattern>/policies</url-pattern>
     </servlet-mapping>
+
+
+    <!-- Default page -->
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
 
 </web-app>

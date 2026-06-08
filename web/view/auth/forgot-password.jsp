@@ -4,7 +4,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Forgot Password</title>
+    <title>Quên mật khẩu</title>
 
     <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/navbar.css">
     <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/footer.css">
@@ -16,16 +16,20 @@
 
     <main class="auth-page">
         <div class="auth-card">
-            <div class="auth-label-top">PASSWORD RECOVERY</div>
-            <h1>Forgot password</h1>
+            <div class="auth-label-top">KHÔI PHỤC MẬT KHẨU</div>
+
+            <h1>Quên mật khẩu</h1>
+
             <p class="auth-subtitle">
-                Enter your staff email to receive a verification code.
+                Nhập email nhân viên của bạn để nhận mã xác minh.
             </p>
+
             <% if (request.getAttribute("error") != null) { %>
                 <p class="auth-message-error">
                     <%= request.getAttribute("error") %>
                 </p>
             <% } %>
+
             <% if (request.getAttribute("message") != null) { %>
                 <p class="auth-message-success">
                     <%= request.getAttribute("message") %>
@@ -37,13 +41,16 @@
                     <label>Email</label>
                     <input type="email" name="email" required>
                 </div>
-                <button type="submit" class="auth-btn">Send code</button>
+
+                <button type="submit" class="auth-btn">Gửi mã</button>
             </form>
+
             <div class="auth-link">
-                <a href="<%= request.getContextPath() %>/logout">
-                    Back to sign in
+                <a href="<%= request.getContextPath() %>/login">
+                    Quay lại đăng nhập
                 </a>
             </div>
+
             <div class="auth-line"></div>
         </div>
     </main>

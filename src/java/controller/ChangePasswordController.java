@@ -35,19 +35,19 @@ public class ChangePasswordController extends HttpServlet {
                 || newPassword == null || newPassword.trim().isEmpty()
                 || confirmPassword == null || confirmPassword.trim().isEmpty()) {
 
-            request.setAttribute("error", "All password fields are required.");
+            request.setAttribute("error", "Vui lòng nhập đầy đủ các trường mật khẩu.");
             request.getRequestDispatcher("/view/auth/user-profile.jsp").forward(request, response);
             return;
         }
 
         if (!newPassword.equals(confirmPassword)) {
-            request.setAttribute("error", "Confirm password does not match.");
+            request.setAttribute("error", "Mật khẩu xác nhận không khớp.");
             request.getRequestDispatcher("/view/auth/user-profile.jsp").forward(request, response);
             return;
         }
 
         if (newPassword.length() < 6) {
-            request.setAttribute("error", "New password must be at least 6 characters.");
+            request.setAttribute("error", "Mật khẩu mới phải có ít nhất 6 ký tự.");
             request.getRequestDispatcher("/view/auth/user-profile.jsp").forward(request, response);
             return;
         }
@@ -57,16 +57,22 @@ public class ChangePasswordController extends HttpServlet {
         StaffAccount checkedStaff = dao.loginWithHashCheck(staff.getUsername(), currentPassword);
 
         if (checkedStaff == null) {
-            request.setAttribute("error", "Current password is incorrect.");
+            request.setAttribute("error", "Mật khẩu hiện tại không đúng.");
+            request.getRequestDispatcher("/view/auth/user-profile.jsp").forward(request, response);
+            return;
+        }
+
+        // Kiểm tra mật khẩu mới không được trùng mật khẩu hiện tại
+        if (currentPassword.equals(newPassword)) {
+            request.setAttribute("error", "Mật khẩu mới không được trùng với mật khẩu hiện tại.");
             request.getRequestDispatcher("/view/auth/user-profile.jsp").forward(request, response);
             return;
         }
 
         String newPasswordHash = PasswordUtil.hashPassword(newPassword);
-
         dao.updatePasswordByStaffId(staff.getStaffId(), newPasswordHash);
 
-        request.setAttribute("message", "Password changed successfully.");
+        request.setAttribute("message", "Đổi mật khẩu thành công.");
         request.getRequestDispatcher("/view/auth/user-profile.jsp").forward(request, response);
     }
 }

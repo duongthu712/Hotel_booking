@@ -17,10 +17,10 @@
 %>
 
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>User Profile</title>
+    <title>Hồ sơ cá nhân</title>
 
     <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/user-profile.css">
 </head>
@@ -28,111 +28,91 @@
 
     <main class="profile-page">
         <div class="profile-container">
-
             <div class="profile-header">
-                <p class="profile-eyebrow">MY ACCOUNT</p>
-                <h1>Staff profile</h1>
-                <p class="profile-subtitle">Personal and contact information.</p>
+                <p class="profile-eyebrow">TÀI KHOẢN CỦA TÔI</p>
+                <h1>Hồ sơ nhân viên</h1>
+                <p class="profile-subtitle">Thông tin cá nhân và thông tin liên hệ.</p>
             </div>
-
             <% if (request.getAttribute("error") != null) { %>
                 <div class="message error-message">
                     <%= request.getAttribute("error") %>
                 </div>
             <% } %>
-
             <% if (request.getAttribute("message") != null) { %>
                 <div class="message success-message">
                     <%= request.getAttribute("message") %>
                 </div>
             <% } %>
-
             <section class="profile-card">
-                <h2>Profile information</h2>
-
+                <h2>Thông tin nhân viên</h2>
                 <form action="<%= request.getContextPath() %>/profile" method="post">
                     <div class="form-grid">
-
                         <div class="form-group">
-                            <label>Username</label>
+                            <label>Tên đăng nhập</label>
                             <input type="text" value="<%= username %>" readonly>
                         </div>
-
                         <div class="form-group">
-                            <label>Full name</label>
+                            <label>Họ và tên</label>
                             <input type="text" name="fullName" value="<%= fullName %>" required>
                         </div>
-
                         <div class="form-group">
                             <label>Email</label>
                             <input type="email" name="email" value="<%= email %>" required>
                         </div>
-
                         <div class="form-group">
-                            <label>Phone</label>
+                            <label>Số điện thoại</label>
                             <input type="text" name="phone" value="<%= phone %>">
                         </div>
-
                         <div class="form-group">
-                            <label>Role</label>
+                            <label>Vai trò</label>
                             <input type="text" value="<%= role %>" readonly>
                         </div>
-
                     </div>
 
                     <div class="button-row">
-                        <button type="submit" class="btn-primary">Save changes</button>
+                        <button type="submit" class="btn-primary">Lưu thay đổi</button>
                     </div>
                 </form>
             </section>
-
             <section class="profile-card">
                 <div class="security-header">
                     <div>
-                        <h2>Change password</h2>
-                        <p class="security-note">Update your password only when needed.</p>
+                        <h2>Đổi mật khẩu</h2>
+                        <p class="security-note">Chỉ cập nhật mật khẩu khi cần thiết.</p>
                     </div>
-
                     <button type="button" class="btn-outline" id="showPasswordBtn">
-                        Change password
+                        Đổi mật khẩu
                     </button>
                 </div>
-
+                
                 <form action="<%= request.getContextPath() %>/profile/change-password"
                       method="post"
                       id="passwordForm"
                       class="hidden">
-
                     <div class="form-grid">
-
                         <div class="form-group full-width">
-                            <label>Current password</label>
+                            <label>Mật khẩu hiện tại</label>
                             <input type="password" name="currentPassword">
                         </div>
-
                         <div class="form-group">
-                            <label>New password</label>
+                            <label>Mật khẩu mới</label>
                             <input type="password" name="newPassword">
                         </div>
-
                         <div class="form-group">
-                            <label>Confirm new password</label>
+                            <label>Nhập lại mật khẩu mới</label>
                             <input type="password" name="confirmPassword">
                         </div>
-
                     </div>
-
                     <div class="button-row">
-                        <button type="submit" class="btn-primary">Update password</button>
-                        <button type="button" class="btn-outline" id="cancelPasswordBtn">Cancel</button>
+                        <button type="submit" class="btn-primary">Cập nhật mật khẩu</button>
+                        <button type="button" class="btn-outline" id="cancelPasswordBtn">Hủy</button>
                     </div>
                 </form>
             </section>
 
             <a class="back-link" href="<%= request.getContextPath() %>/login">
-                Back to dashboard
+                Quay lại trang chính
             </a>
-
         </div>
     </main>
 
@@ -160,6 +140,5 @@
             });
         });
     </script>
-
 </body>
 </html>

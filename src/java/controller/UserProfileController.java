@@ -14,9 +14,7 @@ public class UserProfileController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
         HttpSession session = request.getSession(false);
-
         if (session == null || session.getAttribute("staff") == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
@@ -30,7 +28,6 @@ public class UserProfileController extends HttpServlet {
             throws ServletException, IOException {
         
         request.setCharacterEncoding("UTF-8");
-
         HttpSession session = request.getSession(false);
 
         if (session == null || session.getAttribute("staff") == null) {
@@ -39,14 +36,12 @@ public class UserProfileController extends HttpServlet {
         }
 
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
-
         String fullName = request.getParameter("fullName");
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
 
         if (fullName == null || fullName.trim().isEmpty()
                 || email == null || email.trim().isEmpty()) {
-
             request.setAttribute("error", "Full name and email are required.");
             request.getRequestDispatcher("/view/auth/user-profile.jsp").forward(request, response);
             return;
@@ -55,11 +50,9 @@ public class UserProfileController extends HttpServlet {
         fullName = fullName.trim();
         email = email.trim();
         phone = phone != null ? phone.trim() : "";
-
         StaffAccountDAO dao = new StaffAccountDAO();
 
         dao.updateProfile(staff.getStaffId(), fullName, email, phone);
-
         StaffAccount updatedStaff = dao.getStaffById(staff.getStaffId());
 
         if (updatedStaff != null) {
