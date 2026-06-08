@@ -53,7 +53,7 @@
             </form>
 
             <div class="auth-link">
-                <a href="<%= request.getContextPath() %>/login?showLogin=true">
+                <a href="<%= request.getContextPath() %>/logout">
                     Quay lại đăng nhập
                 </a>
             </div>

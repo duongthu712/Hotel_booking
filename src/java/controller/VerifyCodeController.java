@@ -45,7 +45,7 @@ public class VerifyCodeController extends HttpServlet {
 
         StaffAccountDAO dao = new StaffAccountDAO();
 
-        // Gửi lại mã xác minh
+        //gửi lại mã xác minh
         if ("resend".equalsIgnoreCase(action)) {
             try {
                 String newCode = generateCode();

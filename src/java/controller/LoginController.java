@@ -48,7 +48,7 @@ public class LoginController extends HttpServlet {
         if (staff != null) {
             HttpSession session = request.getSession();
 
-            // Session tồn tại trong 1 giờ
+            //session 1 hr
             session.setMaxInactiveInterval(60 * 60);
 
             session.setAttribute("staff", staff);

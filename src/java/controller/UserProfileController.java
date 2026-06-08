@@ -59,7 +59,6 @@ public class UserProfileController extends HttpServlet {
             session.setAttribute("staff", updatedStaff);
             session.setAttribute("staffId", updatedStaff.getStaffId());
             session.setAttribute("staffRole", updatedStaff.getRole());
-
             request.setAttribute("message", "Profile updated successfully.");
         } else {
             request.setAttribute("error", "Cannot update profile.");

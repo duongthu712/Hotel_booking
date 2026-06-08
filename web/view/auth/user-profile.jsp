@@ -109,10 +109,6 @@
                     </div>
                 </form>
             </section>
-
-            <a class="back-link" href="<%= request.getContextPath() %>/login">
-                Quay lại trang chính
-            </a>
         </div>
     </main>
 
@@ -131,7 +127,7 @@
 
         cancelPasswordBtn.addEventListener("click", function () {
             passwordForm.classList.add("hidden");
-            showPasswordBtn.style.display = "inline-flex";
+            showPasswordBtn.style.display = "";
 
             const passwordInputs = passwordForm.querySelectorAll("input");
             passwordInputs.forEach(input => {

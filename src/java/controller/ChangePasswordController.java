@@ -62,7 +62,7 @@ public class ChangePasswordController extends HttpServlet {
             return;
         }
 
-        // Kiểm tra mật khẩu mới không được trùng mật khẩu hiện tại
+        //check current pass vs new pass
         if (currentPassword.equals(newPassword)) {
             request.setAttribute("error", "Mật khẩu mới không được trùng với mật khẩu hiện tại.");
             request.getRequestDispatcher("/view/auth/user-profile.jsp").forward(request, response);

@@ -55,8 +55,7 @@
                 <a href="#" onclick="document.getElementById('resendForm').submit(); return false;">
                     Gửi lại mã
                 </a>
-
-                <a href="<%= request.getContextPath() %>/login?showLogin=true">
+                <a href="<%= request.getContextPath() %>/logout">
                     Quay lại đăng nhập
                 </a>
             </div>
