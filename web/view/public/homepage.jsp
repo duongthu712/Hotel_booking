@@ -102,7 +102,6 @@
     <h2>Trải nghiệm tại La Mer</h2>
 
     <div class="gallery-split-container">
-        <!-- Hàng 1: Ảnh bên TRÁI - Chữ bên PHẢI (Hồ bơi) -->
         <div class="split-row">
             <div class="split-image">
                 <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0d/ff/4c/58/vinpearl-ha-long-bay.jpg?w=1800&h=-1&s=1" alt="The Oasis Pool">
@@ -114,7 +113,6 @@
             </div>
         </div>
 
-        <!-- Hàng 2: Ảnh bên PHẢI - Chữ bên TRÁI (Trà chiều bãi biển) -->
         <div class="split-row reverse">
             <div class="split-image">
                 <img src="https://i.pinimg.com/736x/56/e0/d8/56e0d8ec5b706d92fe8a65a31462c4ea.jpg" alt="Coastal Afternoon Tea">
@@ -126,7 +124,6 @@
             </div>
         </div>
 
-        <!-- Hàng 3: Ảnh bên TRÁI - Chữ bên PHẢI (Spa) -->
         <div class="split-row">
             <div class="split-image">
                 <img src="https://i.pinimg.com/736x/19/e9/97/19e997f01976241cada0b14047d47842.jpg" alt="La Mer Spa">
@@ -157,7 +154,7 @@
         </div>
 
         <div class="gallery-item">
-            <img src="https://statics.vinpearl.com/villa-4-phong-ngu_1725028102.jpg" alt="">
+            <img src="https://images.trvl-media.com/lodging/2000000/1080000/1077400/1077331/dccd9f83.jpg?impolicy=resizecrop&rw=575&rh=575&ra=fill" alt="">
         </div>
 
         <div class="gallery-item">

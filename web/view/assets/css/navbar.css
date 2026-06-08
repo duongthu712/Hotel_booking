@@ -1,37 +1,29 @@
-/* ==========================================================================
-    NAVBAR DESIGN - FIXED DEEP MOSS GREEN (#2C3E46)
-   ========================================================================== */
-
 /* 1. KHUNG CHỨA BANNER THANH ĐIỀU HƯỚNG CỐ ĐỊNH */
 .navbar {
     height: 90px;
-    background: #2c3e46 !important; /* Màu xanh giống hệt Footer */
+    background: #2c3e46 ; 
     display: flex;
-    justify-content: space-between; /* Đẩy 3 khối chính dạt đều sang 3 góc cân bằng */
+    justify-content: space-between; 
     align-items: center;
-    padding: 0 40px; /* Giảm nhẹ xuống 40px để mở rộng không gian bề ngang cho menu */
+    padding: 0 40px; 
     box-sizing: border-box;
     width: 100%;
-    
-    /* KHÔNG CỐ ĐỊNH: Để thanh menu nằm trong luồng cuộn bình thường của trang */
     position: relative; 
   
 }
 
-/* 2. CHỮ LOGO HOTEL (BÊN TRÁI VÀ ĐỨNG ĐỘC LẬP) */
+/* 2. CHỮ LOGO HOTEL */
 .navbar-logo {
-    /* Đã sửa: Chuyển sang phông chữ Garamond cổ điển hoài cổ */
-    font-family: 'Cormorant Garamond', 'Playfair Display', serif !important; 
-    font-size: 34px; /* Tăng nhẹ kích thước cho phông chữ có chân mảnh */
+    font-family: 'Cormorant Garamond', 'Playfair Display', serif ; 
+    font-size: 34px; 
     font-weight: 600;
     color: white;
-    letter-spacing: 3px; /* Tăng khoảng cách chữ để tạo cảm giác thoáng đãng, luxury */
+    letter-spacing: 3px; 
     text-transform: uppercase; 
     text-decoration: none;
-    flex: 1; /* Cấp không gian vừa đủ cho cánh trái */
+    flex: 1; 
     display: flex;
     justify-content: flex-start;
-    white-space: nowrap; /* Đảm bảo logo luôn nằm trên 1 dòng */
 }
 
 /* 3. MENU ĐIỀU HƯỚNG CHỮ (CĂN CHÍNH GIỮA TUYỆT ĐỐI) */
@@ -39,11 +31,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 30px; /* Tăng nhẹ lên 35px để phông chữ mới có không gian hiển thị */
-    list-style: none;
+    gap: 30px; 
+    list-style: none; 
     margin: 0;
     padding: 0;
-    flex: 2; /* Chiếm tỷ trọng lớn để hút vào giữa trang */
+    flex: 2; 
 }
 
 /* 4. CÁC THÀNH PHẦN HÀNH ĐỘNG (BÊN PHẢI VÀ ĐỨNG ĐỘC LẬP) */
@@ -52,33 +44,25 @@
     align-items: center;
     justify-content: flex-end;
     gap: 30px; 
-    flex: 1.2; /* Tăng nhẹ tỷ trọng từ 1 lên 1.2 để vùng chứa bên phải rộng rãi hơn */
+    flex: 1.2; 
 }
 
 /* 5. ĐỊNH DẠNG LINK MENU VÀ NÚT ĐĂNG NHẬP NHÂN VIÊN */
 .navbar-menu a, 
 .staff-login {
     text-decoration: none;
-    color: rgba(255, 255, 255, 0.8); /* Tăng nhẹ độ sáng chữ */
+    color: #ffffffcc; 
     
-    /* 🔥 ĐÃ SỬA: Thay Montserrat bằng Garamond in nghiêng nghệ thuật và mềm mại */
-    font-family: 'Cormorant Garamond', 'Lora', serif !important; 
-    font-size: 16px; /* Phông chữ có chân thường nhỏ hơn phông không chân nên nâng lên 16px là vừa vặn */
+    font-family: 'Cormorant Garamond', 'Lora', serif; 
+    font-size: 16px; 
     font-weight: 600;
     letter-spacing: 0.5px;
-    text-transform: none; /* Bỏ in hoa toàn bộ để giữ nét tinh tế, uyển chuyển của chữ nghiêng */
-    padding: 10px 0;
-    transition: all 0.25s ease-in-out;
-    
-    /* QUAN TRỌNG: Ép chuỗi text luôn nằm trên một đường thẳng, chống rớt dòng */
     white-space: nowrap; 
 }
 
-/* Hiệu ứng sáng lên khi hover cho menu và đăng nhập */
 .navbar-menu a:hover,
 .staff-login:hover {
     color: #ffffff;
-    text-shadow: 0 0 1px rgba(255,255,255,0.3); /* Tạo hiệu ứng hào quang nhẹ khi di chuột */
 }
 
 /* 6. NÚT ĐẶT PHÒNG NHANH CÓ VIỀN VÀNG PREMIUM */
@@ -86,24 +70,17 @@
     display: inline-block;
     text-decoration: none;
     color: white;
-    border: 1px solid #C8A96B; /* Viền vàng cát sang trọng */
-    padding: 10px 24px; 
+    border: 1px solid #C8A96B; 
+    padding: 10px 20px; 
     border-radius: 2px;
     
-    /* 🔥 ĐÃ SỬA: Đồng bộ phông chữ đứng thanh lịch, giữ nguyên nét sang trọng phương Tây */
-    font-family: 'Cormorant Garamond', serif !important;
+    font-family: 'Cormorant Garamond', serif ;
     font-size: 14px; 
     font-weight: 600;
     letter-spacing: 1.5px;
-    font-style: normal; /* Nút bấm giữ chữ đứng vững chãi */
-    
-    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-    white-space: nowrap; /* Giữ nút luôn cố định phom dòng */
+    white-space: nowrap; 
 }
-
 .booking-btn:hover {
-    background: #C8A96B; /* Hover nền hóa vàng cát */
-    color: #2c3e46 !important; /* Đổi chữ sang màu xanh rêu đậm khi hover để nổi bật trên nền vàng */
-    box-shadow: 0 4px 15px rgba(200, 169, 107, 0.25);
-    transform: translateY(-1px);
+    background: #C8A96B; 
+    color: #2c3e46 ; 
 }
