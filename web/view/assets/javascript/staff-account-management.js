@@ -2,9 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const detailModal = document.getElementById("detail-modal");
     const editModal = document.getElementById("edit-modal");
     const btnCloseDetail = document.getElementById("btn-close-detail");
-    const btnCloseDetail2 = document.getElementById("btn-close-detail2");
     const btnCloseEdit = document.getElementById("btn-close-edit");
-    const btnCloseEdit2 = document.getElementById("btn-close-edit2");
 
     // Get status
     const isEditMode = document.body.getAttribute("data-edit-mode") === "true";
