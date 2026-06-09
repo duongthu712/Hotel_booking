@@ -84,6 +84,22 @@
         <servlet-name>RoomServiceEditController</servlet-name>
         <servlet-class>controller.RoomServiceEditController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>HotelServiceListController</servlet-name>
+        <servlet-class>controller.HotelServiceListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>HotelServiceEditController</servlet-name>
+        <servlet-class>controller.HotelServiceEditController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>HotelServiceDeleteController</servlet-name>
+        <servlet-class>controller.HotelServiceDeleteController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>HotelServiceCreateController</servlet-name>
+        <servlet-class>controller.HotelServiceCreateController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>
         <url-pattern>/login</url-pattern>
@@ -187,5 +203,21 @@
     <servlet-mapping>
         <servlet-name>RoomServiceEditController</servlet-name>
         <url-pattern>/RoomServiceEdit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>HotelServiceListController</servlet-name>
+        <url-pattern>/HotelServiceList</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>HotelServiceEditController</servlet-name>
+        <url-pattern>/HotelServiceEdit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>HotelServiceDeleteController</servlet-name>
+        <url-pattern>/HotelServiceDelete</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>HotelServiceCreateController</servlet-name>
+        <url-pattern>/HotelServiceCreate</url-pattern>
     </servlet-mapping>
 </web-app>

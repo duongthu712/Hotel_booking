@@ -117,6 +117,34 @@ public class HotelServiceDAO extends DBContext {
             }
         }
     }
+    
+    public List<HotelService> searchHotelServicesByName(String keyword) throws Exception {
+        List<HotelService> list = new ArrayList<>();
+        String strSQL = """
+                        select * 
+                        from HotelServices 
+                        where service_name like ?
+                        """;
+
+        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
+            stm.setString(1, "%" + keyword + "%");
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    int id = rs.getInt("hotel_service_id");
+                    BigDecimal price = rs.getBigDecimal("unit_price");
+                    String description = rs.getString("description").trim();
+                    boolean active = rs.getBoolean("is_active");
+                    String imgUrl = rs.getString("image_url");
+
+                    HotelService service = new HotelService(id, strSQL, description, price, imgUrl, active);
+                    list.add(service);
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể tìm kiếm dịch vụ.");
+        }
+        return list;
+    }
 
     public HotelService createHotelService(HotelService hotelService) throws Exception {
         if (isServiceNameExists(hotelService.getServiceName())) {

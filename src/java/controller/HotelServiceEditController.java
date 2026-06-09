@@ -1,6 +1,6 @@
 package controller;
 
-import dao.RoomServiceDAO;
+import dao.HotelServiceDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.math.BigDecimal;
-import model.RoomService;
+import model.HotelService;
 import model.StaffAccount;
 
 /**
@@ -16,12 +16,12 @@ import model.StaffAccount;
  * @version 1.0
  * @since 2026-06-09
  */
-public class RoomServiceEditController extends HttpServlet {
+public class HotelServiceEditController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.sendRedirect(request.getContextPath() + "RoomServiceList");
+        response.sendRedirect(request.getContextPath() + "HotelServiceList");
     }
 
     @Override
@@ -38,6 +38,7 @@ public class RoomServiceEditController extends HttpServlet {
         String serviceName = request.getParameter("serviceName");
         String description = request.getParameter("description");
         String unitPriceStr = request.getParameter("unitPrice");
+        String imageUrl = request.getParameter("imageUrl");
         String activeStr = request.getParameter("active");
         String page = request.getParameter("page");
         String keyword = request.getParameter("keyword");
@@ -56,22 +57,16 @@ public class RoomServiceEditController extends HttpServlet {
             }
         } catch (NumberFormatException e) {
             session.setAttribute("errorMessage", "Đơn giá không hợp lệ.");
-            response.sendRedirect(request.getContextPath() + "RoomServiceList");
+            response.sendRedirect(request.getContextPath() + "HotelServiceList");
             return;
         }
 
         boolean isActive = "true".equals(activeStr);
-        RoomService updatedService = new RoomService(
-                Integer.parseInt(serviceIdStr),
-                serviceName.trim(),
-                description.trim(),
-                unitPrice,
-                isActive
-        );
+        HotelService updatedService = new HotelService(0, serviceName, description, unitPrice, imageUrl, isActive);
 
         try {
-            RoomServiceDAO dao = new RoomServiceDAO();
-            dao.updateRoomService(updatedService);
+            HotelServiceDAO dao = new HotelServiceDAO();
+            dao.updateHotelService(updatedService);
             session.setAttribute("successMessage", "Cập nhật dịch vụ \"" + serviceName.trim() + "\" thành công.");
         } catch (Exception e) {
             session.setAttribute("errorMessage", e.getMessage());
@@ -81,7 +76,7 @@ public class RoomServiceEditController extends HttpServlet {
     }
 
     private String buildRedirectUrl(HttpServletRequest request, String page, String keyword) {
-        StringBuilder url = new StringBuilder(request.getContextPath() + "RoomServiceList");
+        StringBuilder url = new StringBuilder(request.getContextPath() + "HotelServiceList");
         url.append("?page=").append(page != null ? page : "1");
         if (keyword != null && !keyword.trim().isEmpty()) {
             try {
@@ -95,7 +90,7 @@ public class RoomServiceEditController extends HttpServlet {
 
     @Override
     public String getServletInfo() {
-        return "Room Service Edit Controller";
+        return "Hotel Service Edit Controller";
     }
 
 }
