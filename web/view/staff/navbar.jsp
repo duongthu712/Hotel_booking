@@ -16,13 +16,15 @@
 
     <% if ("MANAGER".equals(role)) { %>
 
-    <a href="ManagerDashboard">Tổng quan</a>
-    <a href="HotelInfoList">Thông tin khách sạn</a>
-    <a href="RoomTypeList">Quản lý loại phòng</a>
-    <a href="RoomList">Quản lý phòng</a>
-    <a href="FeedbackList">Đánh giá</a>
-    <a href="ServiceList">Quản lý dịch vụ</a>
-    <a href="PolicyList">Quản lý chính sách</a>
+    <a href="${pageContext.request.contextPath}/dashboard.jsp">Tổng quan</a>
+    <a href="${pageContext.request.contextPath}/HotelInfoList">Thông tin khách sạn</a>
+    <a href="${pageContext.request.contextPath}/RoomTypeList">Quản lý loại phòng</a>
+    <a href="${pageContext.request.contextPath}/RoomList">Quản lý phòng</a>
+    <a href="${pageContext.request.contextPath}/RoomServiceList">Quản lý dịch vụ phòng</a>
+    <a href="${pageContext.request.contextPath}/ServiceList">Quản lý tiện nghi phòng</a>
+    <a href="${pageContext.request.contextPath}/HotelServiceList">Quản lý dịch vụ khách sạn</a>
+    <a href="${pageContext.request.contextPath}/PolicyList">Quản lý chính sách</a>
+    <a href="${pageContext.request.contextPath}/FeedbackList">Đánh giá</a>
     <%}else if("RECEPTIONIST".equals(role)){%>
 
     <%}else if("ADMIN".equals(role)){%>

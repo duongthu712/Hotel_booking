@@ -83,7 +83,7 @@ html, body {
     cursor: pointer;
     text-decoration: none;
     font-size: 14px;
-    
+
     background: var(--text-main);
     color: white;
 }
@@ -186,37 +186,6 @@ html, body {
     border-color: var(--text-main);
 }
 
-.data-table {
-    table-layout: fixed;
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    border: 2px solid var(--text-main);
-    border-radius: var(--radius-custom);
-    overflow: hidden;
-    font-size: 1rem;
-}
-
-.data-table th {
-    background: var(--bg-main);
-    color: var(--text-main);
-    text-transform: uppercase;
-    padding: 15px 20px;
-    font-family: var(--font-logo);
-    font-size: 1rem;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-}
-
-.data-table td {
-    padding: 15px 20px;
-    font-family: var(--font-logo);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: table-cell;
-}
-
 .status-active {
     background-color: #e8f5e9;
     color: #2e7d32;
@@ -229,6 +198,34 @@ html, body {
     border: 1px solid #ffcdd2;
 }
 
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th {
+    padding: 18px 16px;
+    text-align: center;
+    font-family: var(--font-logo);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.data-table td {
+    padding: 18px 16px;
+    font-family: var(--font-logo);
+    font-size: 1rem;
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
 .btn-action {
     vertical-align: middle;
     text-align: center;
@@ -238,7 +235,6 @@ html, body {
 .btn-action a {
     text-decoration: none;
     border: none;
-    background-color: white;
     font-size: 1em;
     font-weight: 700;
     color: var(--text-main);
@@ -246,11 +242,7 @@ html, body {
     transition: color 0.3s;
 }
 
-.btn-action a:hover {
-    color: var(--text-main);
-}
-
-.btn-action form {
+.btn-action form, .btn-action a{
     display: inline-block;
     margin: 0;
 }
@@ -258,17 +250,13 @@ html, body {
 .btn-action button {
     text-decoration: none;
     border: none;
-    background-color: white;
     font-size: 1em;
     font-weight: 700;
     color: var(--text-main);
     cursor: pointer;
     font-family: var(--font-logo);
     padding: 0;
-}
-
-.btn-action button:hover {
-    color: #c62828;
+    background: transparent;
 }
 
 .pagination {
