@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
-import model.Service;
+import model.RoomService;
 import dao.HotelServiceDAO;
 import dao.RoomServiceDAO;
 import java.util.ArrayList;
@@ -87,11 +87,11 @@ public class ServiceListController extends HttpServlet {
 
         HotelServiceDAO hDao = new HotelServiceDAO();
         RoomServiceDAO rDao = new RoomServiceDAO();
-        List<Service> serviceList = new ArrayList<>();
+        List<RoomService> serviceList = new ArrayList<>();
 
         //Get data from database
-        List<Service> hServices = hDao.getAllHotelServices();
-        List<Service> rServices = rDao.getAllRoomServices();
+        List<RoomService> hServices = hDao.getAllHotelServices();
+        List<RoomService> rServices = rDao.getAllRoomServices();
 
         //Filter data by filterType
         if ("HOTEL".equals(filterType)) {
@@ -119,7 +119,7 @@ public class ServiceListController extends HttpServlet {
         int end = Math.min(start + recordsPerPage, totalRecords);
 
         // Danh sách đã cắt để hiển thị
-        List<Service> pagedList = serviceList.subList(start, end);
+        List<RoomService> pagedList = serviceList.subList(start, end);
 
         //Send data to jsp page
         request.setAttribute("serviceList", pagedList);

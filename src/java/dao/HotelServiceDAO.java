@@ -19,9 +19,6 @@ import java.sql.SQLException;
  */
 public class HotelServiceDAO extends DBContext {
 
-    PreparedStatement stm;
-    ResultSet rs;
-
     public List<HotelService> getAllHotelServices() throws Exception {
         List<HotelService> list = new ArrayList<HotelService>();
         String strSQL = """
@@ -33,7 +30,6 @@ public class HotelServiceDAO extends DBContext {
             while (rs.next()) {
                 int id = rs.getInt("hotel_service_id");
                 BigDecimal price = rs.getBigDecimal("unit_price");
-                String serviceName = rs.getString("service_name");
                 String description = rs.getString("description").trim();
                 String name = rs.getString("service_name");
                 boolean active = rs.getBoolean("is_active");
@@ -46,7 +42,7 @@ public class HotelServiceDAO extends DBContext {
             if (e.getErrorCode() == 547) {
                 throw new Exception("Không thể xóa dịch vụ này vì đang được sử dụng trong các đơn đặt phòng.");
             } else {
-                throw new Exception("Hệ thống đang bận, vui lòng thử lại sau.");
+                throw new Exception("Lỗi hệ thống: Vui lòng thử lại sau.");
             }
         }
         return list;
@@ -76,7 +72,7 @@ public class HotelServiceDAO extends DBContext {
                 }
             }
         } catch (SQLException e) {
-            throw new Exception("Hệ thống đang bận, vui lòng thử lại sau.");
+            throw new Exception("Lỗi hệ thống: Vui lòng thử lại sau.");
         }
     }
 
@@ -104,7 +100,7 @@ public class HotelServiceDAO extends DBContext {
                 }
             }
         } catch (SQLException e) {
-            throw new Exception("Hệ thống đang bận, vui lòng thử lại sau.");
+            throw new Exception("Lỗi hệ thống: Vui lòng thử lại sau.");
         }
     }
 
@@ -150,7 +146,7 @@ public class HotelServiceDAO extends DBContext {
                 throw new Exception("Thêm dịch vụ thất bại.");
             }
         } catch (SQLException e) {
-            throw new Exception("Không thể tạo mới dịch vụ.");
+            throw new Exception("Lỗi hệ thống: Không thể tạo mới dịch vụ.");
         }
     }
 
@@ -184,7 +180,7 @@ public class HotelServiceDAO extends DBContext {
                 throw new Exception("Cập nhật dịch vụ thất bại.");
             }
         } catch (SQLException e) {
-            throw new Exception("Không thể cập nhật dịch vụ.");
+            throw new Exception("Lỗi hệ thống: Không thể cập nhật dịch vụ.");
         }
     }
 
@@ -213,7 +209,7 @@ public class HotelServiceDAO extends DBContext {
             if (e.getErrorCode() == 547) {
                 throw new Exception("Không thể xóa vì dịch vụ này đang được sử dụng trong các đơn đặt phòng.");
             }
-            throw new Exception("Không thể thực hiện thao tác xóa.");
+            throw new Exception("Lỗi hệ thống: Không thể thực hiện thao tác xóa.");
         }
     }
 }

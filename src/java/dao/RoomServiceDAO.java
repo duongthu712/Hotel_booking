@@ -1,4 +1,3 @@
- 
 package dao;
 
 import dal.DBContext;
@@ -7,12 +6,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import model.Service;
-import model.ServiceType;
+import model.RoomService;
+import java.sql.SQLException;
 
 /**
- * RoomServiceDAO.java Data Processing Operator layer for room services
- * Provides CRUD with RoomServices table
+ * RoomServiceDAO.java Data Processing Operator layer for room services Provides
+ * CRUD with RoomServices table
  *
  * @author LinhLTHE200306
  * @version 1.0
@@ -20,166 +19,174 @@ import model.ServiceType;
  */
 public class RoomServiceDAO extends DBContext {
 
-    PreparedStatement stm;
-    ResultSet rs;
+    public List<RoomService> getAllRoomServices() throws Exception {
+        List<RoomService> list = new ArrayList<>();
+        String strSQL = """
+                        select * 
+                        from RoomServices
+                        """;
 
-    /**
-     * Get list all room servives from database
-     *
-     * @return List of service object, return null if not have data
-     */
-    public List<Service> getAllRoomServices() {
-        List<Service> roomServices = new ArrayList<Service>();
-        try {
-            String strSQL = """
-                           select * from RoomServices
-                           """;
-            stm = connection.prepareStatement(strSQL);
-            rs = stm.executeQuery();
-
+        try (PreparedStatement stm = connection.prepareStatement(strSQL);
+             ResultSet rs = stm.executeQuery()) {
             while (rs.next()) {
-                int serviceId = rs.getInt("service_id");
-                BigDecimal price = rs.getBigDecimal("unit_price");
-                String serviceName = rs.getString("service_name");
+                int id = rs.getInt("service_id");
+                String name = rs.getString("service_name");
                 String description = rs.getString("description").trim();
+                BigDecimal price = rs.getBigDecimal("unit_price");
                 boolean active = rs.getBoolean("is_active");
 
-                Service newService = new Service(serviceId, serviceName, 
-                        description, price, active, ServiceType.ROOM);
-                roomServices.add(newService);
+                RoomService newRoomService = new RoomService(id, name, description, price, active);
+                list.add(newRoomService);
             }
-        } catch (Exception ex) {
-            System.out.println("GetRoomServices:" + ex.getMessage());
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể truy xuất danh sách dịch vụ.");
         }
-        return roomServices;
+        return list;
     }
 
-    /**
-     * Find a service by its ID
-     *
-     * @param serviceId
-     * @return Service object if found, if not found return null
-     */
-    public Service getRoomServicesById(int serviceId) {
-        Service roomService = null;
-        try {
-            String strSQL = """
-                          select * from RoomServices rs
-                          where rs.service_id = ?
-                          """;
-            stm = connection.prepareCall(strSQL);
+    public RoomService getRoomServicesById(int serviceId) throws Exception {
+        String strSQL = """
+                        select * 
+                        from RoomServices 
+                        where service_id = ?
+                        """;
+
+        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
             stm.setInt(1, serviceId);
-            rs = stm.executeQuery();
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    int id = rs.getInt("service_id");
+                    String name = rs.getString("service_name");
+                    String description = rs.getString("description").trim();
+                    BigDecimal price = rs.getBigDecimal("unit_price");
+                    boolean active = rs.getBoolean("is_active");
 
-            while (rs.next()) {
-                BigDecimal price = rs.getBigDecimal("unit_price");
-                String serviceName = rs.getString("service_name");
-                String description = rs.getString("description").trim();
-                boolean active = rs.getBoolean("is_active");
-
-                roomService = new Service(serviceId, serviceName, description, 
-                        price, active, ServiceType.ROOM);
+                    RoomService roomService = new RoomService(id, name, description, price, active);
+                    return roomService;
+                } else {
+                    throw new Exception("Dịch vụ này không tồn tại.");
+                }
             }
-        } catch (Exception ex) {
-            System.out.println("GetRoomServices:" + ex.getMessage());
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Vui lòng thử lại sau.");
         }
-        return roomService;
     }
 
-    /**
-     * Adding new service in system
-     *
-     * @param roomService
-     * @return service object if add successfully, null if unsuccess
-     */
-    public Service createRoomService(Service roomService) {
-        //Check service is exist
-        Service found = getRoomServicesById(roomService.getServiceId());
-        if (found != null) {
-            return null;
+    public RoomService getRoomServicesByName(String serviceName) throws Exception {
+        String strSQL = """
+                        select * 
+                        from RoomServices 
+                        where service_name = ?
+                        """;
+
+        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
+            stm.setString(1, serviceName);
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    int id = rs.getInt("service_id");
+                    String name = rs.getString("service_name");
+                    String description = rs.getString("description") != null ? rs.getString("description").trim() : "";
+                    BigDecimal price = rs.getBigDecimal("unit_price");
+                    boolean active = rs.getBoolean("is_active");
+
+                    RoomService roomService = new RoomService(id, name, description, price, active);
+                    return roomService;
+                } else {
+                    throw new Exception("Dịch vụ này không tồn tại.");
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Vui lòng thử lại sau.");
+        }
+    }
+
+    public RoomService createRoomService(RoomService roomService) throws Exception {
+        try {
+            getRoomServicesByName(roomService.getServiceName());
+            throw new Exception("Tên dịch vụ này đã tồn tại.");
+        } catch (Exception e) {
+            if (!e.getMessage().equals("Dịch vụ này không tồn tại.")) {
+                throw e;
+            }
         }
 
-        try {
-            String strSQL = """
-                            insert into RoomServices ([service_name], 
-                            [description], unit_price, is_active) 
-                            values (?, ?, ?, ?)
-                            """;
-            stm = connection.prepareCall(strSQL);
+        String strSQL = """
+                        insert into RoomServices ([service_name], [description], unit_price, is_active) 
+                        values (?, ?, ?, ?)
+                        """;
 
+        try (PreparedStatement stm = connection.prepareStatement(strSQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stm.setString(1, roomService.getServiceName());
             stm.setString(2, roomService.getDescription());
             stm.setBigDecimal(3, roomService.getUnitPrice());
             stm.setBoolean(4, roomService.isActive());
 
-            stm.execute();
-        } catch (Exception ex) {
-            System.out.println("CreateRoomServices:" + ex.getMessage());
+            if (stm.executeUpdate() > 0) {
+                try (ResultSet generatedKeys = stm.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        roomService.setServiceId(generatedKeys.getInt(1));
+                    }
+                }
+                return roomService;
+            } else {
+                throw new Exception("Thêm dịch vụ thất bại.");
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể tạo mới dịch vụ.");
         }
-        return roomService;
     }
 
-    /**
-     * Update the information for an existing room service.
-     *
-     * @param roomService
-     * @return The Service object will be null after the update if the ID is
-     * successful, or null if the ID is not found
-     */
-    public Service updateRoomService(Service roomService) {
-        Service found = getRoomServicesById(roomService.getServiceId());
-        if (found == null) {
-            return null;
+    public RoomService updateRoomService(RoomService roomService) throws Exception {
+        if (getRoomServicesById(roomService.getServiceId()) == null) {
+            throw new Exception("Dịch vụ không tồn tại, không thể cập nhật.");
         }
 
-        try {
-            String strSQL = """
-                           update RoomServices 
-                           set [service_name] = ?, 
-                           [description] =?, 
-                           unit_price =?, 
-                           is_active = ? 
-                           where service_id = ?
-                           """;
-            stm = connection.prepareCall(strSQL);
+        String strSQL = """
+                        update RoomServices 
+                        set [service_name] = ?, 
+                        [description] = ?, 
+                        unit_price = ?, 
+                        is_active = ? 
+                        where service_id = ?
+                        """;
 
+        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
             stm.setString(1, roomService.getServiceName());
             stm.setString(2, roomService.getDescription());
             stm.setBigDecimal(3, roomService.getUnitPrice());
             stm.setBoolean(4, roomService.isActive());
             stm.setInt(5, roomService.getServiceId());
 
-            stm.execute();
-        } catch (Exception ex) {
-            System.out.println("UpdateRoomServices:" + ex.getMessage());
+            if (stm.executeUpdate() > 0) {
+                return roomService;
+            } else {
+                throw new Exception("Cập nhật thất bại.");
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể cập nhật.");
         }
-        return roomService;
     }
 
-    /**
-     * Remove a service from the system based on its ID.
-     *
-     * @param serviceId
-     * @return The Service object is deleted if successful, null if the service
-     * is not found.
-     */
-    public Service delete(int serviceId) {
-        Service found = getRoomServicesById(serviceId);
-        if (found == null) {
-            return null;
-        }
+    public RoomService delete(int serviceId) throws Exception {
+        RoomService found = getRoomServicesById(serviceId);
+        String strSQL = """
+                        delete 
+                        from RoomServices 
+                        where service_id = ?
+                        """;
 
-        try {
-            String strSQL = """
-                           delete RoomServices where service_id = ?
-                           """;
-            stm = connection.prepareCall(strSQL);
+        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
             stm.setInt(1, serviceId);
-            stm.execute();
-        } catch (Exception ex) {
-            System.out.println("DeleteRoomServices:" + ex.getMessage());
+            if (stm.executeUpdate() > 0) {
+                return found;
+            } else {
+                throw new Exception("Không thể xóa dịch vụ.");
+            }
+        } catch (SQLException e) {
+            if (e.getErrorCode() == 547) {
+                throw new Exception("Không thể xóa vì dịch vụ đang được sử dụng.");
+            }
+            throw new Exception("Lỗi hệ thống: Không thể xóa.");
         }
-        return found;
     }
 }
- 

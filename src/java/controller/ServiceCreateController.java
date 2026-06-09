@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.math.BigDecimal;
-import model.Service;
+import model.RoomService;
 import model.ServiceType;
 import model.StaffAccount;
 
@@ -76,8 +76,8 @@ public class ServiceCreateController extends HttpServlet {
         boolean active = "true".equals(request.getParameter("active"));
         ServiceType type = ServiceType.valueOf(request.getParameter("type"));
 
-        //Create new Service object
-        Service service = new Service(serviceName, description, unitPrice, active, type);
+        //Create new RoomService object
+        RoomService service = new RoomService(serviceName, description, unitPrice, active, type);
 
         //Delegate to the approriate DAO base on service type
         HotelServiceDAO hDao = new HotelServiceDAO();

@@ -3,7 +3,7 @@ package dao;
 import dal.DBContext;
 import model.RoomType;
 import model.RoomTypeService;
-import model.Service;          
+import model.RoomService;          
 import model.ServiceType;      
 import java.sql.*;
 import java.util.ArrayList;
@@ -52,7 +52,7 @@ public class RoomTypeDAO extends DBContext {
                 psSvc.setInt(1, rt.getRoomTypeId());
                 ResultSet rsSvc = psSvc.executeQuery();
                 while (rsSvc.next()) {
-                    Service s = new Service(rsSvc.getInt("service_id"), rsSvc.getString("service_name"), rsSvc.getString("svc_desc"), rsSvc.getBigDecimal("unit_price"), rsSvc.getBoolean("svc_active"), ServiceType.ROOM);
+                    RoomService s = new RoomService(rsSvc.getInt("service_id"), rsSvc.getString("service_name"), rsSvc.getString("svc_desc"), rsSvc.getBigDecimal("unit_price"), rsSvc.getBoolean("svc_active"), ServiceType.ROOM);
                     RoomTypeService rtsObj = new RoomTypeService(rsSvc.getInt("room_type_service_id"), rsSvc.getInt("room_type_id"), rsSvc.getInt("service_id"), rsSvc.getInt("quantity"), rsSvc.getBoolean("is_free"), s);
                     roomTypeServicesList.add(rtsObj);
                 }
@@ -109,7 +109,7 @@ public class RoomTypeDAO extends DBContext {
                 psSvc.setInt(1, rt.getRoomTypeId());
                 ResultSet rsSvc = psSvc.executeQuery();
                 while (rsSvc.next()) {
-                    Service s = new Service(rsSvc.getInt("service_id"), rsSvc.getString("service_name"), rsSvc.getString("svc_desc"), rsSvc.getBigDecimal("unit_price"), rsSvc.getBoolean("svc_active"), ServiceType.ROOM);
+                    RoomService s = new RoomService(rsSvc.getInt("service_id"), rsSvc.getString("service_name"), rsSvc.getString("svc_desc"), rsSvc.getBigDecimal("unit_price"), rsSvc.getBoolean("svc_active"), ServiceType.ROOM);
                     RoomTypeService rtsObj = new RoomTypeService(rsSvc.getInt("room_type_service_id"), rsSvc.getInt("room_type_id"), rsSvc.getInt("service_id"), rsSvc.getInt("quantity"), rsSvc.getBoolean("is_free"), s);
                     roomTypeServicesList.add(rtsObj);
                 }

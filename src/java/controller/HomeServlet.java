@@ -12,7 +12,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import model.Service;    // Import lớp thực thể thông tin khách sạn
+import model.RoomService;    // Import lớp thực thể thông tin khách sạn
 
 /**
  *
@@ -49,9 +49,9 @@ public class HomeServlet extends HttpServlet {
             // 1. Khởi tạo DAO xử lý thông tin dịch vụ
             HotelInfoDAO hotelInfoDAO = new HotelInfoDAO();
 
-            // 2. 🔥 ĐÃ SỬA: Lấy danh sách dịch vụ theo Model Service mới gộp
+            // 2. 🔥 ĐÃ SỬA: Lấy danh sách dịch vụ theo Model RoomService mới gộp
             // Dùng để hiển thị khối "Dịch vụ & tiện nghi" ở giữa trang chủ
-            List<Service> servicesList = hotelInfoDAO.getActiveHotelServices();
+            List<RoomService> servicesList = hotelInfoDAO.getActiveHotelServices();
             request.setAttribute("services", servicesList);
             
         } catch (Exception e) {

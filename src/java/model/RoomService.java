@@ -2,38 +2,26 @@ package model;
 
 import java.math.BigDecimal;
 
-public class Service {
+public class RoomService {
 
     private int serviceId;
     private String serviceName;
     private String description;
     private BigDecimal unitPrice;
     private boolean active;
-    private ServiceType type;
 
     //Constructor
-    public Service() {
+    public RoomService() {
     }
 
-    public Service(int serviceId, String serviceName, String description, BigDecimal unitPrice, boolean active, ServiceType type) {
+    public RoomService(int serviceId, String serviceName, String description, BigDecimal unitPrice, boolean active) {
         this.serviceId = serviceId;
         this.serviceName = serviceName;
         this.description = description;
         this.unitPrice = unitPrice;
         this.active = active;
-        this.type = type;
     }
 
-    public Service(String serviceName, String description, BigDecimal unitPrice, boolean active, ServiceType type) {
-        this.serviceName = serviceName;
-        this.description = description;
-        this.unitPrice = unitPrice;
-        this.active = active;
-        this.type = type;
-    }
-
-    //Getter & Setter
-    
     public int getServiceId() {
         return serviceId;
     }
@@ -72,14 +60,6 @@ public class Service {
 
     public void setActive(boolean active) {
         this.active = active;
-    }
-
-    public ServiceType getType() {
-        return type;
-    }
-
-    public void setType(ServiceType type) {
-        this.type = type;
     }
 
 }

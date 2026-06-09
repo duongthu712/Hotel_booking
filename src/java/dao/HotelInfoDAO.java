@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import model.Service;
+import model.RoomService;
 import model.ServiceType;
 import model.HotelInfo;
 /**
@@ -17,15 +17,15 @@ import model.HotelInfo;
  */
 public class HotelInfoDAO extends DBContext{
  // 1. Lấy danh sách dịch vụ đang hoạt động (Bảng HotelServices thực tế)
-    public List<Service> getActiveHotelServices() {
-        List<Service> list = new ArrayList<>();
+    public List<RoomService> getActiveHotelServices() {
+        List<RoomService> list = new ArrayList<>();
         String sql = "SELECT hotel_service_id, service_name, [description], unit_price, is_active " +
                      "FROM HotelServices WHERE is_active = 1";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                Service service = new Service(
+                RoomService service = new RoomService(
                     rs.getInt("hotel_service_id"),
                     rs.getString("service_name"),
                     rs.getString("description"),

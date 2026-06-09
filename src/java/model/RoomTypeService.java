@@ -9,13 +9,13 @@ public class RoomTypeService {
 
     private boolean isFree;
 
-    private Service service;
+    private RoomService service;
 
     // Constructor
     public RoomTypeService() {
     }
 
-    public RoomTypeService(int roomTypeServiceId, int roomTypeId, int serviceId, int quantity, boolean isFree, Service service) {
+    public RoomTypeService(int roomTypeServiceId, int roomTypeId, int serviceId, int quantity, boolean isFree, RoomService service) {
 
         this.roomTypeServiceId = roomTypeServiceId;
         this.roomTypeId = roomTypeId;
@@ -26,11 +26,11 @@ public class RoomTypeService {
     }
     // Getter & Setter
 
-    public Service getService() {
+    public RoomService getService() {
         return service;
     }
 
-    public void setService(Service service) {
+    public void setService(RoomService service) {
         this.service = service;
     }
 
