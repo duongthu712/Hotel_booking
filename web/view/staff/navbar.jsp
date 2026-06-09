@@ -21,7 +21,7 @@
     <a href="${pageContext.request.contextPath}/RoomTypeList">Quản lý loại phòng</a>
     <a href="${pageContext.request.contextPath}/RoomList">Quản lý phòng</a>
     <a href="${pageContext.request.contextPath}/RoomServiceList">Quản lý dịch vụ phòng</a>
-    <a href="${pageContext.request.contextPath}/ServiceList">Quản lý tiện nghi phòng</a>
+    <a href="${pageContext.request.contextPath}/RoomAmenityList">Quản lý tiện nghi phòng</a>
     <a href="${pageContext.request.contextPath}/HotelServiceList">Quản lý dịch vụ khách sạn</a>
     <a href="${pageContext.request.contextPath}/PolicyList">Quản lý chính sách</a>
     <a href="${pageContext.request.contextPath}/FeedbackList">Đánh giá</a>

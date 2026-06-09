@@ -70,6 +70,8 @@ html, body {
     border-radius: 12px;
     outline: none;
     font-size: 14px;
+    
+    font-family: var(--font-logo);
 }
 
 .search-input:focus{
@@ -83,7 +85,7 @@ html, body {
     cursor: pointer;
     text-decoration: none;
     font-size: 14px;
-
+    font-family: var(--font-logo);
     background: var(--text-main);
     color: white;
 }
@@ -303,7 +305,7 @@ html, body {
     border: 1px solid #c8e6c9;
 }
 
-.service-popup, .room-modal, .staff-modal {
+.service-popup, .amenity-popup, .room-modal, .staff-modal {
     display: none;
     position: fixed;
     inset: 0;
@@ -314,7 +316,7 @@ html, body {
     z-index: 1000;
 }
 
-.service-popup.active, .room-modal.active, .staff-modal.show {
+.service-popup.active, .amenity-popup.active, .room-modal.active, .staff-modal.show {
     display: flex;
 }
 
@@ -361,7 +363,7 @@ html, body {
     margin-bottom: 5px;
 }
 
-.service-popup-input-field {
+.service-popup-input-field, .amenity-popup-input-field {
     width: 100%;
     padding: 10px;
     border: none;
@@ -371,12 +373,12 @@ html, body {
     transition: 0.3s;
 }
 
-.service-popup-input-field:focus {
+.service-popup-input-field, .amenity-popup-input-field:focus {
     border-bottom-color: var(--text-main);
     outline: none;
 }
 
-.service-popup-action {
+.service-popup-action, .amenity-popup-action {
     display: flex;
     justify-content: flex-end;
     gap: 15px;

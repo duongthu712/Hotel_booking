@@ -100,6 +100,22 @@
         <servlet-name>HotelServiceCreateController</servlet-name>
         <servlet-class>controller.HotelServiceCreateController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>RoomAmenityListController</servlet-name>
+        <servlet-class>controller.RoomAmenityListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RoomAmenityCreateController</servlet-name>
+        <servlet-class>controller.RoomAmenityCreateController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RoomAmenityEditController</servlet-name>
+        <servlet-class>controller.RoomAmenityEditController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RoomAmenityDeleteController</servlet-name>
+        <servlet-class>controller.RoomAmenityDeleteController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>
         <url-pattern>/login</url-pattern>
@@ -219,5 +235,21 @@
     <servlet-mapping>
         <servlet-name>HotelServiceCreateController</servlet-name>
         <url-pattern>/HotelServiceCreate</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RoomAmenityListController</servlet-name>
+        <url-pattern>/RoomAmenityList</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RoomAmenityCreateController</servlet-name>
+        <url-pattern>/RoomAmenityCreateController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RoomAmenityEditController</servlet-name>
+        <url-pattern>/RoomAmenityEdit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RoomAmenityDeleteController</servlet-name>
+        <url-pattern>/RoomAmenityDelete</url-pattern>
     </servlet-mapping>
 </web-app>

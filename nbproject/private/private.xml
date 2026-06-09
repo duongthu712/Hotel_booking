@@ -3,21 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/admin/staff-management.jsp</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/assets/javascript/staff-account-management.js</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/StaffAccountDeleteController.java</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/StaffAccountCreateController.java</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/StaffAccountEditController.java</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/dao/RoomAmenityDAO.java</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/RoomAmenityCreateController.java</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/RoomServiceListController.java</file>
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/assets/css/common.css</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/admin/create-staff-account.jsp</file>
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/assets/css/service-management.css</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/StaffAccountDetailController.java</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/assets/css/staff-management.css</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/manager/service-management.jsp</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/StaffAccountListController.java</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/manager/room-management.jsp</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/assets/css/room-management.css</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/assets/css/staff-navbar.css</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/manager/room-amenity-management.jsp</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/dao/RoomServiceDAO.java</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/model/RoomAmenity.java</file>
         </group>
     </open-files>
 </project-private>
