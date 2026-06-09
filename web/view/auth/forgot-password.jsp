@@ -4,11 +4,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-<<<<<<< Updated upstream
-    <title>Quên mật khẩu</title>
-=======
     <title>Đăng nhập nhân viên</title>
->>>>>>> Stashed changes
 
     <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/navbar.css">
     <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/footer.css">
@@ -20,21 +16,12 @@
 
     <main class="auth-page">
         <div class="auth-card">
-<<<<<<< Updated upstream
-            <div class="auth-label-top">KHÔI PHỤC MẬT KHẨU</div>
-
-            <h1>Quên mật khẩu</h1>
-
-            <p class="auth-subtitle">
-                Nhập email nhân viên của bạn để nhận mã xác minh.
-=======
             <div class="auth-label-top">CỔNG NHÂN VIÊN</div>
 
             <h1>Đăng nhập</h1>
 
             <p class="auth-subtitle">
                 Dành cho lễ tân, quản lý và quản trị viên.
->>>>>>> Stashed changes
             </p>
 
             <% if (request.getAttribute("error") != null) { %>
@@ -49,11 +36,7 @@
                 </p>
             <% } %>
 
-<<<<<<< Updated upstream
-            <form class="auth-form" action="<%= request.getContextPath() %>/forgot-password" method="post">
-=======
             <form class="auth-form" action="<%= request.getContextPath() %>/login" method="post">
->>>>>>> Stashed changes
                 <div class="auth-form-group">
                     <label>Tên đăng nhập</label>
                     <input 
@@ -64,14 +47,6 @@
                     >
                 </div>
 
-<<<<<<< Updated upstream
-                <button type="submit" class="auth-btn">Gửi mã</button>
-            </form>
-
-            <div class="auth-link">
-                <a href="<%= request.getContextPath() %>/logout">
-                    Quay lại đăng nhập
-=======
                 <div class="auth-form-group">
                     <label>Mật khẩu</label>
                     <input 
@@ -87,7 +62,6 @@
             <div class="auth-link">
                 <a href="<%= request.getContextPath() %>/forgot-password">
                     Quên mật khẩu?
->>>>>>> Stashed changes
                 </a>
             </div>
 

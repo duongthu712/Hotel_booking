@@ -54,10 +54,6 @@ public class LoginController extends HttpServlet {
 
             HttpSession session = request.getSession();
 
-<<<<<<< Updated upstream
-            //session 1 hr
-=======
->>>>>>> Stashed changes
             session.setMaxInactiveInterval(60 * 60);
 
             session.setAttribute("staff", staff);

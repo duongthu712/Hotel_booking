@@ -28,21 +28,21 @@ public class StaffAccountDAO extends DBContext {
             stm.setInt(1, staffId);
 
             rs = stm.executeQuery();
+
             if (rs.next()) {
                 staff = mapStaff(rs);
             }
+
         } catch (Exception e) {
             System.out.println("getStaffById: " + e.getMessage());
         }
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
         return staff;
     }
 
     public StaffAccount getStaffByEmail(String email) {
         StaffAccount staff = null;
+
         try {
             String sql = """
                          SELECT *
@@ -50,48 +50,31 @@ public class StaffAccountDAO extends DBContext {
                          WHERE email = ?
                            AND is_active = 1
                          """;
+
             stm = connection.prepareStatement(sql);
             stm.setString(1, email);
+
             rs = stm.executeQuery();
+
             if (rs.next()) {
                 staff = mapStaff(rs);
             }
+
         } catch (Exception e) {
             System.out.println("getStaffByEmail: " + e.getMessage());
         }
+
         return staff;
     }
 
     public StaffAccount loginWithHashCheck(String username, String password) {
         StaffAccount staff = null;
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
         try {
             String sql = """
                          SELECT *
                          FROM StaffAccounts
                          WHERE username = ?
-<<<<<<< Updated upstream
-                           AND is_active = 1
-                         """;
-            stm = connection.prepareStatement(sql);
-            stm.setString(1, username);
-            rs = stm.executeQuery();
-            if (rs.next()) {
-                staff = mapStaff(rs);
-            }
-            if (staff == null) {
-                return null;
-            }
-            if (password == null || staff.getPasswordHash() == null) {
-                return null;
-            }
-            if (password.equals(staff.getPasswordHash())) {
-                return staff;
-            }
-=======
                          """;
 
             stm = connection.prepareStatement(sql);
@@ -115,7 +98,6 @@ public class StaffAccountDAO extends DBContext {
                 return staff;
             }
 
->>>>>>> Stashed changes
             if (PasswordUtil.checkPassword(password, staff.getPasswordHash())) {
                 return staff;
             }
@@ -123,12 +105,10 @@ public class StaffAccountDAO extends DBContext {
         } catch (Exception e) {
             System.out.println("loginWithHashCheck: " + e.getMessage());
         }
+
         return null;
     }
 
-<<<<<<< Updated upstream
-    public void updateProfile(int staffId, String fullName, String email, String phone) {
-=======
     public boolean isValueExistsForOtherStaff(String field, String value, int currentStaffId) {
         if (value == null || value.trim().isEmpty()) {
             return false;
@@ -172,7 +152,6 @@ public class StaffAccountDAO extends DBContext {
     }
 
     public boolean updateProfile(int staffId, String fullName, String email, String phone) {
->>>>>>> Stashed changes
         try {
             String sql = """
                          UPDATE StaffAccounts
@@ -195,17 +174,11 @@ public class StaffAccountDAO extends DBContext {
         } catch (Exception e) {
             System.out.println("updateProfile: " + e.getMessage());
         }
-<<<<<<< Updated upstream
-    }
-
-    public void updatePasswordByStaffId(int staffId, String newPasswordHash) {
-=======
 
         return false;
     }
 
     public boolean updatePasswordByStaffId(int staffId, String newPasswordHash) {
->>>>>>> Stashed changes
         try {
             String sql = """
                          UPDATE StaffAccounts
@@ -238,11 +211,14 @@ public class StaffAccountDAO extends DBContext {
                          WHERE email = ?
                            AND is_active = 1
                          """;
+
             stm = connection.prepareStatement(sql);
             stm.setString(1, code);
             stm.setTimestamp(2, Timestamp.valueOf(expiryTime));
             stm.setString(3, email);
+
             stm.executeUpdate();
+
         } catch (Exception e) {
             System.out.println("saveResetCode: " + e.getMessage());
         }
@@ -263,10 +239,13 @@ public class StaffAccountDAO extends DBContext {
             stm = connection.prepareStatement(sql);
             stm.setString(1, email);
             stm.setString(2, code);
+
             rs = stm.executeQuery();
+
             if (rs.next()) {
                 return true;
             }
+
         } catch (Exception e) {
             System.out.println("isValidResetCode: " + e.getMessage());
         }
@@ -289,7 +268,9 @@ public class StaffAccountDAO extends DBContext {
             stm = connection.prepareStatement(sql);
             stm.setString(1, newPasswordHash);
             stm.setString(2, email);
+
             stm.executeUpdate();
+
         } catch (Exception e) {
             System.out.println("updatePasswordAndClearReset: " + e.getMessage());
         }

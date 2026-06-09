@@ -13,11 +13,8 @@ import java.security.SecureRandom;
 
 public class VerifyCodeController extends HttpServlet {
 
-<<<<<<< Updated upstream
-=======
     private static final int RESET_CODE_EXPIRY_MINUTES = 10;
 
->>>>>>> Stashed changes
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -50,10 +47,6 @@ public class VerifyCodeController extends HttpServlet {
 
         StaffAccountDAO dao = new StaffAccountDAO();
 
-<<<<<<< Updated upstream
-        //gửi lại mã xác minh
-=======
->>>>>>> Stashed changes
         if ("resend".equalsIgnoreCase(action)) {
             try {
                 String newCode = generateCode();

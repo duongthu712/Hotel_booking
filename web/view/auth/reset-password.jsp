@@ -18,19 +18,10 @@
         <div class="auth-card">
             <div class="auth-label-top">TẠO MẬT KHẨU MỚI</div>
 
-<<<<<<< Updated upstream
-            <div class="auth-label-top">MẬT KHẨU MỚI</div>
-
-            <h1>Đặt lại mật khẩu</h1>
-
-            <p class="auth-subtitle">
-                Tạo mật khẩu mới cho tài khoản nhân viên của bạn.
-=======
             <h1>Đặt lại mật khẩu</h1>
 
             <p class="auth-subtitle">
                 Nhập mật khẩu mới để hoàn tất quá trình khôi phục tài khoản.
->>>>>>> Stashed changes
             </p>
 
             <% if (request.getAttribute("error") != null) { %>
@@ -48,14 +39,6 @@
             <form class="auth-form" action="<%= request.getContextPath() %>/reset-password" method="post">
                 <div class="auth-form-group">
                     <label>Mật khẩu mới</label>
-<<<<<<< Updated upstream
-                    <input type="password" name="newPassword" required>
-                </div>
-
-                <div class="auth-form-group">
-                    <label>Nhập lại mật khẩu</label>
-                    <input type="password" name="confirmPassword" required>
-=======
                     <input
                         type="password"
                         name="newPassword"
@@ -70,18 +53,13 @@
                         name="confirmPassword"
                         required
                     >
->>>>>>> Stashed changes
                 </div>
 
                 <button type="submit" class="auth-btn">Đặt lại mật khẩu</button>
             </form>
 
             <div class="auth-link">
-<<<<<<< Updated upstream
-                <a href="<%= request.getContextPath() %>/logout">
-=======
                 <a href="<%= request.getContextPath() %>/login">
->>>>>>> Stashed changes
                     Quay lại đăng nhập
                 </a>
             </div>
