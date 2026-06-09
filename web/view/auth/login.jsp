@@ -39,12 +39,29 @@
             <form class="auth-form" action="<%= request.getContextPath() %>/login" method="post">
                 <div class="auth-form-group">
                     <label>Tên đăng nhập</label>
+<<<<<<< Updated upstream
                     <input type="text" name="username" required>
+=======
+                    <input 
+                        type="text" 
+                        name="username" 
+                        value="<%= request.getParameter("username") != null ? request.getParameter("username") : "" %>"
+                        required
+                    >
+>>>>>>> Stashed changes
                 </div>
 
                 <div class="auth-form-group">
                     <label>Mật khẩu</label>
+<<<<<<< Updated upstream
                     <input type="password" name="password" required>
+=======
+                    <input 
+                        type="password" 
+                        name="password" 
+                        required
+                    >
+>>>>>>> Stashed changes
                 </div>
 
                 <button type="submit" class="auth-btn">Đăng nhập</button>

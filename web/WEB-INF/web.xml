@@ -37,7 +37,42 @@
         <servlet-name>LoginController</servlet-name>
         <servlet-class>controller.LoginController</servlet-class>
     </servlet>
+<<<<<<< Updated upstream
 
+=======
+    <servlet>
+        <servlet-name>ServiceListController</servlet-name>
+        <servlet-class>controller.ServiceListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ServiceEditController</servlet-name>
+        <servlet-class>controller.ServiceEditController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ServiceDeleteController</servlet-name>
+        <servlet-class>controller.ServiceDeleteController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ServiceCreateController</servlet-name>
+        <servlet-class>controller.ServiceCreateController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>HotelPolicyServlet</servlet-name>
+        <servlet-class>controller.HotelPolicyServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ChangePasswordController</servlet-name>
+        <servlet-class>controller.ChangePasswordController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UserProfileController</servlet-name>
+        <servlet-class>controller.UserProfileController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoginController</servlet-name>
+        <url-pattern>/login</url-pattern>
+    </servlet-mapping>
+>>>>>>> Stashed changes
     <servlet>
         <servlet-name>LogoutController</servlet-name>
         <servlet-class>controller.LogoutController</servlet-class>
@@ -158,6 +193,17 @@
     <servlet-mapping>
         <servlet-name>HotelPolicyServlet</servlet-name>
         <url-pattern>/policies</url-pattern>
+<<<<<<< Updated upstream
+=======
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ChangePasswordController</servlet-name>
+        <url-pattern>/profile/change-password</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UserProfileController</servlet-name>
+        <url-pattern>/profile</url-pattern>
+>>>>>>> Stashed changes
     </servlet-mapping>
 
 

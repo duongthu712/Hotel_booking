@@ -16,6 +16,8 @@ import model.StaffAccount;
 
 public class ForgotPasswordController extends HttpServlet {
 
+    private static final int RESET_CODE_EXPIRY_MINUTES = 10;
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -57,13 +59,17 @@ public class ForgotPasswordController extends HttpServlet {
 
             if (staff == null) {
                 session.removeAttribute("pendingResetEmail");
+<<<<<<< Updated upstream
                 request.setAttribute("error", "Email không tồn tại hoặc tài khoản đã bị vô hiệu hóa.");
+=======
+                request.setAttribute("error", "Email không tồn tại hoặc tài khoản đã bị khóa.");
+>>>>>>> Stashed changes
                 request.getRequestDispatcher("/view/auth/forgot-password.jsp").forward(request, response);
                 return;
             }
 
             String code = generateCode();
-            LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(10);
+            LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(RESET_CODE_EXPIRY_MINUTES);
 
             dao.saveResetCode(email, code, expiryTime);
 

@@ -46,9 +46,18 @@ public class LoginController extends HttpServlet {
         StaffAccount staff = dao.loginWithHashCheck(username, password);
 
         if (staff != null) {
+            if (!staff.isActive()) {
+                request.setAttribute("error", "Tài khoản đã bị khóa.");
+                request.getRequestDispatcher("/view/auth/login.jsp").forward(request, response);
+                return;
+            }
+
             HttpSession session = request.getSession();
 
+<<<<<<< Updated upstream
             //session 1 hr
+=======
+>>>>>>> Stashed changes
             session.setMaxInactiveInterval(60 * 60);
 
             session.setAttribute("staff", staff);
