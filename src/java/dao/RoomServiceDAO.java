@@ -23,7 +23,8 @@ public class RoomServiceDAO extends DBContext {
         List<RoomService> list = new ArrayList<>();
         String strSQL = """
                         select * 
-                        from RoomServices
+                        from RoomServices 
+                        order by service_id desc
                         """;
 
         try (PreparedStatement stm = connection.prepareStatement(strSQL);
@@ -48,7 +49,8 @@ public class RoomServiceDAO extends DBContext {
         String strSQL = """
                         select * 
                         from RoomServices 
-                        where service_id = ?
+                        where service_id = ? 
+                        order by service_id desc
                         """;
 
         try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
@@ -76,7 +78,8 @@ public class RoomServiceDAO extends DBContext {
         String strSQL = """
                         select * 
                         from RoomServices 
-                        where service_name = ?
+                        where service_name = ? 
+                        order by service_id desc
                         """;
 
         try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
@@ -105,7 +108,8 @@ public class RoomServiceDAO extends DBContext {
         String strSQL = """
                         select * 
                         from RoomServices 
-                        where service_name like ?
+                        where service_name like ? 
+                        order by service_id desc
                         """;
 
         try (PreparedStatement stm = connection.prepareStatement(strSQL)) {

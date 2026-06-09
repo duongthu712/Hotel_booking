@@ -5,12 +5,11 @@
 
 :root {
     --bg-main: #F7F1E5;
-    --text-main: #1b1b1b;
+    --text-main: #244769;
     --text-muted: #8e8a82;
     --border-color: rgba(27, 27, 27, 0.15);
     --accent-color: #d4af37;
     --radius-custom: 13px;
-    --font-primary: 'Poppins', sans-serif;
     --font-logo: 'Cormorant Garamond', serif;
 }
 
@@ -19,7 +18,7 @@ html, body {
     padding: 0;
     min-height: 100vh;
     background: var(--bg-main);
-    font-family: var(--font-primary);
+    font-family: var(--font-logo);
 }
 
 .content-container {
@@ -29,6 +28,66 @@ html, body {
     min-height: 100vh;
     box-sizing: border-box;
 }
+
+.alert-message {
+    padding: 12px 16px;
+    margin: 20px 0;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.alert-success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.alert-error {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+.alert-message {
+    transition: all 0.3s ease;
+}
+
+.search-container{
+    margin: 20px 0;
+}
+
+.search-form{
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.search-input{
+    width: 320px;
+    padding: 10px 14px;
+    border: 1px solid #d9d9d9;
+    border-radius: 12px;
+    outline: none;
+    font-size: 14px;
+}
+
+.search-input:focus{
+    border-color: #999;
+}
+
+.search-btn,.reset-btn{
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+    
+    background: var(--text-main);
+    color: white;
+}
+
 
 .header-action {
     display: flex;
@@ -52,7 +111,7 @@ html, body {
     border-radius: var(--radius-custom);
     text-transform: uppercase;
     font-size: 0.8rem;
-    font-family: var(--font-primary);
+    font-family: var(--font-logo);
     letter-spacing: 0.1em;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -73,7 +132,7 @@ html, body {
     cursor: pointer;
     text-transform: uppercase;
     font-size: 0.8rem;
-    font-family: var(--font-primary);
+    font-family: var(--font-logo);
     letter-spacing: 0.05em;
     text-decoration: none;
     display: inline-block;
@@ -91,7 +150,7 @@ html, body {
     cursor: pointer;
     text-transform: uppercase;
     font-size: 0.8rem;
-    font-family: var(--font-primary);
+    font-family: var(--font-logo);
     letter-spacing: 0.05em;
 }
 
@@ -110,7 +169,7 @@ html, body {
 .filter-input, .filter-btn {
     padding: 10px 20px;
     font-size: 0.8rem;
-    font-family: var(--font-primary);
+    font-family: var(--font-logo);
     text-transform: uppercase;
     text-decoration: none;
     color: var(--text-main);
@@ -151,7 +210,7 @@ html, body {
 
 .data-table td {
     padding: 15px 20px;
-    font-family: var(--font-primary);
+    font-family: var(--font-logo);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -182,7 +241,7 @@ html, body {
     background-color: white;
     font-size: 1em;
     font-weight: 700;
-    color: blue;
+    color: var(--text-main);
     margin-right: 10px;
     transition: color 0.3s;
 }
@@ -202,9 +261,9 @@ html, body {
     background-color: white;
     font-size: 1em;
     font-weight: 700;
-    color: red;
+    color: var(--text-main);
     cursor: pointer;
-    font-family: var(--font-primary);
+    font-family: var(--font-logo);
     padding: 0;
 }
 
@@ -240,7 +299,7 @@ html, body {
     padding: 15px 20px;
     border-radius: var(--radius-custom);
     margin-bottom: 20px;
-    font-family: var(--font-primary);
+    font-family: var(--font-logo);
     font-size: 0.9rem;
 }
 
@@ -297,7 +356,7 @@ html, body {
 }
 
 .modal-body {
-    font-family: var(--font-primary);
+    font-family: var(--font-logo);
 }
 
 .form-group {
@@ -319,7 +378,7 @@ html, body {
     padding: 10px;
     border: none;
     background: transparent;
-    font-family: var(--font-primary);
+    font-family: var(--font-logo);
     font-size: 0.9rem;
     transition: 0.3s;
 }

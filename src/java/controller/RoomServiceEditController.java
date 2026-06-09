@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.math.BigDecimal;
+import java.util.List;
 import model.RoomService;
 import model.StaffAccount;
 
@@ -21,7 +22,30 @@ public class RoomServiceEditController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.sendRedirect(request.getContextPath() + "/RoomServiceList");
+        HttpSession session = request.getSession();
+        StaffAccount staff = (StaffAccount) session.getAttribute("staff");
+
+        if (staff == null) {
+            response.sendRedirect("view/auth/login.jsp");
+            return;
+        }
+
+        try {
+            int serviceId = Integer.parseInt(request.getParameter("serviceId"));
+
+            RoomServiceDAO dao = new RoomServiceDAO();
+            RoomService service = dao.getRoomServicesById(serviceId);
+            List<RoomService> serviceList = dao.getAllRoomServices();
+
+            request.setAttribute("serviceList", serviceList);
+            request.setAttribute("serviceToEdit", service);
+            request.setAttribute("page", request.getParameter("page"));
+            request.setAttribute("keyword", request.getParameter("keyword"));
+            request.getRequestDispatcher("/view/manager/room-service-management.jsp").forward(request, response);
+        } catch (Exception e) {
+            session.setAttribute("errorMessage", e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/RoomServiceList");
+        }
     }
 
     @Override

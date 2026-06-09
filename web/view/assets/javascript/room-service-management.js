@@ -5,6 +5,19 @@ document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("service-form");
     const modalTitle = document.getElementById("modal-title");
 
+    const alerts = document.querySelectorAll(".alert-message");
+
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.style.opacity = "0";
+            alert.style.transform = "translateY(-10px)";
+
+            setTimeout(() => {
+                alert.remove();
+            }, 300);
+        }, 3000);
+    });
+
     //Get status from body
     const isEditMode = document.body.getAttribute("data-edit-mode") === "true";
 

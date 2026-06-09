@@ -61,7 +61,7 @@
 .filter-btn {
     padding: 10px 20px;
     font-size: 0.7rem;
-    font-family: var(--font-primary);
+    font-family: var(--font-logo);
     text-transform: uppercase;
     text-decoration: none;
     color: var(--text-muted);

@@ -25,6 +25,14 @@
                 <button id="btn-create" class="btn-primary">Thêm dịch vụ phòng mới</button>          
             </div>
 
+            <div class="search-container">
+                <form action="RoomServiceList" method="GET" class="search-form">
+                    <input type="text" name="keyword" class="search-input" placeholder="Tìm kiếm theo tên dịch vụ..." value="${keyword}">
+                    <button type="submit" class="search-btn">Tìm kiếm</button>
+                    <a href="RoomServiceList" class="reset-btn">Làm mới</a>
+                </form>
+            </div>
+
             <c:if test="${not empty sessionScope.errorMessage}">
                 <div class="alert-message alert-error">
                     ${sessionScope.errorMessage}
@@ -38,6 +46,8 @@
                 </div>
                 <c:remove var="successMessage" scope="session"/>
             </c:if>
+
+
 
             <div>
                 <table class="data-table">
@@ -63,9 +73,11 @@
                                     </div>
                                 </td>
                                 <td class="btn-action">
-                                    <a class="btn-edit" href="RoomServiceEdit?serviceId=${srv.getServiceId()}">Sửa</a>
+                                    <a class="btn-edit" href="RoomServiceEdit?serviceId=${srv.getServiceId()}&page=${currentPage}&keyword=${keyword}"">Sửa</a>
                                     <form action="RoomServiceDelete" method="post">
                                         <input type="hidden" name="serviceId" value="${srv.getServiceId()}">
+                                        <input type="hidden" name="page" value="${currentPage}">
+                                        <input type="hidden" name="keyword" value="${keyword}">
                                         <button type="submit">Xoá</button>
                                     </form>
                                 </td>
@@ -86,6 +98,8 @@
                 <h2 class="service-popup-title" id="modal-title">Thêm dịch vụ phòng mới</h2>
 
                 <input type="hidden" name="serviceId" id="serviceId" value="${serviceToEdit.getServiceId()}">
+                <input type="hidden" name="page" value="${page}">
+                <input type="hidden" name="keyword" value="${keyword}">
 
                 <div class="form-group">
                     <label class="input-label">Tên dịch vụ phòng</label>
