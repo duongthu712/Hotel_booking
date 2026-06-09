@@ -2,6 +2,7 @@ package controller;
 
 import dao.RoomServiceDAO;
 import java.io.IOException;
+import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +17,13 @@ import model.StaffAccount;
  * @version 1.0
  * @since 2026-06-09
  */
-public class RoomServiceCreateController extends HttpServlet {
+public class RoomServiceEditController extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.sendRedirect(request.getContextPath() + "RoomServiceList");
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -24,25 +31,21 @@ public class RoomServiceCreateController extends HttpServlet {
         HttpSession session = request.getSession();
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
         if (staff == null) {
-            response.sendRedirect(request.getContextPath() + "/view/auth/login.jsp");
+            response.sendRedirect("view/auth/login.jsp");
             return;
         }
 
+        String serviceIdStr = request.getParameter("serviceId");
         String serviceName = request.getParameter("serviceName");
         String description = request.getParameter("description");
         String unitPriceStr = request.getParameter("unitPrice");
         String activeStr = request.getParameter("active");
-        
+        String page = request.getParameter("page");
+        String keyword = request.getParameter("keyword");
 
         if (serviceName == null || serviceName.trim().isEmpty()) {
             session.setAttribute("errorMessage", "Tên dịch vụ không được để trống.");
-            response.sendRedirect(request.getContextPath() + "RoomServiceList");
-            return;
-        }
-
-        if (unitPriceStr == null || unitPriceStr.trim().isEmpty()) {
-            session.setAttribute("errorMessage", "Đơn giá không được để trống.");
-            response.sendRedirect(request.getContextPath() + "RoomServiceList");
+            response.sendRedirect(buildRedirectUrl(request, page, keyword));
             return;
         }
 
@@ -59,21 +62,41 @@ public class RoomServiceCreateController extends HttpServlet {
         }
 
         boolean isActive = "true".equals(activeStr);
-        RoomService newService = new RoomService(0, serviceName, description, unitPrice, isActive);
+        RoomService updatedService = new RoomService(
+                Integer.parseInt(serviceIdStr),
+                serviceName.trim(),
+                description.trim(),
+                unitPrice,
+                isActive
+        );
 
         try {
             RoomServiceDAO dao = new RoomServiceDAO();
-            dao.createRoomService(newService);
-            session.setAttribute("successMessage", "Thêm dịch vụ \"" + serviceName.trim() + "\" thành công.");
+            dao.updateRoomService(updatedService);
+            session.setAttribute("successMessage", "Cập nhật dịch vụ \"" + serviceName.trim() + "\" thành công.");
         } catch (Exception e) {
             session.setAttribute("errorMessage", e.getMessage());
         }
-        response.sendRedirect(request.getContextPath() + "RoomServiceList");
+
+        response.sendRedirect(buildRedirectUrl(request, page, keyword));
+    }
+
+    private String buildRedirectUrl(HttpServletRequest request, String page, String keyword) {
+        StringBuilder url = new StringBuilder(request.getContextPath() + "RoomServiceList");
+        url.append("?page=").append(page != null ? page : "1");
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            try {
+                url.append("&keyword=").append(java.net.URLEncoder.encode(keyword.trim(), "UTF-8"));
+            } catch (java.io.UnsupportedEncodingException e) {
+                url.append("&keyword=").append(keyword.trim());
+            }
+        }
+        return url.toString();
     }
 
     @Override
     public String getServletInfo() {
-        return "Room Service Create Controller";
+        return "Room Service Edit Controller";
     }
 
 }
