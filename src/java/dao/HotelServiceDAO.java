@@ -22,28 +22,20 @@ public class HotelServiceDAO extends DBContext {
     PreparedStatement stm;
     ResultSet rs;
 
-    /**
-     * Get list all hotel servives from database
-     *
-     * @return List of service object, return null if not have data
-     */
     public List<HotelService> getAllHotelServices() throws Exception {
         List<HotelService> list = new ArrayList<HotelService>();
         String strSQL = """
-                        select * from HotelServices
+                        select * 
+                        from HotelServices
                         """;
-        try (PreparedStatement stm = connection.prepareStatement(strSQL); ResultSet rs = stm.executeQuery()) {
 
+        try (PreparedStatement stm = connection.prepareStatement(strSQL); ResultSet rs = stm.executeQuery()) {
             while (rs.next()) {
                 int id = rs.getInt("hotel_service_id");
                 BigDecimal price = rs.getBigDecimal("unit_price");
-<<<<<<< Updated upstream
                 String serviceName = rs.getString("service_name");
                 String description = rs.getString("description").trim();
-=======
                 String name = rs.getString("service_name");
-                String description = rs.getString("description");
->>>>>>> Stashed changes
                 boolean active = rs.getBoolean("is_active");
                 String imgUrl = rs.getString("image_url");
 
@@ -54,93 +46,123 @@ public class HotelServiceDAO extends DBContext {
             if (e.getErrorCode() == 547) {
                 throw new Exception("Không thể xóa dịch vụ này vì đang được sử dụng trong các đơn đặt phòng.");
             } else {
-                throw new Exception("Lỗi hệ thống: " + e.getMessage());
+                throw new Exception("Hệ thống đang bận, vui lòng thử lại sau.");
             }
         }
         return list;
     }
 
-    /**
-     * Find a service by its ID
-     *
-     * @param serviceId
-     * @return HotelService object if found, if not found return null
-     */
-    public HotelService getHotelHotelServicesById(int serviceId) {
-        HotelService roomHotelService = null;
-        try {
-            String strSQL = """
-                          select * from HotelHotelServices rs
-                          where rs.hotel_service_id = ?
-                          """;
-            stm = connection.prepareCall(strSQL);
+    public HotelService getHotelServicesById(int serviceId) throws Exception {
+        String strSQL = """
+                        select * 
+                        from HotelServices 
+                        where hotel_service_id = ?
+                        """;
+
+        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
             stm.setInt(1, serviceId);
-            rs = stm.executeQuery();
 
-            while (rs.next()) {
-                BigDecimal price = rs.getBigDecimal("unit_price");
-                String serviceName = rs.getString("service_name");
-                String description = rs.getString("description").trim();
-                boolean active = rs.getBoolean("is_active");
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    BigDecimal price = rs.getBigDecimal("unit_price");
+                    String name = rs.getString("service_name");
+                    String description = rs.getString("description").trim();
+                    boolean active = rs.getBoolean("is_active");
+                    String imgUrl = rs.getString("image_url");
 
-                roomHotelService = new HotelService(serviceId, serviceName, description,
-                        price, active, HotelServiceType.HOTEL);
+                    return new HotelService(serviceId, name, description, price, imgUrl, active);
+                } else {
+                    throw new Exception("Dịch vụ này không tồn tại trong hệ thống.");
+                }
             }
-        } catch (Exception ex) {
-            System.out.println("GetHotelHotelServices:" + ex.getMessage());
+        } catch (SQLException e) {
+            throw new Exception("Hệ thống đang bận, vui lòng thử lại sau.");
         }
-        return roomHotelService;
     }
 
-    /**
-     * Adding new service in system
-     *
-     * @param hotelHotelService
-     * @return service object if add successfully, null if unsuccess
-     */
-    public HotelService createHotelHotelService(HotelService hotelHotelService) {
-        //Check service is exist
-        HotelService found = getHotelHotelServicesById(hotelHotelService.getHotelServiceId());
-        if (found != null) {
-            return null;
+    public HotelService getHotelServicesByName(String serviceName) throws Exception {
+        String strSQL = """
+                        select * 
+                        from HotelServices 
+                        where service_name = ?
+                        """;
+
+        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
+            stm.setString(1, serviceName);
+
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    int id = rs.getInt("hotel_service_id");
+                    BigDecimal price = rs.getBigDecimal("unit_price");
+                    String description = rs.getString("description").trim();
+                    boolean active = rs.getBoolean("is_active");
+                    String imgUrl = rs.getString("image_url");
+
+                    return new HotelService(id, serviceName, description, price, imgUrl, active);
+                } else {
+                    throw new Exception("Dịch vụ này không tồn tại trong hệ thống.");
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Hệ thống đang bận, vui lòng thử lại sau.");
         }
-
-        try {
-            String strSQL = """
-                            insert into HotelHotelServices ([service_name], 
-                            [description], unit_price, is_active) 
-                            values (?, ?, ?, ?)
-                            """;
-            stm = connection.prepareCall(strSQL);
-
-            stm.setString(1, hotelHotelService.getHotelServiceName());
-            stm.setString(2, hotelHotelService.getDescription());
-            stm.setBigDecimal(3, hotelHotelService.getUnitPrice());
-            stm.setBoolean(4, hotelHotelService.isActive());
-
-            stm.execute();
-        } catch (Exception ex) {
-            System.out.println("CreateHotelHotelServices:" + ex.getMessage());
-        }
-        return hotelHotelService;
     }
 
-    /**
-     * Update the information for an existing hotel service.
-     *
-     * @param roomHotelService
-     * @return The HotelService object will be null after the update if the ID
-     * is successful, or null if the ID is not found
-     */
-    public HotelService updateHotelHotelService(HotelService roomHotelService) {
-        HotelService found = getHotelHotelServicesById(roomHotelService.getHotelServiceId());
+    private boolean isServiceNameExists(String serviceName) throws SQLException {
+        String sql = """
+                     select 1 
+                     from HotelServices 
+                     where service_name = ?
+                     """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1, serviceName);
+            try (ResultSet rs = stm.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    public HotelService createHotelService(HotelService hotelService) throws Exception {
+        if (isServiceNameExists(hotelService.getServiceName())) {
+            throw new Exception("Tên dịch vụ này đã tồn tại, vui lòng chọn tên khác.");
+        }
+
+        String strSQL = """
+                           insert into HotelServices ([service_name], [description], unit_price, is_active, image_url) 
+                           values (?, ?, ?, ?)
+                           """;
+
+        try (PreparedStatement stm = connection.prepareStatement(strSQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            stm.setString(1, hotelService.getServiceName());
+            stm.setString(2, hotelService.getDescription());
+            stm.setBigDecimal(3, hotelService.getUnitPrice());
+            stm.setBoolean(4, hotelService.isActive());
+            stm.setString(5, hotelService.getImageUrl());
+            
+            if (stm.executeUpdate() > 0) {
+                try (ResultSet generatedKeys = stm.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        hotelService.setHotelServiceId(generatedKeys.getInt(1));
+                    }
+                }
+                return hotelService;
+            } else {
+                throw new Exception("Thêm dịch vụ thất bại.");
+            }
+        } catch (SQLException e) {
+            throw new Exception("Không thể tạo mới dịch vụ.");
+        }
+    }
+
+    public HotelService updateHotelService(HotelService roomHotelService) {
+        HotelService found = getHotelServicesById(roomHotelService.getHotelServiceId());
         if (found == null) {
             return null;
         }
 
         try {
             String strSQL = """
-                           update HotelHotelServices 
+                           update HotelServices 
                            set [service_name] = ?, 
                            [description] =?, 
                            unit_price =?, 
@@ -157,7 +179,7 @@ public class HotelServiceDAO extends DBContext {
 
             stm.execute();
         } catch (Exception ex) {
-            System.out.println("UpdateHotelHotelServices:" + ex.getMessage());
+            System.out.println("UpdateHotelServices:" + ex.getMessage());
         }
         return roomHotelService;
     }
@@ -170,20 +192,20 @@ public class HotelServiceDAO extends DBContext {
      * service is not found.
      */
     public HotelService delete(int serviceId) {
-        HotelService found = getHotelHotelServicesById(serviceId);
+        HotelService found = getHotelServicesById(serviceId);
         if (found == null) {
             return null;
         }
 
         try {
             String strSQL = """
-                           delete HotelHotelServices where hotel_service_id = ?
+                           delete HotelServices where hotel_service_id = ?
                            """;
             stm = connection.prepareCall(strSQL);
             stm.setInt(1, serviceId);
             stm.execute();
         } catch (Exception ex) {
-            System.out.println("DeleteHotelHotelServices:" + ex.getMessage());
+            System.out.println("DeleteHotelServices:" + ex.getMessage());
         }
         return found;
     }
