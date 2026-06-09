@@ -6,12 +6,9 @@
     Author     : Minh Thu
 */
 
-/* ==========================================================================
-   SEARCH RESULT PAGE DESIGN (MÀU VÀNG NGÀ CỔ ĐIỂN SANG TRỌNG)
-   ========================================================================== */
 
 body {
-    background-color: #F9F5EB !important; /* Ép đồng bộ nền vàng ngà giống hệt homepage */
+    background-color: #F9F5EB ; /* Ép đồng bộ nền vàng ngà giống hệt homepage */
 }
 
 .room-list-page {
@@ -21,15 +18,19 @@ body {
 }
 
 .search-summary-text {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Lora', 'Cormorant Garamond', serif;
+    font-size: 16px;
     color: #2c3e46;
-    margin-bottom: 25px;
-    font-size: 15px;
+    line-height: 1.8;
+    margin-bottom: 30px;
 }
 
 .search-summary-text strong {
+    font-family: 'Lora', 'Cormorant Garamond', serif;
+    font-weight: 600;
     color: #C8A96B;
 }
+
 
 /* Khu vực lưới hiển thị danh sách phòng */
 .room-list-grid {

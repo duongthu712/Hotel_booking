@@ -51,10 +51,19 @@
                     <c:when test="${not empty param.checkIn}">
                         <fmt:parseDate value="${param.checkIn}" pattern="yyyy-MM-dd" var="parsedCheckIn" />
                         <fmt:parseDate value="${param.checkOut}" pattern="yyyy-MM-dd" var="parsedCheckOut" />
+                        <c:set var="formattedCheckIn"><fmt:formatDate value="${parsedCheckIn}" pattern="dd/MM/yyyy" /></c:set>
+                        <c:set var="formattedCheckOut"><fmt:formatDate value="${parsedCheckOut}" pattern="dd/MM/yyyy" /></c:set>
+                        <c:set var="reqRooms" value="${not empty param.roomQuantity ? param.roomQuantity : 1}" />
 
-                        Đang hiển thị các loại phòng trống có: <strong>${not empty param.roomQuantity ? param.roomQuantity : 1} Phòng</strong> | 
-                        Thời gian: <strong><fmt:formatDate value="${parsedCheckIn}" pattern="dd/MM/yyyy" /></strong> 
-                        đến <strong><fmt:formatDate value="${parsedCheckOut}" pattern="dd/MM/yyyy" /></strong>
+                        <c:choose>
+                            <c:when test="${not empty param.roomTypeId && param.roomTypeId ne 'all' && not empty availableRoomTypes}">
+                                <c:set var="selectedTypeName" value="${availableRoomTypes[0].typeName}" />
+                                Hạng phòng <strong>${selectedTypeName}</strong> sẵn sàng đón tiếp Quý khách với số lượng <strong>${reqRooms} phòng</strong> từ ngày <strong>${formattedCheckIn}</strong> đến <strong>${formattedCheckOut}</strong>:
+                            </c:when>
+                            <c:otherwise>
+                                Tìm thấy các <strong>hạng phòng</strong> trống đáp ứng đủ nhu cầu <strong>${reqRooms} phòng</strong> của Quý khách từ ngày <strong>${formattedCheckIn}</strong> đến <strong>${formattedCheckOut}</strong>:
+                            </c:otherwise>
+                        </c:choose>
                     </c:when>
                     <c:otherwise>
                         Chào mừng bạn đến với La Mer. Dưới đây là <strong>Tất cả các hạng phòng hiện có</strong> tại khách sạn:
@@ -99,20 +108,8 @@
                                             </span>
                                         </div>
 
-                                        <%-- Dòng 2: Duyệt danh sách dịch vụ Free đồng bộ chằn chặn --%>
-                                        <div class="room-extra-services">
-                                            <c:forEach var="rts" items="${room.roomTypeServices}">
-                                                <span class="badge-service-large">
-                                                    <c:out value="${rts.service.serviceName}" />
-                                                    <c:if test="${rts.quantity > 1}">
-                                                        (x<c:out value="${rts.quantity}" />)
-                                                    </c:if>
-                                                    <strong style="color: #2e7d32; font-size: 13px; margin-left: 6px;">[Free]</strong>
-                                                </span>
-                                            </c:forEach>
-                                        </div>
                                     </div>
-                                    
+
                                     <div class="room-card-footer-bar">
                                         <div class="room-actions-group">
                                             <a href="${pageContext.request.contextPath}/room-detail?id=${room.roomTypeId}" class="btn-action-view">
