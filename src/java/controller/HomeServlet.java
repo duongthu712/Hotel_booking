@@ -13,8 +13,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import model.HotelImage;
+import model.HotelInfo;
+import model.HotelNews;
+import model.HotelService;
 import model.RoomType;
-import model.Service;    // Import lớp thực thể thông tin khách sạn
 
 /**
  *
@@ -46,12 +49,19 @@ public class HomeServlet extends HttpServlet {
 
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-            HotelInfoDAO hotelInfoDAO = new HotelInfoDAO();
-            List<Service> servicesList = hotelInfoDAO.getActiveHotelServices();
-            request.setAttribute("services", servicesList);
-            RoomTypeDAO roomtypeDAO = new RoomTypeDAO();
-            List<RoomType> roomTypeList = roomtypeDAO.getAllRoomTypes();
-            request.setAttribute("allRoomTypesList", roomTypeList);
-            request.getRequestDispatcher("/view/public/homepage.jsp").forward(request, response);
+        HotelInfoDAO hotelInfoDAO = new HotelInfoDAO();
+        RoomTypeDAO roomtypeDAO = new RoomTypeDAO();
+        HotelInfo hotelInfo = hotelInfoDAO.getHotelDetails(1);
+        List<HotelService> servicesList = hotelInfoDAO.getActiveHotelServices();
+        List<HotelNews> top3News = hotelInfoDAO.getTop3LatestNews();
+        List<HotelImage> smallImages = hotelInfoDAO.get6SmallImages(1);
+        List<RoomType> roomTypeList = roomtypeDAO.getAllRoomTypes();
+        request.setAttribute("hotelInfo", hotelInfo);
+        request.setAttribute("services", servicesList);
+        request.setAttribute("top3News", top3News);
+        request.setAttribute("smallImages", smallImages);
+        request.setAttribute("allRoomTypesList", roomTypeList);
+
+        request.getRequestDispatcher("/view/public/homepage.jsp").forward(request, response);
     }
 }
