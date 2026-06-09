@@ -21,7 +21,7 @@ public class RoomServiceEditController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.sendRedirect(request.getContextPath() + "RoomServiceList");
+        response.sendRedirect(request.getContextPath() + "/RoomServiceList");
     }
 
     @Override
@@ -56,7 +56,7 @@ public class RoomServiceEditController extends HttpServlet {
             }
         } catch (NumberFormatException e) {
             session.setAttribute("errorMessage", "Đơn giá không hợp lệ.");
-            response.sendRedirect(request.getContextPath() + "RoomServiceList");
+            response.sendRedirect(request.getContextPath() + "/RoomServiceList");
             return;
         }
 
@@ -81,7 +81,7 @@ public class RoomServiceEditController extends HttpServlet {
     }
 
     private String buildRedirectUrl(HttpServletRequest request, String page, String keyword) {
-        StringBuilder url = new StringBuilder(request.getContextPath() + "RoomServiceList");
+        StringBuilder url = new StringBuilder(request.getContextPath() + "/RoomServiceList");
         url.append("?page=").append(page != null ? page : "1");
         if (keyword != null && !keyword.trim().isEmpty()) {
             try {

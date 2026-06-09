@@ -69,7 +69,7 @@
         <servlet-class>controller.StaffAccountDeleteController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RoomServiceController</servlet-name>
+        <servlet-name>RoomServiceListController</servlet-name>
         <servlet-class>controller.RoomServiceListController</servlet-class>
     </servlet>
     <servlet>
@@ -189,8 +189,8 @@
         <url-pattern>/StaffAccountDelete</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RoomServiceController</servlet-name>
-        <url-pattern>/RoomService</url-pattern>
+        <servlet-name>RoomServiceListController</servlet-name>
+        <url-pattern>/RoomServiceList</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>RoomServiceCreateController</servlet-name>

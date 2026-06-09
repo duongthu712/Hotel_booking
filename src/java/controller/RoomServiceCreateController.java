@@ -36,13 +36,13 @@ public class RoomServiceCreateController extends HttpServlet {
 
         if (serviceName == null || serviceName.trim().isEmpty()) {
             session.setAttribute("errorMessage", "Tên dịch vụ không được để trống.");
-            response.sendRedirect(request.getContextPath() + "RoomServiceList");
+            response.sendRedirect(request.getContextPath() + "/RoomServiceList");
             return;
         }
 
         if (unitPriceStr == null || unitPriceStr.trim().isEmpty()) {
             session.setAttribute("errorMessage", "Đơn giá không được để trống.");
-            response.sendRedirect(request.getContextPath() + "RoomServiceList");
+            response.sendRedirect(request.getContextPath() + "/RoomServiceList");
             return;
         }
 
@@ -54,7 +54,7 @@ public class RoomServiceCreateController extends HttpServlet {
             }
         } catch (NumberFormatException e) {
             session.setAttribute("errorMessage", "Đơn giá không hợp lệ.");
-            response.sendRedirect(request.getContextPath() + "RoomServiceList");
+            response.sendRedirect(request.getContextPath() + "/RoomServiceList");
             return;
         }
 
@@ -68,7 +68,7 @@ public class RoomServiceCreateController extends HttpServlet {
         } catch (Exception e) {
             session.setAttribute("errorMessage", e.getMessage());
         }
-        response.sendRedirect(request.getContextPath() + "RoomServiceList");
+        response.sendRedirect(request.getContextPath() + "/RoomServiceList");
     }
 
     @Override

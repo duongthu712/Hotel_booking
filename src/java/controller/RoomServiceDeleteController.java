@@ -42,7 +42,7 @@ public class RoomServiceDeleteController extends HttpServlet {
     }
 
     private String buildRedirectUrl(HttpServletRequest request, String page, String keyword) {
-        StringBuilder url = new StringBuilder(request.getContextPath() + "RoomServiceList");
+        StringBuilder url = new StringBuilder(request.getContextPath() + "/RoomServiceList");
         url.append("?page=").append(page != null ? page : "1");
         if (keyword != null && !keyword.trim().isEmpty()) {
             try {

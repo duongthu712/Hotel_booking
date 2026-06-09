@@ -75,11 +75,11 @@ public class RoomServiceListController extends HttpServlet {
             request.setAttribute("keyword", keyword);
             
             
-            request.getRequestDispatcher("/view/manager/service-management.jsp").forward(request, response);
+            request.getRequestDispatcher("/view/manager/room-service-management.jsp").forward(request, response);
 
         } catch (Exception e) {
             request.setAttribute("errorMessage", e.getMessage());
-            request.getRequestDispatcher("/view/manager/service-management.jsp").forward(request, response);
+            request.getRequestDispatcher("/view/manager/room-service-management.jsp").forward(request, response);
         }
     }
 
