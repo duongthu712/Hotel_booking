@@ -7,8 +7,8 @@
 <!-- the Compile on Save feature is turned off for the project. -->
 <!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
 <!-- in the project's Project Properties dialog box.-->
-<project name="Hotel_booking_project" default="default" basedir=".">
-    <description>Builds, tests, and runs the project Hotel_booking_project.</description>
+<project name="Hotel_booking_iter1_final" default="default" basedir=".">
+    <description>Builds, tests, and runs the project Hotel_booking_iter1_final.</description>
     <import file="nbproject/build-impl.xml"/>
     <!--
 

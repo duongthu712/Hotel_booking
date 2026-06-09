@@ -1,10 +1,10 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Verify Code</title>
+    <title>Quên mật khẩu</title>
 
     <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/navbar.css">
     <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/footer.css">
@@ -16,13 +16,12 @@
 
     <main class="auth-page">
         <div class="auth-card">
+            <div class="auth-label-top">KHÔI PHỤC TÀI KHOẢN</div>
 
-            <div class="auth-label-top">VERIFICATION</div>
-
-            <h1>Verify code</h1>
+            <h1>Quên mật khẩu</h1>
 
             <p class="auth-subtitle">
-                Enter the verification code sent to your staff email.
+                Nhập email nhân viên để nhận mã xác minh đặt lại mật khẩu.
             </p>
 
             <% if (request.getAttribute("error") != null) { %>
@@ -37,28 +36,27 @@
                 </p>
             <% } %>
 
-            <form class="auth-form" action="<%= request.getContextPath() %>/verify-code" method="post">
-
+            <form class="auth-form" action="<%= request.getContextPath() %>/forgot-password" method="post">
                 <div class="auth-form-group">
-                    <label>Code</label>
-                    <input type="text" name="code" required>
+                    <label>Email</label>
+                    <input
+                        type="email"
+                        name="email"
+                        value="<%= request.getParameter("email") != null ? request.getParameter("email") : "" %>"
+                        required
+                    >
                 </div>
 
-                <button type="submit" class="auth-btn">Verify code</button>
+                <button type="submit" class="auth-btn">Gửi mã xác minh</button>
             </form>
 
-            <div class="auth-link-row">
-                <a href="<%= request.getContextPath() %>/forgot-password">
-                    Resend code
-                </a>
-
+            <div class="auth-link">
                 <a href="<%= request.getContextPath() %>/login">
-                    Back to sign in
+                    Quay lại đăng nhập
                 </a>
             </div>
 
             <div class="auth-line"></div>
-
         </div>
     </main>
 

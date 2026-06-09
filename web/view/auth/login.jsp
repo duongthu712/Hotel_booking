@@ -1,10 +1,10 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Staff Login</title>
+    <title>Đăng nhập nhân viên</title>
 
     <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/navbar.css">
     <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/footer.css">
@@ -16,13 +16,12 @@
 
     <main class="auth-page">
         <div class="auth-card">
+            <div class="auth-label-top">CỔNG NHÂN VIÊN</div>
 
-            <div class="auth-label-top">STAFF PORTAL</div>
-
-            <h1>Sign in</h1>
+            <h1>Đăng nhập</h1>
 
             <p class="auth-subtitle">
-                Reception, management and administration access.
+                Dành cho lễ tân, quản lý và quản trị viên.
             </p>
 
             <% if (request.getAttribute("error") != null) { %>
@@ -33,33 +32,40 @@
 
             <% if ("success".equals(request.getParameter("reset"))) { %>
                 <p class="auth-message-success">
-                    Password reset successfully. Please login again.
+                    Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại.
                 </p>
             <% } %>
 
             <form class="auth-form" action="<%= request.getContextPath() %>/login" method="post">
-
                 <div class="auth-form-group">
-                    <label>Username</label>
-                    <input type="text" name="username" required>
+                    <label>Tên đăng nhập</label>
+                    <input 
+                        type="text" 
+                        name="username" 
+                        value="<%= request.getParameter("username") != null ? request.getParameter("username") : "" %>"
+                        required
+                    >
                 </div>
 
                 <div class="auth-form-group">
-                    <label>Password</label>
-                    <input type="password" name="password" required>
+                    <label>Mật khẩu</label>
+                    <input 
+                        type="password" 
+                        name="password" 
+                        required
+                    >
                 </div>
 
-                <button type="submit" class="auth-btn">Sign in</button>
+                <button type="submit" class="auth-btn">Đăng nhập</button>
             </form>
 
             <div class="auth-link">
                 <a href="<%= request.getContextPath() %>/forgot-password">
-                    Forgot password?
+                    Quên mật khẩu?
                 </a>
             </div>
 
             <div class="auth-line"></div>
-
         </div>
     </main>
 
