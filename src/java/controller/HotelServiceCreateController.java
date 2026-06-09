@@ -30,20 +30,20 @@ public class HotelServiceCreateController extends HttpServlet {
 
         String serviceName = request.getParameter("serviceName");
         String description = request.getParameter("description");
-        String unitPriceStr = request.getParameter("unitPrice");
+        String unitPriceStr = request.getParameter("unitPrice");        
         String imageUrl = request.getParameter("imageUrl");
         String activeStr = request.getParameter("active");
         
 
         if (serviceName == null || serviceName.trim().isEmpty()) {
             session.setAttribute("errorMessage", "Tên dịch vụ không được để trống.");
-            response.sendRedirect(request.getContextPath() + "HotelServiceList");
+            response.sendRedirect(request.getContextPath() + "/HotelServiceList");
             return;
         }
 
         if (unitPriceStr == null || unitPriceStr.trim().isEmpty()) {
             session.setAttribute("errorMessage", "Đơn giá không được để trống.");
-            response.sendRedirect(request.getContextPath() + "HotelServiceList");
+            response.sendRedirect(request.getContextPath() + "/HotelServiceList");
             return;
         }
 
@@ -55,7 +55,7 @@ public class HotelServiceCreateController extends HttpServlet {
             }
         } catch (NumberFormatException e) {
             session.setAttribute("errorMessage", "Đơn giá không hợp lệ.");
-            response.sendRedirect(request.getContextPath() + "HotelServiceList");
+            response.sendRedirect(request.getContextPath() + "/HotelServiceList");
             return;
         }
 
@@ -69,7 +69,7 @@ public class HotelServiceCreateController extends HttpServlet {
         } catch (Exception e) {
             session.setAttribute("errorMessage", e.getMessage());
         }
-        response.sendRedirect(request.getContextPath() + "HotelServiceList");
+        response.sendRedirect(request.getContextPath() + "/HotelServiceList");
     }
 
     @Override

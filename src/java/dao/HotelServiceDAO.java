@@ -23,7 +23,8 @@ public class HotelServiceDAO extends DBContext {
         List<HotelService> list = new ArrayList<HotelService>();
         String strSQL = """
                         select * 
-                        from HotelServices
+                        from HotelServices 
+                        order by hotel_service_id desc
                         """;
 
         try (PreparedStatement stm = connection.prepareStatement(strSQL); ResultSet rs = stm.executeQuery()) {
@@ -52,7 +53,8 @@ public class HotelServiceDAO extends DBContext {
         String strSQL = """
                         select * 
                         from HotelServices 
-                        where hotel_service_id = ?
+                        where hotel_service_id = ? 
+                        order by hotel_service_id desc
                         """;
 
         try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
@@ -117,13 +119,14 @@ public class HotelServiceDAO extends DBContext {
             }
         }
     }
-    
+
     public List<HotelService> searchHotelServicesByName(String keyword) throws Exception {
         List<HotelService> list = new ArrayList<>();
         String strSQL = """
                         select * 
                         from HotelServices 
-                        where service_name like ?
+                        where service_name like ? 
+                        order by hotel_service_id desc
                         """;
 
         try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
@@ -131,12 +134,13 @@ public class HotelServiceDAO extends DBContext {
             try (ResultSet rs = stm.executeQuery()) {
                 while (rs.next()) {
                     int id = rs.getInt("hotel_service_id");
+
                     BigDecimal price = rs.getBigDecimal("unit_price");
                     String description = rs.getString("description").trim();
                     boolean active = rs.getBoolean("is_active");
                     String imgUrl = rs.getString("image_url");
-
-                    HotelService service = new HotelService(id, strSQL, description, price, imgUrl, active);
+                    String name = rs.getString("service_name");
+                    HotelService service = new HotelService(id, name, description, price, imgUrl, active);
                     list.add(service);
                 }
             }
@@ -189,8 +193,8 @@ public class HotelServiceDAO extends DBContext {
                         set [service_name] = ?, 
                         [description] = ?, 
                         unit_price = ?, 
-                        is_active = ? 
-                        image_url = ?, 
+                        is_active = ?, 
+                        image_url = ? 
                         where hotel_service_id = ?
                         """;
 
@@ -200,6 +204,7 @@ public class HotelServiceDAO extends DBContext {
             stm.setBigDecimal(3, hotelService.getUnitPrice());
             stm.setBoolean(4, hotelService.isActive());
             stm.setString(5, hotelService.getImageUrl());
+            stm.setInt(6, hotelService.getHotelServiceId());
 
             int rowCount = stm.executeUpdate();
             if (rowCount > 0) {

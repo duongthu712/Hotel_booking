@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.math.BigDecimal;
+import java.util.List;
 import model.HotelService;
 import model.StaffAccount;
 
@@ -21,7 +22,30 @@ public class HotelServiceEditController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.sendRedirect(request.getContextPath() + "HotelServiceList");
+        HttpSession session = request.getSession();
+        StaffAccount staff = (StaffAccount) session.getAttribute("staff");
+
+        if (staff == null) {
+            response.sendRedirect("view/auth/login.jsp");
+            return;
+        }
+
+        try {
+            int serviceId = Integer.parseInt(request.getParameter("serviceId"));
+
+            HotelServiceDAO dao = new HotelServiceDAO();
+            HotelService service = dao.getHotelServicesById(serviceId);
+            List<HotelService> serviceList = dao.getAllHotelServices();
+
+            request.setAttribute("serviceList", serviceList);
+            request.setAttribute("serviceToEdit", service);
+            request.setAttribute("page", request.getParameter("page"));
+            request.setAttribute("keyword", request.getParameter("keyword"));
+            request.getRequestDispatcher("/view/manager/hotel-service-management.jsp").forward(request, response);
+        } catch (Exception e) {
+            session.setAttribute("errorMessage", e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/HotelServiceList");
+        }
     }
 
     @Override
@@ -34,12 +58,13 @@ public class HotelServiceEditController extends HttpServlet {
             return;
         }
 
-        String serviceIdStr = request.getParameter("serviceId");
+        int serviceId = Integer.parseInt(request.getParameter("serviceId"));
         String serviceName = request.getParameter("serviceName");
         String description = request.getParameter("description");
         String unitPriceStr = request.getParameter("unitPrice");
-        String imageUrl = request.getParameter("imageUrl");
         String activeStr = request.getParameter("active");
+        String imageUrl = request.getParameter("imageUrl");
+        
         String page = request.getParameter("page");
         String keyword = request.getParameter("keyword");
 
@@ -57,12 +82,12 @@ public class HotelServiceEditController extends HttpServlet {
             }
         } catch (NumberFormatException e) {
             session.setAttribute("errorMessage", "Đơn giá không hợp lệ.");
-            response.sendRedirect(request.getContextPath() + "HotelServiceList");
+            response.sendRedirect(request.getContextPath() + "/HotelServiceList");
             return;
         }
 
         boolean isActive = "true".equals(activeStr);
-        HotelService updatedService = new HotelService(0, serviceName, description, unitPrice, imageUrl, isActive);
+        HotelService updatedService = new HotelService(serviceId, serviceName, description, unitPrice, imageUrl, isActive);
 
         try {
             HotelServiceDAO dao = new HotelServiceDAO();
@@ -76,7 +101,7 @@ public class HotelServiceEditController extends HttpServlet {
     }
 
     private String buildRedirectUrl(HttpServletRequest request, String page, String keyword) {
-        StringBuilder url = new StringBuilder(request.getContextPath() + "HotelServiceList");
+        StringBuilder url = new StringBuilder(request.getContextPath() + "/HotelServiceList");
         url.append("?page=").append(page != null ? page : "1");
         if (keyword != null && !keyword.trim().isEmpty()) {
             try {
