@@ -11,13 +11,13 @@ import java.sql.SQLException;
 
 /**
  * RoomAmenityDAO.java Data Processing Operator layer for room amenitys Provides
- CRUD with RoomAmenities table
+ * CRUD with RoomAmenities table
  *
  * @author LinhLTHE200306
  * @version 1.0
  * @since 2026-06-10
  */
-public class RoomAmenityDAO extends DBContext {
+public class RoomAmenityDAO extends DBContext{
 
     public List<RoomAmenity> getAllRoomAmenities() throws Exception {
         List<RoomAmenity> list = new ArrayList<>();
@@ -27,8 +27,7 @@ public class RoomAmenityDAO extends DBContext {
                         order by amenity_id desc
                         """;
 
-        try (PreparedStatement stm = connection.prepareStatement(strSQL);
-             ResultSet rs = stm.executeQuery()) {
+        try (PreparedStatement stm = connection.prepareStatement(strSQL); ResultSet rs = stm.executeQuery()) {
             while (rs.next()) {
                 int id = rs.getInt("amenity_id");
                 String name = rs.getString("amenity_name");
@@ -102,7 +101,7 @@ public class RoomAmenityDAO extends DBContext {
             throw new Exception("Lỗi hệ thống: Vui lòng thử lại sau.");
         }
     }
-    
+
     public List<RoomAmenity> searchRoomAmenitiesByName(String keyword) throws Exception {
         List<RoomAmenity> list = new ArrayList<>();
         String strSQL = """
@@ -221,4 +220,5 @@ public class RoomAmenityDAO extends DBContext {
             throw new Exception("Lỗi hệ thống: Không thể xóa.");
         }
     }
+
 }
