@@ -71,30 +71,50 @@ public class RoomTypeDAO extends DBContext {
         return list;
     }
 
-    // 2. TÌM KIẾM PHÒNG TRỐNG THEO NGÀY
+// 2. TÌM KIẾM PHÒNG TRỐNG THEO NGÀY
     public List<RoomType> searchRoomTypesByQuantity(String checkIn, String checkOut, int roomQuantity, String roomTypeId) {
         List<RoomType> list = new ArrayList<>();
+
         String sql = "SELECT rt.room_type_id, rt.type_name, rt.description, rt.capacity, "
                 + "       rt.bed_type, rt.bed_count, rt.area_sqm, rt.base_price, rt.is_active, "
                 + "       MIN(rti.image_url) as minImageUrl "
                 + "FROM RoomTypes rt "
                 + "LEFT JOIN RoomTypeImages rti ON rt.room_type_id = rti.room_type_id "
                 + "WHERE rt.is_active = 1 ";
+
         if (roomTypeId != null && !roomTypeId.equals("all")) {
             sql += " AND rt.room_type_id = ? ";
         }
-        sql += " AND (SELECT COUNT(*) FROM Rooms r WHERE r.room_type_id = rt.room_type_id AND r.[status] != N'Đang bảo trì' AND r.room_number NOT IN (SELECT br.room_number FROM BookingRooms br JOIN Bookings b ON br.booking_id = b.booking_id WHERE b.[status] != N'Đã hủy' AND NOT (b.checkout_date <= ? OR b.checkin_date >= ?))) >= ? "
-                + " GROUP BY rt.room_type_id, rt.type_name, rt.description, rt.capacity, rt.bed_type, rt.bed_count, rt.area_sqm, rt.base_price, rt.is_active";
+
+        sql += " AND (SELECT COUNT(*) "
+                + " FROM Rooms r "
+                + " WHERE r.room_type_id = rt.room_type_id "
+                + " AND r.[status] != N'Đang bảo trì' "
+                + " AND r.room_number NOT IN ( "
+                + "     SELECT br.room_number "
+                + "     FROM BookingRooms br "
+                + "     JOIN Bookings b ON br.booking_id = b.booking_id "
+                + "     WHERE b.[status] != N'Đã hủy' "
+                + "     AND NOT (b.checkout_date <= ? OR b.checkin_date >= ?) "
+                + " ) "
+                + ") >= ? "
+                + " GROUP BY rt.room_type_id, rt.type_name, rt.description, rt.capacity, "
+                + " rt.bed_type, rt.bed_count, rt.area_sqm, rt.base_price, rt.is_active";
+
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             int index = 1;
+
             if (roomTypeId != null && !roomTypeId.equals("all")) {
                 ps.setInt(index++, Integer.parseInt(roomTypeId));
             }
+
             ps.setString(index++, checkIn);
             ps.setString(index++, checkOut);
             ps.setInt(index++, roomQuantity);
+
             ResultSet rs = ps.executeQuery();
+
             while (rs.next()) {
                 RoomType rt = new RoomType();
                 rt.setRoomTypeId(rs.getInt("room_type_id"));
@@ -112,31 +132,16 @@ public class RoomTypeDAO extends DBContext {
                     rt.addImage(minImg, "");
                 }
 
-                // Query CHỈ lấy dịch vụ miễn phí (is_free = 1)
-                List<RoomTypeService> roomTypeServicesList = new ArrayList<>();
-                String sqlService = "SELECT rts.room_type_service_id, rts.room_type_id, rts.service_id, rts.quantity, rts.is_free, "
-                        + "       s.service_name, s.[description] as svc_desc, s.unit_price, s.is_active as svc_active "
-                        + "FROM RoomTypeServices rts "
-                        + "JOIN RoomServices s ON rts.service_id = s.service_id "
-                        + "WHERE rts.room_type_id = ? AND rts.is_free = 1";
-                PreparedStatement psSvc = connection.prepareStatement(sqlService);
-                psSvc.setInt(1, rt.getRoomTypeId());
-                ResultSet rsSvc = psSvc.executeQuery();
-                while (rsSvc.next()) {
-                    Service s = new Service(rsSvc.getInt("service_id"), rsSvc.getString("service_name"), rsSvc.getString("svc_desc"), rsSvc.getBigDecimal("unit_price"), rsSvc.getBoolean("svc_active"), ServiceType.ROOM);
-                    RoomTypeService rtsObj = new RoomTypeService(rsSvc.getInt("room_type_service_id"), rsSvc.getInt("room_type_id"), rsSvc.getInt("service_id"), rsSvc.getInt("quantity"), rsSvc.getBoolean("is_free"), s);
-                    roomTypeServicesList.add(rtsObj);
-                }
-                rsSvc.close();
-                psSvc.close();
-                rt.setRoomTypeServices(roomTypeServicesList);
                 list.add(rt);
             }
+
             rs.close();
             ps.close();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return list;
     }
 
@@ -149,15 +154,15 @@ public class RoomTypeDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 RoomType rt = new RoomType(
-                    rs.getInt("room_type_id"),
-                    rs.getString("type_name"),
-                    rs.getString("description"),
-                    rs.getInt("capacity"),
-                    rs.getString("bed_type"),
-                    rs.getInt("bed_count"),
-                    rs.getBigDecimal("area_sqm"),
-                    rs.getBigDecimal("base_price"),
-                    rs.getBoolean("is_active")
+                        rs.getInt("room_type_id"),
+                        rs.getString("type_name"),
+                        rs.getString("description"),
+                        rs.getInt("capacity"),
+                        rs.getString("bed_type"),
+                        rs.getInt("bed_count"),
+                        rs.getBigDecimal("area_sqm"),
+                        rs.getBigDecimal("base_price"),
+                        rs.getBoolean("is_active")
                 );
 
                 String sqlImg = "SELECT image_url FROM RoomTypeImages WHERE room_type_id = ?";
@@ -167,12 +172,16 @@ public class RoomTypeDAO extends DBContext {
                 while (rsImg.next()) {
                     rt.addImage(rsImg.getString("image_url"), "");
                 }
-                rsImg.close(); psImg.close();
+                rsImg.close();
+                psImg.close();
 
                 list.add(rt);
             }
-            rs.close(); ps.close();
-        } catch (Exception e) { e.printStackTrace(); }
+            rs.close();
+            ps.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return list;
     }
 
@@ -185,17 +194,17 @@ public class RoomTypeDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 RoomType rt = new RoomType(
-                    rs.getInt("room_type_id"),
-                    rs.getString("type_name"),
-                    rs.getString("description"),
-                    rs.getInt("capacity"),
-                    rs.getString("bed_type"),
-                    rs.getInt("bed_count"),
-                    rs.getBigDecimal("area_sqm"),
-                    rs.getBigDecimal("base_price"),
-                    rs.getBoolean("is_active")
+                        rs.getInt("room_type_id"),
+                        rs.getString("type_name"),
+                        rs.getString("description"),
+                        rs.getInt("capacity"),
+                        rs.getString("bed_type"),
+                        rs.getInt("bed_count"),
+                        rs.getBigDecimal("area_sqm"),
+                        rs.getBigDecimal("base_price"),
+                        rs.getBoolean("is_active")
                 );
-                
+
                 String sqlImg = "SELECT image_url FROM RoomTypeImages WHERE room_type_id = ?";
                 PreparedStatement psImg = connection.prepareStatement(sqlImg);
                 psImg.setInt(1, rt.getRoomTypeId());
@@ -203,11 +212,15 @@ public class RoomTypeDAO extends DBContext {
                 while (rsImg.next()) {
                     rt.addImage(rsImg.getString("image_url"), "");
                 }
-                rsImg.close(); psImg.close();
+                rsImg.close();
+                psImg.close();
                 return rt;
             }
-            rs.close(); ps.close();
-        } catch (Exception e) { e.printStackTrace(); }
+            rs.close();
+            ps.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -237,7 +250,8 @@ public class RoomTypeDAO extends DBContext {
             if (generatedKeys.next()) {
                 newRoomTypeId = generatedKeys.getInt(1);
             }
-            generatedKeys.close(); psRoom.close();
+            generatedKeys.close();
+            psRoom.close();
 
             // Tiến hành chèn toàn bộ mảng ảnh đi kèm vào bảng liên kết RoomTypeImages
             if (newRoomTypeId > 0 && rt.getImageUrl() != null && !rt.getImageUrl().isEmpty()) {
@@ -258,7 +272,11 @@ public class RoomTypeDAO extends DBContext {
             connection.setAutoCommit(true);
             return true;
         } catch (Exception e) {
-            try { connection.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
         }
         return false;
@@ -311,7 +329,11 @@ public class RoomTypeDAO extends DBContext {
             connection.setAutoCommit(true);
             return true;
         } catch (Exception e) {
-            try { connection.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
         }
         return false;
@@ -327,8 +349,10 @@ public class RoomTypeDAO extends DBContext {
             int row = ps.executeUpdate();
             ps.close();
             return row > 0;
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
-    
+
 }
