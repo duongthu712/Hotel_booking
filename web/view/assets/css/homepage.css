@@ -1,15 +1,8 @@
-/* ==========================================================================
-   GLOBAL RESET FONTS SYSTEM (HỢP NHẤT TOÀN BỘ PHÔNG CHỮ CỔ ĐIỂN MỀM MẠI)
-   ========================================================================== */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    /* Ép đồng bộ toàn bộ website về phông chữ chân mảnh đứng thẳng hoài cổ */
-    font-family: 'Cormorant Garamond', 'Lora', serif !important;
-    font-style: normal ; /* Ép toàn bộ chữ đứng thẳng, không in nghiêng */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    font-family: 'Cormorant Garamond', 'Lora', serif;
 }
 
 body {
@@ -17,29 +10,23 @@ body {
     color: #333;
 }
 
-/* Các thẻ tiêu đề lớn giữ phông đứng thanh lịch tự nhiên */
 h1, h2, h3, h4, .navbar-logo {
-    font-family: 'Cormorant Garamond', serif !important;
+    font-family: 'Cormorant Garamond', serif;
     font-weight: 600;
-    font-style: normal !important;
+    font-style: normal;
 }
 
-/* Khung chứa layout chính */
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
 }
 
-/* ==========================================================================
-   HERO BANNER STRUCTURE (KHU VỰC ĐẦU TRANG)
-   ========================================================================== */
 .hero {
     min-height: 100vh;
     width: 100%;
     background-size: cover;
     background-position: center;
-    background-repeat: no-repeat;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -64,16 +51,12 @@ h1, h2, h3, h4, .navbar-logo {
 
 .hero-content p {
     font-size: 20px;
-    font-style: normal !important;
     line-height: 1.8;
     color: rgba(255, 255, 255, 0.9);
     margin-bottom: 35px;
     text-align: justify;
 }
 
-/* ==========================================================================
-   CẤU HÌNH HAI NÚT BẤM TRONG SUỐT HOÀN TOÀN - KHÔNG IN HOA, CHỮ ĐỨNG THẲNG
-   ========================================================================== */
 .hero-actions {
     display: flex;
     gap: 20px;
@@ -82,56 +65,39 @@ h1, h2, h3, h4, .navbar-logo {
 }
 
 .hero-actions .btn {
-    font-family: 'Cormorant Garamond', 'Lora', serif !important;
+    font-family: 'Cormorant Garamond', 'Lora', serif;
     font-size: 15px;
     font-weight: 600;
-    font-style: normal !important;
-    text-transform: none !important;
     letter-spacing: 1px;
     padding: 12px 32px;
     border-radius: 2px;
     display: inline-block;
     text-decoration: none;
-    white-space: nowrap;
-
-    background: transparent !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    color: #ffffff !important;
-    border: 1px solid rgba(255, 255, 255, 0.4) !important;
-
-    transition: all 0.3s ease;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.4);
     cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-/* Hiệu ứng tương tác: Hover hoặc bấm giữ chuột hóa trắng tinh khôi */
 .hero-actions .btn:hover,
 .hero-actions .btn:active {
-    background: #ffffff !important;
-    border-color: #ffffff !important;
-    color: #2c3e46 !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
+    background: #ffffff;
+    border-color: #ffffff;
+    color: #2c3e46;
 }
 
-/* ==========================================================================
-   THANH TÌM KIẾM ĐẶT PHÒNG NHANH (MÀU XANH RÊU ĐỒNG BỘ)
-   ========================================================================== */
 .search-bar {
     background: #2c3e46;
-    width: calc(100% - 100px);
+    width: 100%;
     max-width: 1200px;
-    margin: 0 auto -45px auto;
-    padding: 25px 35px;
+    padding: 20px;
     border-radius: 2px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    margin: 0 auto -45px auto;
     position: relative;
     z-index: 10;
-
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 20px;
+    gap: 15px;
 }
 
 .search-bar input,
@@ -144,7 +110,12 @@ h1, h2, h3, h4, .navbar-logo {
     padding: 8px 0;
     outline: none;
     flex: 1;
-    transition: 0.3s ease;
+    transition: border-color 0.3s ease;
+}
+
+.search-bar input:focus,
+.search-bar select:focus {
+    border-bottom-color: #C8A96B;
 }
 
 .search-bar input[type="date"]::-webkit-calendar-picker-indicator {
@@ -164,13 +135,10 @@ h1, h2, h3, h4, .navbar-logo {
     border: none;
     font-size: 14px;
     font-weight: 600;
-    font-style: normal !important;
-    text-transform: none !important;
-    letter-spacing: 0.5px;
     padding: 12px 28px;
     height: 42px;
     cursor: pointer;
-    transition: 0.3s ease;
+    transition: background 0.3s ease;
     border-radius: 2px;
     white-space: nowrap;
 }
@@ -179,14 +147,10 @@ h1, h2, h3, h4, .navbar-logo {
     background: #b5955a;
 }
 
-/* ==========================================================================
-   NÂNG CẤP ĐỊNH DẠNG CÁC PHÂN ĐOẠN NỘI DUNG (MAIN CONTENT)
-   ========================================================================== */
 .section {
     padding: 100px 0 20px 0;
 }
 
-/* Căn lề khoảng cách các phân đoạn */
 main.container .section:first-of-type {
     padding-top: 140px;
 }
@@ -198,22 +162,17 @@ main.container .section:first-of-type {
     margin-bottom: 45px;
     font-weight: 500;
     letter-spacing: 1px;
-    position: relative;
 }
 
-/* Đường gạch trang trí nhỏ tinh tế dưới mỗi tiêu đề */
 .section h2::after {
     content: '';
     display: block;
     width: 50px;
-    height: 1.5px;
+    height: 2px;
     background: #C8A96B;
     margin: 15px auto 0 auto;
 }
 
-/* ==========================================================================
-   LƯỚI DỊCH VỤ - 3 CỘT 1 HÀNG CÓ HIỆU ỨNG ĐỘNG (HOVER EFFECT) SANG TRỌNG
-   ========================================================================== */
 .grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -222,57 +181,37 @@ main.container .section:first-of-type {
 }
 
 .card {
-    background: transparent !important;
-    padding: 15px 15px 25px 15px !important;
-    border: none !important;
-    border-bottom: 1px dashed #ebd9b4 !important;
-    box-shadow: none !important;
+    background: transparent;
+    padding: 20px 15px;
+    border: none;
+    border-bottom: 1px dashed #ebd9b4;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     position: relative;
-    overflow: visible;
     border-radius: 4px;
-    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 15px;
-    width: calc(100% - 30px);
-    height: 2px;
-    background: #C8A96B;
-    transform: scaleX(0);
-    transition: transform 0.35s ease;
+    transition: background-color 0.3s ease;
 }
 
 .card:hover {
-    transform: translateY(-6px) !important;
-    border-color: transparent !important;
-    background: #fbf9f3 !important;
-    box-shadow: 0 12px 30px rgba(44, 62, 70, 0.05) !important;
-}
-
-.card:hover::before {
-    transform: scaleX(1) !important;
+    background-color: #fbf9f3;
+    border-bottom-style: solid;
+    border-bottom-color: #C8A96B;
 }
 
 .card h3 {
-    font-family: 'Cormorant Garamond', 'Lora', serif !important;
-    font-size: 21px;
-    font-style: normal !important;
+    font-family: 'Cormorant Garamond', 'Lora', serif;
+    font-size: 22px;
     color: #2c3e46;
-    margin: 10px 0 12px 0;
+    margin-bottom: 12px;
     font-weight: 500;
     letter-spacing: 0.5px;
 }
 
 .card p {
-    font-size: 14.5px;
+    font-size: 15px;
     color: #666;
-    line-height: 1.65;
+    line-height: 1.6;
     margin-bottom: 18px;
     text-align: justify;
 }
@@ -280,36 +219,30 @@ main.container .section:first-of-type {
 .card .price {
     display: inline-block;
     align-self: flex-start;
-    font-size: 12px;
+    font-size: 13px;
     color: #C8A96B;
     font-weight: 600;
-    font-style: normal !important;
-    text-transform: none !important;
     letter-spacing: 0.5px;
-    border-top: none !important;
-    padding-top: 0 !important;
     margin-top: auto;
     background-color: #fbf6eb;
-    padding: 4px 12px !important;
+    padding: 6px 14px;
     border-radius: 2px;
+    border: 1px solid rgba(200, 169, 107, 0.3);
 }
 
-/* ==========================================================================
-   BỐ CỤC SO LE CHIA ĐÔI - KHUNG VÀNG LUXURY ĐỔ BÓNG (GOLD SHADOW FRAME)
-   ========================================================================== */
 .gallery-split-container {
     display: flex;
     flex-direction: column;
-    gap: 100px;
+    gap: 80px;
     margin-top: 60px;
     width: 100%;
 }
 
 .split-row {
     display: flex;
-    align-items: center; /* Ép khối chữ và ảnh luôn cân tâm dọc tuyệt đối */
+    align-items: center;
     justify-content: space-between;
-    gap: 90px;
+    gap: 70px;
     width: 100%;
 }
 
@@ -319,34 +252,24 @@ main.container .section:first-of-type {
 
 .split-image {
     flex: 1;
-    height: 440px;
+    height: 400px;
     position: relative;
-    overflow: visible;
 }
 
-/* Khung viền nhô ra phía sau */
 .split-image::before {
     content: '';
     position: absolute;
     width: 100%;
     height: 100%;
-
-    /* 🔥 ĐÃ SỬA: Chuyển từ viền đen xanh rêu sang viền vàng cát Luxury dày 2px */
     border: 2px solid #C8A96B;
-
     top: 15px;
     left: 15px;
     z-index: 1;
-
-    /* 🔥 ĐÃ SỬA: Chỉnh bóng đổ mờ nhẹ tông ấm để hòa quyện xuất sắc trên nền ngà */
-    box-shadow: 8px 8px 24px rgba(200, 169, 107, 0.15);
-
     transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .split-row.reverse .split-image::before {
     left: -15px;
-    box-shadow: -8px 8px 24px rgba(200, 169, 107, 0.15);
 }
 
 .split-image img {
@@ -355,62 +278,48 @@ main.container .section:first-of-type {
     object-fit: cover;
     position: relative;
     z-index: 2;
-    border-radius: 1px;
+    border-radius: 2px;
     transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* --------------------------------------------------------------------------
-   ĐỊNH DẠNG KHỐI CHỮ CHUẨN TỶ LỆ TẠP CHÍ CAO CẤP
-   -------------------------------------------------------------------------- */
 .split-content {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
-    padding: 0 20px;
-    height: 100%;
+    padding: 0 10px;
 }
 
-/* Dòng số thứ tự (Màu xanh rêu đậm làm điểm tựa thị giác tương phản) */
 .split-num {
-    font-family: 'Cormorant Garamond', serif !important;
-    font-size: 17px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
     color: #bfa15f;
     font-weight: 600;
-    letter-spacing: 3px;
-    margin-bottom: 12px;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
     text-transform: uppercase;
 }
 
-/* Tiêu đề dịch vụ lớn (Hạ tông vàng đậm tinh tế rõ nét trên nền ngà) */
 .split-title {
-    font-family: 'Cormorant Garamond', serif !important;
-    font-size: 17px;
-    color: #bfa15f;
-    font-weight: 600;
-    margin: 0 0 20px 0;
-    letter-spacing: 0.5px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    color: #2c3e46;
+    font-weight: 500;
+    margin-bottom: 15px;
     line-height: 1.3;
 }
 
-/* Đoạn văn kể chuyện mô tả dịch vụ */
 .split-desc {
-    font-family: 'Cormorant Garamond', serif !important;
+    font-family: 'Cormorant Garamond', serif;
     font-size: 17px;
     color: #444444;
-    line-height: 1.85;
+    line-height: 1.75;
     text-align: justify;
-    margin: 0;
-    letter-spacing: 0.2px;
 }
 
-/* --------------------------------------------------------------------------
-   HIỆU ỨNG TƯƠNG TÁC KHI HOVER
-   -------------------------------------------------------------------------- */
 .split-row:hover .split-image img {
     transform: translate(8px, 8px);
-    box-shadow: 0 15px 35px rgba(44, 62, 70, 0.12);
 }
 
 .split-row.reverse:hover .split-image img {
@@ -420,26 +329,20 @@ main.container .section:first-of-type {
 .split-row:hover .split-image::before {
     top: 8px;
     left: 8px;
-    box-shadow: 4px 4px 16px rgba(200, 169, 107, 0.25);
 }
 
 .split-row.reverse:hover .split-image::before {
     top: 8px;
     left: -8px;
-    box-shadow: -4px 4px 16px rgba(200, 169, 107, 0.25);
-}
-.luxury-gallery-section {
-    padding: 100px 0;
-    overflow: hidden;
 }
 
-.luxury-gallery-section h2 {
-    margin-bottom: 60px;
+.luxury-gallery-section {
+    padding: 100px 0;
 }
 
 .luxury-gallery {
     display: flex;
-    height: 500px;
+    height: 450px;
     gap: 10px;
     width: 100%;
 }
@@ -447,36 +350,22 @@ main.container .section:first-of-type {
 .gallery-item {
     flex: 1;
     overflow: hidden;
-    position: relative;
     cursor: pointer;
-
-    transition: all 0.6s ease;
+    border: 1px solid rgba(200, 169, 107, 0.2);
+    transition: flex 0.5s ease;
 }
 
 .gallery-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-
-    transition: all 0.6s ease;
-}
-
-/* Ảnh đang hover sẽ mở rộng */
-.luxury-gallery:hover .gallery-item {
-    flex: 1;
+    transition: filter 0.3s ease;
 }
 
 .luxury-gallery .gallery-item:hover {
-    flex: 4;
+    flex: 3.5;
 }
 
-/* Làm tối các ảnh còn lại */
 .luxury-gallery:hover .gallery-item:not(:hover) img {
-    filter: brightness(0.6);
+    filter: brightness(0.7);
 }
-
-/* Zoom nhẹ ảnh được chọn */
-.gallery-item:hover img {
-    transform: scale(1.05);
-}
-
