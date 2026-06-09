@@ -72,7 +72,7 @@ public class RoomServiceDAO extends DBContext {
         }
     }
 
-    public RoomService getRoomServicesByName(String serviceName) throws Exception {
+    public RoomService getRoomServicesByFullName(String serviceName) throws Exception {
         String strSQL = """
                         select * 
                         from RoomServices 
@@ -99,10 +99,38 @@ public class RoomServiceDAO extends DBContext {
             throw new Exception("Lỗi hệ thống: Vui lòng thử lại sau.");
         }
     }
+    
+    public List<RoomService> searchRoomServicesByName(String keyword) throws Exception {
+        List<RoomService> list = new ArrayList<>();
+        String strSQL = """
+                        select * 
+                        from RoomServices 
+                        where service_name like ?
+                        """;
+
+        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
+            stm.setString(1, "%" + keyword + "%");
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    int id = rs.getInt("service_id");
+                    String name = rs.getString("service_name");
+                    String description = rs.getString("description").trim();
+                    BigDecimal price = rs.getBigDecimal("unit_price");
+                    boolean active = rs.getBoolean("is_active");
+
+                    RoomService service = new RoomService(id, name, description, price, active);
+                    list.add(service);
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể tìm kiếm dịch vụ.");
+        }
+        return list;
+    }
 
     public RoomService createRoomService(RoomService roomService) throws Exception {
         try {
-            getRoomServicesByName(roomService.getServiceName());
+            getRoomServicesByFullName(roomService.getServiceName());
             throw new Exception("Tên dịch vụ này đã tồn tại.");
         } catch (Exception e) {
             if (!e.getMessage().equals("Dịch vụ này không tồn tại.")) {
