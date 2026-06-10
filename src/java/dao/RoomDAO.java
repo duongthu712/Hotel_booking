@@ -3,117 +3,93 @@ package dao;
 import dal.DBContext;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import model.GuestStay;
 import model.Room;
 
 /**
- * RoomDAO.java
+ * RoomDAO.java Data Processing Operator layer for rooms Provides CRUD with
+ * Rooms table
  *
  * @author LinhLTHE200306
- * @version 1.0
- * @since 2026-06-07
+ * @version 2.0
+ * @since 2026-06-10
  */
-
 public class RoomDAO extends DBContext {
 
-    PreparedStatement stm;
-    ResultSet rs;
-
-    /**
-     * Get all rooms
-     *
-     * @return List of room
-     */
-    public List<Room> getAllRooms() {
+    public List<Room> getAllRooms() throws Exception {
         List<Room> rooms = new ArrayList<>();
-        try {
-            String strSQL = """
-                            select *
-                            from Rooms
-                            order by floor, room_number
-                            """;
-            stm = connection.prepareStatement(strSQL);
-            rs = stm.executeQuery();
+        String strSQL = """
+                        select *
+                        from Rooms
+                        order by floor, room_number
+                        """;
+
+        try (PreparedStatement stm = connection.prepareStatement(strSQL); ResultSet rs = stm.executeQuery()) {
 
             while (rs.next()) {
-                Room room = new Room(
-                        rs.getInt("room_number"),
-                        rs.getInt("floor"),
-                        rs.getString("status"),
-                        rs.getInt("room_type_id")
-                );
+                int roomNumber = rs.getInt("room_number");
+                int floor = rs.getInt("floor");
+                String status = rs.getString("status");
+                int roomTypeId = rs.getInt("room_type_id");
+
+                Room room = new Room(roomNumber, floor, status, roomTypeId);
                 rooms.add(room);
             }
-        } catch (Exception ex) {
-            System.out.println("GetAllRooms:" + ex.getMessage());
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể lấy danh sách phòng.");
         }
         return rooms;
     }
 
-    /**
-     * Get room by room number
-     *
-     * @param roomNumber
-     * @return Room object if found, null if not found
-     */
-    public Room getRoomByNumber(int roomNumber) {
-        Room room = null;
-        try {
-            String strSQL = """
-                            select *
-                            from Rooms
-                            where room_number = ?
-                            """;
+    public Room getRoomByNumber(int roomNumber) throws Exception {
+        String strSQL = """
+                        select *
+                        from Rooms
+                        where room_number = ?
+                        """;
 
-            stm = connection.prepareStatement(strSQL);
+        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
             stm.setInt(1, roomNumber);
-            rs = stm.executeQuery();
 
-            while (rs.next()) {
-                room = new Room(
-                        rs.getInt("room_number"),
-                        rs.getInt("floor"),
-                        rs.getString("status"),
-                        rs.getInt("room_type_id")
-                );
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    int floor = rs.getInt("floor");
+                    String status = rs.getString("status");
+                    int roomTypeId = rs.getInt("room_type_id");
+
+                    return new Room(roomNumber, floor, status, roomTypeId);
+                } else {
+                    throw new Exception("Phòng này không tồn tại trong hệ thống.");
+                }
             }
-        } catch (Exception ex) {
-            System.out.println("GetRoomByNumber:" + ex.getMessage());
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Vui lòng thử lại sau.");
         }
-        return room;
     }
 
-    /**
-     * Search and filter rooms
-     *
-     * @param floor
-     * @param roomTypeId
-     * @param keyword
-     * @return List room after filter
-     */
-    public List<Room> searchAndFilterRooms(Integer floor, Integer roomTypeId, String keyword) {
+    public List<Room> searchAndFilterRooms(Integer floor, Integer roomTypeId, String keyword) throws Exception {
         List<Room> rooms = new ArrayList<>();
-        try {
-            String strSQL = """
+        StringBuilder strSQL = new StringBuilder("""
                             select *
                             from Rooms
                             where 1 = 1
-                            """;
-            if (floor != null) {
-                strSQL += " and floor = ?";
-            }
-            if (roomTypeId != null) {
-                strSQL += " and room_type_id = ?";
-            }
-            if (keyword != null && !keyword.trim().isEmpty()) {
-                strSQL += " and cast(room_number as varchar) like ?";
-            }
-            strSQL += " order by floor, room_number";
+                            """);
 
-            stm = connection.prepareStatement(strSQL);
+        if (floor != null) {
+            strSQL.append(" and floor = ?");
+        }
+        if (roomTypeId != null) {
+            strSQL.append(" and room_type_id = ?");
+        }
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            strSQL.append(" and cast(room_number as varchar) like ?");
+        }
+        strSQL.append(" order by floor, room_number");
 
+        try (PreparedStatement stm = connection.prepareStatement(strSQL.toString())) {
             int index = 1;
             if (floor != null) {
                 stm.setInt(index++, floor);
@@ -124,122 +100,109 @@ public class RoomDAO extends DBContext {
             if (keyword != null && !keyword.trim().isEmpty()) {
                 stm.setString(index++, "%" + keyword.trim() + "%");
             }
-            rs = stm.executeQuery();
 
-            while (rs.next()) {
-                Room room = new Room(
-                        rs.getInt("room_number"),
-                        rs.getInt("floor"),
-                        rs.getString("status"),
-                        rs.getInt("room_type_id")
-                );
-                rooms.add(room);
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    int roomNumber = rs.getInt("room_number");
+                    int f = rs.getInt("floor");
+                    String status = rs.getString("status");
+                    int rtId = rs.getInt("room_type_id");
+
+                    Room room = new Room(roomNumber, f, status, rtId);
+                    rooms.add(room);
+                }
             }
-        } catch (Exception ex) {
-            System.out.println("SearchAndFilterRooms:" + ex.getMessage());
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể tìm kiếm phòng.");
         }
         return rooms;
     }
 
-    /**
-     * Update room information
-     *
-     * Rule: - Room Number: cannot edit - Floor: cannot edit - Status: editable
-     * - Room Type: editable only if Controller allows
-     *
-     * @param room
-     * @return Room object after update, null if room not found
-     */
-    public Room updateRoom(Room room) {
+    public Room updateRoom(Room room) throws Exception {
         Room found = getRoomByNumber(room.getRoomNumber());
         if (found == null) {
-            return null;
+            throw new Exception("Phòng này không tồn tại, không thể cập nhật.");
         }
-        try {
-            String strSQL = """
-                            update Rooms
-                            set status = ?,
-                                room_type_id = ?
-                            where room_number = ?
-                            """;
 
-            stm = connection.prepareStatement(strSQL);
+        String strSQL = """
+                        update Rooms
+                        set status = ?,
+                            room_type_id = ?
+                        where room_number = ?
+                        """;
 
+        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
             stm.setString(1, room.getStatus());
             stm.setInt(2, room.getRoomTypeId());
             stm.setInt(3, room.getRoomNumber());
-            stm.execute();
-        } catch (Exception ex) {
-            System.out.println("UpdateRoom:" + ex.getMessage());
+
+            int rowCount = stm.executeUpdate();
+            if (rowCount > 0) {
+                return room;
+            } else {
+                throw new Exception("Cập nhật phòng thất bại.");
+            }
+        } catch (SQLException e) {
+            if (e.getErrorCode() == 547) {
+                throw new Exception("Không thể cập nhật vì loại phòng không tồn tại.");
+            }
+            throw new Exception("Lỗi hệ thống: Không thể cập nhật phòng.");
         }
-        return room;
     }
 
-    /**
-     * Get guests currently staying in room
-     *
-     * @param roomNumber
-     * @return List GuestStay
-     */
-    public List<GuestStay> getGuestsByRoomNumber(int roomNumber) {
+    public List<GuestStay> getGuestsByRoomNumber(int roomNumber) throws Exception {
         List<GuestStay> guestList = new ArrayList<>();
-        try {
-            String strSQL = """
-                            select
-                            gs.stay_id, 
-                            gs.booking_room_id, 
-                            gs.full_name, 
-                            gs.phone, 
-                            gs.id_number 
-                            from GuestStays gs 
-                            inner join BookingRooms br on gs.booking_room_id = br.booking_room_id 
-                            inner join Bookings b on br.booking_id = b.booking_id 
-                            where br.room_number = ? 
-                            and b.status = N'Đã xác nhận' 
-                            and CAST(GETDATE() AS DATE) 
-                            between b.checkin_date and b.checkout_date
-                            """;
+        String strSQL = """
+                        select
+                            gs.stay_id,
+                            gs.booking_room_id,
+                            gs.full_name,
+                            gs.phone,
+                            gs.id_number
+                        from GuestStays gs
+                        inner join BookingRooms br on gs.booking_room_id = br.booking_room_id
+                        inner join Bookings b on br.booking_id = b.booking_id
+                        where br.room_number = ?
+                          and b.status = N'Đã xác nhận'
+                          and CAST(GETDATE() AS DATE) between b.checkin_date and b.checkout_date
+                        """;
 
-            stm = connection.prepareStatement(strSQL);
+        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
             stm.setInt(1, roomNumber);
-            rs = stm.executeQuery();
 
-            while (rs.next()) {
-                GuestStay guest = new GuestStay(
-                        rs.getInt("stay_id"),
-                        rs.getInt("booking_room_id"),
-                        rs.getString("full_name"),
-                        rs.getString("phone"),
-                        rs.getString("id_number")
-                );
-                guestList.add(guest);
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    int stayId = rs.getInt("stay_id");
+                    int bookingRoomId = rs.getInt("booking_room_id");
+                    String fullName = rs.getString("full_name");
+                    String phone = rs.getString("phone");
+                    String idNumber = rs.getString("id_number");
+
+                    GuestStay guest = new GuestStay(stayId, bookingRoomId, fullName, phone, idNumber);
+                    guestList.add(guest);
+                }
             }
-        } catch (Exception ex) {
-            System.out.println("GetGuestsByRoomNumber:" + ex.getMessage());
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể lấy danh sách khách đang ở phòng.");
         }
         return guestList;
     }
 
-    /**
-     * Get all floors for filter dropdown
-     *
-     * @return List floor number
-     */
-    public List<Integer> getAllFloors() {
+    public List<Integer> getAllFloors() throws Exception {
         List<Integer> floors = new ArrayList<>();
-        try {
-            String strSQL = """
-                            select distinct floor
-                            from Rooms
-                            order by floor
-                            """;
-            stm = connection.prepareStatement(strSQL);
-            rs = stm.executeQuery();
+        String strSQL = """
+                        select distinct floor
+                        from Rooms
+                        order by floor
+                        """;
+
+        try (PreparedStatement stm = connection.prepareStatement(strSQL); ResultSet rs = stm.executeQuery()) {
+
             while (rs.next()) {
                 floors.add(rs.getInt("floor"));
             }
-        } catch (Exception ex) {
-            System.out.println("GetAllFloors:" + ex.getMessage());
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể lấy danh sách tầng.");
         }
         return floors;
     }

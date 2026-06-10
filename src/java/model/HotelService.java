@@ -14,10 +14,23 @@ public class HotelService {
     private BigDecimal unitPrice;
     private String imageUrl; // Trường ảnh mới lưu link ảnh dịch vụ
     private boolean isActive;
+    private int hotelId;
 
     public HotelService() {
     }
 
+    public HotelService(int hotelServiceId, String serviceName, int hotelId, String description, BigDecimal unitPrice, String imageUrl, boolean isActive) {
+        this.hotelServiceId = hotelServiceId;
+        this.serviceName = serviceName;
+        this.description = description;
+        this.unitPrice = unitPrice;
+        this.imageUrl = imageUrl;
+        this.isActive = isActive;
+        this.hotelId = hotelId;
+    }
+
+    
+    
     public HotelService(int hotelServiceId, String serviceName, String description, BigDecimal unitPrice, String imageUrl, boolean isActive) {
         this.hotelServiceId = hotelServiceId;
         this.serviceName = serviceName;
