@@ -22,8 +22,18 @@
         <%@ include file="/view/staff/navbar.jsp" %>
 
         <main class="content-container">
-            <c:if test="${not empty error}">
-                <div class="alert alert-error">${error}</div>
+             <c:if test="${not empty sessionScope.errorMessage}">
+                <div class="alert-message alert-error">
+                    ${sessionScope.errorMessage}
+                </div>
+                <c:remove var="errorMessage" scope="session"/>
+            </c:if>
+
+            <c:if test="${not empty sessionScope.successMessage}">
+                <div class="alert-message alert-success">
+                    ${sessionScope.successMessage}
+                </div>
+                <c:remove var="successMessage" scope="session"/>
             </c:if>
 
             <form action="StaffAccountCreate" method="post" class="create-form-grid">

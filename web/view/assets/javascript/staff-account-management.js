@@ -4,11 +4,23 @@ document.addEventListener("DOMContentLoaded", function () {
     const btnCloseDetail = document.getElementById("btn-close-detail");
     const btnCloseEdit = document.getElementById("btn-close-edit");
 
-    // Get status
     const isEditMode = document.body.getAttribute("data-edit-mode") === "true";
     const isDetailMode = document.body.getAttribute("data-detail-mode") === "true";
+    
+    const alerts = document.querySelectorAll(".alert-message, .error-message, .success-message");
 
-    // Open and close modal
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.style.opacity = "0";
+            alert.style.transform = "translateY(-10px)";
+            alert.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+
+            setTimeout(() => {
+                alert.remove();
+            }, 300);
+        }, 3000);
+    });
+
     function toggleModal(modal, show) {
         if (show) {
             modal.classList.add("show");
@@ -17,17 +29,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Open detail modal
     if (isDetailMode && detailModal) {
         toggleModal(detailModal, true);
     }
 
-    // Open edit modal
     if (isEditMode && editModal) {
         toggleModal(editModal, true);
     }
 
-    // Close detail modal
     if (btnCloseDetail) {
         btnCloseDetail.addEventListener("click", function () {
             toggleModal(detailModal, false);
@@ -35,14 +44,10 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Close edit modal
     if (btnCloseEdit) {
         btnCloseEdit.addEventListener("click", function () {
             toggleModal(editModal, false);
             window.location.href = "StaffAccountList";
         });
     }
-
 });
-
-

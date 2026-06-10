@@ -458,11 +458,9 @@ public class StaffAccountDAO extends DBContext {
     public List<StaffAccount> getAllStaffAcc() throws Exception {
         List<StaffAccount> list = new ArrayList<>();
         String strSQL = """
-                        select staff_id, username, email, full_name, phone,
-                               [role], is_active, created_at, reset_code, reset_expiry, reset_used
+                        select *
                         from StaffAccounts
                         where deleted_at is null
-                        order by staff_id desc
                         """;
 
         try (PreparedStatement stm = connection.prepareStatement(strSQL);
@@ -508,7 +506,6 @@ public class StaffAccountDAO extends DBContext {
                                [role], is_active, created_at, reset_code, reset_expiry, reset_used
                         from StaffAccounts
                         where deleted_at is null and full_name like ?
-                        order by staff_id desc
                         """;
 
         try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
@@ -528,11 +525,9 @@ public class StaffAccountDAO extends DBContext {
     public List<StaffAccount> searchStaffAccByRole(String role) throws Exception {
         List<StaffAccount> list = new ArrayList<>();
         String strSQL = """
-                        select staff_id, username, email, full_name, phone,
-                               [role], is_active, created_at, reset_code, reset_expiry, reset_used
+                        select *
                         from StaffAccounts
                         where deleted_at is null and [role] = ?
-                        order by staff_id desc
                         """;
 
         try (PreparedStatement stm = connection.prepareStatement(strSQL)) {

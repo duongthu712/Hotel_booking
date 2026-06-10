@@ -1,120 +1,88 @@
 package controller;
 
 import dao.StaffAccountDAO;
-import jakarta.servlet.RequestDispatcher;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.List;
 import model.StaffAccount;
 
 /**
- * StaffAccountEditController.java Update staff information
- *
  * @author LinhLTHE200306
  * @version 1.0
  * @since 2026-06-07
  */
 public class StaffAccountEditController extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet StaffAccountEditController</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet StaffAccountEditController at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
-
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
+
         if (staff == null) {
-            response.sendRedirect("/view/auth/login.jsp");
+            response.sendRedirect("view/auth/login.jsp");
             return;
         }
 
         try {
             int staffId = Integer.parseInt(request.getParameter("staffId"));
+
             StaffAccountDAO staffDao = new StaffAccountDAO();
-
             StaffAccount editStaff = staffDao.getStaffByIdIncludeInactive(staffId);
+            List<StaffAccount> staffList = staffDao.getAllStaffAcc();
 
+            request.setAttribute("staffList", staffList);
             request.setAttribute("editStaff", editStaff);
-            RequestDispatcher rd = request.getRequestDispatcher("/StaffAccountList");
-            rd.forward(request, response);
-
-        } catch (Exception ex) {
-            System.out.println("StaffAccountEditController:" + ex.getMessage());
-            response.sendRedirect("StaffAccountList");
+            request.setAttribute("page", request.getParameter("page"));
+            request.setAttribute("searchText", request.getParameter("searchText"));
+            request.setAttribute("roleFilter", request.getParameter("roleFilter"));
+            request.getRequestDispatcher("/view/admin/staff-management.jsp").forward(request, response);
+        } catch (Exception e) {
+            session.setAttribute("errorMessage", e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/StaffAccountList");
         }
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
         if (staff == null) {
-            response.sendRedirect("/view/auth/login.jsp");
+            response.sendRedirect("view/auth/login.jsp");
             return;
         }
 
+        int staffId = Integer.parseInt(request.getParameter("staffId"));
+        String fullName = request.getParameter("fullName");
+        String email = request.getParameter("email");
+        String phone = request.getParameter("phone");
+        String role = request.getParameter("role");
+        String activeStr = request.getParameter("active");
+
+        String page = request.getParameter("page");
+        String searchText = request.getParameter("searchText");
+        String roleFilter = request.getParameter("roleFilter");
+
+        if (staff.getStaffId() == staffId && !staff.getRole().equals(role)) {
+            session.setAttribute("errorMessage", "Bạn không thể tự thay đổi chức vụ (Role) của bản thân.");
+            response.sendRedirect(buildRedirectUrl(request, page, searchText, roleFilter));
+            return;
+        }
+
+        boolean isActive = "true".equals(activeStr);
+
         try {
-            int staffId = Integer.parseInt(request.getParameter("staffId"));
-            String fullName = request.getParameter("fullName");
-            String email = request.getParameter("email");
-            String phone = request.getParameter("phone");
-            String role = request.getParameter("role");
-            boolean active = "true".equals(request.getParameter("active"));
-
             StaffAccountDAO staffDao = new StaffAccountDAO();
-
-            // Dùng getStaffByIdIncludeInactive để lấy cả inactive
             StaffAccount existingStaff = staffDao.getStaffByIdIncludeInactive(staffId);
 
             if (existingStaff == null) {
-                session.setAttribute("error", "Không tìm thấy nhân viên.");
-                response.sendRedirect("StaffAccountList");
+                session.setAttribute("errorMessage", "Không tìm thấy nhân viên.");
+                response.sendRedirect(buildRedirectUrl(request, page, searchText, roleFilter));
                 return;
             }
 
@@ -126,30 +94,43 @@ public class StaffAccountEditController extends HttpServlet {
             updatedStaff.setEmail(email);
             updatedStaff.setPhone(phone);
             updatedStaff.setRole(role);
-            updatedStaff.setActive(active);
+            updatedStaff.setActive(isActive);
             updatedStaff.setCreatedAt(existingStaff.getCreatedAt());
             updatedStaff.setResetCode(existingStaff.getResetCode());
             updatedStaff.setResetExpiry(existingStaff.getResetExpiry());
             updatedStaff.setResetUsed(existingStaff.isResetUsed());
 
             staffDao.updateStaff(updatedStaff);
-            session.setAttribute("success", "Cập nhật nhân viên thành công.");
-
-        } catch (Exception ex) {
-            System.out.println("StaffAccountEditController:" + ex.getMessage());
-            session.setAttribute("error", "Có lỗi xảy ra khi cập nhật nhân viên.");
+            session.setAttribute("successMessage", "Cập nhật nhân viên thành công.");
+        } catch (Exception e) {
+            session.setAttribute("errorMessage", e.getMessage());
         }
-        response.sendRedirect("StaffAccountList");
+
+        response.sendRedirect(buildRedirectUrl(request, page, searchText, roleFilter));
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
+    private String buildRedirectUrl(HttpServletRequest request, String page, String searchText, String roleFilter) {
+        StringBuilder url = new StringBuilder(request.getContextPath() + "/StaffAccountList");
+        url.append("?page=").append(page != null ? page : "1");
+        if (searchText != null && !searchText.trim().isEmpty()) {
+            try {
+                url.append("&searchText=").append(java.net.URLEncoder.encode(searchText.trim(), "UTF-8"));
+            } catch (java.io.UnsupportedEncodingException e) {
+                url.append("&searchText=").append(searchText.trim());
+            }
+        }
+        if (roleFilter != null && !roleFilter.trim().isEmpty()) {
+            try {
+                url.append("&roleFilter=").append(java.net.URLEncoder.encode(roleFilter.trim(), "UTF-8"));
+            } catch (java.io.UnsupportedEncodingException e) {
+                url.append("&roleFilter=").append(roleFilter.trim());
+            }
+        }
+        return url.toString();
+    }
+
     @Override
     public String getServletInfo() {
         return "Staff Management Controller";
     }
-
 }

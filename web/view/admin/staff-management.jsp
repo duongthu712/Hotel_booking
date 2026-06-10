@@ -28,6 +28,20 @@
                 <a href="StaffAccountCreate" class="btn-primary">Thêm nhân viên mới</a>
             </div>
 
+             <c:if test="${not empty sessionScope.errorMessage}">
+                <div class="alert-message alert-error">
+                    ${sessionScope.errorMessage}
+                </div>
+                <c:remove var="errorMessage" scope="session"/>
+            </c:if>
+
+            <c:if test="${not empty sessionScope.successMessage}">
+                <div class="alert-message alert-success">
+                    ${sessionScope.successMessage}
+                </div>
+                <c:remove var="successMessage" scope="session"/>
+            </c:if>
+            
             <div class="filter-bar">
                 <form action="StaffAccountList" method="GET" class="filter-form">
                     <input type="text" name="searchText" class="filter-input" placeholder="Tìm theo tên, email..." value="${searchText}">
