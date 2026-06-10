@@ -10,7 +10,7 @@
 //import jakarta.servlet.http.HttpServletResponse;
 //import jakarta.servlet.http.HttpSession;
 //import java.math.BigDecimal;
-//import model.RoomService;
+//import model.Service;
 //import model.ServiceType;
 //import model.StaffAccount;
 //
@@ -63,9 +63,9 @@
 //            throws ServletException, IOException {
 //        //Check authentication, redirect to login page if not logged in
 //        HttpSession session = request.getSession();
-//        StaffAccount  staff = (StaffAccount) session.getAttribute("staff");
+//        StaffAccount  staff = (StaffAccount) session.getAttribute(" staff");
 //        if ( staff == null) {
-//            response.sendRedirect("/view/auth/login.jsp");
+//            response.sendRedirect("Login");
 //            return;
 //        }
 //
@@ -76,8 +76,8 @@
 //        boolean active = "true".equals(request.getParameter("active"));
 //        ServiceType type = ServiceType.valueOf(request.getParameter("type"));
 //
-//        //Create new RoomService object
-//        RoomService service = new RoomService(serviceName, description, unitPrice, active, type);
+//        //Create new Service object
+//        Service service = new Service(serviceName, description, unitPrice, active, type);
 //
 //        //Delegate to the approriate DAO base on service type
 //        HotelServiceDAO hDao = new HotelServiceDAO();
@@ -100,7 +100,10 @@
 //     */
 //    @Override
 //    public String getServletInfo() {
+
 //        return "Service Management Controller";
+// //        return "Short description";
+
 //    }
 //
 //}

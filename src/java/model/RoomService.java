@@ -1,3 +1,7 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package model;
 
 import java.math.BigDecimal;
@@ -55,11 +59,10 @@ public class RoomService {
     }
 
     public boolean isActive() {
-        return active;
+        return isActive;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
     }
-
 }
