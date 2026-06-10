@@ -73,7 +73,10 @@
                                     </div>
                                 </td>
                                 <td class="btn-action">
-                                    <a class="btn-edit" href="RoomServiceEdit?serviceId=${srv.getServiceId()}&page=${currentPage}&keyword=${keyword}"">Sửa</a>
+                                    <a class="btn-edit" 
+                                       href="RoomServiceEdit?serviceId=${srv.getServiceId()}&page=${currentPage}&keyword=${keyword}">
+                                        Sửa</a>
+                                    
                                     <form action="RoomServiceDelete" method="post">
                                         <input type="hidden" name="serviceId" value="${srv.getServiceId()}">
                                         <input type="hidden" name="page" value="${currentPage}">

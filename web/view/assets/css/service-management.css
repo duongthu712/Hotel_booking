@@ -12,12 +12,8 @@
     width: 20%;
 }
 
-.col-type {
-    width: 8%;
-}
-
 .col-desc {
-    width: 55%;
+    width: 51%;
 }
 
 .col-price {
@@ -26,7 +22,7 @@
 }
 
 .col-status {
-    width: 8%;
+    width: 9%;
 }
 
 .col-action {
