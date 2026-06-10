@@ -153,18 +153,19 @@ public class RoomDAO extends DBContext {
     public List<GuestStay> getGuestsByRoomNumber(int roomNumber) throws Exception {
         List<GuestStay> guestList = new ArrayList<>();
         String strSQL = """
-                        select
-                            gs.stay_id,
-                            gs.booking_room_id,
-                            gs.full_name,
-                            gs.phone,
-                            gs.id_number
-                        from GuestStays gs
-                        inner join BookingRooms br on gs.booking_room_id = br.booking_room_id
-                        inner join Bookings b on br.booking_id = b.booking_id
-                        where br.room_number = ?
-                          and b.status = N'Đã xác nhận'
-                          and CAST(GETDATE() AS DATE) between b.checkin_date and b.checkout_date
+                        SELECT
+                        gs.stay_id,
+                        gs.booking_room_id, 
+                        gs.full_name, 
+                        gs.phone, 
+                        gs.id_number 
+                        FROM GuestStays gs 
+                        INNER JOIN BookingRooms br ON gs.booking_room_id = br.booking_room_id 
+                        INNER JOIN Bookings b ON br.booking_id = b.booking_id 
+                        WHERE br.room_number = ? 
+                        AND b.status = N'Đã nhận phòng'           
+                        AND CAST(GETDATE() AS DATE) >= b.checkin_date   
+                        AND CAST(GETDATE() AS DATE) < b.checkout_date;
                         """;
 
         try (PreparedStatement stm = connection.prepareStatement(strSQL)) {

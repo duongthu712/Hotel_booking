@@ -358,7 +358,6 @@ border-radius: var(--radius-custom);
     display: block;
     font-size: 1rem;
     font-weight: 600;
-    text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--text-muted);
     margin-bottom: 5px;

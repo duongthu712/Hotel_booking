@@ -19,6 +19,11 @@
     width: 100%;
 }
 
+h3{
+    color: var(--text-main);
+font-family: var(--font-logo);
+}
+
 .floor-title {
     font-family: var(--font-logo);
     font-size: 2rem;
@@ -131,4 +136,55 @@
     margin-bottom: 15px;
     font-family: var(--font-primary);
     color: var(--text-main);
+}
+
+.col-room-number {
+    width: 15%;
+}
+
+.col-floor {
+    width: 10%;
+    text-align: center;
+}
+
+.col-room-type {
+    width: 25%;
+}
+
+.col-status {
+    width: 20%;
+}
+
+.col-action {
+    width: 10%;
+}
+
+.room-status {
+    text-align: center;
+    font-size: 0.8em;
+    display: inline-block;
+}
+
+.status-empty {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.status-occupied {
+    background-color: #fff3e0;
+    color: #ef6c00;
+    border: 1px solid #ffe0b2;
+}
+
+.status-cleaning {
+    background-color: #e3f2fd;
+    color: #1565c0;
+    border: 1px solid #bbdefb;
+}
+
+.status-maintenance {
+    background-color: #fce4ec;
+    color: #c62828;
+    border: 1px solid #f8bbd0;
 }

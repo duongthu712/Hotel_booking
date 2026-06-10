@@ -58,14 +58,13 @@
 
             <div class="room-map">
                 <c:forEach begin="1" end="5" var="floor">
-                    <%-- Kiểm tra xem có phòng nào thuộc tầng này trong roomList không --%>
                     <c:set var="hasRoom" value="false"/>
                     <c:forEach var="room" items="${roomList}">
                         <c:if test="${room.getFloor() == floor}">
                             <c:set var="hasRoom" value="true"/>
                         </c:if>
                     </c:forEach>
-                    
+
                     <c:if test="${hasRoom}">
                         <div class="floor-section">
                             <h2 class="floor-title">Tầng ${floor}</h2>
@@ -93,7 +92,7 @@
                                             </div>
                                             <div class="room-action">
                                                 <a class="btn-edit" href="RoomDetail?roomNumber=${room.getRoomNumber()}&page=${currentPage}&roomTypeId=${selectedRoomTypeId}&keyword=${keyword}">Chi tiết</a>
-                                                <a class="btn-edit" href="RoomEdit?roomNumber=${room.getRoomNumber()}&page=${currentPage}&roomTypeId=${selectedRoomTypeId}&keyword=${keyword}">Sửa</a>    
+                                                <a class="btn-edit" href="RoomEdit?roomNumber=${room.getRoomNumber()}&page=${currentPage}&roomTypeId=${selectedRoomTypeId}&keyword=${keyword}">Sửa</a>
                                             </div>
                                         </div>
                                     </c:if>
@@ -111,7 +110,6 @@
             </div>
         </main>
 
-        <%-- Modal Chi tiết --%>
         <div class="room-modal" id="detail-modal">
             <div class="popup-content">
                 <h2 class="service-popup-title">Chi tiết phòng ${selectedRoom.getRoomNumber()}</h2>
@@ -139,7 +137,7 @@
 
                     <c:if test="${selectedRoom.getStatus() == 'Phòng có khách'}">
                         <hr>
-                        <h3>Danh sách khách đang lưu trú</h3>
+                        <h3 class="guest-popup-list">Danh sách khách đang lưu trú</h3>
                         <table class="guest-table data-table">
                             <thead class="data-table-thead">
                                 <tr>
@@ -160,6 +158,7 @@
                         </table>
                     </c:if>
                 </c:if>
+                        
 
                 <div class="service-popup-action">
                     <button type="button" class="btn-close" id="btn-close-detail">Đóng</button>
@@ -168,46 +167,61 @@
             </div>
         </div>
 
-        <%-- Modal Chỉnh sửa --%>
         <div class="room-modal" id="edit-modal">
-            <form action="RoomEdit" method="post" id="edit-form" class="popup-content">
-                <h2 class="service-popup-title">Chỉnh sửa phòng ${editRoom.getRoomNumber()}</h2>
+            <form action="" method="POST" id="edit-form" class="popup-content">
+                <h2 class="service-popup-title" id="edit-modal-title">Chỉnh sửa phòng</h2>
 
-                <input type="hidden" name="roomNumber" value="${editRoom.getRoomNumber()}">
+                <%-- Hidden fields giữ trạng thái filter để redirect --%>
                 <input type="hidden" name="page" value="${currentPage}">
-                <input type="hidden" name="roomTypeId" value="${selectedRoomTypeId}">
+                <input type="hidden" name="filterRoomTypeId" value="${selectedRoomTypeId}">
                 <input type="hidden" name="keyword" value="${keyword}">
 
-                <c:if test="${editRoom != null}">
-                    <div class="form-group">
-                        <label class="input-label">Số phòng</label>
-                        <input class="service-popup-input-field" type="text" value="${editRoom.getRoomNumber()}" readonly>
-                    </div>
+                <input type="hidden" name="roomNumber" id="editRoomNumber" value="${editRoom.getRoomNumber()}">
 
-                    <div class="form-group">
-                        <label class="input-label">Tầng</label>
-                        <input class="service-popup-input-field" type="text" value="${editRoom.getFloor()}" readonly>
-                    </div>
+                <div class="form-group">
+                    <label class="input-label">Số phòng</label>
+                    <input class="service-popup-input-field" type="text" value="${editRoom.getRoomNumber()}" readonly>
+                </div>
 
-                    <div class="form-group">
-                        <label class="input-label">Trạng thái</label>
-                        <select class="service-popup-input-field" name="status">
-                            <option value="Phòng trống" ${editRoom.getStatus() == 'Phòng trống' ? 'selected' : ''}>Phòng trống</option>
-                            <option value="Phòng có khách" ${editRoom.getStatus() == 'Phòng có khách' ? 'selected' : ''}>Phòng có khách</option>
-                            <option value="Đang dọn dẹp" ${editRoom.getStatus() == 'Đang dọn dẹp' ? 'selected' : ''}>Đang dọn dẹp</option>
-                            <option value="Đang bảo trì" ${editRoom.getStatus() == 'Đang bảo trì' ? 'selected' : ''}>Đang bảo trì</option>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label class="input-label">Tầng</label>
+                    <input class="service-popup-input-field" type="text" value="${editRoom.getFloor()}" readonly>
+                </div>
 
-                    <div class="form-group">
-                        <label class="input-label">Hạng phòng</label>
-                        <select class="service-popup-input-field" name="roomTypeId">
-                            <c:forEach var="rt" items="${roomTypeList}">
-                                <option value="${rt.getRoomTypeId()}" ${editRoom.getRoomTypeId() == rt.getRoomTypeId() ? 'selected' : ''}>${rt.getTypeName()}</option>
-                            </c:forEach>
-                        </select>
-                    </div>
-                </c:if>
+                <div class="form-group">
+                    <label class="input-label">Trạng thái</label>
+                    <select class="service-popup-input-field" name="status" id="editStatus">
+                        <c:choose>
+                            <c:when test="${editRoom.getStatus() == 'Phòng trống'}">
+                                <option value="Phòng trống" selected>Phòng trống</option>
+                                <option value="Đang dọn dẹp">Đang dọn dẹp</option>
+                                <option value="Đang bảo trì">Đang bảo trì</option>
+                            </c:when>
+                            <c:when test="${editRoom.getStatus() == 'Đang dọn dẹp'}">
+                                <option value="Phòng trống">Phòng trống</option>
+                                <option value="Đang dọn dẹp" selected>Đang dọn dẹp</option>
+                                <option value="Đang bảo trì">Đang bảo trì</option>
+                            </c:when>
+                            <c:when test="${editRoom.getStatus() == 'Đang bảo trì'}">
+                                <option value="Phòng trống">Phòng trống</option>
+                                <option value="Đang dọn dẹp">Đang dọn dẹp</option>
+                                <option value="Đang bảo trì" selected>Đang bảo trì</option>
+                            </c:when>
+                            <c:otherwise>
+                                <option value="Phòng có khách" selected>Phòng có khách</option>
+                            </c:otherwise>
+                        </c:choose>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="input-label">Hạng phòng</label>
+                    <select class="service-popup-input-field" name="roomTypeId" id="editRoomTypeId">
+                        <c:forEach var="rt" items="${roomTypeList}">
+                            <option value="${rt.getRoomTypeId()}" ${editRoom.getRoomTypeId() == rt.getRoomTypeId() ? 'selected' : ''}>${rt.getTypeName()}</option>
+                        </c:forEach>
+                    </select>
+                </div>
 
                 <div class="service-popup-action">
                     <button type="button" class="btn-close" id="btn-close-edit">Huỷ</button>
