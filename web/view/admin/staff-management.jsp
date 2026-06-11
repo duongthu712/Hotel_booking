@@ -96,8 +96,13 @@
                                     </div>
                                 </td>
                                 <td class="btn-action">
+
                                     <a class="btn-edit" href="StaffAccountEdit?staffId=${s.getStaffId()}&page=${currentPage}&searchText=${searchText}&roleFilter=${roleFilter}">Sửa</a>
                                     <form action="StaffAccountDelete" method="post" style="display: inline-block; margin: 0;">
+
+                                    <a class="btn-edit" href="StaffAccountEdit?staffId=${s.getStaffId()}">Sửa</a>
+                                    <form action="StaffAccountDelete" method="POST">
+
                                         <input type="hidden" name="staffId" value="${s.getStaffId()}">
                                         <button type="submit" onclick="return confirm('Bạn có chắc muốn xoá nhân viên ${s.getFullName()}?')">Xoá</button>
                                     </form>

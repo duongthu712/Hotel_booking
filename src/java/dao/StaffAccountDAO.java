@@ -69,6 +69,26 @@ public class StaffAccountDAO extends DBContext {
         return staff;
     }
 
+    //LinhLTHE200306
+    public StaffAccount delete(int staffId) {
+        StaffAccount found = getStaffById(staffId);
+        if (found == null) {
+            return null;
+        }
+
+        try {
+            String strSQL = """
+                           delete StaffAccount where staff_id = ?
+                           """;
+            stm = connection.prepareCall(strSQL);
+            stm.setInt(1, staffId);
+            stm.execute();
+        } catch (Exception ex) {
+            System.out.println("DeleteStaffAccount:" + ex.getMessage());
+        }
+        return found;
+    }
+    
     public StaffAccount getStaffByUsername(String username) {
         StaffAccount staff = null;
 
