@@ -1,0 +1,236 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Jun 6, 2026, 11:22:02 PM
+    Author     : admin
+*/
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f2ea;
+    color: #073842;
+}
+
+.profile-page {
+    padding: 60px 80px 90px;
+    min-height: 100vh;
+}
+
+.profile-container {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.profile-header {
+    margin-bottom: 36px;
+}
+
+.profile-eyebrow {
+    font-size: 12px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #168c91;
+    font-weight: 600;
+    margin-bottom: 14px;
+}
+
+.profile-header h1 {
+    font-family: "Times New Roman", Georgia, serif;
+    font-size: 58px;
+    font-weight: normal;
+    color: #073842;
+    margin-bottom: 14px;
+}
+
+.profile-subtitle {
+    font-size: 20px;
+    color: #466167;
+    line-height: 1.5;
+}
+
+.profile-card {
+    background: #fbf7f1;
+    border: 1px solid #eadfce;
+    border-radius: 18px;
+    padding: 32px;
+    margin-bottom: 28px;
+    box-shadow: 0 6px 22px rgba(7, 56, 66, 0.04);
+}
+
+.profile-card h2 {
+    font-family: "Times New Roman", Georgia, serif;
+    font-size: 34px;
+    font-weight: normal;
+    color: #073842;
+    margin-bottom: 20px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px 28px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+label {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #168c91;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+input {
+    width: 100%;
+    height: 50px;
+    border: 1px solid #d9cdbb;
+    border-radius: 10px;
+    padding: 0 14px;
+    font-size: 17px;
+    color: #073842;
+    background-color: #fffdf9;
+    outline: none;
+}
+
+input:focus {
+    border-color: #0f6a79;
+    box-shadow: 0 0 0 3px rgba(22, 140, 145, 0.10);
+}
+
+input[readonly] {
+    background-color: #f2ece3;
+    color: #5b6f73;
+}
+
+.button-row {
+    display: flex;
+    gap: 14px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+}
+
+.btn-primary,
+.btn-outline {
+    min-width: 180px;
+    height: 48px;
+    padding: 0 22px;
+    border-radius: 10px;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.btn-primary {
+    border: 1px solid #073842;
+    background-color: #073842;
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background-color: #0b4b57;
+}
+
+.btn-outline {
+    border: 1px solid #073842;
+    background-color: transparent;
+    color: #073842;
+}
+
+.btn-outline:hover {
+    background-color: #073842;
+    color: #ffffff;
+}
+
+.security-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 18px;
+}
+
+.security-note {
+    font-size: 16px;
+    color: #5a6c70;
+    line-height: 1.5;
+}
+
+.message {
+    padding: 14px 16px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.success-message {
+    background-color: #eaf7ef;
+    color: #1d6c3b;
+    border: 1px solid #b7e2c2;
+}
+
+.error-message {
+    background-color: #fff0f0;
+    color: #a12b2b;
+    border: 1px solid #efb5b5;
+}
+
+.hidden {
+    display: none;
+}
+
+@media (max-width: 900px) {
+    .profile-page {
+        padding: 40px 20px 60px;
+    }
+
+    .profile-header h1 {
+        font-size: 44px;
+    }
+
+    .profile-subtitle {
+        font-size: 17px;
+    }
+
+    .profile-card {
+        padding: 22px;
+    }
+
+    .profile-card h2 {
+        font-size: 28px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .security-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btn-primary,
+    .btn-outline {
+        width: 100%;
+    }
+}

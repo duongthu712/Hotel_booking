@@ -1,39 +1,42 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package model;
 
 import java.math.BigDecimal;
 
-public class Service {
+/**
+ *
+ * @author Minh Thu
+ */
+public class RoomService {
 
     private int serviceId;
     private String serviceName;
     private String description;
     private BigDecimal unitPrice;
-    private boolean active;
-    private ServiceType type;
+    private boolean isActive;
 
-    //Constructor
-    public Service() {
+    public RoomService() {
     }
 
-    public Service(int serviceId, String serviceName, String description, BigDecimal unitPrice, boolean active, ServiceType type) {
+    public RoomService(int serviceId, String serviceName, String description, BigDecimal unitPrice, boolean isActive) {
         this.serviceId = serviceId;
         this.serviceName = serviceName;
         this.description = description;
         this.unitPrice = unitPrice;
-        this.active = active;
-        this.type = type;
+        this.isActive = isActive;
     }
 
-    public Service(String serviceName, String description, BigDecimal unitPrice, boolean active, ServiceType type) {
+    public RoomService(String serviceName, String description, BigDecimal unitPrice, boolean isActive) {
         this.serviceName = serviceName;
         this.description = description;
         this.unitPrice = unitPrice;
-        this.active = active;
-        this.type = type;
+        this.isActive = isActive;
     }
 
-    //Getter & Setter
-    
+    // Getter & Setter
     public int getServiceId() {
         return serviceId;
     }
@@ -67,19 +70,10 @@ public class Service {
     }
 
     public boolean isActive() {
-        return active;
+        return isActive;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
     }
-
-    public ServiceType getType() {
-        return type;
-    }
-
-    public void setType(ServiceType type) {
-        this.type = type;
-    }
-
 }

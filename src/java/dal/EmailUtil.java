@@ -15,10 +15,8 @@ import java.util.Properties;
 public class EmailUtil {
 
     public static void sendResetCode(String toEmail, String code) throws Exception {
-
         // Gmail dùng để GỬI mail
         final String fromEmail = "phuonglinhthcsphuongdien@gmail.com";
-
         // App Password 16 ký tự, không phải password Gmail thường
         final String appPassword = "pnzf biix zhmo zrxt";
 
@@ -37,7 +35,6 @@ public class EmailUtil {
         });
 
         Message message = new MimeMessage(session);
-
         message.setFrom(new InternetAddress(fromEmail));
         message.setRecipients(
                 Message.RecipientType.TO,
@@ -58,7 +55,7 @@ public class EmailUtil {
 
         message.setContent(htmlContent, "text/html; charset=UTF-8");
 
-        // Gửi mail
+        //gui mail
         Transport.send(message);
     }
 }

@@ -14,6 +14,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.annotation.WebFilter;
+import java.util.List;
+import model.HotelImage;
 
 /**
  *
@@ -32,14 +34,14 @@ public class FooterDataFilter implements Filter {
         HotelInfoDAO hotel = new HotelInfoDAO();
         HotelInfo hotelInfo = hotel.getHotelDetails(1);
         request.setAttribute("hotelInfo", hotelInfo);
-        if (hotelInfo != null && hotelInfo.getImageUrl() != null && !hotelInfo.getImageUrl().isEmpty()) {
-            int lastImg = hotelInfo.getImageUrl().size() - 1;
-            String lastestImg = hotelInfo.getImageUrl().get(lastImg);
-            request.setAttribute("bgImage", lastestImg);
-                    
+        
+        if (hotelInfo != null && hotelInfo.getImages() != null && !hotelInfo.getImages().isEmpty()) {
+            List<HotelImage> imgs = hotelInfo.getImages();
+            HotelImage latestImgObj = imgs.get(0);
+            request.setAttribute("bgImage", latestImgObj.getImageUrl());
         }
+        
         chain.doFilter(request, response);
-
     }
 
     @Override

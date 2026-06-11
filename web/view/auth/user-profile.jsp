@@ -1,17 +1,190 @@
-<%-- 
-    Document   : user-profile
-    Created on : May 27, 2026, 10:48:43 PM
-    Author     : Minh Thu
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="model.StaffAccount"%>
+
+<%
+    StaffAccount staff = (StaffAccount) session.getAttribute("staff");
+
+    if (staff == null) {
+        response.sendRedirect(request.getContextPath() + "/login");
+        return;
+    }
+
+    String username = staff.getUsername() != null ? staff.getUsername() : "";
+
+    String fullName = request.getAttribute("fullNameValue") != null
+            ? (String) request.getAttribute("fullNameValue")
+            : (staff.getFullName() != null ? staff.getFullName() : "");
+
+    String email = request.getAttribute("emailValue") != null
+            ? (String) request.getAttribute("emailValue")
+            : (staff.getEmail() != null ? staff.getEmail() : "");
+
+    String phone = request.getAttribute("phoneValue") != null
+            ? (String) request.getAttribute("phoneValue")
+            : (staff.getPhone() != null ? staff.getPhone() : "");
+
+    String role = staff.getRole() != null ? staff.getRole() : "";
+
+    boolean showPasswordForm = request.getAttribute("showPasswordForm") != null;
+%>
+
 <!DOCTYPE html>
-<html>
+<html lang="vi">
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <meta charset="UTF-8">
+        <title>Hồ sơ cá nhân</title>
+
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/user-profile.css">
     </head>
     <body>
-        <h1>Hello World!</h1>
+
+        <main class="profile-page">
+            <div class="profile-container">
+                <div class="profile-header">
+                    <p class="profile-eyebrow">TÀI KHOẢN CỦA TÔI</p>
+                    <h1>Hồ sơ nhân viên</h1>
+                    <p class="profile-subtitle">Thông tin cá nhân và thông tin liên hệ.</p>
+                </div>
+
+                <section class="profile-card" id="profile-section">
+                    <h2>Thông tin nhân viên</h2>
+
+                    <% if (request.getAttribute("profileError") != null) { %>
+                    <div class="message error-message">
+                        <%= request.getAttribute("profileError") %>
+                    </div>
+                    <% } %>
+
+                    <% if (request.getAttribute("profileMessage") != null) { %>
+                    <div class="message success-message">
+                        <%= request.getAttribute("profileMessage") %>
+                    </div>
+                    <% } %>
+
+                    <form action="<%= request.getContextPath() %>/profile#profile-section" method="post">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Tên đăng nhập</label>
+                                <input type="text" value="<%= username %>" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Họ và tên</label>
+                                <input type="text" name="fullName" value="<%= fullName %>" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" name="email" value="<%= email %>" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Số điện thoại</label>
+                                <input type="text" name="phone" value="<%= phone %>">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Vai trò</label>
+                                <input type="text" value="<%= role %>" readonly>
+                            </div>
+                        </div>
+
+                        <div class="button-row">
+                            <button type="submit" class="btn-primary">Lưu thay đổi</button>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="profile-card" id="password-section">
+                    <div class="security-header">
+                        <div>
+                            <h2>Đổi mật khẩu</h2>
+                            <p class="security-note">Chỉ cập nhật mật khẩu khi cần thiết.</p>
+                        </div>
+
+                        <button type="button"
+                                class="btn-outline"
+                                id="showPasswordBtn"
+                                style="<%= showPasswordForm ? "display:none;" : "" %>">
+                            Đổi mật khẩu
+                        </button>
+                    </div>
+
+                    <% if (request.getAttribute("passwordError") != null) { %>
+                    <div class="message error-message password-message" id="passwordMessageBox">
+                        <%= request.getAttribute("passwordError") %>
+                    </div>
+                    <% } %>
+
+                    <% if (request.getAttribute("passwordMessage") != null) { %>
+                    <div class="message success-message password-message" id="passwordMessageBox">
+                        <%= request.getAttribute("passwordMessage") %>
+                    </div>
+                    <% } %>
+
+                    <form action="<%= request.getContextPath() %>/profile/change-password#password-section"
+                          method="post"
+                          id="passwordForm"
+                          class="<%= showPasswordForm ? "" : "hidden" %>">
+
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label>Mật khẩu hiện tại</label>
+                                <input type="password" name="currentPassword" <%= showPasswordForm ? "required" : "" %>>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Mật khẩu mới</label>
+                                <input type="password" name="newPassword" <%= showPasswordForm ? "required" : "" %>>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Nhập lại mật khẩu mới</label>
+                                <input type="password" name="confirmPassword" <%= showPasswordForm ? "required" : "" %>>
+                            </div>
+                        </div>
+
+                        <div class="button-row">
+                            <button type="submit" class="btn-primary">Cập nhật mật khẩu</button>
+                            <button type="button" class="btn-outline" id="cancelPasswordBtn">Hủy</button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </main>
+
+        <script>
+            const showPasswordBtn = document.getElementById("showPasswordBtn");
+            const cancelPasswordBtn = document.getElementById("cancelPasswordBtn");
+            const passwordForm = document.getElementById("passwordForm");
+            const passwordMessageBox = document.getElementById("passwordMessageBox");
+
+            showPasswordBtn.addEventListener("click", function () {
+                passwordForm.classList.remove("hidden");
+                showPasswordBtn.style.display = "none";
+
+                const passwordInputs = passwordForm.querySelectorAll("input");
+                passwordInputs.forEach(input => input.required = true);
+
+                if (passwordMessageBox) {
+                    passwordMessageBox.style.display = "none";
+                }
+            });
+
+            cancelPasswordBtn.addEventListener("click", function () {
+                passwordForm.classList.add("hidden");
+                showPasswordBtn.style.display = "";
+
+                const passwordInputs = passwordForm.querySelectorAll("input");
+                passwordInputs.forEach(input => {
+                    input.required = false;
+                    input.value = "";
+                });
+
+                if (passwordMessageBox) {
+                    passwordMessageBox.style.display = "none";
+                }
+            });
+        </script>
     </body>
 </html>
