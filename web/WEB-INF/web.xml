@@ -101,6 +101,14 @@
         <servlet-name>RoomDetailServlet</servlet-name>
         <servlet-class>controller.RoomDetailServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>RoomTypeListServlet</servlet-name>
+        <servlet-class>controller.RoomTypeListServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CreateRoomTypeServlet</servlet-name>
+        <servlet-class>controller.CreateRoomTypeServlet</servlet-class>
+    </servlet>
 
 
     <!-- ================= MAPPINGS ================= -->
@@ -173,5 +181,14 @@
         <servlet-name>RoomDetailServlet</servlet-name>
         <url-pattern>/room-detail</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RoomTypeListServlet</servlet-name>
+        <url-pattern>/roomtypelist</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreateRoomTypeServlet</servlet-name>
+        <url-pattern>/create-roomtype</url-pattern>
+    </servlet-mapping>
+</web-app>
 
 </web-app>
