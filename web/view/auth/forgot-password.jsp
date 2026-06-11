@@ -2,74 +2,65 @@
 
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Đăng nhập nhân viên</title>
+    <head>
+        <meta charset="UTF-8">
+        <title>Quên mật khẩu</title>
 
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/navbar.css">
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/footer.css">
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/auth.css">
-</head>
-<body>
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/navbar.css">
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/footer.css">
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/auth.css">
+    </head>
+    <body>
 
-    <jsp:include page="/view/common/navbar.jsp" />
+        <jsp:include page="/view/common/navbar.jsp" />
 
-    <main class="auth-page">
-        <div class="auth-card">
-            <div class="auth-label-top">CỔNG NHÂN VIÊN</div>
+        <main class="auth-page">
+            <div class="auth-card">
+                <div class="auth-label-top">KHÔI PHỤC TÀI KHOẢN</div>
 
-            <h1>Đăng nhập</h1>
+                <h1>Quên mật khẩu</h1>
 
-            <p class="auth-subtitle">
-                Dành cho lễ tân, quản lý và quản trị viên.
-            </p>
+                <p class="auth-subtitle">
+                    Nhập email nhân viên để nhận mã xác minh đặt lại mật khẩu.
+                </p>
 
-            <% if (request.getAttribute("error") != null) { %>
+                <% if (request.getAttribute("error") != null) { %>
                 <p class="auth-message-error">
                     <%= request.getAttribute("error") %>
                 </p>
-            <% } %>
+                <% } %>
 
-            <% if ("success".equals(request.getParameter("reset"))) { %>
+                <% if (request.getAttribute("message") != null) { %>
                 <p class="auth-message-success">
-                    Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại.
+                    <%= request.getAttribute("message") %>
                 </p>
-            <% } %>
+                <% } %>
 
-            <form class="auth-form" action="<%= request.getContextPath() %>/login" method="post">
-                <div class="auth-form-group">
-                    <label>Tên đăng nhập</label>
-                    <input 
-                        type="text" 
-                        name="username" 
-                        value="<%= request.getParameter("username") != null ? request.getParameter("username") : "" %>"
-                        required
-                    >
+                <form class="auth-form" action="<%= request.getContextPath() %>/forgot-password" method="post">
+                    <div class="auth-form-group">
+                        <label>Email</label>
+                        <input
+                            type="email"
+                            name="email"
+                            value="<%= request.getParameter("email") != null ? request.getParameter("email") : "" %>"
+                            required
+                            >
+                    </div>
+
+                    <button type="submit" class="auth-btn">Gửi mã xác minh</button>
+                </form>
+
+                <div class="auth-link">
+                    <a href="<%= request.getContextPath() %>/login">
+                        Quay lại đăng nhập
+                    </a>
                 </div>
 
-                <div class="auth-form-group">
-                    <label>Mật khẩu</label>
-                    <input 
-                        type="password" 
-                        name="password" 
-                        required
-                    >
-                </div>
-
-                <button type="submit" class="auth-btn">Đăng nhập</button>
-            </form>
-
-            <div class="auth-link">
-                <a href="<%= request.getContextPath() %>/forgot-password">
-                    Quên mật khẩu?
-                </a>
+                <div class="auth-line"></div>
             </div>
+        </main>
 
-            <div class="auth-line"></div>
-        </div>
-    </main>
+        <jsp:include page="/view/common/footer.jsp" />
 
-    <jsp:include page="/view/common/footer.jsp" />
-
-</body>
+    </body>
 </html>

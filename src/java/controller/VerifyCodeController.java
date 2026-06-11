@@ -3,13 +3,13 @@ package controller;
 import dal.EmailUtil;
 import dao.StaffAccountDAO;
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.security.SecureRandom;
 
 public class VerifyCodeController extends HttpServlet {
 
@@ -18,7 +18,7 @@ public class VerifyCodeController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         HttpSession session = request.getSession(false);
 
         if (session == null || session.getAttribute("pendingResetEmail") == null) {
@@ -32,7 +32,7 @@ public class VerifyCodeController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         request.setCharacterEncoding("UTF-8");
 
         HttpSession session = request.getSession(false);
@@ -67,7 +67,6 @@ public class VerifyCodeController extends HttpServlet {
 
             } catch (Exception e) {
                 e.printStackTrace();
-
                 request.setAttribute("error", "Không thể gửi lại mã. Vui lòng thử lại.");
                 request.getRequestDispatcher("/view/auth/verify-code.jsp").forward(request, response);
                 return;

@@ -26,7 +26,6 @@ public class StaffAccountDAO extends DBContext {
 
             stm = connection.prepareStatement(sql);
             stm.setInt(1, staffId);
-
             rs = stm.executeQuery();
 
             if (rs.next()) {
@@ -53,7 +52,6 @@ public class StaffAccountDAO extends DBContext {
 
             stm = connection.prepareStatement(sql);
             stm.setString(1, email);
-
             rs = stm.executeQuery();
 
             if (rs.next()) {
@@ -79,7 +77,6 @@ public class StaffAccountDAO extends DBContext {
 
             stm = connection.prepareStatement(sql);
             stm.setString(1, username);
-
             rs = stm.executeQuery();
 
             if (rs.next()) {
@@ -163,7 +160,6 @@ public class StaffAccountDAO extends DBContext {
                          """;
 
             stm = connection.prepareStatement(sql);
-
             stm.setString(1, fullName);
             stm.setString(2, email);
             stm.setString(3, phone);
@@ -188,7 +184,6 @@ public class StaffAccountDAO extends DBContext {
                          """;
 
             stm = connection.prepareStatement(sql);
-
             stm.setString(1, newPasswordHash);
             stm.setInt(2, staffId);
 
@@ -242,9 +237,7 @@ public class StaffAccountDAO extends DBContext {
 
             rs = stm.executeQuery();
 
-            if (rs.next()) {
-                return true;
-            }
+            return rs.next();
 
         } catch (Exception e) {
             System.out.println("isValidResetCode: " + e.getMessage());

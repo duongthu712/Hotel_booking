@@ -53,7 +53,6 @@ public class LoginController extends HttpServlet {
             }
 
             HttpSession session = request.getSession();
-
             session.setMaxInactiveInterval(60 * 60);
 
             session.setAttribute("staff", staff);

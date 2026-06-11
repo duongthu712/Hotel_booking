@@ -2,6 +2,27 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/web/view/auth/access-denied.jsp</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/src/java/controller/ResetPasswordController.java</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/web/view/assets/css/auth.css</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/src/java/controller/RoomDetailServlet.java</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/web/view/auth/login.jsp</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/web/view/auth/user-profile.jsp</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/web/WEB-INF/web.xml</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/src/java/controller/VerifyCodeController.java</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/src/java/controller/LoginController.java</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/web/view/auth/reset-password.jsp</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/src/java/controller/LogoutController.java</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/src/java/controller/ChangePasswordController.java</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/src/java/model/StaffAccount.java</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/src/java/dao/StaffAccountDAO.java</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/src/java/controller/ForgotPasswordController.java</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/web/view/auth/forgot-password.jsp</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/src/java/filter/AuthorizationFilter.java</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/src/java/controller/AccessDeniedController.java</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/web/view/auth/verify-code.jsp</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/src/java/controller/UserProfileController.java</file>
+        </group>
     </open-files>
 </project-private>

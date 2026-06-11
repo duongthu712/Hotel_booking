@@ -15,35 +15,24 @@ public class RoomType {
     private BigDecimal areaSqm;
     private BigDecimal basePrice;
     private boolean active;
+
     private List<String> imageUrl;
     private List<String> imageCaption;
-    
-    private List<RoomTypeService> roomTypeServices; 
 
-    public void addImage(String url, String caption) {
-        if (imageUrl == null) {
-            imageUrl = new ArrayList<>();
-            imageCaption = new ArrayList<>();
-        }
-        imageUrl.add(url);
-        imageCaption.add(caption);
-    }
-
-    public void clearImages() {
-        if (imageUrl != null) {
-            imageUrl.clear();
-        }
-        if (imageCaption != null) {
-            imageCaption.clear();
-        }
-    }
+    private List<RoomTypeService> roomTypeServices;
+    private List<RoomAmenity> roomAmenities;
 
     public RoomType() {
+        imageUrl = new ArrayList<>();
+        imageCaption = new ArrayList<>();
+        roomTypeServices = new ArrayList<>();
+        roomAmenities = new ArrayList<>();
     }
 
-    public RoomType(int roomTypeId, String typeName, String description, 
-            int capacity, String bedType, int bedCount, BigDecimal areaSqm, 
+    public RoomType(int roomTypeId, String typeName, String description,
+            int capacity, String bedType, int bedCount, BigDecimal areaSqm,
             BigDecimal basePrice, boolean active) {
+        this();
         this.roomTypeId = roomTypeId;
         this.typeName = typeName;
         this.description = description;
@@ -53,6 +42,29 @@ public class RoomType {
         this.areaSqm = areaSqm;
         this.basePrice = basePrice;
         this.active = active;
+    }
+
+    public void addImage(String url, String caption) {
+        if (imageUrl == null) {
+            imageUrl = new ArrayList<>();
+        }
+
+        if (imageCaption == null) {
+            imageCaption = new ArrayList<>();
+        }
+
+        imageUrl.add(url);
+        imageCaption.add(caption);
+    }
+
+    public void clearImages() {
+        if (imageUrl != null) {
+            imageUrl.clear();
+        }
+
+        if (imageCaption != null) {
+            imageCaption.clear();
+        }
     }
 
     public int getRoomTypeId() {
@@ -149,5 +161,13 @@ public class RoomType {
 
     public void setRoomTypeServices(List<RoomTypeService> roomTypeServices) {
         this.roomTypeServices = roomTypeServices;
+    }
+
+    public List<RoomAmenity> getRoomAmenities() {
+        return roomAmenities;
+    }
+
+    public void setRoomAmenities(List<RoomAmenity> roomAmenities) {
+        this.roomAmenities = roomAmenities;
     }
 }
