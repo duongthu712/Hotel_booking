@@ -11,8 +11,6 @@ body {
     min-height: 100vh;
 }
 
-/* ===== AUTH PAGE COMMON ===== */
-
 .auth-page {
     min-height: 620px;
     background-color: #f7f2ea;
@@ -50,8 +48,6 @@ body {
     margin-bottom: 30px;
     line-height: 1.5;
 }
-
-/* ===== FORM ===== */
 
 .auth-form {
     width: 100%;
@@ -93,7 +89,7 @@ body {
     background-color: #073842;
     color: white;
     font-size: 11px;
-    letter-spacing: 6px;
+    letter-spacing: 5px;
     text-transform: uppercase;
     cursor: pointer;
     margin-top: 8px;
@@ -105,7 +101,17 @@ body {
     background-color: #0b4b57;
 }
 
-/* ===== LINK ===== */
+.auth-btn-secondary {
+    margin-top: 14px;
+    background-color: transparent;
+    color: #073842;
+    border: 1px solid #073842;
+}
+
+.auth-btn-secondary:hover {
+    background-color: #073842;
+    color: #ffffff;
+}
 
 .auth-link {
     text-align: center;
@@ -113,7 +119,7 @@ body {
 }
 
 .auth-link a {
-    font-size: px;
+    font-size: 17px;
     color: #073842;
     text-decoration: none;
 }
@@ -130,7 +136,7 @@ body {
 }
 
 .auth-link-row a {
-    font-size: 17px;
+    font-size: 13px;
     color: #073842;
     text-decoration: none;
 }
@@ -139,7 +145,24 @@ body {
     text-decoration: underline;
 }
 
-/* ===== MESSAGE ===== */
+.auth-action-row {
+    display: flex;
+    gap: 28px;
+    margin-top: 24px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.auth-text-link {
+    font-size: 17px;
+    color: #073842;
+    text-decoration: none;
+    font-weight: normal;
+}
+
+.auth-text-link:hover {
+    text-decoration: underline;
+}
 
 .auth-message-error {
     color: #b30000;
@@ -166,8 +189,6 @@ body {
     background-color: #d8cfc2;
     margin-top: 45px;
 }
-
-/* ===== RESPONSIVE ===== */
 
 @media (max-width: 768px) {
     .auth-page {
@@ -199,32 +220,9 @@ body {
     .auth-btn {
         letter-spacing: 4px;
     }
-    
-    .auth-btn-secondary {
-        margin-top: 14px;
-        background-color: transparent;
-        color: #073842;
-        border: 1px solid #073842;
-    }
 
-    .auth-btn-secondary:hover {
-        background-color: #073842;
-        color: #ffffff;
-    }
-    
-    /* ===== ACCESS DENIED INFO ===== */
-
-    .auth-info-box {
-        background-color: #efe7dc;
-        border-left: 3px solid #073842;
-        padding: 14px 16px;
-        margin-bottom: 24px;
-        font-size: 16px;
-        color: #073842;
-        line-height: 1.6;
-    }
-
-    .auth-info-box p {
-        margin: 4px 0;
+    .auth-action-row {
+        flex-direction: column;
+        gap: 12px;
     }
 }

@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package filter;
 
 import jakarta.servlet.Filter;
@@ -31,30 +27,39 @@ public class AuthorizationFilter implements Filter {
 
         String contextPath = req.getContextPath();
         String uri = req.getRequestURI();
+
         HttpSession session = req.getSession(false);
-        // kiem tra nguoi dung da dang nhap hay chua
+
         if (session == null || session.getAttribute("staff") == null) {
             res.sendRedirect(contextPath + "/login");
             return;
         }
+
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
+
+        if (staff == null || staff.getRole() == null) {
+            res.sendRedirect(contextPath + "/access-denied");
+            return;
+        }
+
         String role = staff.getRole().trim();
         boolean allowed = false;
-        // admin
+
         if (uri.startsWith(contextPath + "/view/admin/")) {
             allowed = role.equalsIgnoreCase("Quản trị viên");
-        //manager
         } else if (uri.startsWith(contextPath + "/view/manager/")) {
             allowed = role.equalsIgnoreCase("Quản lý");
-        //le tan
         } else if (uri.startsWith(contextPath + "/view/receptionist/")) {
             allowed = role.equalsIgnoreCase("Lễ tân");
+        } else {
+            allowed = true;
         }
-        //access denied
+
         if (!allowed) {
             res.sendRedirect(contextPath + "/access-denied");
             return;
         }
+
         chain.doFilter(request, response);
     }
 
