@@ -5,54 +5,45 @@ import java.util.List;
 
 public class HotelInfo {
 
-    private int hotelId;
+   private int hotelId;
     private String hotelName;
     private String description;
-    private String checkinTime;
+    private String checkinTime; 
     private String checkoutTime;
     private String address;
+    private String addressUrl; 
     private String phone;
     private String email;
-    private List<String> imageUrl;
-    private List<String> imageCaption;
+    private List<HotelImage> images;
 
-    //Method addImage into hotel image list
-    public void addImage(String url, String caption) {
-        if (imageUrl == null) {
-            imageUrl = new ArrayList<>();
-            imageCaption = new ArrayList<>();
+    public void addImage(HotelImage image) {
+        if (this.images == null) {
+            this.images = new ArrayList<>();
         }
-        imageUrl.add(url);
-        imageCaption.add(caption);
+        this.images.add(image);
     }
 
-    //Method clearImages clears all image urls and captions in the list
     public void clearImages() {
-        if (imageUrl != null) {
-            imageUrl.clear();
-        }
-        if (imageCaption != null) {
-            imageCaption.clear();
+        if (this.images != null) {
+            this.images.clear();
         }
     }
 
-    //Constructor
     public HotelInfo() {
-
     }
 
-    public HotelInfo(int hotelId, String hotelName, String description, String checkinTime, String checkoutTime, String address, String phone, String email) {
+    public HotelInfo(int hotelId, String hotelName, String description, String checkinTime, String checkoutTime, String address, String addressUrl, String phone, String email) {
         this.hotelId = hotelId;
         this.hotelName = hotelName;
         this.description = description;
         this.checkinTime = checkinTime;
         this.checkoutTime = checkoutTime;
         this.address = address;
+        this.addressUrl = addressUrl;
         this.phone = phone;
         this.email = email;
     }
 
-    //Getter & Setter
     public int getHotelId() {
         return hotelId;
     }
@@ -101,6 +92,14 @@ public class HotelInfo {
         this.address = address;
     }
 
+    public String getAddressUrl() {
+        return addressUrl;
+    }
+
+    public void setAddressUrl(String addressUrl) {
+        this.addressUrl = addressUrl;
+    }
+
     public String getPhone() {
         return phone;
     }
@@ -117,19 +116,11 @@ public class HotelInfo {
         this.email = email;
     }
 
-    public List<String> getImageUrl() {
-        return imageUrl;
+    public List<HotelImage> getImages() {
+        return images;
     }
 
-    public void setImageUrl(List<String> imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public List<String> getImageCaption() {
-        return imageCaption;
-    }
-
-    public void setImageCaption(List<String> imageCaption) {
-        this.imageCaption = imageCaption;
+    public void setImages(List<HotelImage> images) {
+        this.images = images;
     }
 }
