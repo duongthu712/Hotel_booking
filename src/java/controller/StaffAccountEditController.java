@@ -32,7 +32,7 @@ public class StaffAccountEditController extends HttpServlet {
             int staffId = Integer.parseInt(request.getParameter("staffId"));
 
             StaffAccountDAO staffDao = new StaffAccountDAO();
-            StaffAccount editStaff = staffDao.getStaffByIdIncludeInactive(staffId);
+            StaffAccount editStaff = staffDao.getStaffAccById(staffId);
             List<StaffAccount> staffList = staffDao.getAllStaffAcc();
 
             request.setAttribute("staffList", staffList);
@@ -69,7 +69,7 @@ public class StaffAccountEditController extends HttpServlet {
         String roleFilter = request.getParameter("roleFilter");
 
         if (staff.getStaffId() == staffId && !staff.getRole().equals(role)) {
-            session.setAttribute("errorMessage", "Bạn không thể tự thay đổi chức vụ (Role) của bản thân.");
+            session.setAttribute("errorMessage", "Bạn không thể tự thay đổi chức vụ của bản thân.");
             response.sendRedirect(buildRedirectUrl(request, page, searchText, roleFilter));
             return;
         }
@@ -78,7 +78,7 @@ public class StaffAccountEditController extends HttpServlet {
 
         try {
             StaffAccountDAO staffDao = new StaffAccountDAO();
-            StaffAccount existingStaff = staffDao.getStaffByIdIncludeInactive(staffId);
+            StaffAccount existingStaff = staffDao.getStaffAccById(staffId);
 
             if (existingStaff == null) {
                 session.setAttribute("errorMessage", "Không tìm thấy nhân viên.");
@@ -100,7 +100,7 @@ public class StaffAccountEditController extends HttpServlet {
             updatedStaff.setResetExpiry(existingStaff.getResetExpiry());
             updatedStaff.setResetUsed(existingStaff.isResetUsed());
 
-            staffDao.updateStaff(updatedStaff);
+            staffDao.updateStaffAcc(updatedStaff);
             session.setAttribute("successMessage", "Cập nhật nhân viên thành công.");
         } catch (Exception e) {
             session.setAttribute("errorMessage", e.getMessage());

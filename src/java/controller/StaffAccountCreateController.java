@@ -26,8 +26,7 @@ public class StaffAccountCreateController extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
-
-        request.getRequestDispatcher("/view/admin/create-staff-account.jsp").forward(request, response);
+         response.sendRedirect(request.getContextPath() + "/StaffAccountList");
     }
 
     @Override
@@ -35,8 +34,9 @@ public class StaffAccountCreateController extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
+        
         if (staff == null) {
-            response.sendRedirect("index.html");
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
@@ -48,16 +48,16 @@ public class StaffAccountCreateController extends HttpServlet {
         String role = request.getParameter("role");
 
         if (username == null || username.trim().isEmpty()) {
-            request.setAttribute("error", "Tên đăng nhập không được để trống.");
-            retainFormFields(request, username, fullName, email, phone, role);
-            request.getRequestDispatcher("/view/admin/create-staff-account.jsp").forward(request, response);
+            session.setAttribute("errorMessage", "Tên đăng nhập không được để trống.");
+            retainFormFields(session, username, fullName, email, phone, role);
+            response.sendRedirect(request.getContextPath() + "/StaffAccountList");
             return;
         }
 
         if (password == null || password.trim().isEmpty()) {
-            request.setAttribute("error", "Mật khẩu không được để trống.");
-            retainFormFields(request, username, fullName, email, phone, role);
-            request.getRequestDispatcher("/view/admin/create-staff-account.jsp").forward(request, response);
+            session.setAttribute("errorMessage", "Mật khẩu không được để trống.");
+            retainFormFields(session, username, fullName, email, phone, role);
+            response.sendRedirect(request.getContextPath() + "/StaffAccountList");
             return;
         }
 
@@ -65,16 +65,16 @@ public class StaffAccountCreateController extends HttpServlet {
             StaffAccountDAO staffDao = new StaffAccountDAO();
 
             if (staffDao.getStaffByUsername(username) != null) {
-                request.setAttribute("error", "Tên đăng nhập đã tồn tại.");
-                retainFormFields(request, username, fullName, email, phone, role);
-                request.getRequestDispatcher("/view/admin/create-staff-account.jsp").forward(request, response);
+                session.setAttribute("errorMessage", "Tên đăng nhập đã tồn tại.");
+                retainFormFields(session, username, fullName, email, phone, role);
+                response.sendRedirect(request.getContextPath() + "/StaffAccountList");
                 return;
             }
 
             if (staffDao.getStaffByEmail(email) != null) {
-                request.setAttribute("error", "Email đã được sử dụng.");
-                retainFormFields(request, username, fullName, email, phone, role);
-                request.getRequestDispatcher("/view/admin/create-staff-account.jsp").forward(request, response);
+                session.setAttribute("errorMessage", "Email đã được sử dụng.");
+                retainFormFields(session, username, fullName, email, phone, role);
+                response.sendRedirect(request.getContextPath() + "/StaffAccountList");
                 return;
             }
 
@@ -90,21 +90,24 @@ public class StaffAccountCreateController extends HttpServlet {
             newStaff.setActive(true);
 
             staffDao.createStaff(newStaff);
+            
             session.setAttribute("successMessage", "Tạo nhân viên mới thành công.");
             response.sendRedirect(request.getContextPath() + "/StaffAccountList");
+            
         } catch (Exception e) {
-            request.setAttribute("error", e.getMessage());
-            retainFormFields(request, username, fullName, email, phone, role);
-            request.getRequestDispatcher("/view/admin/create-staff-account.jsp").forward(request, response);
+            session.setAttribute("errorMessage", "Lỗi hệ thống: " + e.getMessage());
+            retainFormFields(session, username, fullName, email, phone, role);
+            response.sendRedirect(request.getContextPath() + "/StaffAccountList");
         }
     }
 
-    private void retainFormFields(HttpServletRequest request, String username, String fullName, String email, String phone, String role) {
-        request.setAttribute("username", username);
-        request.setAttribute("fullName", fullName);
-        request.setAttribute("email", email);
-        request.setAttribute("phone", phone);
-        request.setAttribute("role", role);
+    private void retainFormFields(HttpSession session, String username, String fullName, String email, String phone, String role) {
+        session.setAttribute("keepUsername", username);
+        session.setAttribute("keepFullName", fullName);
+        session.setAttribute("keepEmail", email);
+        session.setAttribute("keepPhone", phone);
+        session.setAttribute("keepRole", role);
+        session.setAttribute("openCreateModal", true);
     }
 
     @Override

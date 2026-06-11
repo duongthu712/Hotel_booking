@@ -30,9 +30,18 @@
     font-weight: 530;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    transition: color 0.2s;
+    transition: all 0.2s ease;
+    padding-bottom: 4px; 
+    border-bottom: 2px solid transparent;
 }
 
 .staff-navbar a:hover {
-    color: var(--text-main);
+    color: #ffffff;;
+}
+
+.staff-navbar a.active {
+    color: #ffffff;         
+    font-weight: 700;        
+    border-bottom-color: #ffffff; 
+    opacity: 1;
 }

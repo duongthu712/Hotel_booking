@@ -3,10 +3,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const editModal = document.getElementById("edit-modal");
     const btnCloseDetail = document.getElementById("btn-close-detail");
     const btnCloseEdit = document.getElementById("btn-close-edit");
-
+    const btnCloseCreate = document.getElementById("btn-close-create");
+    const form = document.getElementById("staff-form");
+    const createModal = document.getElementById("create-modal");
+    const btnCreate = document.getElementById("btn-create");
     const isEditMode = document.body.getAttribute("data-edit-mode") === "true";
     const isDetailMode = document.body.getAttribute("data-detail-mode") === "true";
-    
+
     const alerts = document.querySelectorAll(".alert-message, .error-message, .success-message");
 
     alerts.forEach(alert => {
@@ -50,4 +53,21 @@ document.addEventListener("DOMContentLoaded", function () {
             window.location.href = "StaffAccountList";
         });
     }
+
+if (btnCloseCreate) {
+    btnCloseCreate.addEventListener("click", () => {
+        toggleModal(createModal, false);
+        window.location.href = "StaffAccountList";
+    });
+}
+
+    if (btnCreate) {
+        btnCreate.addEventListener("click", () => {
+            form.action = "StaffAccountCreate";
+            form.reset();
+            toggleModal(createModal, true);
+        });
+    }
+    
+   
 });

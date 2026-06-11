@@ -40,7 +40,7 @@ public class StaffAccountDeleteController extends HttpServlet {
             }
 
             StaffAccountDAO staffDao = new StaffAccountDAO();
-            staffDao.updateStaffStatus(staffId, false);
+            staffDao.deleteStaffAcc(staffId);
 
             session.setAttribute("success", "Xoá nhân viên thành công.");
 

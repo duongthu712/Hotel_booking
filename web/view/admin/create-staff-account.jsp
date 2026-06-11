@@ -38,22 +38,22 @@
 
             <form action="StaffAccountCreate" method="post" class="create-form-grid">
                 <div class="form-group">
-                    <label class="input-label">Tên đăng nhập</label>
+                    <label class="input-label">Tên đăng nhập*</label>
                     <input class="service-popup-input-field" type="text" name="username" value="${username}" placeholder="Nhập tên đăng nhập..." required>
                 </div>
 
                 <div class="form-group">
-                    <label class="input-label">Mật khẩu</label>
+                    <label class="input-label">Mật khẩu*</label>
                     <input class="service-popup-input-field" type="password" name="password" placeholder="Nhập mật khẩu..." required>
                 </div>
 
                 <div class="form-group">
-                    <label class="input-label">Họ tên</label>
+                    <label class="input-label">Họ tên*</label>
                     <input class="service-popup-input-field" type="text" name="fullName" value="${fullName}" placeholder="Nhập họ tên..." required>
                 </div>
 
                 <div class="form-group">
-                    <label class="input-label">Email</label>
+                    <label class="input-label">Email*</label>
                     <input class="service-popup-input-field" type="email" name="email" value="${email}" placeholder="Nhập email..." required>
                 </div>
 
@@ -63,7 +63,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="input-label">Chức vụ</label>
+                    <label class="input-label">Chức vụ*</label>
                     <select class="service-popup-input-field" name="role" required>
                         <option value="">Chọn chức vụ</option>
                         <option value="Lễ tân" ${role == 'Lễ tân' ? 'selected' : ''}>Lễ tân</option>

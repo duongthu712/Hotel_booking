@@ -107,7 +107,7 @@ public class LoginController extends HttpServlet {
         } else if (role.equalsIgnoreCase("Administrator")
                 || role.equalsIgnoreCase("Admin")
                 || role.equalsIgnoreCase("Quản trị viên")) {
-            response.sendRedirect(request.getContextPath() + "/view/admin/dashboard.jsp");
+            response.sendRedirect(request.getContextPath() + "/StaffAccountList");
 
         } else {
             request.setAttribute("error", "Invalid role: " + role);
