@@ -36,6 +36,10 @@
         <servlet-name>UserProfileController</servlet-name>
         <servlet-class>controller.UserProfileController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AccessDeniedController</servlet-name>
+        <servlet-class>controller.AccessDeniedController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>
         <url-pattern>/login</url-pattern>
@@ -99,5 +103,38 @@
     <servlet-mapping>
         <servlet-name>UserProfileController</servlet-name>
         <url-pattern>/profile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AccessDeniedController</servlet-name>
+        <url-pattern>/access-denied</url-pattern>
+    </servlet-mapping>
+    
+    <filter>
+        <filter-name>AuthorizationFilter</filter-name>
+        <filter-class>filter.AuthorizationFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>AuthorizationFilter</filter-name>
+        <url-pattern>/view/admin/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>AuthorizationFilter</filter-name>
+        <url-pattern>/view/manager/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>AuthorizationFilter</filter-name>
+        <url-pattern>/view/receptionist/*</url-pattern>
+    </filter-mapping>
+    <servlet>
+        <servlet-name>RoomDetailServlet</servlet-name>
+        <servlet-class>controller.RoomDetailServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>RoomDetailServlet</servlet-name>
+        <url-pattern>/room-detail</url-pattern>
     </servlet-mapping>
 </web-app>

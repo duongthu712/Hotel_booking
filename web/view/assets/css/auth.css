@@ -113,7 +113,7 @@ body {
 }
 
 .auth-link a {
-    font-size: 17px;
+    font-size: px;
     color: #073842;
     text-decoration: none;
 }
@@ -130,7 +130,7 @@ body {
 }
 
 .auth-link-row a {
-    font-size: 13px;
+    font-size: 17px;
     color: #073842;
     text-decoration: none;
 }
@@ -210,5 +210,21 @@ body {
     .auth-btn-secondary:hover {
         background-color: #073842;
         color: #ffffff;
+    }
+    
+    /* ===== ACCESS DENIED INFO ===== */
+
+    .auth-info-box {
+        background-color: #efe7dc;
+        border-left: 3px solid #073842;
+        padding: 14px 16px;
+        margin-bottom: 24px;
+        font-size: 16px;
+        color: #073842;
+        line-height: 1.6;
+    }
+
+    .auth-info-box p {
+        margin: 4px 0;
     }
 }

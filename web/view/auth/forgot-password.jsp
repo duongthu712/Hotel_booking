@@ -4,7 +4,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Đăng nhập nhân viên</title>
+    <title>Quên mật khẩu</title>
 
     <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/navbar.css">
     <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/footer.css">
@@ -16,12 +16,12 @@
 
     <main class="auth-page">
         <div class="auth-card">
-            <div class="auth-label-top">CỔNG NHÂN VIÊN</div>
+            <div class="auth-label-top">KHÔI PHỤC TÀI KHOẢN</div>
 
-            <h1>Đăng nhập</h1>
+            <h1>Quên mật khẩu</h1>
 
             <p class="auth-subtitle">
-                Dành cho lễ tân, quản lý và quản trị viên.
+                Nhập email nhân viên để nhận mã xác minh đặt lại mật khẩu.
             </p>
 
             <% if (request.getAttribute("error") != null) { %>
@@ -30,38 +30,29 @@
                 </p>
             <% } %>
 
-            <% if ("success".equals(request.getParameter("reset"))) { %>
+            <% if (request.getAttribute("message") != null) { %>
                 <p class="auth-message-success">
-                    Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại.
+                    <%= request.getAttribute("message") %>
                 </p>
             <% } %>
 
-            <form class="auth-form" action="<%= request.getContextPath() %>/login" method="post">
+            <form class="auth-form" action="<%= request.getContextPath() %>/forgot-password" method="post">
                 <div class="auth-form-group">
-                    <label>Tên đăng nhập</label>
-                    <input 
-                        type="text" 
-                        name="username" 
-                        value="<%= request.getParameter("username") != null ? request.getParameter("username") : "" %>"
+                    <label>Email</label>
+                    <input
+                        type="email"
+                        name="email"
+                        value="<%= request.getParameter("email") != null ? request.getParameter("email") : "" %>"
                         required
                     >
                 </div>
 
-                <div class="auth-form-group">
-                    <label>Mật khẩu</label>
-                    <input 
-                        type="password" 
-                        name="password" 
-                        required
-                    >
-                </div>
-
-                <button type="submit" class="auth-btn">Đăng nhập</button>
+                <button type="submit" class="auth-btn">Gửi mã xác minh</button>
             </form>
 
             <div class="auth-link">
-                <a href="<%= request.getContextPath() %>/forgot-password">
-                    Quên mật khẩu?
+                <a href="<%= request.getContextPath() %>/logout">
+                    Quay lại đăng nhập
                 </a>
             </div>
 

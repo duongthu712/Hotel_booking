@@ -31,23 +31,28 @@ public class ChangePasswordController extends HttpServlet {
         String newPassword = request.getParameter("newPassword");
         String confirmPassword = request.getParameter("confirmPassword");
 
-        if (currentPassword == null || currentPassword.trim().isEmpty()
-                || newPassword == null || newPassword.trim().isEmpty()
-                || confirmPassword == null || confirmPassword.trim().isEmpty()) {
+        currentPassword = currentPassword != null ? currentPassword.trim() : "";
+        newPassword = newPassword != null ? newPassword.trim() : "";
+        confirmPassword = confirmPassword != null ? confirmPassword.trim() : "";
 
-            request.setAttribute("error", "Vui lòng nhập đầy đủ các trường mật khẩu.");
-            request.getRequestDispatcher("/view/auth/user-profile.jsp").forward(request, response);
-            return;
-        }
+        request.setAttribute("showPasswordForm", true);
 
-        if (!newPassword.equals(confirmPassword)) {
-            request.setAttribute("error", "Mật khẩu xác nhận không khớp.");
+        if (currentPassword.isEmpty()
+                || newPassword.isEmpty()
+                || confirmPassword.isEmpty()) {
+            request.setAttribute("passwordError", "Vui lòng nhập đầy đủ các trường mật khẩu.");
             request.getRequestDispatcher("/view/auth/user-profile.jsp").forward(request, response);
             return;
         }
 
         if (newPassword.length() < 6) {
-            request.setAttribute("error", "Mật khẩu mới phải có ít nhất 6 ký tự.");
+            request.setAttribute("passwordError", "Mật khẩu mới phải có ít nhất 6 ký tự.");
+            request.getRequestDispatcher("/view/auth/user-profile.jsp").forward(request, response);
+            return;
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            request.setAttribute("passwordError", "Mật khẩu xác nhận không khớp.");
             request.getRequestDispatcher("/view/auth/user-profile.jsp").forward(request, response);
             return;
         }
@@ -57,22 +62,33 @@ public class ChangePasswordController extends HttpServlet {
         StaffAccount checkedStaff = dao.loginWithHashCheck(staff.getUsername(), currentPassword);
 
         if (checkedStaff == null) {
-            request.setAttribute("error", "Mật khẩu hiện tại không đúng.");
+            request.setAttribute("passwordError", "Mật khẩu hiện tại không đúng.");
             request.getRequestDispatcher("/view/auth/user-profile.jsp").forward(request, response);
             return;
         }
 
-        //check current pass vs new pass
         if (currentPassword.equals(newPassword)) {
-            request.setAttribute("error", "Mật khẩu mới không được trùng với mật khẩu hiện tại.");
+            request.setAttribute("passwordError", "Mật khẩu mới không được trùng với mật khẩu hiện tại.");
             request.getRequestDispatcher("/view/auth/user-profile.jsp").forward(request, response);
             return;
         }
 
         String newPasswordHash = PasswordUtil.hashPassword(newPassword);
-        dao.updatePasswordByStaffId(staff.getStaffId(), newPasswordHash);
+        boolean updated = dao.updatePasswordByStaffId(staff.getStaffId(), newPasswordHash);
 
-        request.setAttribute("message", "Đổi mật khẩu thành công.");
+        if (!updated) {
+            request.setAttribute("passwordError", "Không thể đổi mật khẩu. Vui lòng thử lại.");
+            request.getRequestDispatcher("/view/auth/user-profile.jsp").forward(request, response);
+            return;
+        }
+
+        request.removeAttribute("showPasswordForm");
+        request.setAttribute("passwordMessage", "Đổi mật khẩu thành công.");
         request.getRequestDispatcher("/view/auth/user-profile.jsp").forward(request, response);
+    }
+
+    @Override
+    public String getServletInfo() {
+        return "Change Password Controller";
     }
 }
