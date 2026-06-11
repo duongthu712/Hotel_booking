@@ -189,6 +189,6 @@
         <servlet-name>CreateRoomTypeServlet</servlet-name>
         <url-pattern>/create-roomtype</url-pattern>
     </servlet-mapping>
-</web-app>
+
 
 </web-app>
