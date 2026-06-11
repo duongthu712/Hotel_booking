@@ -100,20 +100,20 @@
 
         <div class="service-popup" id="service-modal">
             <form action="" method="POST" id="service-form" class="popup-content">
-                <h2 class="service-popup-title" id="modal-title">Thêm dịch vụ phòng mới</h2>
+                <h2 class="service-popup-title" id="modal-title">Thêm dịch vụ mới</h2>
 
                 <input type="hidden" name="serviceId" id="serviceId" value="${serviceToEdit.getServiceId()}">
                 <input type="hidden" name="page" value="${page}">
                 <input type="hidden" name="keyword" value="${keyword}">
 
                 <div class="form-group">
-                    <label class="input-label">Tên dịch vụ phòng</label>
+                    <label class="input-label">Tên dịch vụ*</label>
                     <input class="service-popup-input-field" type="text" name="serviceName" id="serviceName" 
                            placeholder="Nhập tên..." value="${serviceToEdit.getServiceName()}" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="input-label">Đơn giá (VNĐ)</label>
+                    <label class="input-label">Đơn giá (VNĐ)*</label>
                     <input class="service-popup-input-field" type="number" name="unitPrice" id="unitPrice" 
                            placeholder="0.00" value="${serviceToEdit.getUnitPrice()}" required>
                 </div>

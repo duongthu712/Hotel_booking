@@ -102,7 +102,7 @@
                 <input type="hidden" name="keyword" value="${keyword}">
 
                 <div class="form-group">
-                    <label class="input-label">Tên dịch vụ khách sạn</label>
+                    <label class="input-label">Tên dịch vụ*</label>
                     <input class="service-popup-input-field" type="text" name="serviceName" id="serviceName" 
                            placeholder="Nhập tên..." value="${serviceToEdit.getServiceName()}" required>
                 </div>
@@ -114,7 +114,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="input-label">Đơn giá (VNĐ)</label>
+                    <label class="input-label">Đơn giá (VNĐ)*</label>
                     <input class="service-popup-input-field" type="number" name="unitPrice" id="unitPrice" 
                            placeholder="0.00" value="${serviceToEdit.getUnitPrice()}" required>
                 </div>

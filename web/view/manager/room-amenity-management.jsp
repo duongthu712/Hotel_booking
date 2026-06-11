@@ -95,20 +95,20 @@
 
         <div class="amenity-popup" id="amenity-modal">
             <form action="" method="POST" id="amenity-form" class="popup-content">
-                <h2 class="amenity-popup-title" id="modal-title">Thêm tiện nghi phòng mới</h2>
+                <h2 class="amenity-popup-title" id="modal-title">Thêm tiện nghi mới</h2>
 
                 <input type="hidden" name="amenityId" id="amenityId" value="${amenityToEdit.getAmenityId()}">
                 <input type="hidden" name="page" value="${page}">
                 <input type="hidden" name="keyword" value="${keyword}">
 
                 <div class="form-group">
-                    <label class="input-label">Tên tiện nghi phòng</label>
+                    <label class="input-label">Tên tiện nghi*</label>
                     <input class="amenity-popup-input-field" type="text" name="amenityName" id="amenityName" 
                            placeholder="Nhập tên..." value="${amenityToEdit.getAmenityName()}" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="input-label">Đơn giá (VNĐ)</label>
+                    <label class="input-label">Đơn giá (VNĐ)*</label>
                     <input class="amenity-popup-input-field" type="number" name="unitPrice" id="unitPrice" 
                            placeholder="0.00" value="${amenityToEdit.getUnitPrice()}" required>
                 </div>

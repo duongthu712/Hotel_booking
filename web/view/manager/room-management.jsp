@@ -168,7 +168,6 @@
             <form action="" method="POST" id="edit-form" class="popup-content">
                 <h2 class="service-popup-title" id="edit-modal-title">Chỉnh sửa phòng</h2>
 
-                <%-- Hidden fields giữ trạng thái filter để redirect --%>
                 <input type="hidden" name="page" value="${currentPage}">
                 <input type="hidden" name="filterRoomTypeId" value="${selectedRoomTypeId}">
                 <input type="hidden" name="keyword" value="${keyword}">
