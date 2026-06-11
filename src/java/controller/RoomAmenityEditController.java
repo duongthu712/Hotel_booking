@@ -26,7 +26,7 @@ public class RoomAmenityEditController extends HttpServlet {
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
 
         if (staff == null) {
-            response.sendRedirect("view/auth/login.jsp");
+            response.sendRedirect("login");
             return;
         }
 
@@ -54,7 +54,7 @@ public class RoomAmenityEditController extends HttpServlet {
         HttpSession session = request.getSession();
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
         if (staff == null) {
-            response.sendRedirect("view/auth/login.jsp");
+            response.sendRedirect("login");
             return;
         }
 

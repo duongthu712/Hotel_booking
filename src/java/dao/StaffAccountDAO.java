@@ -478,8 +478,7 @@ public class StaffAccountDAO extends DBContext {
 
     public StaffAccount getStaffAccById(int staffId) throws Exception {
         String strSQL = """
-                        select staff_id, username, email, full_name, phone,
-                               [role], is_active, created_at, reset_code, reset_expiry, reset_used
+                        select *
                         from StaffAccounts
                         where staff_id = ? and deleted_at is null
                         """;
@@ -502,10 +501,31 @@ public class StaffAccountDAO extends DBContext {
     public List<StaffAccount> searchStaffAccByName(String keyword) throws Exception {
         List<StaffAccount> list = new ArrayList<>();
         String strSQL = """
-                        select staff_id, username, email, full_name, phone,
-                               [role], is_active, created_at, reset_code, reset_expiry, reset_used
+                        select *
                         from StaffAccounts
                         where deleted_at is null and full_name like ?
+                        """;
+
+        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
+            stm.setString(1, "%" + keyword + "%");
+
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapStaff(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể tìm kiếm nhân viên.");
+        }
+        return list;
+    }
+    
+    public List<StaffAccount> searchStaffAccByMail(String keyword) throws Exception {
+        List<StaffAccount> list = new ArrayList<>();
+        String strSQL = """
+                        select *
+                        from StaffAccounts
+                        where deleted_at is null and email like ?
                         """;
 
         try (PreparedStatement stm = connection.prepareStatement(strSQL)) {

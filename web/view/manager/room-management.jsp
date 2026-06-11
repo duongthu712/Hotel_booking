@@ -22,9 +22,6 @@
         <%@ include file="/view/staff/navbar.jsp" %>
 
         <main class="content-container">
-            <div class="header-action">
-                <h1 class="header-title">Quản lý phòng</h1>
-            </div>
 
             <div class="search-container">
                 <form action="RoomList" method="GET" class="search-form">

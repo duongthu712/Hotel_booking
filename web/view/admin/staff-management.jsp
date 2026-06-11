@@ -23,12 +23,9 @@
         <%@ include file="/view/staff/navbar.jsp" %>
 
         <main class="content-container">
-            <div class="header-action">
-                <h1 class="header-title">Quản lý nhân viên</h1>
-                <a href="StaffAccountCreate" class="btn-primary">Thêm nhân viên mới</a>
-            </div>
 
-             <c:if test="${not empty sessionScope.errorMessage}">
+
+            <c:if test="${not empty sessionScope.errorMessage}">
                 <div class="alert-message alert-error">
                     ${sessionScope.errorMessage}
                 </div>
@@ -41,7 +38,7 @@
                 </div>
                 <c:remove var="successMessage" scope="session"/>
             </c:if>
-            
+
             <div class="filter-bar">
                 <form action="StaffAccountList" method="GET" class="filter-form">
                     <input type="text" name="searchText" class="filter-input" placeholder="Tìm theo tên, email..." value="${searchText}">
@@ -55,6 +52,9 @@
 
                     <button type="submit" class="btn-filter">Tìm kiếm</button>
                 </form>
+                <div class="header-action">
+                    <a href="StaffAccountCreate" class="btn-primary">Thêm nhân viên mới</a>
+                </div>
             </div>
 
             <div>

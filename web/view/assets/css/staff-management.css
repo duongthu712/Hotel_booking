@@ -7,7 +7,9 @@
     display: flex;
     gap: 15px;
     width: 100%;
+    
 }
+
 
 .btn-filter {
     background-color: var(--text-main);
@@ -27,6 +29,7 @@
 
 .col-id {
     width: 5%;
+    text-align: center;
 }
 
 .col-name {
@@ -43,18 +46,22 @@
 
 .col-phone {
     width: 12%;
+    text-align: center;
 }
 
 .col-role {
     width: 10%;
+    text-align: center;
 }
 
 .col-status {
     width: 8%;
+    text-align: center;
 }
 
 .col-action {
     width: 10%;
+    text-align: center;
 }
 
 .staffRole {
@@ -67,6 +74,7 @@
     background-color: #fff4d8;
     color: var(--text-muted);
     border: 1px solid var(--text-muted);
+    width: 75%;
 }
 
 .staffAct {
@@ -76,6 +84,7 @@
     border-radius: var(--radius-custom);
     padding: 6px 10px;
     display: inline-block;
+    width: 75%;
 }
 
 .staff-name-link {

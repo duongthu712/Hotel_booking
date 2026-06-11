@@ -24,7 +24,7 @@ public class StaffAccountEditController extends HttpServlet {
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
 
         if (staff == null) {
-            response.sendRedirect("view/auth/login.jsp");
+            response.sendRedirect("login");
             return;
         }
 
@@ -53,7 +53,7 @@ public class StaffAccountEditController extends HttpServlet {
         HttpSession session = request.getSession();
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
         if (staff == null) {
-            response.sendRedirect("view/auth/login.jsp");
+            response.sendRedirect("login");
             return;
         }
 

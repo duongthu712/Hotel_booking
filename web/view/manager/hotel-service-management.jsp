@@ -20,10 +20,7 @@
         <%@ include file="/view/staff/header.jsp" %>
         <%@ include file="/view/staff/navbar.jsp" %>
         <main class="conent-container">
-            <div class="header-action">
-                <h1 class="header-title">Quản lý dịch vụ khách sạn</h1>
-                <button id="btn-create" class="btn-primary">Thêm dịch vụ khách sạn mới</button>          
-            </div>
+
 
             <div class="search-container">
                 <form action="HotelServiceList" method="GET" class="search-form">
@@ -31,6 +28,9 @@
                     <button type="submit" class="search-btn">Tìm kiếm</button>
                     <a href="HotelServiceList" class="reset-btn">Làm mới</a>
                 </form>
+                <div class="header-action">
+                    <button id="btn-create" class="btn-primary">Thêm dịch vụ khách sạn mới</button>          
+                </div>
             </div>
 
             <c:if test="${not empty sessionScope.errorMessage}">

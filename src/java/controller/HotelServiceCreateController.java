@@ -24,7 +24,7 @@ public class HotelServiceCreateController extends HttpServlet {
         HttpSession session = request.getSession();
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
         if (staff == null) {
-            response.sendRedirect(request.getContextPath() + "/view/auth/login.jsp");
+            response.sendRedirect(request.getContextPath() + "login");
             return;
         }
 

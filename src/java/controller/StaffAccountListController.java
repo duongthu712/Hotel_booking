@@ -27,7 +27,7 @@ public class StaffAccountListController extends HttpServlet {
         HttpSession session = request.getSession();
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
         if (staff == null) {
-            response.sendRedirect("view/auth/login.jsp");
+            response.sendRedirect("login");
             return;
         }
 
@@ -59,18 +59,17 @@ public class StaffAccountListController extends HttpServlet {
 
             if (!searchText.trim().isEmpty() && !"ALL".equals(roleFilter)) {
                 staffList = staffDao.searchStaffAccByName(searchText);
+                staffList.addAll(staffDao.searchStaffAccByMail(searchText));
                 final String filterRole = roleFilter;
-                staffList = staffList.stream()
-                        .filter(s -> filterRole.equals(s.getRole()))
-                        .collect(Collectors.toList());
+                staffList = staffList.stream().filter(s -> filterRole.equals(s.getRole())).collect(Collectors.toList());
             } else if (!searchText.trim().isEmpty()) {
                 staffList = staffDao.searchStaffAccByName(searchText);
+                staffList.addAll(staffDao.searchStaffAccByMail(searchText));
             } else if (!"ALL".equals(roleFilter)) {
                 staffList = staffDao.searchStaffAccByRole(roleFilter);
             } else {
                 staffList = staffDao.getAllStaffAcc();
             }
-
 
             // Pagination
             int totalRecords = staffList.size();
