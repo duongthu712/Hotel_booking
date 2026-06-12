@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //Open edit modal
     if (isEditMode) {
         modalTitle.innerText = "Cập nhật dịch vụ";
-        form.action = "ServiceEdito";
+        form.action = "ServiceEdit";
         toggleModal(true);
     }
 

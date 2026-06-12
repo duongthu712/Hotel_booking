@@ -12,6 +12,7 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        <%@ include file="/view/staff/header.jsp" %>
+        <%@ include file="/view/staff/navbar.jsp" %>
     </body>
 </html>

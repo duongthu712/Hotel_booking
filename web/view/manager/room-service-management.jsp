@@ -1,9 +1,7 @@
 <%-- 
-    Document   : service
-    Document   : serviceManagement
-    Created on : May 27, 2026, 10:50:44 PM
-    Author     : Minh Thu
-    Editer     : LinhLTHE200306
+    Document   : room-service-management
+    Created on : Jun 9, 2026, 10:15:17 PM
+    Author     : LinhLTHE200306
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -16,50 +14,59 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Quản lý dịch vụ</title>
+        <title>Quản lý dịch vụ phòng</title>
     </head>
     <body data-edit-mode="${not empty serviceToEdit}">
         <%@ include file="/view/staff/header.jsp" %>
         <%@ include file="/view/staff/navbar.jsp" %>
         <main class="conent-container">
-            <div class="header-action">
-                <h1 class="header-title">Quản lý dịch vụ</h1>
-                <button id="btn-create" class="btn-primary">Thêm dịch vụ mới</button>          
+            
+                          
+            
+
+            <div class="search-container">
+                <form action="RoomServiceList" method="GET" class="search-form">
+                    <input type="text" name="keyword" class="search-input" placeholder="Tìm kiếm theo tên dịch vụ..." value="${keyword}">
+                    <button type="submit" class="search-btn">Tìm kiếm</button>
+                    <a href="RoomServiceList" class="reset-btn">Làm mới</a>
+                </form>
+                    <div class="header-action">
+                    <button id="btn-create" class="btn-primary">Thêm dịch vụ phòng mới</button>
+                    </div>
             </div>
 
-            <div class="filter-bar">
-                <p class="filter-title">Bộ lọc danh mục:</p>
+            <c:if test="${not empty sessionScope.errorMessage}">
+                <div class="alert-message alert-error">
+                    ${sessionScope.errorMessage}
+                </div>
+                <c:remove var="errorMessage" scope="session"/>
+            </c:if>
 
-                <a href="ServiceList?filterType=ALL" 
-                   class="filter-btn ${filterType == 'ALL' ? 'active' : ''}">
-                    Tất cả</a>
+            <c:if test="${not empty sessionScope.successMessage}">
+                <div class="alert-message alert-success">
+                    ${sessionScope.successMessage}
+                </div>
+                <c:remove var="successMessage" scope="session"/>
+            </c:if>
 
-                <a href="ServiceList?filterType=HOTEL" 
-                   class="filter-btn ${filterType == 'HOTEL' ? 'active' : ''}">
-                    Dịch vụ khách sạn</a>
 
-                <a href="ServiceList?filterType=ROOM" 
-                   class="filter-btn ${filterType == 'ROOM' ? 'active' : ''}">
-                    Dịch vụ phòng</a>
-            </div>
 
             <div>
                 <table class="data-table">
                     <thead class="data-table-thead">
                         <tr>
-                            <th class="col-name">Tên dịch vụ</th>
-                            <th class="col-type">Phân loại</th>
+                            <th class="col-name">Tên dịch vụ phòng</th>
                             <th class="col-desc">Mô tả</th>
                             <th class="col-price">Đơn giá (VNĐ)</th>
                             <th class="col-status">Trạng thái</th>
                             <th class="col-action">Hành động</th>
                         </tr>
                     </thead>
+
                     <tbody class="data-table-tbody">
                         <c:forEach var="srv" items="${serviceList}">
                             <tr>
                                 <td class="col-name">${srv.getServiceName()}</td>
-                                <td class="col-type"><div class="srvType">${srv.getType()}</div></td>
                                 <td class="col-desc">${srv.getDescription()}</td>
                                 <td class="col-price"><fmt:formatNumber value="${srv.getUnitPrice()}" type="number" pattern="#,###" />đ</td>
                                 <td class="col-status">
@@ -68,25 +75,24 @@
                                     </div>
                                 </td>
                                 <td class="btn-action">
-                                    <a class="btn-edit" href="ServiceEdit?serviceId=${srv.getServiceId()}&type=${srv.getType()}">Sửa</a>
-                                    <form action="ServiceDelete" method="post">
-                                        <input type="hidden" name="serviceId" 
-                                               value="${srv.getServiceId()}">
-                                        <input type="hidden" name="type" 
-                                               value="${srv.getType()}">
+                                    <a class="btn-edit" 
+                                       href="RoomServiceEdit?serviceId=${srv.getServiceId()}&page=${currentPage}&keyword=${keyword}">
+                                        Sửa</a>
+                                    
+                                    <form action="RoomServiceDelete" method="post">
+                                        <input type="hidden" name="serviceId" value="${srv.getServiceId()}">
+                                        <input type="hidden" name="page" value="${currentPage}">
+                                        <input type="hidden" name="keyword" value="${keyword}">
                                         <button type="submit">Xoá</button>
                                     </form>
                                 </td>
                             </tr>
-</c:forEach>
+                        </c:forEach>
                     </tbody>
                 </table>
                 <div class="pagination">
                     <c:forEach begin="1" end="${totalPages}" var="i">
-                        <a href="ServiceList?filterType=${filterType}&page=${i}" 
-                           class="${currentPage == i ? 'active' : ''}">
-                            ${i}
-                        </a>
+                        <a href="RoomServiceList?page=${i}" class="${currentPage == i ? 'active' : ''}">${i}</a>
                     </c:forEach>
                 </div>
             </div>
@@ -97,23 +103,17 @@
                 <h2 class="service-popup-title" id="modal-title">Thêm dịch vụ mới</h2>
 
                 <input type="hidden" name="serviceId" id="serviceId" value="${serviceToEdit.getServiceId()}">
+                <input type="hidden" name="page" value="${page}">
+                <input type="hidden" name="keyword" value="${keyword}">
 
                 <div class="form-group">
-                    <label class="input-label">Tên dịch vụ *</label>
+                    <label class="input-label">Tên dịch vụ*</label>
                     <input class="service-popup-input-field" type="text" name="serviceName" id="serviceName" 
                            placeholder="Nhập tên..." value="${serviceToEdit.getServiceName()}" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="input-label">Phân loại danh mục (Service Type) *</label>
-                    <select class="service-popup-input-field" name="type" id="type">
-                        <option value="HOTEL" ${serviceToEdit.getType() == 'HOTEL' ? 'selected' : ''}>Hotel Service</option>
-                        <option value="ROOM" ${serviceToEdit.getType() == 'ROOM' ? 'selected' : ''}>Room Service</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="input-label">Đơn giá (VNĐ) *</label>
+                    <label class="input-label">Đơn giá (VNĐ)*</label>
                     <input class="service-popup-input-field" type="number" name="unitPrice" id="unitPrice" 
                            placeholder="0.00" value="${serviceToEdit.getUnitPrice()}" required>
                 </div>
@@ -138,5 +138,6 @@
                 </div>
             </form>
         </div>
-        <script src="<%=request.getContextPath()%>/view/assets/javascript/service-management.js"></script></body>
+        <script src="<%=request.getContextPath()%>/view/assets/javascript/room-service-management.js"></script></body>
 </html>
+

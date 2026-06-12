@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import model.StaffAccount;
+import java.sql.SQLException;
 
 public class StaffAccountDAO extends DBContext {
 
@@ -286,5 +287,189 @@ public class StaffAccountDAO extends DBContext {
         staff.setResetUsed(rs.getBoolean("reset_used"));
 
         return staff;
+    }
+
+    //LinhLTHE200306
+    public List<StaffAccount> getAllStaffAcc() throws Exception {
+        List<StaffAccount> list = new ArrayList<>();
+        String strSQL = """
+                        select * 
+                        from StaffAccounts 
+                        where deleted_at is null
+                        """;
+
+        try (PreparedStatement stm = connection.prepareStatement(strSQL); ResultSet rs = stm.executeQuery()) {
+
+            while (rs.next()) {
+                StaffAccount staff = mapStaff(rs);
+                list.add(staff);
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể lấy danh sách nhân viên.");
+        }
+        return list;
+    }
+
+    public StaffAccount getStaffAccById(int staffId) throws Exception {
+        String strSQL = """
+                        select * 
+                        from StaffAccounts 
+                        where staff_id = ? and deleted_at is null
+                        """;
+
+        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
+            stm.setInt(1, staffId);
+
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    return mapStaff(rs);
+                } else {
+                    throw new Exception("Nhân viên này không tồn tại hoặc đã bị xóa.");
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Vui lòng thử lại sau.");
+        }
+    }
+
+    public List<StaffAccount> searchStaffAccByName(String keyword) throws Exception {
+        List<StaffAccount> list = new ArrayList<>();
+        String strSQL = """
+                        select * 
+                        from StaffAccounts 
+                        where deleted_at is null and full_name like ?
+                        """;
+
+        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
+            stm.setString(1, "%" + keyword + "%");
+
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapStaff(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể tìm kiếm nhân viên.");
+        }
+        return list;
+    }
+
+    public List<StaffAccount> searchStaffAccByMail(String keyword) throws Exception {
+        List<StaffAccount> list = new ArrayList<>();
+        String strSQL = """
+                        select * 
+                        from StaffAccounts 
+                        where deleted_at is null and email like ?
+                        """;
+
+        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
+            stm.setString(1, "%" + keyword + "%");
+
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapStaff(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể tìm kiếm nhân viên.");
+        }
+        return list;
+    }
+
+    public List<StaffAccount> searchStaffAccByRole(String role) throws Exception {
+        List<StaffAccount> list = new ArrayList<>();
+        String strSQL = """
+                        select * 
+                        from StaffAccounts 
+                        where deleted_at is null and [role] = ?
+                        """;
+
+        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
+            stm.setString(1, role);
+
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapStaff(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể tìm kiếm nhân viên theo chức vụ.");
+        }
+        return list;
+    }
+
+    public StaffAccount updateStaffAcc(StaffAccount staff) throws Exception {
+        StaffAccount found = getStaffById(staff.getStaffId());
+        if (found == null) {
+            throw new Exception("Nhân viên này không tồn tại, không thể cập nhật.");
+        }
+
+        String checkEmailSQL = """
+                               select staff_id 
+                               from StaffAccounts 
+                               where email = ? and staff_id != ? and deleted_at is null
+                               """;
+        try (PreparedStatement checkStm = connection.prepareStatement(checkEmailSQL)) {
+            checkStm.setString(1, staff.getEmail());
+            checkStm.setInt(2, staff.getStaffId());
+            try (ResultSet rs = checkStm.executeQuery()) {
+                if (rs.next()) {
+                    throw new Exception("Email này đã được sử dụng bởi một nhân viên khác.");
+                }
+            }
+        }
+
+        String strSQL = """
+                        update StaffAccounts 
+                        set full_name = ?, 
+                            phone = ?, 
+                        email = ?, 
+                            [role] = ? 
+                        where staff_id = ? and deleted_at is null
+                        """;
+
+        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
+            stm.setString(1, staff.getFullName());
+            stm.setString(2, staff.getPhone());
+            stm.setString(3, staff.getEmail());
+            stm.setString(4, staff.getRole());
+            stm.setInt(5, staff.getStaffId());
+
+            int rowCount = stm.executeUpdate();
+            if (rowCount > 0) {
+                return staff;
+            } else {
+                throw new Exception("Cập nhật nhân viên thất bại.");
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể cập nhật nhân viên.");
+        }
+    }
+
+    public StaffAccount deleteStaffAcc(int staffId) throws Exception {
+        StaffAccount found = getStaffById(staffId);
+        if (found == null) {
+            throw new Exception("Nhân viên cần xóa không tồn tại.");
+        }
+
+        String strSQL = """
+                        update StaffAccounts 
+                        set deleted_at = GETDATE(), 
+                            is_active = 0 
+                        where staff_id = ? and deleted_at is null
+                        """;
+
+        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
+            stm.setInt(1, staffId);
+
+            int rowCount = stm.executeUpdate();
+            if (rowCount > 0) {
+                return found;
+            } else {
+                throw new Exception("Không thể xóa nhân viên này.");
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể thực hiện thao tác xóa.");
+        }
     }
 }
