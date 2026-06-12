@@ -34,18 +34,15 @@ public class SearchRoomServlet extends HttpServlet {
 
         RoomTypeDAO roomTypeDAO = new RoomTypeDAO();
 
-        // Luôn luôn lấy tất cả loại phòng để đổ vào thanh <select> của thanh search
         List<RoomType> allRoomTypesList = roomTypeDAO.getAllRoomTypes();
         request.setAttribute("allRoomTypesList", allRoomTypesList);
 
         List<RoomType> list;
 
-        // 2. Logic kiểm tra điều hướng lọc phòng trống:
+        //Lúc chưa nhập ngày checkin checkout
         if (checkIn == null || checkOut == null || checkIn.trim().isEmpty() || checkOut.trim().isEmpty()) {
-            // Nếu khách chưa nhập ngày (Vào trực tiếp từ link hoặc click Khám phá) -> Lấy danh sách gốc sẵn có
             list = allRoomTypesList;
         } else {
-            // Xử lý bốc số lượng phòng cần đặt
             int roomQuantity = 1;
             if (roomQuantityStr != null && !roomQuantityStr.trim().isEmpty()) {
                 try {
@@ -55,24 +52,15 @@ public class SearchRoomServlet extends HttpServlet {
                 }
             }
 
-            // Xử lý giá trị mặc định cho loại phòng nếu null
             if (roomTypeId == null) {
                 roomTypeId = "all";
             }
 
-            // Gọi hàm đếm số lượng phòng trống từ DAO mới
             list = roomTypeDAO.searchRoomTypesByQuantity(checkIn, checkOut, roomQuantity, roomTypeId);
         }
 
-        // ====================================================================================
-        // 🔥 ĐÃ XÓA: Đoạn gọi HotelInfoDAO rườm rà ở đây vì đã có FooterDataFilter lo ngầm 
-        // cho cả hệ thống rồi, tránh việc ép SQL Server bắt kết nối thêm một lần vô ích.
-        // ====================================================================================
-
-        // 3. Đẩy list kết quả tìm kiếm sang request attribute để trang kết quả hiển thị
         request.setAttribute("availableRoomTypes", list);
 
-        // Chuyển tiếp chính xác đến trang giao diện search-result của bạn
         request.getRequestDispatcher("/view/public/search-result.jsp").forward(request, response);
     }
 

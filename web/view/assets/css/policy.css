@@ -10,7 +10,7 @@
 /* Dòng giới thiệu phụ nằm dưới tiêu đề h2 */
 .policy-section .section-intro {
     font-size: 16px;
-    font-family: 'Cormorant Garamond', 'Lora', serif !important;
+    font-family: 'Cormorant Garamond', 'Lora', serif ;
     color: #7f786d;
     text-align: center;
     max-width: 670px;
@@ -30,7 +30,7 @@
 
 .policy-group-title{
     font-size:18px;
-    font-family: 'Cormorant Garamond', 'Lora', serif !important;
+    font-family: 'Cormorant Garamond' ;
      color: #bfa15f;
     font-weight:600;
     margin-bottom:25px;
@@ -39,7 +39,8 @@
 }
 
 .policy-item{
-    padding:18px 0;
+    font-family: 'Cormorant Garamond' ;
+    padding:16px 0;
     border-bottom:1px dashed rgba(44,62,70,.12);
 }
 
@@ -50,10 +51,10 @@
 .policy-item h4{
      color: #bfa15f;
     font-size:18px;
-    font-weight:500;
+    font-weight:400;
     
     margin-bottom:8px;
-    font-family: 'Cormorant Garamond', 'Lora', serif ;
+    font-family: 'Cormorant Garamond'  ;
 }
 
 .policy-item p{
@@ -61,5 +62,5 @@
     font-size:15px;
     line-height:1.8;
     margin:0;
-     font-family: 'Cormorant Garamond', 'Lora', serif ;
+     font-family: 'Cormorant Garamond' ;
 }

@@ -6,14 +6,17 @@ public class RoomTypeService {
     private int roomTypeId;
     private int serviceId;
     private int quantity;
-    private boolean isFree;
+    private int isFree; // Đổi từ boolean sang int để lưu số lượng free
     
     private RoomService roomService; 
 
+    private RoomService service;
+
+    // Constructor
     public RoomTypeService() {
     }
 
-    public RoomTypeService(int roomTypeServiceId, int roomTypeId, int serviceId, int quantity, boolean isFree, RoomService roomService) {
+    public RoomTypeService(int roomTypeServiceId, int roomTypeId, int serviceId, int quantity, int isFree, RoomService roomService) {
         this.roomTypeServiceId = roomTypeServiceId;
         this.roomTypeId = roomTypeId;
         this.serviceId = serviceId;
@@ -22,14 +25,14 @@ public class RoomTypeService {
         this.roomService = roomService;
     }
 
-    public RoomTypeService(int roomTypeId, int serviceId, int quantity, boolean isFree) {
+    public RoomTypeService(int roomTypeId, int serviceId, int quantity, int isFree) {
         this.roomTypeId = roomTypeId;
         this.serviceId = serviceId;
         this.quantity = quantity;
         this.isFree = isFree;
     }
 
-    // Getter & Setter
+    // Getter & Setter mới
     public int getRoomTypeServiceId() {
         return roomTypeServiceId;
     }
@@ -62,11 +65,12 @@ public class RoomTypeService {
         this.quantity = quantity;
     }
 
-    public boolean isIsFree() {
+    // Đổi tên từ isIsFree() thành getIsFree() cho chuẩn kiểu int
+    public int getIsFree() {
         return isFree;
     }
 
-    public void setIsFree(boolean isFree) {
+    public void setIsFree(int isFree) {
         this.isFree = isFree;
     }
 

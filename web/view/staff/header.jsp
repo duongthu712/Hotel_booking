@@ -17,7 +17,7 @@
     </div>
     <div class="staff-header-user">
         <a href="userProfile.jsp" class="staff-name"><%= headAcc.getFullName()%></a>
-        <form action="logout" method="POST">
+        <form action="logout" method="GET">
             <button type="submit" class="logout-btn">Đăng xuất</button>
         </form>
     </div>

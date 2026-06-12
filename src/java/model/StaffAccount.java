@@ -17,43 +17,7 @@ public class StaffAccount {
     private Timestamp resetExpiry;
     private boolean resetUsed;
 
-    public String getRoleEn() {
-        switch (role) {
-            case "Quản lý":
-                return "MANAGER";
-            case "Lễ tân":
-                return "RECEPTIONIST";
-            case "Quản trị viên":
-                return "ADMIN";
-            default:
-                return "UNKNOWN";
-        }
-    }
-
     public StaffAccount() {
-    }
-
-    public StaffAccount(int staffId, String username, String passwordHash,
-            String fullName, String email, String phone, String role,
-            boolean active, Timestamp createdAt, String resetCode,
-            Timestamp resetExpiry, boolean resetUsed) {
-        this.staffId = staffId;
-        this.username = username;
-        this.passwordHash = passwordHash;
-        this.fullName = fullName;
-        this.email = email;
-        this.phone = phone;
-        this.role = role;
-        this.active = active;
-        this.createdAt = createdAt;
-        this.resetCode = resetCode;
-        this.resetExpiry = resetExpiry;
-        this.resetUsed = resetUsed;
-    }
-
-    public StaffAccount(int staffId, String username, String fullName,
-            String email, String phone, String role, boolean active,
-            Timestamp createdAt) {
     }
 
     public int getStaffId() {
@@ -61,7 +25,6 @@ public class StaffAccount {
     }
 
     public void setStaffId(int staffId) {
-
         this.staffId = staffId;
     }
 
@@ -112,20 +75,12 @@ public class StaffAccount {
     public void setRole(String role) {
         this.role = role;
     }
-
+    
     public boolean isActive() {
         return active;
     }
 
     public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public boolean isIsActive() {
-        return active;
-    }
-
-    public void setIsActive(boolean active) {
         this.active = active;
     }
 
@@ -161,4 +116,23 @@ public class StaffAccount {
         this.resetUsed = resetUsed;
     }
 
+    public String getRoleEn() {
+        if (role == null) {
+            return "";
+        }
+
+        if (role.equalsIgnoreCase("Quản trị viên")) {
+            return "ADMIN";
+        }
+
+        if (role.equalsIgnoreCase("Quản lý")) {
+            return "MANAGER";
+        }
+
+        if (role.equalsIgnoreCase("Lễ tân")) {
+            return "RECEPTIONIST";
+        }
+
+        return role;
+    }
 }
