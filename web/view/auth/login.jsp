@@ -1,69 +1,75 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
 <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Staff Login</title>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8">
+        <title>Đăng nhập nhân viên</title>
 
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/navbar.css">
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/footer.css">
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/auth.css">
-</head>
-<body>
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/navbar.css">
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/footer.css">
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/auth.css">
+    </head>
+    <body>
 
-    <jsp:include page="/view/common/navbar.jsp" />
+        <jsp:include page="/view/common/navbar.jsp" />
 
-    <main class="auth-page">
-        <div class="auth-card">
+        <main class="auth-page">
+            <div class="auth-card">
+                <div class="auth-label-top">CỔNG NHÂN VIÊN</div>
 
-            <div class="auth-label-top">STAFF PORTAL</div>
+                <h1>Đăng nhập</h1>
 
-            <h1>Sign in</h1>
+                <p class="auth-subtitle">
+                    Dành cho lễ tân, quản lý và quản trị viên.
+                </p>
 
-            <p class="auth-subtitle">
-                Reception, management and administration access.
-            </p>
-
-            <% if (request.getAttribute("error") != null) { %>
+                <% if (request.getAttribute("error") != null) { %>
                 <p class="auth-message-error">
                     <%= request.getAttribute("error") %>
                 </p>
-            <% } %>
+                <% } %>
 
-            <% if ("success".equals(request.getParameter("reset"))) { %>
+                <% if ("success".equals(request.getParameter("reset"))) { %>
                 <p class="auth-message-success">
-                    Password reset successfully. Please login again.
+                    Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại.
                 </p>
-            <% } %>
+                <% } %>
 
-            <form class="auth-form" action="<%= request.getContextPath() %>/login" method="post">
+                <form class="auth-form" action="<%= request.getContextPath() %>/login" method="post">
+                    <div class="auth-form-group">
+                        <label>Tên đăng nhập</label>
+                        <input
+                            type="text"
+                            name="username"
+                            value="<%= request.getParameter("username") != null ? request.getParameter("username") : "" %>"
+                            required
+                            >
+                    </div>
 
-                <div class="auth-form-group">
-                    <label>Username</label>
-                    <input type="text" name="username" required>
+                    <div class="auth-form-group">
+                        <label>Mật khẩu</label>
+                        <input
+                            type="password"
+                            name="password"
+                            required
+                            >
+                    </div>
+
+                    <button type="submit" class="auth-btn">Đăng nhập</button>
+                </form>
+
+                <div class="auth-link">
+                    <a href="<%= request.getContextPath() %>/forgot-password">
+                        Quên mật khẩu?
+                    </a>
                 </div>
 
-                <div class="auth-form-group">
-                    <label>Password</label>
-                    <input type="password" name="password" required>
-                </div>
-
-                <button type="submit" class="auth-btn">Sign in</button>
-            </form>
-
-            <div class="auth-link">
-                <a href="<%= request.getContextPath() %>/forgot-password">
-                    Forgot password?
-                </a>
+                <div class="auth-line"></div>
             </div>
+        </main>
 
-            <div class="auth-line"></div>
+        <jsp:include page="/view/common/footer.jsp" />
 
-        </div>
-    </main>
-
-    <jsp:include page="/view/common/footer.jsp" />
-
-</body>
+    </body>
 </html>

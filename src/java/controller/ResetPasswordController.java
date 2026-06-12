@@ -1,9 +1,8 @@
 package controller;
 
-import dal.PasswordUtil;
 import dao.StaffAccountDAO;
+import dal.PasswordUtil;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,28 +11,10 @@ import jakarta.servlet.http.HttpSession;
 
 public class ResetPasswordController extends HttpServlet {
 
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        
-        response.setContentType("text/html;charset=UTF-8");
-
-        try (PrintWriter out = response.getWriter()) {
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet ResetPasswordController</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet ResetPasswordController at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         HttpSession session = request.getSession(false);
 
         if (session == null || session.getAttribute("resetEmail") == null) {
@@ -47,11 +28,8 @@ public class ResetPasswordController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        request.setCharacterEncoding("UTF-8");
 
-        String newPassword = request.getParameter("newPassword");
-        String confirmPassword = request.getParameter("confirmPassword");
+        request.setCharacterEncoding("UTF-8");
 
         HttpSession session = request.getSession(false);
 
@@ -61,45 +39,38 @@ public class ResetPasswordController extends HttpServlet {
         }
 
         String email = (String) session.getAttribute("resetEmail");
+        String newPassword = request.getParameter("newPassword");
+        String confirmPassword = request.getParameter("confirmPassword");
 
-        if (newPassword == null || confirmPassword == null
-                || newPassword.trim().isEmpty()
-                || confirmPassword.trim().isEmpty()) {
+        newPassword = newPassword != null ? newPassword.trim() : "";
+        confirmPassword = confirmPassword != null ? confirmPassword.trim() : "";
 
-            request.setAttribute("error", "Please fill in all fields.");
-            request.getRequestDispatcher("/view/auth/reset-password.jsp").forward(request, response);
-            return;
-        }
-
-        if (!newPassword.equals(confirmPassword)) {
-            request.setAttribute("error", "Passwords do not match.");
+        if (newPassword.isEmpty() || confirmPassword.isEmpty()) {
+            request.setAttribute("error", "Vui lòng nhập đầy đủ mật khẩu mới.");
             request.getRequestDispatcher("/view/auth/reset-password.jsp").forward(request, response);
             return;
         }
 
         if (newPassword.length() < 6) {
-            request.setAttribute("error", "Password must be at least 6 characters.");
+            request.setAttribute("error", "Mật khẩu mới phải có ít nhất 6 ký tự.");
             request.getRequestDispatcher("/view/auth/reset-password.jsp").forward(request, response);
             return;
         }
 
-        try {
-            StaffAccountDAO dao = new StaffAccountDAO();
-
-            String newPasswordHash = PasswordUtil.hashPassword(newPassword);
-
-            dao.updatePasswordAndClearReset(email, newPasswordHash);
-
-            session.removeAttribute("resetEmail");
-
-            response.sendRedirect(request.getContextPath() + "/login?reset=success&showLogin=true");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-
-            request.setAttribute("error", "System error. Please try again.");
+        if (!newPassword.equals(confirmPassword)) {
+            request.setAttribute("error", "Mật khẩu xác nhận không khớp.");
             request.getRequestDispatcher("/view/auth/reset-password.jsp").forward(request, response);
+            return;
         }
+
+        String newPasswordHash = PasswordUtil.hashPassword(newPassword);
+
+        StaffAccountDAO dao = new StaffAccountDAO();
+        dao.updatePasswordAndClearReset(email, newPasswordHash);
+
+        session.removeAttribute("resetEmail");
+
+        response.sendRedirect(request.getContextPath() + "/login?reset=success");
     }
 
     @Override

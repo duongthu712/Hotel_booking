@@ -15,9 +15,7 @@ public class PasswordUtil {
             for (byte b : hashedBytes) {
                 sb.append(String.format("%02x", b));
             }
-
             return sb.toString();
-
         } catch (Exception e) {
             throw new RuntimeException("Error hashing password", e);
         }
@@ -27,11 +25,9 @@ public class PasswordUtil {
         if (rawPassword == null || storedPassword == null) {
             return false;
         }
-
         if (rawPassword.equals(storedPassword)) {
             return true;
         }
-
         String rawHash = hashPassword(rawPassword);
         return rawHash.equalsIgnoreCase(storedPassword);
     }
