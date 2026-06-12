@@ -34,7 +34,7 @@ public class StaffAccountDetailController extends HttpServlet {
             int staffId = Integer.parseInt(request.getParameter("staffId"));
             StaffAccountDAO staffDao = new StaffAccountDAO();
 
-            StaffAccount selectedStaff = staffDao.getStaffByIdIncludeInactive(staffId);
+            StaffAccount selectedStaff = staffDao.getStaffAccById(staffId);
 
             request.setAttribute("selectedStaff", selectedStaff);
             RequestDispatcher rd = request.getRequestDispatcher("/StaffAccountList");
