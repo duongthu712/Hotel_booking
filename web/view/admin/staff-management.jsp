@@ -18,14 +18,13 @@
         <title>Quản lý nhân viên</title>
     </head>
 
-    <body data-edit-mode="${not empty editStaff}" 
-          data-detail-mode="${not empty selectedStaff}" 
-          data-create-mode="${not empty sessionScope.openCreateModal}">
+    <body data-edit-mode="${not empty editStaff}"  
+          data-detail-mode="${not empty selectedStaff}"  
+          data-create-mode="${not empty openCreateModal ? 'true' : 'false'}"> 
         <%@ include file="/view/staff/header.jsp" %>
         <%@ include file="/view/staff/navbar.jsp" %>
 
         <main class="content-container">
-
 
             <div class="search-container">
                 <form action="StaffAccountList" method="GET" class="search-form">
@@ -46,11 +45,10 @@
                 </div>
             </div>
 
-            <c:if test="${not empty sessionScope.errorMessage}">
+            <c:if test="${not empty errorMessage && empty openCreateModal && empty editStaff}">
                 <div class="alert-message alert-error">
-                    ${sessionScope.errorMessage}
+                    ${errorMessage}
                 </div>
-                <c:remove var="errorMessage" scope="session"/>
             </c:if>
 
             <c:if test="${not empty sessionScope.successMessage}">
@@ -60,14 +58,12 @@
                 <c:remove var="successMessage" scope="session"/>
             </c:if>
 
-
             <div>
                 <table class="data-table">
                     <thead class="data-table-thead">
                         <tr>
-                            <th class="col-id">ID</th>
+                            <th class="col-id">STT</th>
                             <th class="col-name">Họ tên</th>
-                            <th class="col-username">Tên đăng nhập</th>
                             <th class="col-email">Email</th>
                             <th class="col-phone">Số điện thoại</th>
                             <th class="col-role">Chức vụ</th>
@@ -76,15 +72,14 @@
                         </tr>
                     </thead>
                     <tbody class="data-table-tbody">
-                        <c:forEach var="s" items="${staffList}">
+                        <c:forEach var="s" items="${staffList}" varStatus="loop">
                             <tr>
-                                <td class="col-id">${s.getStaffId()}</td>
+                                <td class="col-id">${(currentPage - 1) * 10 + loop.index + 1}</td>
                                 <td class="col-name">
-                                    <a href="StaffAccountDetail?staffId=${s.getStaffId()}" class="staff-name-link">
+                                    <a href="StaffAccountDetail?staffId=${s.getStaffId()}&page=${currentPage}&searchText=${searchText}&roleFilter=${roleFilter}" class="staff-name-link">
                                         ${s.getFullName()}
                                     </a>
                                 </td>
-                                <td class="col-username">${s.getUsername()}</td>
                                 <td class="col-email">${s.getEmail()}</td>
                                 <td class="col-phone">${s.getPhone()}</td>
                                 <td class="col-role">
@@ -96,14 +91,13 @@
                                     </div>
                                 </td>
                                 <td class="btn-action">
-
                                     <a class="btn-edit" href="StaffAccountEdit?staffId=${s.getStaffId()}&page=${currentPage}&searchText=${searchText}&roleFilter=${roleFilter}">Sửa</a>
+
                                     <form action="StaffAccountDelete" method="post" style="display: inline-block; margin: 0;">
-
-                                    <a class="btn-edit" href="StaffAccountEdit?staffId=${s.getStaffId()}">Sửa</a>
-                                    <form action="StaffAccountDelete" method="POST">
-
                                         <input type="hidden" name="staffId" value="${s.getStaffId()}">
+                                        <input type="hidden" name="page" value="${currentPage}">
+                                        <input type="hidden" name="searchText" value="${searchText}">
+                                        <input type="hidden" name="roleFilter" value="${roleFilter}">
                                         <button type="submit" onclick="return confirm('Bạn có chắc muốn xoá nhân viên ${s.getFullName()}?')">Xoá</button>
                                     </form>
                                 </td>
@@ -154,6 +148,11 @@
                 <input type="hidden" name="searchText" value="${searchText}">
                 <input type="hidden" name="roleFilter" value="${roleFilter}">
 
+                <c:if test="${not empty errorMessage && not empty editStaff}">
+                    <div class="alert-message alert-error">
+                        ${errorMessage}
+                    </div>
+                </c:if>
                 <div class="form-group">
                     <label class="input-label">ID</label>
                     <input class="service-popup-input-field" type="text" value="${editStaff.getStaffId()}" readonly>
@@ -203,53 +202,57 @@
             </form>
         </div>
 
-        <div class="staff-modal" id="create-modal">
+        <div class="staff-modal ${not empty openCreateModal ? 'show' : ''}" id="create-modal" ${not empty openCreateModal ? 'style="display: flex;"' : ''}>
             <form action="StaffAccountCreate" method="POST" id="staff-form" class="modal-content">
                 <h2 class="staff-popup-title" id="modal-title">Thêm nhân viên mới</h2>
 
-                <c:if test="${not empty sessionScope.errorMessage and not empty sessionScope.openCreateModal}">
-                    <div class="alert-message alert-error" style="position: static; margin-bottom: 15px; width: 100%;">
-                        ${sessionScope.errorMessage}
+                <input type="hidden" name="page" value="${currentPage}">
+                <input type="hidden" name="searchText" value="${searchText}">
+                <input type="hidden" name="roleFilter" value="${roleFilter}">
+
+                <c:if test="${not empty errorMessage && not empty openCreateModal}">
+                    <div class="alert-message alert-error">
+                        ${errorMessage}
                     </div>
                 </c:if>
 
                 <div class="form-group">
                     <label class="input-label">Tên đăng nhập*</label>
                     <input class="service-popup-input-field" type="text" name="username" id="username" 
-                           placeholder="Nhập tên đăng nhập..." value="${sessionScope.keepUsername}" required>
+                           placeholder="Nhập tên đăng nhập..." value="${keepUsername}" required>
                 </div>
 
                 <div class="form-group">
                     <label class="input-label">Mật khẩu*</label>
                     <input class="service-popup-input-field" type="password" name="password" id="password" 
-                           placeholder="Nhập mật khẩu..." required>
+                           placeholder="Nhập mật khẩu...">
                 </div>
 
                 <div class="form-group">
                     <label class="input-label">Họ tên*</label>
                     <input class="service-popup-input-field" type="text" name="fullName" id="fullName" 
-                           placeholder="Nhập họ tên..." value="${sessionScope.keepFullName}" required>
+                           placeholder="Nhập họ tên..." value="${keepFullName}" required>
                 </div>
 
                 <div class="form-group">
                     <label class="input-label">Email*</label>
                     <input class="service-popup-input-field" type="email" name="email" id="email" 
-                           placeholder="Nhập email..." value="${sessionScope.keepEmail}" required>
+                           placeholder="Nhập email..." value="${keepEmail}" required>
                 </div>
 
                 <div class="form-group">
                     <label class="input-label">Số điện thoại</label>
                     <input class="service-popup-input-field" type="text" name="phone" id="phone" 
-                           placeholder="Nhập số điện thoại..." value="${sessionScope.keepPhone}">
+                           placeholder="Nhập số điện thoại..." value="${keepPhone}">
                 </div>
 
                 <div class="form-group">
                     <label class="input-label">Chức vụ*</label>
                     <select class="service-popup-input-field" name="role" id="role" required>
                         <option value="">Chọn chức vụ</option>
-                        <option value="Lễ tân" ${sessionScope.keepRole == 'Lễ tân' ? 'selected' : ''}>Lễ tân</option>
-                        <option value="Quản lý" ${sessionScope.keepRole == 'Quản lý' ? 'selected' : ''}>Quản lý</option>
-                        <option value="Quản trị viên" ${sessionScope.keepRole == 'Quản trị viên' ? 'selected' : ''}>Quản trị viên</option>
+                        <option value="Lễ tân" ${keepRole == 'Lễ tân' ? 'selected' : ''}>Lễ tân</option>
+                        <option value="Quản lý" ${keepRole == 'Quản lý' ? 'selected' : ''}>Quản lý</option>
+                        <option value="Quản trị viên" ${keepRole == 'Quản trị viên' ? 'selected' : ''}>Quản trị viên</option>
                     </select>
                 </div>
 

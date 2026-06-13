@@ -32,9 +32,8 @@ public class StaffAccountDeleteController extends HttpServlet {
         try {
             int staffId = Integer.parseInt(request.getParameter("staffId"));
 
-            // Prevent self-deletion
             if (staffId == staff.getStaffId()) {
-                session.setAttribute("error", "Không thể xoá tài khoản của chính mình.");
+                session.setAttribute("errorMessage", "Không thể xoá tài khoản của chính mình.");
                 response.sendRedirect("StaffAccountList");
                 return;
             }
@@ -42,11 +41,11 @@ public class StaffAccountDeleteController extends HttpServlet {
             StaffAccountDAO staffDao = new StaffAccountDAO();
             staffDao.deleteStaffAcc(staffId);
 
-            session.setAttribute("success", "Xoá nhân viên thành công.");
+            session.setAttribute("successMessage", "Xoá nhân viên thành công.");
 
         } catch (Exception ex) {
             System.out.println("StaffAccountDeleteController:" + ex.getMessage());
-            session.setAttribute("error", "Có lỗi xảy ra khi xoá nhân viên.");
+            session.setAttribute("errorMessage", ex.getMessage());
         }
         response.sendRedirect("StaffAccountList");
     }

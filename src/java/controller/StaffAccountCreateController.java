@@ -3,6 +3,7 @@ package controller;
 import dao.StaffAccountDAO;
 import dal.PasswordUtil;
 import java.io.IOException;
+import java.net.URLEncoder;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,8 +13,8 @@ import model.StaffAccount;
 
 /**
  * @author LinhLTHE200306
- * @version 1.0
- * @since 2026-06-07
+ * @version 1.1
+ * @since 2026-06-13
  */
 public class StaffAccountCreateController extends HttpServlet {
 
@@ -26,7 +27,7 @@ public class StaffAccountCreateController extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
-         response.sendRedirect(request.getContextPath() + "/StaffAccountList");
+        response.sendRedirect(request.getContextPath() + "/StaffAccountList");
     }
 
     @Override
@@ -34,7 +35,7 @@ public class StaffAccountCreateController extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
-        
+
         if (staff == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
@@ -47,67 +48,101 @@ public class StaffAccountCreateController extends HttpServlet {
         String phone = request.getParameter("phone");
         String role = request.getParameter("role");
 
+        String pageParam = request.getParameter("page");
+        String searchTextFilter = request.getParameter("searchText");
+        String roleFilterParam = request.getParameter("roleFilter");
+
+        if (pageParam == null || pageParam.trim().isEmpty()) pageParam = "1";
+        if (searchTextFilter == null) searchTextFilter = "";
+        if (roleFilterParam == null) roleFilterParam = "ALL";
+
+        String errorMsg = null;
+
         if (username == null || username.trim().isEmpty()) {
-            session.setAttribute("errorMessage", "Tên đăng nhập không được để trống.");
-            retainFormFields(session, username, fullName, email, phone, role);
-            response.sendRedirect(request.getContextPath() + "/StaffAccountList");
-            return;
+            errorMsg = "Tên đăng nhập không được để trống.";
+        } else if (username.trim().length() < 3 || username.trim().length() > 20) {
+            errorMsg = "Tên đăng nhập phải từ 3 đến 20 ký tự.";
+        } else if (!username.trim().matches("^[a-zA-Z0-9._]+$")) {
+            errorMsg = "Tên đăng nhập chỉ được chứa chữ cái, số, dấu chấm hoặc dấu gạch dưới.";
+        } 
+        
+        else if (password == null || password.isEmpty()) {
+            errorMsg = "Mật khẩu không được để trống.";
+        } else if (password.length() < 6) {
+            errorMsg = "Mật khẩu phải có ít nhất 6 ký tự.";
         }
 
-        if (password == null || password.trim().isEmpty()) {
-            session.setAttribute("errorMessage", "Mật khẩu không được để trống.");
-            retainFormFields(session, username, fullName, email, phone, role);
-            response.sendRedirect(request.getContextPath() + "/StaffAccountList");
-            return;
+        if (errorMsg == null) {
+            errorMsg = dal.InputValidationUtil.validateStaffInput(fullName, email, phone);
         }
 
+        String formattedFullName = dal.InputValidationUtil.capitalizeWords(fullName);
+
+        if (errorMsg != null) {
+            forwardWithError(request, response, errorMsg, username, formattedFullName, email, phone, role, 
+                             pageParam, searchTextFilter, roleFilterParam);
+            return;
+        }
+        
         try {
             StaffAccountDAO staffDao = new StaffAccountDAO();
 
-            if (staffDao.getStaffByUsername(username) != null) {
-                session.setAttribute("errorMessage", "Tên đăng nhập đã tồn tại.");
-                retainFormFields(session, username, fullName, email, phone, role);
-                response.sendRedirect(request.getContextPath() + "/StaffAccountList");
+            if (staffDao.getStaffByUsername(username.trim()) != null) {
+                forwardWithError(request, response, "Tên đăng nhập đã tồn tại.", username, formattedFullName, email, phone, role, 
+                                 pageParam, searchTextFilter, roleFilterParam);
                 return;
             }
 
-            if (staffDao.getStaffByEmail(email) != null) {
-                session.setAttribute("errorMessage", "Email đã được sử dụng.");
-                retainFormFields(session, username, fullName, email, phone, role);
-                response.sendRedirect(request.getContextPath() + "/StaffAccountList");
+            if (staffDao.getStaffByEmail(email.trim()) != null) {
+                forwardWithError(request, response, "Email đã được sử dụng.", username, formattedFullName, email, phone, role, 
+                                 pageParam, searchTextFilter, roleFilterParam);
                 return;
             }
 
             String passwordHash = PasswordUtil.hashPassword(password);
 
             StaffAccount newStaff = new StaffAccount();
-            newStaff.setUsername(username);
+            newStaff.setUsername(username.trim());
             newStaff.setPasswordHash(passwordHash);
-            newStaff.setFullName(fullName);
-            newStaff.setEmail(email);
-            newStaff.setPhone(phone);
+            newStaff.setFullName(formattedFullName); 
+            newStaff.setEmail(email.trim());
+            newStaff.setPhone(phone.trim());
             newStaff.setRole(role);
             newStaff.setActive(true);
 
             staffDao.createStaff(newStaff);
-            
+
             session.setAttribute("successMessage", "Tạo nhân viên mới thành công.");
-            response.sendRedirect(request.getContextPath() + "/StaffAccountList");
             
+            String redirectUrl = request.getContextPath() + "/StaffAccountList"
+                    + "?page=" + pageParam
+                    + "&searchText=" + URLEncoder.encode(searchTextFilter, "UTF-8")
+                    + "&roleFilter=" + URLEncoder.encode(roleFilterParam, "UTF-8");
+            
+            response.sendRedirect(redirectUrl);
+
         } catch (Exception e) {
-            session.setAttribute("errorMessage", "Lỗi hệ thống: " + e.getMessage());
-            retainFormFields(session, username, fullName, email, phone, role);
-            response.sendRedirect(request.getContextPath() + "/StaffAccountList");
+            forwardWithError(request, response, "Lỗi hệ thống: " + e.getMessage(), username, formattedFullName, email, phone, role, 
+                             pageParam, searchTextFilter, roleFilterParam);
         }
     }
 
-    private void retainFormFields(HttpSession session, String username, String fullName, String email, String phone, String role) {
-        session.setAttribute("keepUsername", username);
-        session.setAttribute("keepFullName", fullName);
-        session.setAttribute("keepEmail", email);
-        session.setAttribute("keepPhone", phone);
-        session.setAttribute("keepRole", role);
-        session.setAttribute("openCreateModal", true);
+    private void forwardWithError(HttpServletRequest request, HttpServletResponse response, String errorMsg,
+                                  String username, String fullName, String email, String phone, String role,
+                                  String page, String searchText, String roleFilter) 
+                                  throws ServletException, IOException {
+        
+        request.setAttribute("errorMessage", errorMsg);
+        request.setAttribute("keepUsername", username);
+        request.setAttribute("keepFullName", fullName);
+        request.setAttribute("keepEmail", email);
+        request.setAttribute("keepPhone", phone);
+        request.setAttribute("keepRole", role);
+        request.setAttribute("openCreateModal", true);request.setAttribute("currentPage", page);
+        request.setAttribute("searchText", searchText);
+        request.setAttribute("roleFilter", roleFilter);
+
+        request.getRequestDispatcher("/StaffAccountList").forward(request, response);
     }
 
     @Override
