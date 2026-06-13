@@ -8,6 +8,8 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import model.StaffAccount;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StaffAccountDAO extends DBContext {
 
@@ -471,5 +473,57 @@ public class StaffAccountDAO extends DBContext {
         } catch (SQLException e) {
             throw new Exception("Lỗi hệ thống: Không thể thực hiện thao tác xóa.");
         }
+    }
+    
+    public void createStaff(StaffAccount staff) {
+        try {
+            String sql = """
+                         INSERT INTO StaffAccounts
+                         (username, password_hash, full_name, email, phone, [role], is_active)
+                         VALUES (?, ?, ?, ?, ?, ?, ?)
+                         """;
+
+            stm = connection.prepareStatement(sql);
+
+            stm.setString(1, staff.getUsername());
+            stm.setString(2, staff.getPasswordHash());
+            stm.setString(3, staff.getFullName());
+            stm.setString(4, staff.getEmail());
+            stm.setString(5, staff.getPhone());
+            stm.setString(6, staff.getRole());
+            stm.setBoolean(7, staff.isActive());
+
+            stm.executeUpdate();
+
+        } catch (Exception e) {
+            System.out.println("createStaff: " + e.getMessage());
+        }
+    }
+    
+    public StaffAccount getStaffByUsername(String username) {
+        StaffAccount staff = null;
+
+        try {
+            String sql = """
+                         SELECT *
+                         FROM StaffAccounts
+                         WHERE username = ?
+                           AND deleted_at is null
+                         """;
+
+            stm = connection.prepareStatement(sql);
+            stm.setString(1, username);
+
+            rs = stm.executeQuery();
+
+            if (rs.next()) {
+                staff = mapStaff(rs);
+            }
+
+        } catch (Exception e) {
+            System.out.println("getStaffByUsername: " + e.getMessage());
+        }
+
+        return staff;
     }
 }
