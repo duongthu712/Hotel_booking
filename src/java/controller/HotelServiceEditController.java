@@ -14,7 +14,7 @@ import model.StaffAccount;
 
 /**
  * @author LinhLTHE200306
- * @version 1.0
+ * @version 1.1
  * @since 2026-06-09
  */
 public class HotelServiceEditController extends HttpServlet {
@@ -35,11 +35,12 @@ public class HotelServiceEditController extends HttpServlet {
 
             HotelServiceDAO dao = new HotelServiceDAO();
             HotelService service = dao.getHotelServicesById(serviceId);
+            
             List<HotelService> serviceList = dao.getAllHotelServices();
 
             request.setAttribute("serviceList", serviceList);
             request.setAttribute("serviceToEdit", service);
-            request.setAttribute("page", request.getParameter("page"));
+            request.setAttribute("currentPage", request.getParameter("page"));
             request.setAttribute("keyword", request.getParameter("keyword"));
             request.getRequestDispatcher("/view/manager/hotel-service-management.jsp").forward(request, response);
         } catch (Exception e) {
@@ -58,7 +59,7 @@ public class HotelServiceEditController extends HttpServlet {
             return;
         }
 
-        int serviceId = Integer.parseInt(request.getParameter("serviceId"));
+        String serviceIdStr = request.getParameter("serviceId");
         String serviceName = request.getParameter("serviceName");
         String description = request.getParameter("description");
         String unitPriceStr = request.getParameter("unitPrice");
@@ -68,25 +69,42 @@ public class HotelServiceEditController extends HttpServlet {
         String page = request.getParameter("page");
         String keyword = request.getParameter("keyword");
 
-        if (serviceName == null || serviceName.trim().isEmpty()) {
-            session.setAttribute("errorMessage", "Tên dịch vụ không được để trống.");
-            response.sendRedirect(buildRedirectUrl(request, page, keyword));
-            return;
-        }
+        String errorMsg = dal.InputValidationUtil.validateServiceInput(serviceName, unitPriceStr);
 
-        BigDecimal unitPrice;
-        try {
-            unitPrice = new BigDecimal(unitPriceStr.trim());
-            if (unitPrice.compareTo(BigDecimal.ZERO) < 0) {
-                throw new NumberFormatException();
+        if (errorMsg != null) {
+            try {
+                HotelServiceDAO dao = new HotelServiceDAO();
+                int serviceId = Integer.parseInt(serviceIdStr);
+                
+                BigDecimal tempPrice = BigDecimal.ZERO;
+                try {
+                    tempPrice = new BigDecimal(unitPriceStr.trim());
+                } catch (Exception e) {}
+                
+                boolean isActive = "true".equals(activeStr);
+                HotelService serviceToEditTemp = new HotelService(serviceId, serviceName, description, tempPrice, imageUrl, isActive);
+                
+                List<HotelService> serviceList = dao.getAllHotelServices();
+                
+                request.setAttribute("serviceList", serviceList);
+                request.setAttribute("serviceToEdit", serviceToEditTemp);
+                request.setAttribute("errorMessage", errorMsg);
+                request.setAttribute("currentPage", page);
+                request.setAttribute("keyword", keyword);
+                
+                request.getRequestDispatcher("/view/manager/hotel-service-management.jsp").forward(request, response);
+                return;
+            } catch (Exception ex) {
+                session.setAttribute("errorMessage", ex.getMessage());
+                response.sendRedirect(buildRedirectUrl(request, page, keyword));
+                return;
             }
-        } catch (NumberFormatException e) {
-            session.setAttribute("errorMessage", "Đơn giá không hợp lệ.");
-            response.sendRedirect(request.getContextPath() + "/HotelServiceList");
-            return;
         }
 
+        int serviceId = Integer.parseInt(serviceIdStr);
+        BigDecimal unitPrice = new BigDecimal(unitPriceStr.trim());
         boolean isActive = "true".equals(activeStr);
+        
         HotelService updatedService = new HotelService(serviceId, serviceName, description, unitPrice, imageUrl, isActive);
 
         try {
@@ -117,5 +135,4 @@ public class HotelServiceEditController extends HttpServlet {
     public String getServletInfo() {
         return "Hotel Service Edit Controller";
     }
-
 }

@@ -7,13 +7,14 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 import model.HotelService;
 import model.StaffAccount;
 
 /**
  * @author LinhLTHE200306
- * @version 1.0
+ * @version 1.1
  * @since 2026-06-09
  */
 public class HotelServiceListController extends HttpServlet {
@@ -45,9 +46,13 @@ public class HotelServiceListController extends HttpServlet {
         try {
             List<HotelService> hotelServiceList;
             if (keyword != null && !keyword.trim().isEmpty()) {
-                hotelServiceList = rDao.searchHotelServicesByName(keyword);
+                hotelServiceList = rDao.searchHotelServicesByName(keyword.trim());
             } else {
                 hotelServiceList = rDao.getAllHotelServices();
+            }
+
+            if (hotelServiceList == null) {
+                hotelServiceList = new ArrayList<>();
             }
 
             int totalRecords = hotelServiceList.size();
@@ -74,11 +79,15 @@ public class HotelServiceListController extends HttpServlet {
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("keyword", keyword);
             
-            
             request.getRequestDispatcher("/view/manager/hotel-service-management.jsp").forward(request, response);
 
         } catch (Exception e) {
-            request.setAttribute("errorMessage", e.getMessage());
+            request.setAttribute("errorMessage", "Đã xảy ra lỗi hệ thống: " + e.getMessage());
+            request.setAttribute("serviceList", new ArrayList<>());
+            request.setAttribute("currentPage", 1);
+            request.setAttribute("totalPages", 1);
+            request.setAttribute("keyword", keyword);
+            
             request.getRequestDispatcher("/view/manager/hotel-service-management.jsp").forward(request, response);
         }
     }
