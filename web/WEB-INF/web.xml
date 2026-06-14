@@ -313,7 +313,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>RoomAmenityCreateController</servlet-name>
-        <url-pattern>/RoomAmenityCreateController</url-pattern>
+        <url-pattern>/RoomAmenityCreate</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>RoomAmenityEditController</servlet-name>
