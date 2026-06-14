@@ -166,8 +166,9 @@ public class RoomTypeDAO extends DBContext {
 
         String sqlServices = "SELECT rts.room_type_service_id, rts.service_id, rts.quantity, rts.is_free, s.service_name, s.unit_price "
                 + "FROM RoomTypeServices rts "
-                + "INNER JOIN RoomServices s ON rts.service_id = s.service_id "
+                + "LEFT JOIN RoomServices s ON rts.service_id = s.service_id "
                 + "WHERE rts.room_type_id = ?";
+
         // CHỐT SỬA LUỒNG AMENITIES: JOIN thẳng bảng liên kết và bảng gốc để lấy dữ liệu tiện nghi
         String sqlAmenities = "SELECT rta.quantity, ra.amenity_id, ra.amenity_name, ra.unit_price "
                 + "FROM RoomTypeAmenities rta "
@@ -221,23 +222,24 @@ public class RoomTypeDAO extends DBContext {
 
                         try (ResultSet rsSer = psSer.executeQuery()) {
                             while (rsSer.next()) {
-                                model.RoomTypeService rts = new model.RoomTypeService();
-                                rts.setRoomTypeServiceId(rsSer.getInt("room_type_service_id"));
-                                rts.setServiceId(rsSer.getInt("service_id"));
-                                rts.setQuantity(rsSer.getInt("quantity"));
-                                rts.setIsFree(rsSer.getInt("is_free"));
+                                if (rsSer.getObject("service_id") != null) {
+                                    model.RoomTypeService rts = new model.RoomTypeService();
+                                    rts.setRoomTypeServiceId(rsSer.getInt("room_type_service_id"));
+                                    rts.setServiceId(rsSer.getInt("service_id")); // THÊM DÒNG NÀY
+                                    rts.setQuantity(rsSer.getInt("quantity"));
+                                    rts.setIsFree(rsSer.getInt("is_free"));
 
-                                model.RoomService s = new model.RoomService();
-                                s.setServiceId(rsSer.getInt("service_id"));
-                                s.setServiceName(rsSer.getString("service_name"));
-                                s.setUnitPrice(rsSer.getBigDecimal("unit_price"));
+                                    model.RoomService s = new model.RoomService();
+                                    s.setServiceId(rsSer.getInt("service_id"));
+                                    s.setServiceName(rsSer.getString("service_name"));
+                                    s.setUnitPrice(rsSer.getBigDecimal("unit_price"));
 
-                                rts.setRoomService(s);
-                                servicesList.add(rts);
+                                    rts.setRoomService(s);
+                                    servicesList.add(rts);
+                                }
                             }
                         }
                     }
-                    rt.setRoomTypeServices(servicesList);
 
                     // --- LUỒNG LẤY DANH SÁCH TIỆN NGHI (Khớp chuẩn List<RoomAmenity> trong Model của Vũ) ---
                     List<model.RoomAmenity> amenitiesList = new ArrayList<>();
@@ -693,7 +695,7 @@ public class RoomTypeDAO extends DBContext {
         String sqlRoom = "SELECT room_type_id, type_name, description, capacity, bed_type, bed_count, area_sqm, base_price, is_active "
                 + "FROM RoomTypes WHERE room_type_id = ?";
 
-        String sqlImages = "SELECT image_url FROM RoomTypeImages WHERE room_type_id = ?";
+        String sqlImages = "SELECT image_url FROM RoomTypeImages WHERE room_type_id = ? ORDER BY image_id ASC";
 
         String sqlServices = "SELECT rts.room_type_service_id, rts.service_id, rts.quantity, rts.is_free, s.service_name, s.unit_price "
                 + "FROM RoomTypeServices rts "
@@ -806,4 +808,60 @@ public class RoomTypeDAO extends DBContext {
         }
         return null;
     }
+
+    // 7. Đếm số phòng còn trống theo hạng phòng và khoảng ngày (phục vụ public Room Detail)
+    public int getAvailableRoomCount(int roomTypeId, String checkIn, String checkOut) {
+        int availableRooms = 0;
+
+        String sql = "SELECT COUNT(*) AS available_rooms "
+                + "FROM Rooms r "
+                + "WHERE r.room_type_id = ? "
+                + "AND r.[status] != N'Đang bảo trì' "
+                + "AND r.room_number NOT IN ( "
+                + "    SELECT br.room_number "
+                + "    FROM BookingRooms br "
+                + "    JOIN Bookings b ON br.booking_id = b.booking_id "
+                + "    WHERE b.[status] != N'Đã hủy' "
+                + "    AND NOT (b.checkout_date <= ? OR b.checkin_date >= ?) "
+                + ")";
+
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            if (connection == null) {
+                System.out.println(">>> DAO ERROR: Connection đang bị NULL tại getAvailableRoomCount!");
+                return 0;
+            }
+
+            ps = connection.prepareStatement(sql);
+            ps.setInt(1, roomTypeId);
+            ps.setString(2, checkIn);
+            ps.setString(3, checkOut);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                availableRooms = rs.getInt("available_rooms");
+            }
+
+        } catch (Exception e) {
+            System.out.println(">>> LỖI LOGIC TẠI getAvailableRoomCount: " + e.getMessage());
+            e.printStackTrace();
+
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (ps != null) {
+                    ps.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return Math.max(availableRooms, 0);
+    }
+
 }
