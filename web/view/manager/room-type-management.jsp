@@ -13,11 +13,11 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Quản Lý Loại Phòng - La Mer Hotel</title>
-        
+
         <jsp:include page="/view/staff/header.jsp" />
-        
+
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css"/>
-        
+
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/view/assets/css/room-type-list.css?v=<%= System.currentTimeMillis() %>">
     </head>
     <body>
@@ -27,10 +27,10 @@
             <div class="row">
                 <main class="col-md-12 ms-sm-auto px-md-4">
                     <div class="management-wrapper mt-4">
-                        
+
                         <div class="d-flex justify-content-between align-items-center mb-4 border-bottom-luxury pb-3">
                             <h2 class="management-title"><i class="fa-solid fa-bed me-2"></i>Quản Lý Hạng Phòng</h2>
-                            <a href="${pageContext.request.contextPath}/roomtypecreate" class="btn btn-primary px-4">
+                            <a href="${pageContext.request.contextPath}/createroomtype" class="btn btn-primary px-4">
                                 <i class="fa-solid fa-plus me-2"></i>Thêm Loại Phòng Mới
                             </a>
                         </div>
@@ -46,7 +46,7 @@
                                         <th class="col-config">Cấu Hình Phòng</th>
                                         <th class="col-price">Giá Cơ Bản</th>
                                         <th class="col-services">Dịch Vụ Đi Kèm</th>
-                                        <th class="col-status">Trạng Thái</th>
+                                        <th class="col-amenities">Tiện Nghi</th> <th class="col-status">Trạng Thái</th>
                                         <th class="col-actions">Thao Tác</th>
                                     </tr>
                                 </thead>
@@ -62,20 +62,20 @@
                                                     <td class="col-desc text-wrap-normal">
                                                         <span class="room-type-desc-text text-muted">${item.description}</span>
                                                     </td>
-                                                    
+
                                                     <td class="col-img">
                                                         <c:choose>
                                                             <c:when test="${not empty item.imageUrl}">
                                                                 <div class="image-preview-container">
-                                                                    
+
                                                                     <a href="${item.imageUrl[0]}" data-fancybox="gallery-${item.roomTypeId}" data-caption="${item.typeName}">
                                                                         <img src="${item.imageUrl[0]}" alt="Room Thumbnail" class="main-thumbnail">
                                                                     </a>
-                                                                    
+
                                                                     <c:if test="${item.imageUrl.size() > 1}">
                                                                         <span class="image-count-badge">+${item.imageUrl.size() - 1} ảnh</span>
                                                                     </c:if>
-                                                                    
+
                                                                     <div style="display: none;">
                                                                         <c:forEach var="imgUrl" items="${item.imageUrl}" varStatus="status">
                                                                             <c:if test="${!status.first}">
@@ -85,7 +85,7 @@
                                                                             </c:if>
                                                                         </c:forEach>
                                                                     </div>
-                                                                    
+
                                                                 </div>
                                                             </c:when>
                                                             <c:otherwise>
@@ -95,7 +95,7 @@
                                                             </c:otherwise>
                                                         </c:choose>
                                                     </td>
-                                                    
+
                                                     <td class="col-config">
                                                         <div class="room-config-info">
                                                             <div><i class="fa-solid fa-users me-1"></i> ${item.capacity} khách</div>
@@ -117,6 +117,23 @@
                                                                                 <span class="inner-qty-badge">Tổng: ${rts.quantity}</span>
                                                                                 <span class="inner-free-badge">Miễn phí: ${rts.isFree}</span>
                                                                             </div>
+                                                                        </span>
+                                                                    </c:forEach>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <span class="text-muted-italic">Chưa cấu hình</span>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-wrap-normal">
+                                                        <div class="amenities-list-container">
+                                                            <c:choose>
+                                                                <c:when test="${not empty item.roomAmenities}">
+                                                                    <c:forEach var="amenity" items="${item.roomAmenities}">
+                                                                        <span class="badge-service-item" ">
+                                                                            <span class="service-name-text" >${amenity.amenityName}</span> 
+                                                                            <span class="text-muted" style="font-size:11.5px;">( ${amenity.description})</span>
                                                                         </span>
                                                                     </c:forEach>
                                                                 </c:when>
@@ -159,6 +176,8 @@
             </div>
         </div>
 
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
         <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
         <script>
             Fancybox.bind("[data-fancybox]", {
@@ -166,5 +185,7 @@
                 Toolbar: { display: { left: ["infobar"], right: ["zoom", "close"] } }
             });
         </script>
+
+        <script src="${pageContext.request.contextPath}/view/assets/javascript/room-type-notification.js?v=<%= System.currentTimeMillis() %>"></script>
     </body>
 </html>
