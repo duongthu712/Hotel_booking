@@ -1,0 +1,190 @@
+/* 
+    Created on : Jun 7, 2026, 5:04:15 PM
+    Author     : LinhLTHE200306
+*/
+
+/* 
+    room-management.css - CSS riêng trang Quản lý phòng
+*/
+
+.room-map {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    margin-top: 30px;
+    width: 100%;
+}
+
+.floor-section {
+    width: 100%;
+}
+
+h3{
+    color: var(--text-main);
+font-family: var(--font-logo);
+}
+
+.floor-title {
+    font-family: var(--font-logo);
+    font-size: 2rem;
+    color: var(--text-main);
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.room-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+    width: 100%;
+}
+
+.room-card {
+    background: white;
+    padding: 20px;
+    border-radius: var(--radius-custom);
+    border: 1px solid var(--border-color);
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.room-card:hover {
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+.room-number {
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+    color: var(--text-main);
+}
+
+.room-type {
+    font-size: 1rem;
+    padding: 5px;
+    color: var(--text-muted);
+}
+
+.room-status span {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: var(--radius-custom);
+    font-size: 0.75rem;
+    font-family: var(--font-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    border: 1px solid transparent;
+    margin: 5px;
+}
+
+.status-empty {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border-color: #c8e6c9;
+}
+
+.status-occupied {
+    background-color: #ffebee;
+    color: #c62828;
+    border-color: #ffcdd2;
+}
+
+.status-cleaning {
+    background-color: #fff8e1;
+    color: #856404;
+    border-color: #ffe082;
+}
+
+.status-maintenance {
+    background-color: #f5f5f5;
+    color: #616161;
+    border-color: #e0e0e0;
+}
+
+.room-action {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #edf2f7;
+}
+
+.room-action a {
+    text-decoration: none;
+    font-family: var(--font-primary);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.btn-filter {
+    background-color: #f4efd3;
+    padding: 10px 20px;
+    font-size: 0.8rem;
+    font-family: var(--font-primary);
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-custom);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.detail-row {
+    margin-bottom: 15px;
+    font-family: var(--font-primary);
+    color: var(--text-main);
+}
+
+.col-room-number {
+    width: 15%;
+}
+
+.col-floor {
+    width: 10%;
+    text-align: center;
+}
+
+.col-room-type {
+    width: 25%;
+}
+
+.col-status {
+    width: 20%;
+}
+
+.col-action {
+    width: 10%;
+}
+
+.room-status {
+    text-align: center;
+    font-size: 0.8em;
+    display: inline-block;
+}
+
+.status-empty {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.status-occupied {
+    background-color: #fff3e0;
+    color: #ef6c00;
+    border: 1px solid #ffe0b2;
+}
+
+.status-cleaning {
+    background-color: #e3f2fd;
+    color: #1565c0;
+    border: 1px solid #bbdefb;
+}
+
+.status-maintenance {
+    background-color: #fce4ec;
+    color: #c62828;
+    border: 1px solid #f8bbd0;
+}
