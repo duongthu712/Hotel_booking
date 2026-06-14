@@ -87,4 +87,16 @@ public class InputValidationUtil {
 
         return null;
     }
+    
+    public static String validateHotelInput(String email, String phone) {
+        if (!EMAIL_PATTERN.matcher(email.trim()).matches()) {
+            return "Định dạng email không hợp lệ.";
+        }
+
+        if (!PHONE_PATTERN.matcher(phone.trim()).matches()) {
+            return "Số điện thoại phải gồm 10 chữ số và bắt đầu bằng đầu số hợp lệ (03/05/07/08/09).";
+        }
+
+        return null;
+    }
 }

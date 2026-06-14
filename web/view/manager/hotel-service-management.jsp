@@ -69,7 +69,7 @@
                                 <td class="col-price"><fmt:formatNumber value="${srv.getUnitPrice()}" type="number" pattern="#,###" />đ</td>
                                 <td class="col-status">
                                     <div class="srvAct ${srv.isActive() ? 'status-active' : 'status-inactive'}">
-                                        ${srv.isActive() ? 'ACTIVE' : 'INACTIVE'}
+                                        ${srv.isActive() ? 'HOẠT ĐỘNG' : 'TẠM DỪNG'}
                                     </div>
                                 </td>
                                 <td class="btn-action">

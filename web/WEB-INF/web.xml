@@ -1,97 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="6.0"
-         xmlns="https://jakarta.ee/xml/ns/jakartaee"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
-
+<web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
     <!-- ================= FILTER ================= -->
     <filter>
         <filter-name>AuthorizationFilter</filter-name>
         <filter-class>filter.AuthorizationFilter</filter-class>
     </filter>
-
     <filter-mapping>
         <filter-name>AuthorizationFilter</filter-name>
         <url-pattern>/view/admin/*</url-pattern>
     </filter-mapping>
-
     <filter-mapping>
         <filter-name>AuthorizationFilter</filter-name>
         <url-pattern>/view/manager/*</url-pattern>
     </filter-mapping>
-
     <filter-mapping>
         <filter-name>AuthorizationFilter</filter-name>
         <url-pattern>/view/receptionist/*</url-pattern>
     </filter-mapping>
-
-
     <!-- ================= SERVLETS ================= -->
     <servlet>
         <servlet-name>HomeServlet</servlet-name>
         <servlet-class>controller.HomeServlet</servlet-class>
     </servlet>
-
     <servlet>
         <servlet-name>LoginController</servlet-name>
         <servlet-class>controller.LoginController</servlet-class>
     </servlet>
-
     <servlet>
         <servlet-name>LogoutController</servlet-name>
         <servlet-class>controller.LogoutController</servlet-class>
     </servlet>
-
     <servlet>
         <servlet-name>ForgotPasswordController</servlet-name>
         <servlet-class>controller.ForgotPasswordController</servlet-class>
     </servlet>
-
     <servlet>
         <servlet-name>VerifyCodeController</servlet-name>
         <servlet-class>controller.VerifyCodeController</servlet-class>
     </servlet>
-
     <servlet>
         <servlet-name>ResetPasswordController</servlet-name>
         <servlet-class>controller.ResetPasswordController</servlet-class>
     </servlet>
-
     <servlet>
         <servlet-name>UserProfileController</servlet-name>
         <servlet-class>controller.UserProfileController</servlet-class>
     </servlet>
-
     <servlet>
         <servlet-name>ChangePasswordController</servlet-name>
         <servlet-class>controller.ChangePasswordController</servlet-class>
     </servlet>
-
     <servlet>
         <servlet-name>AccessDeniedController</servlet-name>
         <servlet-class>controller.AccessDeniedController</servlet-class>
     </servlet>
-
     <servlet>
         <servlet-name>ServiceListController</servlet-name>
         <servlet-class>controller.ServiceListController</servlet-class>
     </servlet>
-
     <servlet>
         <servlet-name>ServiceEditController</servlet-name>
         <servlet-class>controller.ServiceEditController</servlet-class>
     </servlet>
-
     <servlet>
         <servlet-name>ServiceDeleteController</servlet-name>
         <servlet-class>controller.ServiceDeleteController</servlet-class>
     </servlet>
-
     <servlet>
         <servlet-name>ServiceCreateController</servlet-name>
         <servlet-class>controller.ServiceCreateController</servlet-class>
     </servlet>
-
     <servlet>
         <servlet-name>HotelPolicyServlet</servlet-name>
         <servlet-class>controller.HotelPolicyServlet</servlet-class>
@@ -176,7 +154,6 @@
         <servlet-name>RoomAmenityDeleteController</servlet-name>
         <servlet-class>controller.RoomAmenityDeleteController</servlet-class>
     </servlet>
-
     <servlet>
         <servlet-name>RoomDetailServlet</servlet-name>
         <servlet-class>controller.RoomDetailServlet</servlet-class>
@@ -189,69 +166,79 @@
         <servlet-name>CreateRoomTypeServlet</servlet-name>
         <servlet-class>controller.CreateRoomTypeServlet</servlet-class>
     </servlet>
-
-
     <!-- ================= MAPPINGS ================= -->
+    <servlet>
+        <servlet-name>HotelInfoController</servlet-name>
+        <servlet-class>controller.HotelInfoController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>HotelInfoUpdateController</servlet-name>
+        <servlet-class>controller.HotelInfoUpdateController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>HotelImageUpdateController</servlet-name>
+        <servlet-class>controller.HotelImageUpdateController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>HotelNewsCreateController</servlet-name>
+        <servlet-class>controller.HotelNewsCreateController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>HotelNewsEditController</servlet-name>
+        <servlet-class>controller.HotelNewsEditController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>HotelNewsDeleteController</servlet-name>
+        <servlet-class>controller.HotelNewsDeleteController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>
         <url-pattern>/login</url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>LogoutController</servlet-name>
         <url-pattern>/logout</url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>ForgotPasswordController</servlet-name>
         <url-pattern>/forgot-password</url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>VerifyCodeController</servlet-name>
         <url-pattern>/verify-code</url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>ResetPasswordController</servlet-name>
         <url-pattern>/reset-password</url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>UserProfileController</servlet-name>
         <url-pattern>/profile</url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>ChangePasswordController</servlet-name>
         <url-pattern>/profile/change-password</url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>AccessDeniedController</servlet-name>
         <url-pattern>/access-denied</url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>ServiceListController</servlet-name>
         <url-pattern>/ServiceList</url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>ServiceEditController</servlet-name>
         <url-pattern>/ServiceEdit</url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>ServiceDeleteController</servlet-name>
         <url-pattern>/ServiceDelete</url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>ServiceCreateController</servlet-name>
         <url-pattern>/ServiceCreate</url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>HotelPolicyServlet</servlet-name>
         <url-pattern>/policies</url-pattern>
@@ -336,7 +323,6 @@
         <servlet-name>RoomAmenityDeleteController</servlet-name>
         <url-pattern>/RoomAmenityDelete</url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>RoomDetailServlet</servlet-name>
         <url-pattern>/room-detail</url-pattern>
@@ -349,6 +335,28 @@
         <servlet-name>CreateRoomTypeServlet</servlet-name>
         <url-pattern>/create-roomtype</url-pattern>
     </servlet-mapping>
-
-
+    <servlet-mapping>
+        <servlet-name>HotelInfoController</servlet-name>
+        <url-pattern>/HotelInfo</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>HotelInfoUpdateController</servlet-name>
+        <url-pattern>/HotelInfoUpdate</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>HotelImageUpdateController</servlet-name>
+        <url-pattern>/HotelImageUpdate</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>HotelNewsCreateController</servlet-name>
+        <url-pattern>/HotelNewsCreate</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>HotelNewsEditController</servlet-name>
+        <url-pattern>/HotelNewsEdit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>HotelNewsDeleteController</servlet-name>
+        <url-pattern>/HotelNewsDelete</url-pattern>
+    </servlet-mapping>
 </web-app>
