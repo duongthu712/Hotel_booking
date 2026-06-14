@@ -18,8 +18,9 @@
 
 
     <a href="${pageContext.request.contextPath}/dashboard.jsp">Tổng quan</a>
-    <a href="${pageContext.request.contextPath}/HotelInfoList">Thông tin chung</a>
-    <a href="${pageContext.request.contextPath}/roomtypelist">Loại phòng</a>
+    <a href="${pageContext.request.contextPath}/HotelInfoList">Thông tin chungn</a>
+    <a href="${pageContext.request.contextPath}/RoomTypeList">Loại phòng</a>
+
     <a href="${pageContext.request.contextPath}/RoomList">Phòng</a>
     <a href="${pageContext.request.contextPath}/RoomServiceList">Dịch vụ phòng</a>
     <a href="${pageContext.request.contextPath}/RoomAmenityList">Tiện nghi phòng</a>
@@ -29,9 +30,12 @@
     <%}else if("RECEPTIONIST".equals(role)){%>
 
     <%}else if("ADMIN".equals(role)){%>
+    <a href="StaffAccountList">Quản lý tài khoản nhân viên</a>
     <%}%>
     <%}%>
 
 </nav>
+    <script src="${pageContext.request.contextPath}/view/assets/javascript/staff-navbar.js"></script>
+    
 
 

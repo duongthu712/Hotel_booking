@@ -74,6 +74,86 @@
         <servlet-name>HotelPolicyServlet</servlet-name>
         <servlet-class>controller.HotelPolicyServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>RoomListController</servlet-name>
+        <servlet-class>controller.RoomListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RoomEditController</servlet-name>
+        <servlet-class>controller.RoomEditController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RoomDetailController</servlet-name>
+        <servlet-class>controller.RoomDetailController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>StaffAccountListController</servlet-name>
+        <servlet-class>controller.StaffAccountListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>StaffAccountDetailController</servlet-name>
+        <servlet-class>controller.StaffAccountDetailController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>StaffAccountEditController</servlet-name>
+        <servlet-class>controller.StaffAccountEditController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>StaffAccountCreateController</servlet-name>
+        <servlet-class>controller.StaffAccountCreateController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>StaffAccountDeleteController</servlet-name>
+        <servlet-class>controller.StaffAccountDeleteController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RoomServiceListController</servlet-name>
+        <servlet-class>controller.RoomServiceListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RoomServiceCreateController</servlet-name>
+        <servlet-class>controller.RoomServiceCreateController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RoomServiceDeleteController</servlet-name>
+        <servlet-class>controller.RoomServiceDeleteController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RoomServiceEditController</servlet-name>
+        <servlet-class>controller.RoomServiceEditController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>HotelServiceListController</servlet-name>
+        <servlet-class>controller.HotelServiceListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>HotelServiceEditController</servlet-name>
+        <servlet-class>controller.HotelServiceEditController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>HotelServiceDeleteController</servlet-name>
+        <servlet-class>controller.HotelServiceDeleteController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>HotelServiceCreateController</servlet-name>
+        <servlet-class>controller.HotelServiceCreateController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RoomAmenityListController</servlet-name>
+        <servlet-class>controller.RoomAmenityListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RoomAmenityCreateController</servlet-name>
+        <servlet-class>controller.RoomAmenityCreateController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RoomAmenityEditController</servlet-name>
+        <servlet-class>controller.RoomAmenityEditController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RoomAmenityDeleteController</servlet-name>
+        <servlet-class>controller.RoomAmenityDeleteController</servlet-class>
+    </servlet>
 
     <servlet>
         <servlet-name>RoomListController</servlet-name>
@@ -228,7 +308,6 @@
         <servlet-name>HotelPolicyServlet</servlet-name>
         <url-pattern>/policies</url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>RoomListController</servlet-name>
         <url-pattern>/RoomList</url-pattern>
