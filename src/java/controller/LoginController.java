@@ -76,8 +76,12 @@ public class LoginController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/view/receptionist/dashboard.jsp");
         } else if (role.equalsIgnoreCase("Quản lý")) {
             response.sendRedirect(request.getContextPath() + "/view/manager/dashboard.jsp");
-        } else if (role.equalsIgnoreCase("Quản trị viên")) {
-            response.sendRedirect(request.getContextPath() + "/view/admin/staff-management.jsp");
+
+        } else if (role.equalsIgnoreCase("Administrator")
+                || role.equalsIgnoreCase("Admin")
+                || role.equalsIgnoreCase("Quản trị viên")) {
+            response.sendRedirect(request.getContextPath() + "/StaffAccountList");
+
         } else {
             request.setAttribute("error", "Vai trò không hợp lệ: " + role);
             request.getRequestDispatcher("/view/auth/login.jsp").forward(request, response);

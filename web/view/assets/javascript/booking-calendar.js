@@ -4,50 +4,37 @@ function setupCalendarLogic(checkInId, checkOutId) {
 
     if (!checkInInput || !checkOutInput) return;
 
-    // 1. Lấy ngày hôm nay
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    const todayStr = `${yyyy}-${mm}-${dd}`;
+    let checkOutPicker;
 
-    // 2. Không cho chọn ngày quá khứ cho check-in
-    checkInInput.min = todayStr;
+    const checkInPicker = flatpickr(checkInInput, {
+        dateFormat: "d/m/Y",
+        minDate: "today",
 
-    // 3. Nếu đã có check-in sẵn (trang result)
-    if (checkInInput.value) {
-        const currentInDate = new Date(checkInInput.value);
-        currentInDate.setDate(currentInDate.getDate() + 1);
+        onChange: function (selectedDates) {
+            if (selectedDates.length === 0) return;
 
-        const limitStr = `${currentInDate.getFullYear()}-${String(currentInDate.getMonth() + 1).padStart(2, '0')}-${String(currentInDate.getDate()).padStart(2, '0')}`;
-
-        checkOutInput.min = limitStr;
-    }
-
-    // 4. Khi đổi check-in
-    checkInInput.addEventListener('change', () => {
-        if (checkInInput.value) {
-            const nextDay = new Date(checkInInput.value);
+            const nextDay = new Date(selectedDates[0]);
             nextDay.setDate(nextDay.getDate() + 1);
 
-            const nextDayStr = `${nextDay.getFullYear()}-${String(nextDay.getMonth() + 1).padStart(2, '0')}-${String(nextDay.getDate()).padStart(2, '0')}`;
+            checkOutPicker.set("minDate", nextDay);
 
-            // cập nhật min check-out
-            checkOutInput.min = nextDayStr;
+            const currentOut = checkOutPicker.selectedDates[0];
 
-            // tự sửa nếu sai
-            if (!checkOutInput.value || checkOutInput.value <= checkInInput.value) {
-                checkOutInput.value = nextDayStr;
+            if (!currentOut || currentOut <= selectedDates[0]) {
+                checkOutPicker.setDate(nextDay);
             }
         }
     });
+
+    checkOutPicker = flatpickr(checkOutInput, {
+        dateFormat: "d/m/Y",
+        minDate: new Date().fp_incr(1)
+    });
 }
 
-// Hàm chạy chính (init)
 function initCalendar() {
     setupCalendarLogic('checkIn', 'checkOut');
     setupCalendarLogic('checkInResult', 'checkOutResult');
 }
 
-// chạy khi trang load xong
-window.onload = initCalendar;
+document.addEventListener('DOMContentLoaded', initCalendar);

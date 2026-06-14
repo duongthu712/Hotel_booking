@@ -10,6 +10,9 @@ public class RoomTypeService {
     
     private RoomService roomService; 
 
+    private RoomService service;
+
+    // Constructor
     public RoomTypeService() {
     }
 

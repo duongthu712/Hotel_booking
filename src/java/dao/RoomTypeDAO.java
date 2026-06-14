@@ -152,8 +152,8 @@ public class RoomTypeDAO extends DBContext {
 
         return list;
     }
-    
-    //Phần của manager giữ nguyên
+
+    // 1. Lấy toàn bộ danh sách phòng phục vụ trang quản trị Manager (Đã đồng bộ map vào List<RoomAmenity>)
     public List<RoomType> getAllRoomTypesForManager() {
         List<RoomType> list = new ArrayList<>();
 
@@ -167,6 +167,12 @@ public class RoomTypeDAO extends DBContext {
                 + "FROM RoomTypeServices rts "
                 + "LEFT JOIN RoomServices s ON rts.service_id = s.service_id "
                 + "WHERE rts.room_type_id = ?";
+
+        // CHỐT SỬA LUỒNG AMENITIES: JOIN thẳng bảng liên kết và bảng gốc để lấy dữ liệu tiện nghi
+        String sqlAmenities = "SELECT rta.quantity, ra.amenity_id, ra.amenity_name, ra.unit_price "
+                + "FROM RoomTypeAmenities rta "
+                + "INNER JOIN RoomAmenities ra ON rta.amenity_id = ra.amenity_id "
+                + "WHERE rta.room_type_id = ?";
 
         try {
             if (connection == null) {
@@ -208,53 +214,54 @@ public class RoomTypeDAO extends DBContext {
 
                     rt.setImageUrl(imagesList);
 
-                    List<RoomTypeService> servicesList
-                            = new ArrayList<>();
-
-                    try (PreparedStatement psSer
-                            = connection.prepareStatement(sqlServices)) {
-
+                    // --- LUỒNG LẤY DANH SÁCH DỊCH VỤ ĐI KÈM ---
+                    List<model.RoomTypeService> servicesList = new ArrayList<>();
+                    try (PreparedStatement psSer = connection.prepareStatement(sqlServices)) {
                         psSer.setInt(1, roomTypeId);
 
                         try (ResultSet rsSer = psSer.executeQuery()) {
                             while (rsSer.next()) {
                                 if (rsSer.getObject("service_id") != null) {
-                                    RoomTypeService rts
-                                            = new RoomTypeService();
+                                    model.RoomTypeService rts = new model.RoomTypeService();
+                                    rts.setRoomTypeServiceId(rsSer.getInt("room_type_service_id"));
+                                    rts.setServiceId(rsSer.getInt("service_id")); // THÊM DÒNG NÀY
+                                    rts.setQuantity(rsSer.getInt("quantity"));
+                                    rts.setIsFree(rsSer.getInt("is_free"));
 
-                                    rts.setRoomTypeServiceId(
-                                            rsSer.getInt(
-                                                    "room_type_service_id"
-                                            )
-                                    );
-                                    rts.setQuantity(
-                                            rsSer.getInt("quantity")
-                                    );
-                                    rts.setIsFree(
-                                            rsSer.getInt("is_free")
-                                    );
+                                    model.RoomService s = new model.RoomService();
+                                    s.setServiceId(rsSer.getInt("service_id"));
+                                    s.setServiceName(rsSer.getString("service_name"));
+                                    s.setUnitPrice(rsSer.getBigDecimal("unit_price"));
 
-                                    RoomService service
-                                            = new RoomService();
-
-                                    service.setServiceId(
-                                            rsSer.getInt("service_id")
-                                    );
-                                    service.setServiceName(
-                                            rsSer.getString("service_name")
-                                    );
-                                    service.setUnitPrice(
-                                            rsSer.getBigDecimal("unit_price")
-                                    );
-
-                                    rts.setRoomService(service);
+                                    rts.setRoomService(s);
                                     servicesList.add(rts);
                                 }
                             }
                         }
                     }
 
-                    rt.setRoomTypeServices(servicesList);
+                    // --- LUỒNG LẤY DANH SÁCH TIỆN NGHI (Khớp chuẩn List<RoomAmenity> trong Model của Vũ) ---
+                    List<model.RoomAmenity> amenitiesList = new ArrayList<>();
+                    try (PreparedStatement psAmen = connection.prepareStatement(sqlAmenities)) {
+                        psAmen.setInt(1, roomTypeId);
+                        try (ResultSet rsAmen = psAmen.executeQuery()) {
+                            while (rsAmen.next()) {
+                                model.RoomAmenity ra = new model.RoomAmenity();
+                                ra.setAmenityId(rsAmen.getInt("amenity_id"));
+                                ra.setAmenityName(rsAmen.getString("amenity_name"));
+                                ra.setUnitPrice(rsAmen.getBigDecimal("unit_price"));
+
+                                /* MẸO CHIẾN THUẬT: Nhét số lượng quantity từ bảng trung gian vào trường description 
+                                   để đem ra ngoài JSP hiển thị mà hoàn toàn không cần sửa file Model */
+                                ra.setDescription(String.valueOf(rsAmen.getInt("quantity")));
+                                ra.setActive(true);
+
+                                amenitiesList.add(ra);
+                            }
+                        }
+                    }
+                    rt.setRoomAmenities(amenitiesList); // Gán trực tiếp vào List<RoomAmenity> gốc của Vũ
+
                     list.add(rt);
                 }
             }
@@ -270,38 +277,22 @@ public class RoomTypeDAO extends DBContext {
         return list;
     }
 
-    public boolean insertRoomType(
-            RoomType rt,
-            List<String> imageList,
-            List<RoomTypeService> serviceList) {
-
-        String insertRoomTypeSql
-                = "INSERT INTO RoomTypes "
-                + "(type_name, description, capacity, bed_type, "
-                + "bed_count, area_sqm, base_price, is_active) "
+    // 2. Thêm mới một loại phòng vào hệ thống (Nhận danh sách List<RoomAmenity> từ Model gốc)
+    public boolean insertRoomType(RoomType rt, List<String> imageList, List<model.RoomTypeService> serviceList, List<model.RoomAmenity> amenityList) {
+        String insertRoomTypeSql = "INSERT INTO RoomTypes (type_name, description, capacity, bed_type, bed_count, area_sqm, base_price, is_active) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-
-        String insertImageSql
-                = "INSERT INTO RoomTypeImages "
-                + "(room_type_id, image_url) VALUES (?, ?)";
-
-        String insertServiceSql
-                = "INSERT INTO RoomTypeServices "
-                + "(room_type_id, service_id, quantity, is_free) "
-                + "VALUES (?, ?, ?, ?)";
+        String insertImageSql = "INSERT INTO RoomTypeImages (room_type_id, image_url) VALUES (?, ?)";
+        String insertServiceSql = "INSERT INTO RoomTypeServices (room_type_id, service_id, quantity, is_free) VALUES (?, ?, ?, ?)";
+        String insertAmenitySql = "INSERT INTO RoomTypeAmenities (room_type_id, amenity_id, quantity) VALUES (?, ?, ?)";
 
         PreparedStatement psRoom = null;
         PreparedStatement psImg = null;
         PreparedStatement psSer = null;
+        PreparedStatement psAmen = null;
         ResultSet generatedKeys = null;
 
         try {
-            connection.setAutoCommit(false);
-
-            psRoom = connection.prepareStatement(
-                    insertRoomTypeSql,
-                    Statement.RETURN_GENERATED_KEYS
-            );
+            connection.setAutoCommit(false); // Kích hoạt Transaction hóa bảo mật dữ liệu
 
             psRoom.setString(1, rt.getTypeName());
             psRoom.setString(2, rt.getDescription());
@@ -328,6 +319,7 @@ public class RoomTypeDAO extends DBContext {
             }
 
             if (generatedId > 0) {
+                // Chèn album ảnh
                 if (imageList != null && !imageList.isEmpty()) {
                     psImg = connection.prepareStatement(
                             insertImageSql
@@ -346,14 +338,10 @@ public class RoomTypeDAO extends DBContext {
                     psImg.executeBatch();
                 }
 
-                if (serviceList != null
-                        && !serviceList.isEmpty()) {
-
-                    psSer = connection.prepareStatement(
-                            insertServiceSql
-                    );
-
-                    for (RoomTypeService rts : serviceList) {
+                // Chèn danh sách dịch vụ phòng
+                if (serviceList != null && !serviceList.isEmpty()) {
+                    psSer = connection.prepareStatement(insertServiceSql);
+                    for (model.RoomTypeService rts : serviceList) {
                         psSer.setInt(1, generatedId);
                         psSer.setInt(2, rts.getServiceId());
                         psSer.setInt(3, rts.getQuantity());
@@ -362,6 +350,26 @@ public class RoomTypeDAO extends DBContext {
                     }
 
                     psSer.executeBatch();
+                }
+
+                // Chèn danh sách tiện nghi phòng (Bóc tách số lượng lấy từ trường description ra lại kiểu INT)
+                if (amenityList != null && !amenityList.isEmpty()) {
+                    psAmen = connection.prepareStatement(insertAmenitySql);
+                    for (model.RoomAmenity ra : amenityList) {
+                        psAmen.setInt(1, generatedId);
+                        psAmen.setInt(2, ra.getAmenityId());
+
+                        // Đọc ngược số lượng từ chuỗi description để chèn vào cột quantity
+                        int qty = 1;
+                        try {
+                            qty = Integer.parseInt(ra.getDescription());
+                        } catch (Exception ex) {
+                        }
+
+                        psAmen.setInt(3, qty);
+                        psAmen.addBatch();
+                    }
+                    psAmen.executeBatch();
                 }
 
                 connection.commit();
@@ -398,6 +406,9 @@ public class RoomTypeDAO extends DBContext {
                 if (psSer != null) {
                     psSer.close();
                 }
+                if (psAmen != null) {
+                    psAmen.close();
+                }
                 if (connection != null) {
                     connection.setAutoCommit(true);
                 }
@@ -410,48 +421,32 @@ public class RoomTypeDAO extends DBContext {
         return false;
     }
 
-    public boolean updateRoomType(
-            RoomType rt,
-            List<String> newImageList,
-            List<RoomTypeService> newServiceList) {
-
-        String updateRoomTypeSql
-                = "UPDATE RoomTypes SET type_name = ?, "
-                + "description = ?, capacity = ?, bed_type = ?, "
-                + "bed_count = ?, area_sqm = ?, base_price = ?, "
-                + "is_active = ? WHERE room_type_id = ?";
-
-        String deleteOldImagesSql
-                = "DELETE FROM RoomTypeImages "
+    // 3. Cập nhật thông tin chi tiết loại phòng, dọn sạch và ghi đè danh sách mới
+    public boolean updateRoomType(RoomType rt, List<String> newImageList, List<model.RoomTypeService> newServiceList, List<model.RoomAmenity> newAmenityList) {
+        String updateRoomTypeSql = "UPDATE RoomTypes SET type_name = ?, description = ?, capacity = ?, bed_type = ?, "
+                + "bed_count = ?, area_sqm = ?, base_price = ?, is_active = ? "
                 + "WHERE room_type_id = ?";
+        String deleteOldImagesSql = "DELETE FROM RoomTypeImages WHERE room_type_id = ?";
+        String insertImageSql = "INSERT INTO RoomTypeImages (room_type_id, image_url) VALUES (?, ?)";
 
-        String insertImageSql
-                = "INSERT INTO RoomTypeImages "
-                + "(room_type_id, image_url, image_description) "
-                + "VALUES (?, ?, ?)";
+        String deleteOldServicesSql = "DELETE FROM RoomTypeServices WHERE room_type_id = ?";
+        String insertServiceSql = "INSERT INTO RoomTypeServices (room_type_id, service_id, quantity, is_free) VALUES (?, ?, ?, ?)";
 
-        String deleteOldServicesSql
-                = "DELETE FROM RoomTypeServices "
-                + "WHERE room_type_id = ?";
-
-        String insertServiceSql
-                = "INSERT INTO RoomTypeServices "
-                + "(room_type_id, service_id, quantity, is_free) "
-                + "VALUES (?, ?, ?, ?)";
+        String deleteOldAmenitiesSql = "DELETE FROM RoomTypeAmenities WHERE room_type_id = ?";
+        String insertAmenitySql = "INSERT INTO RoomTypeAmenities (room_type_id, amenity_id, quantity) VALUES (?, ?, ?)";
 
         PreparedStatement psRoom = null;
         PreparedStatement psDelImg = null;
         PreparedStatement psInsImg = null;
         PreparedStatement psDelSer = null;
         PreparedStatement psInsSer = null;
+        PreparedStatement psDelAmen = null;
+        PreparedStatement psInsAmen = null;
 
         try {
             connection.setAutoCommit(false);
 
-            psRoom = connection.prepareStatement(
-                    updateRoomTypeSql
-            );
-
+            psRoom = connection.prepareStatement(updateRoomTypeSql);
             psRoom.setString(1, rt.getTypeName());
             psRoom.setString(2, rt.getDescription());
             psRoom.setInt(3, rt.getCapacity());
@@ -463,9 +458,8 @@ public class RoomTypeDAO extends DBContext {
             psRoom.setInt(9, rt.getRoomTypeId());
             psRoom.executeUpdate();
 
-            psDelImg = connection.prepareStatement(
-                    deleteOldImagesSql
-            );
+            // Làm sạch và ghi đè ảnh
+            psDelImg = connection.prepareStatement(deleteOldImagesSql);
             psDelImg.setInt(1, rt.getRoomTypeId());
             psDelImg.executeUpdate();
 
@@ -477,21 +471,9 @@ public class RoomTypeDAO extends DBContext {
                 );
 
                 for (String imgUrl : newImageList) {
-                    if (imgUrl != null
-                            && !imgUrl.trim().isEmpty()) {
-
-                        psInsImg.setInt(
-                                1,
-                                rt.getRoomTypeId()
-                        );
-                        psInsImg.setString(
-                                2,
-                                imgUrl.trim()
-                        );
-                        psInsImg.setString(
-                                3,
-                                "Image for " + rt.getTypeName()
-                        );
+                    if (imgUrl != null && !imgUrl.trim().isEmpty()) {
+                        psInsImg.setInt(1, rt.getRoomTypeId());
+                        psInsImg.setString(2, imgUrl.trim());
                         psInsImg.addBatch();
                     }
                 }
@@ -499,40 +481,45 @@ public class RoomTypeDAO extends DBContext {
                 psInsImg.executeBatch();
             }
 
-            psDelSer = connection.prepareStatement(
-                    deleteOldServicesSql
-            );
+            // Làm sạch và ghi đè dịch vụ
+            psDelSer = connection.prepareStatement(deleteOldServicesSql);
             psDelSer.setInt(1, rt.getRoomTypeId());
             psDelSer.executeUpdate();
 
-            if (newServiceList != null
-                    && !newServiceList.isEmpty()) {
-
-                psInsSer = connection.prepareStatement(
-                        insertServiceSql
-                );
-
-                for (RoomTypeService rts : newServiceList) {
-                    psInsSer.setInt(
-                            1,
-                            rt.getRoomTypeId()
-                    );
-                    psInsSer.setInt(
-                            2,
-                            rts.getServiceId()
-                    );
-                    psInsSer.setInt(
-                            3,
-                            rts.getQuantity()
-                    );
-                    psInsSer.setInt(
-                            4,
-                            rts.getIsFree()
-                    );
+            if (newServiceList != null && !newServiceList.isEmpty()) {
+                psInsSer = connection.prepareStatement(insertServiceSql);
+                for (model.RoomTypeService rts : newServiceList) {
+                    psInsSer.setInt(1, rt.getRoomTypeId());
+                    psInsSer.setInt(2, rts.getServiceId());
+                    psInsSer.setInt(3, rts.getQuantity());
+                    psInsSer.setInt(4, rts.getIsFree());
                     psInsSer.addBatch();
                 }
 
                 psInsSer.executeBatch();
+            }
+
+            // Làm sạch và ghi đè mảng tiện nghi mặc định mới
+            psDelAmen = connection.prepareStatement(deleteOldAmenitiesSql);
+            psDelAmen.setInt(1, rt.getRoomTypeId());
+            psDelAmen.executeUpdate();
+
+            if (newAmenityList != null && !newAmenityList.isEmpty()) {
+                psInsAmen = connection.prepareStatement(insertAmenitySql);
+                for (model.RoomAmenity ra : newAmenityList) {
+                    psInsAmen.setInt(1, rt.getRoomTypeId());
+                    psInsAmen.setInt(2, ra.getAmenityId());
+
+                    int qty = 1;
+                    try {
+                        qty = Integer.parseInt(ra.getDescription());
+                    } catch (Exception ex) {
+                    }
+
+                    psInsAmen.setInt(3, qty);
+                    psInsAmen.addBatch();
+                }
+                psInsAmen.executeBatch();
             }
 
             connection.commit();
@@ -569,7 +556,12 @@ public class RoomTypeDAO extends DBContext {
                 if (psInsSer != null) {
                     psInsSer.close();
                 }
-
+                if (psDelAmen != null) {
+                    psDelAmen.close();
+                }
+                if (psInsAmen != null) {
+                    psInsAmen.close();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -578,6 +570,7 @@ public class RoomTypeDAO extends DBContext {
         return false;
     }
 
+    // 4. Xóa mềm loại phòng (is_active = 0)
     public boolean deleteRoomType(int roomTypeId) {
         String sql
                 = "UPDATE RoomTypes SET is_active = 0 "
@@ -607,248 +600,211 @@ public class RoomTypeDAO extends DBContext {
 
         return false;
     }
-    
-    // Phần room detail
-    public RoomType getRoomTypeById(int roomTypeId) {
-        RoomType room = null;
 
-        String sql
-                = "SELECT room_type_id, type_name, description, capacity, "
-                + "bed_type, bed_count, area_sqm, base_price, is_active "
-                + "FROM RoomTypes "
-                + "WHERE room_type_id = ? "
-                + "AND is_active = 1";
-
-        try {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, roomTypeId);
-
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                room = new RoomType();
-
-                room.setRoomTypeId(rs.getInt("room_type_id"));
-                room.setTypeName(rs.getString("type_name"));
-                room.setDescription(rs.getString("description"));
-                room.setCapacity(rs.getInt("capacity"));
-                room.setBedType(rs.getString("bed_type"));
-                room.setBedCount(rs.getInt("bed_count"));
-                room.setAreaSqm(rs.getBigDecimal("area_sqm"));
-                room.setBasePrice(rs.getBigDecimal("base_price"));
-                room.setActive(rs.getBoolean("is_active"));
-
-                room.setImageUrl(getRoomTypeImagesForDetail(roomTypeId));
-                room.setRoomTypeServices(
-                        getRoomTypeServicesForDetail(roomTypeId)
-                );
-                room.setRoomAmenities(
-                        getRoomTypeAmenitiesForDetail(roomTypeId)
-                );
-            }
-
-            rs.close();
-            ps.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
+    public boolean isRoomTypeNameExist(String typeName) {
+        // Nếu chuỗi rỗng thì coi như không tồn tại, để bộ lọc required của form tự xử lý
+        if (typeName == null || typeName.trim().isEmpty()) {
+            return false;
         }
 
-        return room;
-    }
-
-    public List<String> getRoomTypeImagesForDetail(int roomTypeId) {
-        List<String> images = new ArrayList<>();
-
-        String sql
-                = "SELECT image_url "
-                + "FROM RoomTypeImages "
-                + "WHERE room_type_id = ? "
-                + "ORDER BY image_id ASC";
+        // Sử dụng LOWER và TRIM ở cả 2 đầu để bọc lót, tránh việc Admin cố tình gõ cách hoặc viết hoa chữ cái đầu
+        String sql = "SELECT COUNT(*) FROM RoomTypes WHERE LOWER(TRIM(type_name)) = LOWER(TRIM(?))";
+        PreparedStatement ps = null;
+        ResultSet rs = null;
 
         try {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, roomTypeId);
+            // Kiểm tra an toàn xem connection của class DAO có đang hoạt động không
+            if (connection == null) {
+                System.out.println(">>> DAO ERROR: Connection đang bị NULL tại isRoomTypeNameExist!");
+                return false;
+            }
 
-            ResultSet rs = ps.executeQuery();
+            ps = connection.prepareStatement(sql);
+            ps.setString(1, typeName.trim());
+            rs = ps.executeQuery();
 
-            while (rs.next()) {
-                String imageUrl = rs.getString("image_url");
-
-                if (imageUrl != null && !imageUrl.trim().isEmpty()) {
-                    images.add(imageUrl.trim());
+            if (rs.next()) {
+                // Nếu kết quả COUNT(*) trả về lớn hơn 0, nghĩa là tên này đã bị trùng trong DB
+                return rs.getInt(1) > 0;
+            }
+        } catch (Exception e) {
+            System.out.println(">>> LỖI LOGIC TẠI HÀM isRoomTypeNameExist: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            // Luôn luôn đóng ResultSet và PreparedStatement để giải phóng tài nguyên cho SQL Server
+            try {
+                if (rs != null) {
+                    rs.close();
                 }
+                if (ps != null) {
+                    ps.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            rs.close();
-            ps.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-
-        return images;
+        return false;
     }
 
-    public List<RoomTypeService> getRoomTypeServicesForDetail(
-            int roomTypeId) {
-
-        List<RoomTypeService> list = new ArrayList<>();
-
-        String sql
-                = "SELECT rts.room_type_service_id, "
-                + "rts.room_type_id, "
-                + "rts.service_id, "
-                + "rts.quantity, "
-                + "rts.is_free, "
-                + "rs.service_name, "
-                + "rs.description, "
-                + "rs.unit_price, "
-                + "rs.is_active "
-                + "FROM RoomTypeServices rts "
-                + "JOIN RoomServices rs "
-                + "ON rts.service_id = rs.service_id "
-                + "WHERE rts.room_type_id = ? "
-                + "AND rs.is_active = 1 "
-                + "ORDER BY rts.room_type_service_id ASC";
-
-        try {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, roomTypeId);
-
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                RoomService service = new RoomService();
-
-                service.setServiceId(rs.getInt("service_id"));
-                service.setServiceName(rs.getString("service_name"));
-                service.setDescription(rs.getString("description"));
-                service.setUnitPrice(rs.getBigDecimal("unit_price"));
-                service.setActive(rs.getBoolean("is_active"));
-
-                RoomTypeService roomTypeService = new RoomTypeService();
-
-                roomTypeService.setRoomTypeServiceId(
-                        rs.getInt("room_type_service_id")
-                );
-                roomTypeService.setRoomTypeId(
-                        rs.getInt("room_type_id")
-                );
-                roomTypeService.setServiceId(
-                        rs.getInt("service_id")
-                );
-                roomTypeService.setQuantity(
-                        rs.getInt("quantity")
-                );
-                roomTypeService.setIsFree(
-                        rs.getInt("is_free")
-                );
-                roomTypeService.setRoomService(service);
-
-                list.add(roomTypeService);
-            }
-
-            rs.close();
-            ps.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
+    public boolean isRoomTypeNameExistForEdit(String typeName, int currentRoomTypeId) {
+        if (typeName == null || typeName.trim().isEmpty()) {
+            return false;
         }
 
-        return list;
-    }
-
-    public List<RoomAmenity> getRoomTypeAmenitiesForDetail(
-            int roomTypeId) {
-
-        List<RoomAmenity> list = new ArrayList<>();
-
-        String sql
-                = "SELECT ra.amenity_id, "
-                + "ra.amenity_name, "
-                + "ra.description, "
-                + "ra.unit_price, "
-                + "ra.is_active "
-                + "FROM RoomTypeAmenities rta "
-                + "JOIN RoomAmenities ra "
-                + "ON rta.amenity_id = ra.amenity_id "
-                + "WHERE rta.room_type_id = ? "
-                + "AND ra.is_active = 1 "
-                + "ORDER BY rta.room_type_amenity_id ASC";
+        // THÊM: AND room_type_id != ? để bỏ qua chính nó khi quét trùng
+        String sql = "SELECT COUNT(*) FROM RoomTypes WHERE LOWER(TRIM(type_name)) = LOWER(TRIM(?)) AND room_type_id != ?";
+        PreparedStatement ps = null;
+        ResultSet rs = null;
 
         try {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, roomTypeId);
-
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                RoomAmenity amenity = new RoomAmenity();
-
-                amenity.setAmenityId(rs.getInt("amenity_id"));
-                amenity.setAmenityName(rs.getString("amenity_name"));
-                amenity.setDescription(rs.getString("description"));
-                amenity.setUnitPrice(rs.getBigDecimal("unit_price"));
-                amenity.setActive(rs.getBoolean("is_active"));
-
-                list.add(amenity);
+            if (connection == null) {
+                System.out.println(">>> DAO ERROR: Connection đang bị NULL tại isRoomTypeNameExistForEdit!");
+                return false;
             }
 
-            rs.close();
-            ps.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return list;
-    }
-
-    public int getAvailableRoomCount(
-            int roomTypeId,
-            String checkIn,
-            String checkOut) {
-
-        int availableRooms = 0;
-
-        String sql
-                = "SELECT COUNT(*) AS available_rooms "
-                + "FROM Rooms r "
-                + "WHERE r.room_type_id = ? "
-                + "AND r.[status] != N'Đang bảo trì' "
-                + "AND r.room_number NOT IN ( "
-                + "    SELECT br.room_number "
-                + "    FROM BookingRooms br "
-                + "    JOIN Bookings b "
-                + "    ON br.booking_id = b.booking_id "
-                + "    WHERE b.[status] != N'Đã hủy' "
-                + "    AND NOT (b.checkout_date <= ? "
-                + "             OR b.checkin_date >= ?) "
-                + ")";
-
-        try {
-            PreparedStatement ps = connection.prepareStatement(sql);
-
-            ps.setInt(1, roomTypeId);
-            ps.setString(2, checkIn);
-            ps.setString(3, checkOut);
-
-            ResultSet rs = ps.executeQuery();
+            ps = connection.prepareStatement(sql);
+            ps.setString(1, typeName.trim());
+            ps.setInt(2, currentRoomTypeId); // Khóa ID hiện tại lại
+            rs = ps.executeQuery();
 
             if (rs.next()) {
-                availableRooms = rs.getInt("available_rooms");
+                return rs.getInt(1) > 0;
             }
-
-            rs.close();
-            ps.close();
-
         } catch (Exception e) {
+            System.out.println(">>> LỖI LOGIC TẠI HÀM isRoomTypeNameExistForEdit: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (ps != null) {
+                    ps.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-
-        return Math.max(availableRooms, 0);
+        return false;
     }
 
+    // =========================================================================
+    // 6. LẤY CHI TIẾT MỘT HẠNG PHÒNG THEO ID (Bắt buộc phải có để gánh luồng Edit doGet)
+    public RoomType getRoomTypeById(int roomTypeId) {
+        String sqlRoom = "SELECT room_type_id, type_name, description, capacity, bed_type, bed_count, area_sqm, base_price, is_active "
+                + "FROM RoomTypes WHERE room_type_id = ?";
 
+        String sqlImages = "SELECT image_url FROM RoomTypeImages WHERE room_type_id = ?";
+
+        String sqlServices = "SELECT rts.room_type_service_id, rts.service_id, rts.quantity, rts.is_free, s.service_name, s.unit_price "
+                + "FROM RoomTypeServices rts "
+                + "LEFT JOIN RoomServices s ON rts.service_id = s.service_id "
+                + "WHERE rts.room_type_id = ?";
+
+        String sqlAmenities = "SELECT rta.quantity, ra.amenity_id, ra.amenity_name, ra.unit_price "
+                + "FROM RoomTypeAmenities rta "
+                + "INNER JOIN RoomAmenities ra ON rta.amenity_id = ra.amenity_id "
+                + "WHERE rta.room_type_id = ?";
+
+        PreparedStatement psRoom = null;
+        ResultSet rsRoom = null;
+
+        try {
+            if (connection == null) {
+                System.out.println(">>> DAO ERROR: Connection đang bị NULL tại getRoomTypeById!");
+                return null;
+            }
+
+            psRoom = connection.prepareStatement(sqlRoom);
+            psRoom.setInt(1, roomTypeId);
+            rsRoom = psRoom.executeQuery();
+
+            if (rsRoom.next()) {
+                RoomType rt = new RoomType();
+                rt.setRoomTypeId(rsRoom.getInt("room_type_id"));
+                rt.setTypeName(rsRoom.getString("type_name"));
+                rt.setDescription(rsRoom.getString("description"));
+                rt.setCapacity(rsRoom.getInt("capacity"));
+                rt.setBedType(rsRoom.getString("bed_type"));
+                rt.setBedCount(rsRoom.getInt("bed_count"));
+                rt.setAreaSqm(rsRoom.getBigDecimal("area_sqm"));
+                rt.setBasePrice(rsRoom.getBigDecimal("base_price"));
+                rt.setActive(rsRoom.getBoolean("is_active"));
+
+                // --- ĐỌC DANH SÁCH ẢNH TRUYỀN VÀO OBJECT ---
+                List<String> imagesList = new ArrayList<>();
+                try (PreparedStatement psImg = connection.prepareStatement(sqlImages)) {
+                    psImg.setInt(1, roomTypeId);
+                    try (ResultSet rsImg = psImg.executeQuery()) {
+                        while (rsImg.next()) {
+                            imagesList.add(rsImg.getString("image_url"));
+                        }
+                    }
+                }
+                rt.setImageUrl(imagesList);
+
+                // --- ĐỌC DANH SÁCH DỊCH VỤ ĐI KÈM ---
+                List<model.RoomTypeService> servicesList = new ArrayList<>();
+                try (PreparedStatement psSer = connection.prepareStatement(sqlServices)) {
+                    psSer.setInt(1, roomTypeId);
+                    try (ResultSet rsSer = psSer.executeQuery()) {
+                        while (rsSer.next()) {
+                            if (rsSer.getObject("service_id") != null) {
+                                model.RoomTypeService rts = new model.RoomTypeService();
+                                rts.setRoomTypeServiceId(rsSer.getInt("room_type_service_id"));
+                                rts.setServiceId(rsSer.getInt("service_id")); // THÊM DÒNG NÀY
+                                rts.setQuantity(rsSer.getInt("quantity"));
+                                rts.setIsFree(rsSer.getInt("is_free"));
+
+                                model.RoomService s = new model.RoomService();
+                                s.setServiceId(rsSer.getInt("service_id"));
+                                s.setServiceName(rsSer.getString("service_name"));
+                                s.setUnitPrice(rsSer.getBigDecimal("unit_price"));
+
+                                rts.setRoomService(s);
+                                servicesList.add(rts);
+                            }
+                        }
+                    }
+                }
+                rt.setRoomTypeServices(servicesList);
+
+                // --- ĐỌC DANH SÁCH TIỆN NGHI ĐI KÈM (Mẹo nhét qty vào description để mang ra JSP hiển thị) ---
+                List<model.RoomAmenity> amenitiesList = new ArrayList<>();
+                try (PreparedStatement psAmen = connection.prepareStatement(sqlAmenities)) {
+                    psAmen.setInt(1, roomTypeId);
+                    try (ResultSet rsAmen = psAmen.executeQuery()) {
+                        while (rsAmen.next()) {
+                            model.RoomAmenity ra = new model.RoomAmenity();
+                            ra.setAmenityId(rsAmen.getInt("amenity_id"));
+                            ra.setAmenityName(rsAmen.getString("amenity_name"));
+                            ra.setUnitPrice(rsAmen.getBigDecimal("unit_price"));
+                            ra.setDescription(String.valueOf(rsAmen.getInt("quantity"))); // Ép số lượng thành chuỗi
+                            ra.setActive(true);
+
+                            amenitiesList.add(ra);
+                        }
+                    }
+                }
+                rt.setRoomAmenities(amenitiesList);
+
+                return rt; // Trả về thực thể hạng phòng đầy đủ bộ phận cấu thành
+            }
+        } catch (Exception e) {
+            System.out.println(">>> LỖI KHÔNG LẤY ĐƯỢC CHI TIẾT HẠNG PHÒNG THEO ID: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rsRoom != null) {
+                    rsRoom.close();
+                }
+                if (psRoom != null) {
+                    psRoom.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
 }

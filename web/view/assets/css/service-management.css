@@ -1,0 +1,73 @@
+/* 
+    Created on : Jun 7, 2026, 12:36:49 AM
+    Author     : LinhLTHE200306
+*/
+.conent-container {
+    margin: 0 auto;
+    padding: 10px 50px;
+    background: var(--bg-main);
+}
+
+.col-name {
+    width: 20%;
+}
+
+.col-desc {
+    width: 51%;
+}
+
+.col-price {
+    width: 10%;
+    text-align: center;
+}
+
+.col-status {
+    width: 9%;
+}
+
+.col-action {
+    width: 10%;
+}
+
+.srvType {
+    text-align: center;
+    font-size: 0.8em;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-custom);
+    padding: 6px 10px;
+    background-color: #fff4d8;
+    color: var(--text-muted);
+    border: 1px solid var(--text-muted);
+}
+
+.srvAct {
+    text-align: center;
+    font-size: 0.8em;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-custom);
+    padding: 6px 10px;
+}
+
+.filter-title {
+    font-size: 1rem;
+    text-transform: uppercase;
+    color: var(--text-main);
+}
+
+.filter-btn {
+    padding: 10px 20px;
+    font-size: 0.7rem;
+    font-family: var(--font-logo);
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-custom);
+    transition: all 0.3s;
+}
+
+.filter-btn.active {
+    background: var(--text-main);
+    color: #ffffff;
+    border-color: var(--text-main);
+}

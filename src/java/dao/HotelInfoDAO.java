@@ -132,20 +132,20 @@ public class HotelInfoDAO extends DBContext {
     // Lấy 6 ảnh để hiển thị ở mục Không gian lưu trú
     public List<HotelImage> get6SmallImages(int hotelId) {
         List<HotelImage> list = new ArrayList<>();
-        String sql = "SELECT TOP 6 image_id, image_url, hotel_id, caption, image_type " +
-                     "FROM HotelImages WHERE hotel_id = ? AND image_type = N'Ảnh nhỏ' " +
-                     "ORDER BY image_id DESC";
+        String sql = "SELECT TOP 6 image_id, image_url, hotel_id, caption, image_type "
+                + "FROM HotelImages WHERE hotel_id = ? AND image_type = N'Ảnh nhỏ' "
+                + "ORDER BY image_id DESC";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, hotelId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 HotelImage img = new HotelImage(
-                    rs.getInt("image_id"),
-                    rs.getString("image_url"),
-                    rs.getInt("hotel_id"),
-                    rs.getNString("caption"),
-                    rs.getNString("image_type")
+                        rs.getInt("image_id"),
+                        rs.getString("image_url"),
+                        rs.getInt("hotel_id"),
+                        rs.getNString("caption"),
+                        rs.getNString("image_type")
                 );
                 list.add(img);
             }
@@ -156,6 +156,5 @@ public class HotelInfoDAO extends DBContext {
         }
         return list;
     }
-    
 
 }
