@@ -33,7 +33,7 @@ public class RoomAmenityDeleteController extends HttpServlet {
         try {
             RoomAmenityDAO dao = new RoomAmenityDAO();
             dao.delete(amenityId);
-            session.setAttribute("successMessage", "Xoá dịch vụ thành công.");
+            session.setAttribute("successMessage", "Xoá tiện nghi thành công.");
         } catch (Exception e) {
             session.setAttribute("errorMessage", e.getMessage());
         }

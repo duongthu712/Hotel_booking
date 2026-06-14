@@ -6,11 +6,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const modalTitle = document.getElementById("modal-title");
 
     const alerts = document.querySelectorAll(".alert-message");
-
     alerts.forEach(alert => {
         setTimeout(() => {
             alert.style.opacity = "0";
             alert.style.transform = "translateY(-10px)";
+            alert.style.transition = "opacity 0.3s ease, transform 0.3s ease";
 
             setTimeout(() => {
                 alert.remove();
@@ -18,44 +18,68 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 3000);
     });
 
-    //Get status from body
     const isEditMode = document.body.getAttribute("data-edit-mode") === "true";
+    const isCreateMode = document.body.getAttribute("data-create-mode") === "true";
 
-    //Open and close modal
+    function getFilterParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const page = urlParams.get("page") || "1";
+        const keyword = urlParams.get("keyword") || "";
+        return `page=${page}&keyword=${encodeURIComponent(keyword)}`;
+    }
+
     function toggleModal(show) {
+        if (!modal) return;
+        
         if (show) {
             modal.classList.add("active");
+            modal.style.display = "flex";
         } else {
             modal.classList.remove("active");
-            form.reset();
-            //if in modal edit, enter cancel then back to list services
-            if (isEditMode) {
-                window.location.href = "RoomServiceList";
+            modal.style.display = "none";
+            if (form) {
+                form.reset();
+            }
+            
+            if (isEditMode || isCreateMode) {
+                window.location.href = "RoomServiceList?" + getFilterParams();
             }
         }
     }
 
-    //Open create modal
     if (btnCreate) {
         btnCreate.addEventListener("click", () => {
             modalTitle.innerText = "Thêm dịch vụ mới";
-            form.action = "RoomServiceCreate";
-            form.reset();
+            if (form) {
+                form.action = "RoomServiceCreate";
+                if (!isCreateMode) {
+                    form.reset();
+                    const inputs = form.querySelectorAll("input:not([type='hidden'])");
+                    inputs.forEach(input => input.value = "");
+                    
+                    const textarea = form.querySelector("#description");
+                    if (textarea) textarea.value = "";
+                }
+            }
             toggleModal(true);
         });
     }
 
-    //Open edit modal
     if (isEditMode) {
-        modalTitle.innerText = "Cập nhật dịch vụ";
-        form.action = "RoomServiceEdit";
+        modalTitle.innerText = "Chỉnh sửa dịch vụ";
+        if (form) {
+            form.action = "RoomServiceEdit";
+        }
+        toggleModal(true);
+    } else if (isCreateMode) {
+        modalTitle.innerText = "Thêm dịch vụ mới";
+        if (form) {
+            form.action = "RoomServiceCreate";
+        }
         toggleModal(true);
     }
 
-    //Close modal
     if (btnClose) {
         btnClose.addEventListener("click", () => toggleModal(false));
     }
 });
-
-

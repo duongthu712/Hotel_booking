@@ -35,11 +35,12 @@ public class RoomAmenityEditController extends HttpServlet {
 
             RoomAmenityDAO dao = new RoomAmenityDAO();
             RoomAmenity amenity = dao.getRoomAmenityById(amenityId);
+            
             List<RoomAmenity> amenityList = dao.getAllRoomAmenities();
 
             request.setAttribute("amenityList", amenityList);
             request.setAttribute("amenityToEdit", amenity);
-            request.setAttribute("page", request.getParameter("page"));
+            request.setAttribute("currentPage", request.getParameter("page"));
             request.setAttribute("keyword", request.getParameter("keyword"));
             request.getRequestDispatcher("/view/manager/room-amenity-management.jsp").forward(request, response);
         } catch (Exception e) {
@@ -63,40 +64,53 @@ public class RoomAmenityEditController extends HttpServlet {
         String description = request.getParameter("description");
         String unitPriceStr = request.getParameter("unitPrice");
         String activeStr = request.getParameter("active");
+        String imageUrl = request.getParameter("imageUrl");
+        
         String page = request.getParameter("page");
         String keyword = request.getParameter("keyword");
 
-        if (amenityName == null || amenityName.trim().isEmpty()) {
-            session.setAttribute("errorMessage", "Tên dịch vụ không được để trống.");
-            response.sendRedirect(buildRedirectUrl(request, page, keyword));
-            return;
-        }
+        String errorMsg = dal.InputValidationUtil.validateServiceInput(amenityName, unitPriceStr);
 
-        BigDecimal unitPrice;
-        try {
-            unitPrice = new BigDecimal(unitPriceStr.trim());
-            if (unitPrice.compareTo(BigDecimal.ZERO) < 0) {
-                throw new NumberFormatException();
+        if (errorMsg != null) {
+            try {
+                RoomAmenityDAO dao = new RoomAmenityDAO();
+                int amenityId = Integer.parseInt(amenityIdStr);
+                
+                BigDecimal tempPrice = BigDecimal.ZERO;
+                try {
+                    tempPrice = new BigDecimal(unitPriceStr.trim());
+                } catch (Exception e) {}
+                
+                boolean isActive = "true".equals(activeStr);
+                RoomAmenity amenityToEditTemp = new RoomAmenity(amenityId, amenityName, description, tempPrice, isActive);
+                
+                List<RoomAmenity> amenityList = dao.getAllRoomAmenities();
+                
+                request.setAttribute("amenityList", amenityList);
+                request.setAttribute("amenityToEdit", amenityToEditTemp);
+                request.setAttribute("errorMessage", errorMsg);
+                request.setAttribute("currentPage", page);
+                request.setAttribute("keyword", keyword);
+                
+                request.getRequestDispatcher("/view/manager/room-amenity-management.jsp").forward(request, response);
+                return;
+            } catch (Exception ex) {
+                session.setAttribute("errorMessage", ex.getMessage());
+                response.sendRedirect(buildRedirectUrl(request, page, keyword));
+                return;
             }
-        } catch (NumberFormatException e) {
-            session.setAttribute("errorMessage", "Đơn giá không hợp lệ.");
-            response.sendRedirect(request.getContextPath() + "/RoomAmenityList");
-            return;
         }
 
+        int amenityId = Integer.parseInt(amenityIdStr);
+        BigDecimal unitPrice = new BigDecimal(unitPriceStr.trim());
         boolean isActive = "true".equals(activeStr);
-        RoomAmenity updatedAmenity = new RoomAmenity(
-                Integer.parseInt(amenityIdStr),
-                amenityName.trim(),
-                description.trim(),
-                unitPrice,
-                isActive
-        );
+        
+        RoomAmenity updatedAmenity = new RoomAmenity(amenityId, amenityName, description, unitPrice, isActive);
 
         try {
             RoomAmenityDAO dao = new RoomAmenityDAO();
             dao.updateRoomAmenity(updatedAmenity);
-            session.setAttribute("successMessage", "Cập nhật dịch vụ \"" + amenityName.trim() + "\" thành công.");
+            session.setAttribute("successMessage", "Cập nhật tiện nghi \"" + amenityName.trim() + "\" thành công.");
         } catch (Exception e) {
             session.setAttribute("errorMessage", e.getMessage());
         }
@@ -121,5 +135,4 @@ public class RoomAmenityEditController extends HttpServlet {
     public String getServletInfo() {
         return "Room Amenity Edit Controller";
     }
-
 }

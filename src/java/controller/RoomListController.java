@@ -103,12 +103,6 @@ public class RoomListController extends HttpServlet {
                 session.removeAttribute("guestList");
             }
 
-            Room editRoom = (Room) session.getAttribute("editRoom");
-            if (editRoom != null) {
-                request.setAttribute("editRoom", editRoom);
-                session.removeAttribute("editRoom");
-            }
-
             request.setAttribute("roomList", pagedList);
             request.setAttribute("roomTypeList", roomTypeList);
             request.setAttribute("roomTypeMap", roomTypeMap);

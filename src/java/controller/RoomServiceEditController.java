@@ -35,11 +35,12 @@ public class RoomServiceEditController extends HttpServlet {
 
             RoomServiceDAO dao = new RoomServiceDAO();
             RoomService service = dao.getRoomServicesById(serviceId);
+            
             List<RoomService> serviceList = dao.getAllRoomServices();
 
             request.setAttribute("serviceList", serviceList);
             request.setAttribute("serviceToEdit", service);
-            request.setAttribute("page", request.getParameter("page"));
+            request.setAttribute("currentPage", request.getParameter("page"));
             request.setAttribute("keyword", request.getParameter("keyword"));
             request.getRequestDispatcher("/view/manager/room-service-management.jsp").forward(request, response);
         } catch (Exception e) {
@@ -63,35 +64,48 @@ public class RoomServiceEditController extends HttpServlet {
         String description = request.getParameter("description");
         String unitPriceStr = request.getParameter("unitPrice");
         String activeStr = request.getParameter("active");
+        String imageUrl = request.getParameter("imageUrl");
+        
         String page = request.getParameter("page");
         String keyword = request.getParameter("keyword");
 
-        if (serviceName == null || serviceName.trim().isEmpty()) {
-            session.setAttribute("errorMessage", "Tên dịch vụ không được để trống.");
-            response.sendRedirect(buildRedirectUrl(request, page, keyword));
-            return;
-        }
+        String errorMsg = dal.InputValidationUtil.validateServiceInput(serviceName, unitPriceStr);
 
-        BigDecimal unitPrice;
-        try {
-            unitPrice = new BigDecimal(unitPriceStr.trim());
-            if (unitPrice.compareTo(BigDecimal.ZERO) < 0) {
-                throw new NumberFormatException();
+        if (errorMsg != null) {
+            try {
+                RoomServiceDAO dao = new RoomServiceDAO();
+                int serviceId = Integer.parseInt(serviceIdStr);
+                
+                BigDecimal tempPrice = BigDecimal.ZERO;
+                try {
+                    tempPrice = new BigDecimal(unitPriceStr.trim());
+                } catch (Exception e) {}
+                
+                boolean isActive = "true".equals(activeStr);
+                RoomService serviceToEditTemp = new RoomService(serviceId, serviceName, description, tempPrice, isActive);
+                
+                List<RoomService> serviceList = dao.getAllRoomServices();
+                
+                request.setAttribute("serviceList", serviceList);
+                request.setAttribute("serviceToEdit", serviceToEditTemp);
+                request.setAttribute("errorMessage", errorMsg);
+                request.setAttribute("currentPage", page);
+                request.setAttribute("keyword", keyword);
+                
+                request.getRequestDispatcher("/view/manager/room-service-management.jsp").forward(request, response);
+                return;
+            } catch (Exception ex) {
+                session.setAttribute("errorMessage", ex.getMessage());
+                response.sendRedirect(buildRedirectUrl(request, page, keyword));
+                return;
             }
-        } catch (NumberFormatException e) {
-            session.setAttribute("errorMessage", "Đơn giá không hợp lệ.");
-            response.sendRedirect(request.getContextPath() + "/RoomServiceList");
-            return;
         }
 
+        int serviceId = Integer.parseInt(serviceIdStr);
+        BigDecimal unitPrice = new BigDecimal(unitPriceStr.trim());
         boolean isActive = "true".equals(activeStr);
-        RoomService updatedService = new RoomService(
-                Integer.parseInt(serviceIdStr),
-                serviceName.trim(),
-                description.trim(),
-                unitPrice,
-                isActive
-        );
+        
+        RoomService updatedService = new RoomService(serviceId, serviceName, description, unitPrice, isActive);
 
         try {
             RoomServiceDAO dao = new RoomServiceDAO();
@@ -121,5 +135,4 @@ public class RoomServiceEditController extends HttpServlet {
     public String getServletInfo() {
         return "Room Service Edit Controller";
     }
-
 }

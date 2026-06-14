@@ -109,8 +109,8 @@
                 <input type="hidden" name="keyword" value="${keyword}">
 
                 <c:if test="${not empty errorMessage and (openCreateModal eq 'true' or not empty serviceToEdit)}">
-                    <div class="popup-error-message" style="color: #ff4d4d; background-color: #ffe6e6; padding: 10px; border-radius: 4px; margin-bottom: 15px; width: 100%; border: 1px solid #ffcccc; font-weight: bold; text-align: left; box-sizing: border-box;">
-                        ⚠ ${errorMessage}
+                    <div class="alert-message alert-error">
+                        ${errorMessage}
                     </div>
                 </c:if>
 
