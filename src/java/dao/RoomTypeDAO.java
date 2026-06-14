@@ -241,6 +241,9 @@ public class RoomTypeDAO extends DBContext {
                         }
                     }
 
+                    // Gán danh sách dịch vụ vào loại phòng để đưa ra JSP
+                    rt.setRoomTypeServices(servicesList);
+
                     // --- LUỒNG LẤY DANH SÁCH TIỆN NGHI (Khớp chuẩn List<RoomAmenity> trong Model của Vũ) ---
                     List<model.RoomAmenity> amenitiesList = new ArrayList<>();
                     try (PreparedStatement psAmen = connection.prepareStatement(sqlAmenities)) {
@@ -293,7 +296,17 @@ public class RoomTypeDAO extends DBContext {
         ResultSet generatedKeys = null;
 
         try {
+            if (connection == null) {
+                System.out.println(">>> DAO ERROR: Connection dang NULL tai insertRoomType!");
+                return false;
+            }
+
             connection.setAutoCommit(false); // Kích hoạt Transaction hóa bảo mật dữ liệu
+
+            psRoom = connection.prepareStatement(
+                    insertRoomTypeSql,
+                    Statement.RETURN_GENERATED_KEYS
+            );
 
             psRoom.setString(1, rt.getTypeName());
             psRoom.setString(2, rt.getDescription());
