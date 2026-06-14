@@ -237,6 +237,7 @@ public class RoomTypeDAO extends DBContext {
                             }
                         }
                     }
+                    // 🔥 CHỐT CHẶN CHÍ MẠNG: Gán danh sách dịch vụ vừa bốc từ DB vào đối tượng rt để đẩy ra JSP
                     rt.setRoomTypeServices(servicesList);
 
                     // --- LUỒNG LẤY DANH SÁCH TIỆN NGHI (Khớp chuẩn List<RoomAmenity> trong Model của Vũ) ---
@@ -276,7 +277,6 @@ public class RoomTypeDAO extends DBContext {
         return list;
     }
 
-    // 2. Thêm mới một loại phòng vào hệ thống (Nhận danh sách List<RoomAmenity> từ Model gốc)
     public boolean insertRoomType(RoomType rt, List<String> imageList, List<model.RoomTypeService> serviceList, List<model.RoomAmenity> amenityList) {
         String insertRoomTypeSql = "INSERT INTO RoomTypes (type_name, description, capacity, bed_type, bed_count, area_sqm, base_price, is_active) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -291,7 +291,15 @@ public class RoomTypeDAO extends DBContext {
         ResultSet generatedKeys = null;
 
         try {
+            if (connection == null) {
+                System.out.println(">>> DAO ERROR: Connection dang NULL tai insertRoomType!");
+                return false;
+            }
+
             connection.setAutoCommit(false); // Kích hoạt Transaction hóa bảo mật dữ liệu
+
+            // 🔥 ĐÃ SỬA: Bổ sung dòng khởi tạo psRoom kèm theo cờ lấy ID tự tăng chí mạng
+            psRoom = connection.prepareStatement(insertRoomTypeSql, java.sql.Statement.RETURN_GENERATED_KEYS);
 
             psRoom.setString(1, rt.getTypeName());
             psRoom.setString(2, rt.getDescription());
@@ -305,9 +313,7 @@ public class RoomTypeDAO extends DBContext {
             int affectedRows = psRoom.executeUpdate();
 
             if (affectedRows == 0) {
-                throw new SQLException(
-                        "Creating room type failed, no rows affected."
-                );
+                throw new SQLException("Creating room type failed, no rows affected.");
             }
 
             int generatedId = 0;
@@ -320,20 +326,14 @@ public class RoomTypeDAO extends DBContext {
             if (generatedId > 0) {
                 // Chèn album ảnh
                 if (imageList != null && !imageList.isEmpty()) {
-                    psImg = connection.prepareStatement(
-                            insertImageSql
-                    );
-
+                    psImg = connection.prepareStatement(insertImageSql);
                     for (String imgUrl : imageList) {
-                        if (imgUrl != null
-                                && !imgUrl.trim().isEmpty()) {
-
+                        if (imgUrl != null && !imgUrl.trim().isEmpty()) {
                             psImg.setInt(1, generatedId);
                             psImg.setString(2, imgUrl.trim());
                             psImg.addBatch();
                         }
                     }
-
                     psImg.executeBatch();
                 }
 
@@ -347,18 +347,16 @@ public class RoomTypeDAO extends DBContext {
                         psSer.setInt(4, rts.getIsFree());
                         psSer.addBatch();
                     }
-
                     psSer.executeBatch();
                 }
 
-                // Chèn danh sách tiện nghi phòng (Bóc tách số lượng lấy từ trường description ra lại kiểu INT)
+                // Chèn danh sách tiện nghi phòng
                 if (amenityList != null && !amenityList.isEmpty()) {
                     psAmen = connection.prepareStatement(insertAmenitySql);
                     for (model.RoomAmenity ra : amenityList) {
                         psAmen.setInt(1, generatedId);
                         psAmen.setInt(2, ra.getAmenityId());
 
-                        // Đọc ngược số lượng từ chuỗi description để chèn vào cột quantity
                         int qty = 1;
                         try {
                             qty = Integer.parseInt(ra.getDescription());
@@ -375,9 +373,7 @@ public class RoomTypeDAO extends DBContext {
                 return true;
 
             } else {
-                throw new SQLException(
-                        "Creating room type failed, no ID obtained."
-                );
+                throw new SQLException("Creating room type failed, no ID obtained.");
             }
 
         } catch (Exception e) {
@@ -388,7 +384,6 @@ public class RoomTypeDAO extends DBContext {
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
-
             e.printStackTrace();
 
         } finally {
@@ -411,12 +406,10 @@ public class RoomTypeDAO extends DBContext {
                 if (connection != null) {
                     connection.setAutoCommit(true);
                 }
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-
         return false;
     }
 
