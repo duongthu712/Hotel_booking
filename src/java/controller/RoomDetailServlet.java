@@ -98,7 +98,7 @@ public class RoomDetailServlet extends HttpServlet {
             RoomTypeDAO roomTypeDAO = new RoomTypeDAO();
 
             RoomType room
-                    = roomTypeDAO.getRoomTypeById(roomTypeId);
+                    = roomTypeDAO.getRoomDetailById(roomTypeId);
 
             if (room == null) {
                 request.setAttribute(
