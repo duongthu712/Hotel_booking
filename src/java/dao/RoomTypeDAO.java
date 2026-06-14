@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RoomTypeDAO extends DBContext {
+
     // Lấy các loại phòng để hiện lên thanh search cho khách. Da thay doi SQL
     public List<RoomType> getAllRoomTypes() {
         List<RoomType> list = new ArrayList<>();
@@ -165,9 +166,8 @@ public class RoomTypeDAO extends DBContext {
 
         String sqlServices = "SELECT rts.room_type_service_id, rts.service_id, rts.quantity, rts.is_free, s.service_name, s.unit_price "
                 + "FROM RoomTypeServices rts "
-                + "LEFT JOIN RoomServices s ON rts.service_id = s.service_id "
+                + "INNER JOIN RoomServices s ON rts.service_id = s.service_id "
                 + "WHERE rts.room_type_id = ?";
-
         // CHỐT SỬA LUỒNG AMENITIES: JOIN thẳng bảng liên kết và bảng gốc để lấy dữ liệu tiện nghi
         String sqlAmenities = "SELECT rta.quantity, ra.amenity_id, ra.amenity_name, ra.unit_price "
                 + "FROM RoomTypeAmenities rta "
@@ -221,24 +221,23 @@ public class RoomTypeDAO extends DBContext {
 
                         try (ResultSet rsSer = psSer.executeQuery()) {
                             while (rsSer.next()) {
-                                if (rsSer.getObject("service_id") != null) {
-                                    model.RoomTypeService rts = new model.RoomTypeService();
-                                    rts.setRoomTypeServiceId(rsSer.getInt("room_type_service_id"));
-                                    rts.setServiceId(rsSer.getInt("service_id")); // THÊM DÒNG NÀY
-                                    rts.setQuantity(rsSer.getInt("quantity"));
-                                    rts.setIsFree(rsSer.getInt("is_free"));
+                                model.RoomTypeService rts = new model.RoomTypeService();
+                                rts.setRoomTypeServiceId(rsSer.getInt("room_type_service_id"));
+                                rts.setServiceId(rsSer.getInt("service_id"));
+                                rts.setQuantity(rsSer.getInt("quantity"));
+                                rts.setIsFree(rsSer.getInt("is_free"));
 
-                                    model.RoomService s = new model.RoomService();
-                                    s.setServiceId(rsSer.getInt("service_id"));
-                                    s.setServiceName(rsSer.getString("service_name"));
-                                    s.setUnitPrice(rsSer.getBigDecimal("unit_price"));
+                                model.RoomService s = new model.RoomService();
+                                s.setServiceId(rsSer.getInt("service_id"));
+                                s.setServiceName(rsSer.getString("service_name"));
+                                s.setUnitPrice(rsSer.getBigDecimal("unit_price"));
 
-                                    rts.setRoomService(s);
-                                    servicesList.add(rts);
-                                }
+                                rts.setRoomService(s);
+                                servicesList.add(rts);
                             }
                         }
                     }
+                    rt.setRoomTypeServices(servicesList);
 
                     // --- LUỒNG LẤY DANH SÁCH TIỆN NGHI (Khớp chuẩn List<RoomAmenity> trong Model của Vũ) ---
                     List<model.RoomAmenity> amenitiesList = new ArrayList<>();
