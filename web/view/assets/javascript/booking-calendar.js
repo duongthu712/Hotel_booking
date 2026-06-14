@@ -1,40 +1,60 @@
-function setupCalendarLogic(checkInId, checkOutId) {
-    const checkInInput = document.getElementById(checkInId);
-    const checkOutInput = document.getElementById(checkOutId);
+/* * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
+ */
 
-    if (!checkInInput || !checkOutInput) return;
+window.addEventListener('DOMContentLoaded', () => {
+    // Hàm thiết lập logic lịch cho một cặp ô Input cụ thể
+    const setupCalendarLogic = (checkInId, checkOutId) => {
+        const checkInInput = document.getElementById(checkInId);
+        const checkOutInput = document.getElementById(checkOutId);
 
-    let checkOutPicker;
+        // Nếu trang hiện tại không có các ô input này thì bỏ qua (tránh lỗi crash script)
+        if (!checkInInput || !checkOutInput) return;
 
-    const checkInPicker = flatpickr(checkInInput, {
-        dateFormat: "d/m/Y",
-        minDate: "today",
+        // 1. Lấy ngày hôm nay định dạng yyyy-MM-dd chuẩn hệ thống
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const todayStr = `${yyyy}-${mm}-${dd}`;
 
-        onChange: function (selectedDates) {
-            if (selectedDates.length === 0) return;
+        // 2. Gạch bỏ toàn bộ các ngày trong quá khứ của ô Check-In
+        checkInInput.min = todayStr;
 
-            const nextDay = new Date(selectedDates[0]);
-            nextDay.setDate(nextDay.getDate() + 1);
-
-            checkOutPicker.set("minDate", nextDay);
-
-            const currentOut = checkOutPicker.selectedDates[0];
-
-            if (!currentOut || currentOut <= selectedDates[0]) {
-                checkOutPicker.setDate(nextDay);
-            }
+        // 3. Nếu ô Check-In đã có sẵn dữ liệu cũ (Trang kết quả tìm kiếm)
+        if (checkInInput.value) {
+            const currentInDate = new Date(checkInInput.value);
+            currentInDate.setDate(currentInDate.getDate() + 1);
+            // 🔥 ĐÃ SỬA: Đổi getUTCDate() thành getDate() để không bị lệch múi giờ lùi ngày
+            const limitStr = `${currentInDate.getFullYear()}-${String(currentInDate.getMonth() + 1).padStart(2, '0')}-${String(currentInDate.getDate()).padStart(2, '0')}`;
+            // Khóa các ngày trước ngày Check-in tại ô Check-out
+            checkOutInput.min = limitStr;
         }
-    });
 
-    checkOutPicker = flatpickr(checkOutInput, {
-        dateFormat: "d/m/Y",
-        minDate: new Date().fp_incr(1)
-    });
-}
+        // 4. Lắng nghe sự kiện thay đổi ngày của ô Check-In
+        checkInInput.addEventListener('change', () => {
+            if (checkInInput.value) {
+                const nextDay = new Date(checkInInput.value);
+                nextDay.setDate(nextDay.getDate() + 1);
 
-function initCalendar() {
+                const nextYyyy = nextDay.getFullYear();
+                const nextMm = String(nextDay.getMonth() + 1).padStart(2, '0');
+                const nextDd = String(nextDay.getDate()).padStart(2, '0');
+                const nextDayStr = `${nextYyyy}-${nextMm}-${nextDd}`;
+
+                // Ép ô Check-Out tối thiểu phải là ngày hôm sau của ngày Check-In mới chọn
+                checkOutInput.min = nextDayStr;
+
+                // Nếu ngày Check-Out cũ nhỏ hơn hoặc bằng ngày Check-In mới chọn, tự động nhảy lịch
+                if (!checkOutInput.value || checkOutInput.value <= checkInInput.value) {
+                    checkOutInput.value = nextDayStr;
+                }
+            }
+        });
+    };
+
+    // Thực thi kích hoạt cho cả trang chủ (id: checkIn/checkOut) 
+    // và trang kết quả (id: checkInResult/checkOutResult)
     setupCalendarLogic('checkIn', 'checkOut');
     setupCalendarLogic('checkInResult', 'checkOutResult');
-}
-
-document.addEventListener('DOMContentLoaded', initCalendar);
+});
