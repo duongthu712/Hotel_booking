@@ -140,16 +140,6 @@
             <% } %>
 
             <% if (room != null) { %>
-            <div class="room-breadcrumb">
-                <a href="<%= request.getContextPath() %>/home"><i class="fa-solid fa-house"></i></a>
-                <span>›</span>
-                <a href="<%= request.getContextPath() %>/home">Trang chủ</a>
-                <span>›</span>
-                <a href="<%= request.getContextPath() %>/search">Phòng nghỉ</a>
-                <span>›</span>
-                <span><%= html(room.getTypeName()) %></span>
-            </div>
-
             <section class="room-top-grid">
                 <div class="room-gallery-card">
                     <div class="main-image-box">

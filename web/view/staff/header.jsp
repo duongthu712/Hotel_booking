@@ -16,7 +16,7 @@
         <p class="staff-header-role"><%= headAcc.getRole()%></p>
     </div>
     <div class="staff-header-user">
-        <a href="userProfile.jsp" class="staff-name"><%= headAcc.getFullName()%></a>
+        <a href="${pageContext.request.contextPath}/profile" class="staff-name"><%= headAcc.getFullName()%></a>
         <form action="logout" method="GET">
             <button type="submit" class="logout-btn">Đăng xuất</button>
         </form>
