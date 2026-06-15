@@ -223,20 +223,13 @@ h1, h2, h3, h4, .management-title {
 }
 
 /* === 7. CỘT DỊCH VỤ ĐI KÈM === */
-.services-list-container {
+.services-list-container, .amenities-list-container {
     display: flex;
     flex-direction: column;
     gap: 10px;
     max-width: 320px;
 }
 
-.badge-service-item {
-    font-family: 'Lora', serif;
-    font-size: 13.5px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
 
 .service-name-text {
     font-weight: 500;
@@ -273,7 +266,6 @@ h1, h2, h3, h4, .management-title {
     color: #5c7f9e;
 }
 
-/* === 8. TỶ LỆ KÍCH THƯỚC ĐỒNG BỘ 9 CỘT (GỘP TH/TD RÚT NGẮN CODE) === */
 .luxury-table-layout {
     table-layout: fixed;
     width: 100%;
@@ -283,15 +275,17 @@ h1, h2, h3, h4, .management-title {
     white-space: normal;
 }
 
-.col-id { width: 50px; text-align: center; }
-.col-name { width: 140px; text-align: center; }
-.col-desc { width: 180px; text-align: center; }
-.col-img { width: 165px; text-align: center; } 
-.col-config { width: 140px; text-align: center; }
-.col-price { width: 120px; text-align: center; padding-right: 20px; }
-.col-services { width: 200px; text-align: center; }
+/* Chia lại độ rộng (Width) khóa cứng theo pixel để form phẳng đẹp mắt */
+.col-id { width: 45px; text-align: center; }
+.col-name { width: 130px; text-align: center; }
+.col-desc { width: 160px; text-align: center; }
+.col-img { width: 190px; text-align: center; } 
+.col-config { width: 130px; text-align: center; }
+.col-price { width: 100px; text-align: center; }
+.col-services { width: 150px; text-align: left; }
+.col-amenities { width: 150px; text-align: left; } /* Phân bổ không gian cho cột Tiện nghi mới */
 .col-status { width: 110px; text-align: center; } 
-.col-actions { width: 100px; text-align: center; }
+.col-actions { width: 95px; text-align: center; }
 
 /* === 9. GHI ĐÈ FANCYBOX NỀN VÀNG KEM LUXURY === */
 .fancybox__container {
@@ -362,4 +356,27 @@ h1, h2, h3, h4, .management-title {
 .fancybox__toolbar .f-button[data-fancybox-close]:hover {
     background-color: #112d47 !important; 
     color: #C8A96B;
+}
+.services-list-container, .amenities-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px; /* Co ngắn khoảng cách dòng một chút để bảng gọn gàng */
+    max-width: 320px;
+}
+
+.badge-service-item {
+    font-family: 'Lora', serif;
+    font-size: 13.5px;
+}
+
+.service-name-text {
+   font-family: 'Lora', serif;
+    font-size: 13px;
+    display: inline-block;
+}
+
+/* Định dạng riêng màu chữ vàng kim sang trọng cho tên tiện nghi */
+.amenity-name-highlight {
+    color: #bfa15f !important;
+    font-weight: 600;
 }

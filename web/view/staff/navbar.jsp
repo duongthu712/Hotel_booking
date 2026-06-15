@@ -16,6 +16,7 @@
 
     <% if ("MANAGER".equals(role)) { %>
 
+
     <a href="${pageContext.request.contextPath}/dashboard.jsp">Tổng quan</a>
     <a href="${pageContext.request.contextPath}/HotelInfo">Thông tin chung</a>
     <a href="${pageContext.request.contextPath}/roomtypelist">Loại phòng</a>

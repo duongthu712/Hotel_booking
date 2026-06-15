@@ -1,6 +1,6 @@
 <%-- 
-    Document   : add-room-type
-    Created on : May 27, 2026, 10:50:05 PM
+    Document   : edit-room-type
+    Created on : Jun 13, 2026, 2:43:18 PM
     Author     : Minh Thu
 --%>
 
@@ -11,7 +11,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Thêm Mới Hạng Phòng - La Mer Hotel</title>
+        <title>Chỉnh Sửa Hạng Phòng - La Mer Hotel</title>
 
         <jsp:include page="/view/staff/header.jsp" />
 
@@ -26,12 +26,15 @@
                     <div class="form-box mt-4">
 
                         <div class="form-header mb-4 border-bottom-luxury pb-3">
-                            <h2><i class="fa-solid fa-square-plus me-2"></i>Thêm Mới Hạng Phòng</h2>
-                            <p>Khởi tạo cấu hình, tải lên album ảnh và thiết lập dịch vụ mặc định đi kèm.</p>
+                            <h2><i class="fa-solid fa-pen-to-square me-2"></i>Chỉnh Sửa Hạng Phòng</h2>
+                            <p>Cập nhật lại thông số cấu hình, album không gian ảnh và thiết lập lại các đặc quyền dịch vụ.</p>
                         </div>
 
+ 
 
-                        <form action="${pageContext.request.contextPath}/createroomtype" method="POST">
+                        <form action="${pageContext.request.contextPath}/roomtypeedit" method="POST">
+                            <input type="hidden" name="roomTypeId" value="${roomType.roomTypeId}" />
+
                             <input type="hidden" id="serverStatus" value="${status}" />
                             <input type="hidden" id="serverInvalidName" value="${invalidName}" />
 
@@ -39,15 +42,15 @@
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
                                     <label class="field-label">Tên hạng phòng</label>
-                                    <input type="text" name="typeName" class="input-field" value="${not empty roomType ? roomType.typeName : param.typeName}" required />
+                                    <input type="text" name="typeName" class="input-field" value="${roomType.typeName}" required />
                                 </div>
                                 <div class="col-md-6">
                                     <label class="field-label">Giá cơ bản (VNĐ / Đêm)</label>
-                                    <input type="number" name="basePrice" class="input-field" min="0" value="${not empty roomType ? (roomType.basePrice == 0 ? '' : roomType.basePrice) : param.basePrice}" required />
+                                    <input type="number" name="basePrice" class="input-field" min="0" value="${roomType.basePrice}" required />
                                 </div>
                                 <div class="col-12">
                                     <label class="field-label">Mô tả chi tiết hạng phòng</label>
-                                    <textarea name="description" class="textarea-field" rows="3" required>${not empty roomType ? roomType.description : param.description}</textarea>
+                                    <textarea name="description" class="textarea-field" rows="3" required>${roomType.description}</textarea>
                                 </div>
                             </div>
 
@@ -55,19 +58,19 @@
                             <div class="row g-3 mb-4">
                                 <div class="col-md-3">
                                     <label class="field-label">Sức chứa tối đa (Khách)</label>
-                                    <input type="number" name="capacity" class="input-field" min="1" value="${not empty roomType ? roomType.capacity : param.capacity}" required />
+                                    <input type="number" name="capacity" class="input-field" min="1" value="${roomType.capacity}" required />
                                 </div>
                                 <div class="col-md-3">
                                     <label class="field-label">Diện tích phòng (m²)</label>
-                                    <input type="number" step="any" name="areaSqm" class="input-field" min="1" value="${not empty roomType ? (roomType.areaSqm == 0 ? '' : roomType.areaSqm) : param.areaSqm}" required />
+                                    <input type="number" step="any" name="areaSqm" class="input-field" min="1" value="${roomType.areaSqm}" required />
                                 </div>
                                 <div class="col-md-3">
                                     <label class="field-label">Kiểu giường</label>
-                                    <input type="text" name="bedType" class="input-field" value="${not empty roomType ? roomType.bedType : param.bedType}" required />
+                                    <input type="text" name="bedType" class="input-field" value="${roomType.bedType}" required />
                                 </div>
                                 <div class="col-md-3">
                                     <label class="field-label">Số lượng giường</label>
-                                    <input type="number" name="bedCount" class="input-field" min="1" value="${not empty roomType ? roomType.bedCount : param.bedCount}" required />
+                                    <input type="number" name="bedCount" class="input-field" min="1" value="${roomType.bedCount}" required />
                                 </div>
                             </div>
 
@@ -78,10 +81,11 @@
                                 <div id="imageFieldsContainer">
                                     <div class="img-group mb-2">
                                         <span class="badge-main">Ảnh chính</span>
-                                        <input type="text" name="imageUrls" class="input-field input-grow" placeholder="Nhập đường dẫn ảnh chính..." value="${not empty roomType.imageUrl ? roomType.imageUrl[0] : param.imageUrls}" required />
+                                        <input type="text" name="imageUrls" class="input-field input-grow" placeholder="Nhập đường dẫn ảnh chính..." value="${not empty roomType.imageUrl ? roomType.imageUrl[0] : ''}" required />
                                     </div>
+
                                     <c:forEach items="${roomType.imageUrl}" var="imgUrl" varStatus="st">
-                                        <c:if test="${!st.first && not empty imgUrl}">
+                                        <c:if test="${!st.first}">
                                             <div class="img-group mb-2">
                                                 <input type="text" name="imageUrls" class="input-field input-grow" placeholder="Nhập đường dẫn ảnh phụ..." value="${imgUrl}"/>
                                                 <button type="button" class="btn-delete" onclick="this.parentElement.remove();">Xóa</button>
@@ -110,7 +114,7 @@
                                             <c:set var="isServed" value="false" />
                                             <c:set var="savedQty" value="1" />
                                             <c:set var="savedFree" value="0" />
-                                            
+
                                             <c:forEach items="${roomType.roomTypeServices}" var="rts">
                                                 <c:if test="${rts.serviceId == s.serviceId}">
                                                     <c:set var="isServed" value="true" />
@@ -129,12 +133,10 @@
                                                     </label>
                                                 </td>
                                                 <td style="text-align: center;">
-                                                    <input type="number" id="qty_srv_${s.serviceId}" name="quantity_${s.serviceId}" 
-                                                           value="${savedQty}" min="1" class="qty-input" ${isServed ? '' : 'disabled'} />
+                                                    <input type="number" id="qty_srv_${s.serviceId}" name="quantity_${s.serviceId}" value="${savedQty}" min="1" class="qty-input" ${isServed ? '' : 'disabled'} />
                                                 </td>
                                                 <td style="text-align: center;">
-                                                    <input type="number" id="free_srv_${s.serviceId}" name="isFree_${s.serviceId}" 
-                                                           value="${savedFree}" min="0" class="qty-input" ${isServed ? '' : 'disabled'} />
+                                                    <input type="number" id="free_srv_${s.serviceId}" name="isFree_${s.serviceId}" value="${savedFree}" min="0" class="qty-input" ${isServed ? '' : 'disabled'} />
                                                 </td>
                                             </tr>
                                         </c:forEach>
@@ -155,14 +157,12 @@
                                         <c:forEach items="${availableAmenities}" var="a">
                                             <c:set var="hasAmenity" value="false" />
                                             <c:set var="savedAmenityQty" value="1" />
-                                            
+
                                             <c:forEach items="${roomType.roomAmenities}" var="ra">
                                                 <c:if test="${ra.amenityId == a.amenityId}">
                                                     <c:set var="hasAmenity" value="true" />
-                                                    <c:set var="savedAmenityQty" value="${ra.description}" />
-                                                </c:if>
+                                                    <c:set var="savedAmenityQty" value="${ra.description}" /> </c:if>
                                             </c:forEach>
-
                                             <tr>
                                                 <td>
                                                     <label class="check-box-wrapper">
@@ -173,8 +173,7 @@
                                                     </label>
                                                 </td>
                                                 <td style="text-align: center;">
-                                                    <input type="number" id="qty_amn_${a.amenityId}" name="quantity_amenity_${a.amenityId}" 
-                                                           value="${savedAmenityQty}" min="1" class="qty-input" ${hasAmenity ? '' : 'disabled'} />
+                                                    <input type="number" id="qty_amn_${a.amenityId}" name="quantity_amenity_${a.amenityId}" value="${savedAmenityQty}" min="1" class="qty-input" ${hasAmenity ? '' : 'disabled'} />
                                                 </td>
                                             </tr>
                                         </c:forEach>
@@ -184,8 +183,8 @@
 
                             <div class="status-block">
                                 <label class="check-box-wrapper fw-bold">
-                                    <input type="checkbox" name="isActive" value="true" checked />
-                                    <span>Cho phép hạng phòng này hoạt động kinh doanh ngay lập tức</span>
+                                    <input type="checkbox" name="isActive" value="true" ${roomType.isActive() ? 'checked' : ''} />
+                                    <span>Kích hoạt kinh doanh hạng phòng này</span>
                                 </label>
                             </div>
 
@@ -194,7 +193,7 @@
                                     <i class="fa-solid fa-arrow-left me-1"></i> Quay lại danh sách
                                 </a>
                                 <button type="submit" class="btn-submit">
-                                    <i class="fa-solid fa-floppy-disk me-1"></i> Lưu Hạng Phòng
+                                    <i class="fa-solid fa-floppy-disk me-1"></i> Lưu Thay Đổi
                                 </button>
                             </div>
 
@@ -203,7 +202,6 @@
                 </main>
             </div>
         </div>
-
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
         <script src="${pageContext.request.contextPath}/view/assets/javascript/add-room-type.js?v=<%= System.currentTimeMillis() %>"></script>
         <script src="${pageContext.request.contextPath}/view/assets/javascript/room-type-notification.js?v=<%= System.currentTimeMillis() %>"></script>
