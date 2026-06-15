@@ -156,8 +156,9 @@ public class HotelServiceDAO extends DBContext {
         }
 
         String strSQL = """
-                           insert into HotelServices ([service_name], [description], unit_price, is_active, image_url) 
-                           values (?, ?, ?, ?)
+                           insert into HotelServices 
+                        ([service_name], [description], unit_price, is_active, image_url)  
+                           values (?, ?, ?, ?, ?)
                            """;
 
         try (PreparedStatement stm = connection.prepareStatement(strSQL, PreparedStatement.RETURN_GENERATED_KEYS)) {

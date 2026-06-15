@@ -153,8 +153,8 @@ public class RoomDAO extends DBContext {
     public List<GuestStay> getGuestsByRoomNumber(int roomNumber) throws Exception {
         List<GuestStay> guestList = new ArrayList<>();
         String strSQL = """
-                        SELECT
-                        gs.stay_id,
+                        SELECT 
+                        gs.stay_id, 
                         gs.booking_room_id, 
                         gs.full_name, 
                         gs.phone, 

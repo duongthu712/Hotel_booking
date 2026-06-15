@@ -38,7 +38,7 @@ public class RoomEditController extends HttpServlet {
         HttpSession session = request.getSession();
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
         if (staff == null) {
-            response.sendRedirect("login");
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
@@ -60,14 +60,19 @@ public class RoomEditController extends HttpServlet {
                 roomTypeMap.put(rt.getRoomTypeId(), rt.getTypeName());
             }
 
-            request.setAttribute("editRoom", editRoom);
             request.setAttribute("roomTypeList", roomTypeList);
             request.setAttribute("roomTypeMap", roomTypeMap);
             request.setAttribute("currentPage", request.getParameter("page"));
             request.setAttribute("selectedRoomTypeId", request.getParameter("roomTypeId"));
             request.setAttribute("keyword", request.getParameter("keyword"));
 
-            request.getRequestDispatcher("/view/manager/room-management.jsp").forward(request, response);
+            session.setAttribute("editRoom", editRoom);
+
+            response.sendRedirect(buildRedirectUrl(
+                    request.getParameter("page"),
+                    request.getParameter("roomTypeId"),
+                    request.getParameter("keyword")
+            ));
 
         } catch (Exception e) {
             session.setAttribute("errorMessage", e.getMessage());
@@ -85,7 +90,7 @@ public class RoomEditController extends HttpServlet {
         HttpSession session = request.getSession();
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
         if (staff == null) {
-            response.sendRedirect("login");
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
@@ -101,7 +106,7 @@ public class RoomEditController extends HttpServlet {
                 return;
             }
             int roomNumber = Integer.parseInt(roomNumberStr.trim());
-            
+
             String newStatus = request.getParameter("status");
             if (newStatus == null || newStatus.trim().isEmpty()) {
                 session.setAttribute("errorMessage", "Trạng thái không được để trống.");

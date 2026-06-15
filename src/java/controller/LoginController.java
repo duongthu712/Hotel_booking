@@ -14,7 +14,7 @@ public class LoginController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        
         String showLogin = request.getParameter("showLogin");
 
         if ("true".equals(showLogin)) {
@@ -44,7 +44,7 @@ public class LoginController extends HttpServlet {
 
         StaffAccountDAO dao = new StaffAccountDAO();
         StaffAccount staff = dao.loginWithHashCheck(username, password);
-
+        
         if (staff != null) {
             if (!staff.isActive()) {
                 request.setAttribute("error", "Tài khoản đã bị khóa.");

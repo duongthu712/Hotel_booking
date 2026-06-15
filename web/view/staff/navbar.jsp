@@ -16,11 +16,9 @@
 
     <% if ("MANAGER".equals(role)) { %>
 
-
     <a href="${pageContext.request.contextPath}/dashboard.jsp">Tổng quan</a>
-    <a href="${pageContext.request.contextPath}/HotelInfoList">Thông tin chung</a>
+    <a href="${pageContext.request.contextPath}/HotelInfo">Thông tin chung</a>
     <a href="${pageContext.request.contextPath}/roomtypelist">Loại phòng</a>
-
     <a href="${pageContext.request.contextPath}/RoomList">Phòng</a>
     <a href="${pageContext.request.contextPath}/RoomServiceList">Dịch vụ phòng</a>
     <a href="${pageContext.request.contextPath}/RoomAmenityList">Tiện nghi phòng</a>
