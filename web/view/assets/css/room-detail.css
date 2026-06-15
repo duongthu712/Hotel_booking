@@ -21,10 +21,6 @@ body {
     font-family: "Times New Roman", Georgia, serif;
 }
 
-/* ==========================================================================
-   PAGE WRAPPER
-   ========================================================================== */
-
 .room-detail-wrapper {
     width: min(1360px, calc(100% - 36px));
     margin: 0 auto;
@@ -51,10 +47,6 @@ body {
     font-size: 19px;
 }
 
-/* ==========================================================================
-   BREADCRUMB
-   ========================================================================== */
-
 .room-breadcrumb {
     display: flex;
     align-items: center;
@@ -70,17 +62,10 @@ body {
     text-decoration: none;
 }
 
-.room-breadcrumb a:hover {
-    color: #c8a96b;
-}
-
+.room-breadcrumb a:hover,
 .room-breadcrumb i {
     color: #c8a96b;
 }
-
-/* ==========================================================================
-   MAIN LAYOUT
-   ========================================================================== */
 
 .room-top-grid {
     display: grid;
@@ -107,9 +92,7 @@ body {
     box-shadow: 0 8px 28px rgba(7, 56, 66, 0.07);
 }
 
-/* ==========================================================================
-   IMAGE GALLERY
-   ========================================================================== */
+/* Gallery */
 
 .room-gallery-card {
     overflow: hidden;
@@ -161,9 +144,7 @@ body {
     box-shadow: 0 5px 18px rgba(0, 0, 0, 0.16);
     transform: translateY(-50%);
     cursor: pointer;
-    transition:
-        color 0.25s ease,
-        background-color 0.25s ease,
+    transition: color 0.25s ease, background-color 0.25s ease,
         transform 0.25s ease;
 }
 
@@ -237,9 +218,7 @@ body {
     border-radius: 6px;
     opacity: 0.76;
     cursor: pointer;
-    transition:
-        opacity 0.25s ease,
-        border-color 0.25s ease,
+    transition: opacity 0.25s ease, border-color 0.25s ease,
         transform 0.25s ease;
 }
 
@@ -253,9 +232,7 @@ body {
     transform: translateY(-2px);
 }
 
-/* ==========================================================================
-   RIGHT SIDE
-   ========================================================================== */
+/* Right side */
 
 .room-side-panel {
     display: flex;
@@ -263,10 +240,6 @@ body {
     gap: 15px;
     width: 100%;
 }
-
-/* ==========================================================================
-   ROOM SUMMARY
-   ========================================================================== */
 
 .room-summary-card {
     width: 100%;
@@ -368,9 +341,7 @@ body {
     overflow-wrap: break-word;
 }
 
-/* ==========================================================================
-   BOOKING PANEL
-   ========================================================================== */
+/* Booking */
 
 .booking-panel {
     width: 100%;
@@ -386,11 +357,6 @@ body {
     text-transform: uppercase;
 }
 
-/*
-   Hàng 1: Nhận phòng - Trả phòng
-   Hàng 2: Số khách - Số lượng phòng
-*/
-
 .booking-input-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -400,10 +366,7 @@ body {
     align-items: end;
 }
 
-.booking-input-grid > * {
-    min-width: 0;
-}
-
+.booking-input-grid > *,
 .booking-field {
     min-width: 0;
 }
@@ -418,10 +381,6 @@ body {
     letter-spacing: 0.5px;
     text-transform: uppercase;
 }
-
-/* ==========================================================================
-   DATE INPUT
-   ========================================================================== */
 
 .field-with-icon {
     width: 100%;
@@ -441,9 +400,7 @@ body {
     outline: none;
     font-family: Arial, sans-serif;
     font-size: 15px;
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease,
+    transition: border-color 0.2s ease, box-shadow 0.2s ease,
         background-color 0.2s ease;
 }
 
@@ -463,10 +420,6 @@ body {
     height: 18px;
     cursor: pointer;
 }
-
-/* ==========================================================================
-   QUANTITY INPUT
-   ========================================================================== */
 
 .booking-quantity-field .quantity-box {
     width: 100%;
@@ -497,9 +450,7 @@ body {
     font-size: 21px;
     font-weight: 500;
     cursor: pointer;
-    transition:
-        color 0.2s ease,
-        background-color 0.2s ease;
+    transition: color 0.2s ease, background-color 0.2s ease;
 }
 
 .quantity-box button:first-child {
@@ -523,10 +474,6 @@ body {
     font-weight: 600;
 }
 
-/* ==========================================================================
-   CAPACITY NOTE
-   ========================================================================== */
-
 .capacity-note {
     margin-top: 18px;
     padding: 12px 15px;
@@ -544,9 +491,7 @@ body {
     color: #073842;
 }
 
-/* ==========================================================================
-   CLIENT MESSAGE
-   ========================================================================== */
+/* Messages */
 
 .client-message {
     display: none;
@@ -600,10 +545,6 @@ body {
 .client-message.success i {
     color: #55a94c;
 }
-
-/* ==========================================================================
-   SERVER MESSAGE
-   ========================================================================== */
 
 .availability-box {
     display: grid;
@@ -675,9 +616,7 @@ body {
     white-space: nowrap;
 }
 
-/* ==========================================================================
-   PRICE
-   ========================================================================== */
+/* Price and actions */
 
 .booking-price-row {
     display: flex;
@@ -708,10 +647,6 @@ body {
     font-family: Arial, sans-serif;
     font-size: 12px;
 }
-
-/* ==========================================================================
-   ACTION BUTTONS
-   ========================================================================== */
 
 .booking-action-row {
     display: grid;
@@ -762,9 +697,7 @@ body {
     cursor: not-allowed;
 }
 
-/* ==========================================================================
-   ROOM INFORMATION
-   ========================================================================== */
+/* Room information */
 
 .room-info-grid {
     display: grid;
@@ -829,10 +762,6 @@ body {
     font-size: 11px;
 }
 
-/* ==========================================================================
-   ROOM SERVICES
-   ========================================================================== */
-
 .room-service-item {
     grid-template-columns: 26px minmax(0, 1fr) !important;
     align-items: start !important;
@@ -896,10 +825,6 @@ body {
     background-color: #fff5df;
 }
 
-/* ==========================================================================
-   AMENITIES
-   ========================================================================== */
-
 .amenity-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -922,9 +847,7 @@ body {
     text-align: center;
 }
 
-/* ==========================================================================
-   BENEFITS
-   ========================================================================== */
+/* Benefits */
 
 .benefit-strip {
     display: grid;
@@ -969,9 +892,7 @@ body {
     line-height: 1.4;
 }
 
-/* ==========================================================================
-   MEDIUM DESKTOP
-   ========================================================================== */
+/* Responsive */
 
 @media (max-width: 1200px) {
     .room-detail-wrapper {
@@ -1010,10 +931,6 @@ body {
     }
 }
 
-/* ==========================================================================
-   TABLET
-   ========================================================================== */
-
 @media (max-width: 880px) {
     .room-top-grid {
         grid-template-columns: 1fr;
@@ -1040,10 +957,6 @@ body {
         max-width: none;
     }
 }
-
-/* ==========================================================================
-   SMALL TABLET
-   ========================================================================== */
 
 @media (max-width: 600px) {
     .room-detail-wrapper {
@@ -1093,10 +1006,6 @@ body {
         border-right: none;
     }
 }
-
-/* ==========================================================================
-   MOBILE
-   ========================================================================== */
 
 @media (max-width: 450px) {
     .main-image-box {
