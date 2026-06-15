@@ -18,12 +18,13 @@ public class DepositPayment {
     private String verificationStatus;
     private LocalDateTime verifiedAt;
     private String notes;
+    private int verifiedBy;
 
     //Constructor
     public DepositPayment() {
     }
 
-    public DepositPayment(int depositId, int bookingId, BigDecimal amount, String paymentProofUrl, LocalDateTime submittedAt, String verificationStatus, LocalDateTime verifiedAt, String notes) {
+    public DepositPayment(int depositId, int bookingId, BigDecimal amount, String paymentProofUrl, LocalDateTime submittedAt, String verificationStatus, LocalDateTime verifiedAt, String notes, int verifiedBy) {
         this.depositId = depositId;
         this.bookingId = bookingId;
         this.amount = amount;
@@ -32,6 +33,7 @@ public class DepositPayment {
         this.verificationStatus = verificationStatus;
         this.verifiedAt = verifiedAt;
         this.notes = notes;
+        this.verifiedBy = verifiedBy;
     }
 
     //Getter & Setter
@@ -41,6 +43,14 @@ public class DepositPayment {
 
     public void setDepositId(int depositId) {
         this.depositId = depositId;
+    }
+
+    public int getVerifiedBy() {
+        return verifiedBy;
+    }
+
+    public void setVerifiedBy(int verifiedBy) {
+        this.verifiedBy = verifiedBy;
     }
 
     public int getBookingId() {
