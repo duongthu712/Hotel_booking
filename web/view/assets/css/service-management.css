@@ -13,7 +13,7 @@
 }
 
 .col-desc {
-    width: 51%;
+    width: 47%;
 }
 
 .col-price {
@@ -22,7 +22,7 @@
 }
 
 .col-status {
-    width: 9%;
+    width: 12%;
 }
 
 .col-action {
@@ -42,10 +42,11 @@
 
 .srvAct {
     text-align: center;
-    font-size: 0.8em;
-    border: 2px solid var(--border-color);
+    font-size: 0.75em;
     border-radius: var(--radius-custom);
-    padding: 6px 10px;
+    padding: 5px 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
 }
 
 .filter-title {

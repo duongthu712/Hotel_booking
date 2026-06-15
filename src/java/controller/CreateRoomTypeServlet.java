@@ -5,11 +5,9 @@
 
 package controller;
 
-import dao.RoomTypeDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,11 +16,15 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  * @author Minh Thu
  */
-@WebServlet(name = "RoomTypeDeleteServlet", urlPatterns = {"/roomtypedelete"})
-public class RoomTypeDeleteServlet extends HttpServlet {
+public class CreateRoomTypeServlet extends HttpServlet {
    
-    private final RoomTypeDAO roomTypeDAO = new RoomTypeDAO();
-    
+    /** 
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -31,43 +33,27 @@ public class RoomTypeDeleteServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet RoomTypeDeleteServlet</title>");  
+            out.println("<title>Servlet CreateRoomTypeServlet</title>");  
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet RoomTypeDeleteServlet at " + request.getContextPath () + "</h1>");
+            out.println("<h1>Servlet CreateRoomTypeServlet at " + request.getContextPath () + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
     } 
 
-   
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    /** 
+     * Handles the HTTP <code>GET</code> method.
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        try {
-            // 1. Đi thẳng lấy ID hạng phòng cần xóa từ tham số URL truyền sang
-            String idStr = request.getParameter("id");
-            if (idStr == null || idStr.trim().isEmpty()) {
-                response.sendRedirect(request.getContextPath() + "/roomtypelist");
-                return;
-            }
-            int roomTypeId = Integer.parseInt(idStr);
-
-            // 2. Gọi thẳng xuống hàm delete của RoomTypeDAO có sẵn trong máy Vũ
-            boolean isDeleted = roomTypeDAO.deleteRoomType(roomTypeId);
-
-            // 3. Điều hướng quay về trang danh sách kèm tín hiệu trạng thái thành công/thất bại
-            if (isDeleted) {
-                // Xóa mềm thành công -> Redirect về kèm status=deleted để file JS chung nổ SweetAlert2 xanh
-                response.sendRedirect(request.getContextPath() + "/roomtypelist?status=deleted");
-            } else {
-                response.sendRedirect(request.getContextPath() + "/roomtypelist?status=delete_failed");
-            }
-
-        } catch (Exception e) {
-            System.out.println(">>> LỖI NGHIÊM TRỌNG TẠI RoomTypeDeleteServlet: " + e.getMessage());
-            response.sendRedirect(request.getContextPath() + "/roomtypelist?status=delete_error");
-        }
+        processRequest(request, response);
     } 
 
     /** 

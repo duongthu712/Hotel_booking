@@ -73,9 +73,9 @@ public class StaffAccountDAO extends DBContext {
 
         try {
             String sql = """
-                         SELECT *
-                         FROM StaffAccounts
-                         WHERE username = ?
+                         SELECT * 
+                         FROM StaffAccounts 
+                         WHERE username = ? 
                          """;
 
             stm = connection.prepareStatement(sql);
@@ -426,7 +426,8 @@ public class StaffAccountDAO extends DBContext {
                         set full_name = ?, 
                             phone = ?, 
                         email = ?, 
-                            [role] = ? 
+                            [role] = ?,
+                        is_active = ? 
                         where staff_id = ? and deleted_at is null
                         """;
 
@@ -435,7 +436,8 @@ public class StaffAccountDAO extends DBContext {
             stm.setString(2, staff.getPhone());
             stm.setString(3, staff.getEmail());
             stm.setString(4, staff.getRole());
-            stm.setInt(5, staff.getStaffId());
+            stm.setBoolean(5, staff.isActive());
+            stm.setInt(6, staff.getStaffId());
 
             int rowCount = stm.executeUpdate();
             if (rowCount > 0) {
@@ -449,16 +451,16 @@ public class StaffAccountDAO extends DBContext {
     }
 
     public StaffAccount deleteStaffAcc(int staffId) throws Exception {
-        StaffAccount found = getStaffById(staffId);
+        StaffAccount found = getStaffAccById(staffId);
         if (found == null) {
             throw new Exception("Nhân viên cần xóa không tồn tại.");
         }
 
         String strSQL = """
-                        update StaffAccounts 
-                        set deleted_at = GETDATE(), 
+                        update StaffAccounts  
+                        set deleted_at = GETDATE(),  
                             is_active = 0 
-                        where staff_id = ? and deleted_at is null
+                        where staff_id = ? and deleted_at is null 
                         """;
 
         try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
@@ -478,8 +480,8 @@ public class StaffAccountDAO extends DBContext {
     public void createStaff(StaffAccount staff) {
         try {
             String sql = """
-                         INSERT INTO StaffAccounts
-                         (username, password_hash, full_name, email, phone, [role], is_active)
+                         INSERT INTO StaffAccounts 
+                         (username, password_hash, full_name, email, phone, [role], is_active) 
                          VALUES (?, ?, ?, ?, ?, ?, ?)
                          """;
 
@@ -505,10 +507,10 @@ public class StaffAccountDAO extends DBContext {
 
         try {
             String sql = """
-                         SELECT *
-                         FROM StaffAccounts
-                         WHERE username = ?
-                           AND deleted_at is null
+                         SELECT * 
+                         FROM StaffAccounts 
+                         WHERE username = ? 
+                           AND deleted_at is null 
                          """;
 
             stm = connection.prepareStatement(sql);

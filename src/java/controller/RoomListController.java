@@ -33,7 +33,7 @@ public class RoomListController extends HttpServlet {
         HttpSession session = request.getSession();
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
         if (staff == null) {
-            response.sendRedirect("login");
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
@@ -101,12 +101,6 @@ public class RoomListController extends HttpServlet {
                 request.setAttribute("guestList", guestList);
                 session.removeAttribute("selectedRoom");
                 session.removeAttribute("guestList");
-            }
-
-            Room editRoom = (Room) session.getAttribute("editRoom");
-            if (editRoom != null) {
-                request.setAttribute("editRoom", editRoom);
-                session.removeAttribute("editRoom");
             }
 
             request.setAttribute("roomList", pagedList);

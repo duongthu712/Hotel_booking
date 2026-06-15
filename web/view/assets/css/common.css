@@ -194,13 +194,13 @@ border-radius: var(--radius-custom);
 .status-active {
     background-color: #e8f5e9;
     color: #2e7d32;
-    border: 1px solid #c8e6c9;
+    border: 1px solid #2e7d32;
 }
 
 .status-inactive {
     background-color: #ffebee;
     color: #c62828;
-    border: 1px solid #ffcdd2;
+    border: 1px solid #c62828;
 }
 
 .data-table {

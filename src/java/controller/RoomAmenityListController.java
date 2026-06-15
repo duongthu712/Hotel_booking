@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 import model.RoomAmenity;
 import model.StaffAccount;
@@ -24,7 +25,7 @@ public class RoomAmenityListController extends HttpServlet {
         HttpSession session = request.getSession();
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
         if (staff == null) {
-            response.sendRedirect("login");
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
@@ -43,14 +44,18 @@ public class RoomAmenityListController extends HttpServlet {
         RoomAmenityDAO rDao = new RoomAmenityDAO();
 
         try {
-            List<RoomAmenity> roomAmentityList;
+            List<RoomAmenity> roomAmenityList;
             if (keyword != null && !keyword.trim().isEmpty()) {
-                roomAmentityList = rDao.searchRoomAmenitiesByName(keyword);
+                roomAmenityList = rDao.searchRoomAmenitiesByName(keyword.trim());
             } else {
-                roomAmentityList = rDao.getAllRoomAmenities();
+                roomAmenityList = rDao.getAllRoomAmenities();
             }
 
-            int totalRecords = roomAmentityList.size();
+            if (roomAmenityList == null) {
+                roomAmenityList = new ArrayList<>();
+            }
+
+            int totalRecords = roomAmenityList.size();
             int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
             if (page < 1) {
                 page = 1;
@@ -64,9 +69,9 @@ public class RoomAmenityListController extends HttpServlet {
             List<RoomAmenity> pagedList;
 
             if (totalRecords > 0) {
-                pagedList = roomAmentityList.subList(start, end);
+                pagedList = roomAmenityList.subList(start, end);
             } else {
-                pagedList = roomAmentityList;
+                pagedList = roomAmenityList;
             }
 
             request.setAttribute("amenityList", pagedList);
@@ -74,11 +79,15 @@ public class RoomAmenityListController extends HttpServlet {
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("keyword", keyword);
             
-            
             request.getRequestDispatcher("/view/manager/room-amenity-management.jsp").forward(request, response);
 
         } catch (Exception e) {
-            request.setAttribute("errorMessage", e.getMessage());
+            request.setAttribute("errorMessage", "Đã xảy ra lỗi hệ thống: " + e.getMessage());
+            request.setAttribute("amenityList", new ArrayList<>());
+            request.setAttribute("currentPage", 1);
+            request.setAttribute("totalPages", 1);
+            request.setAttribute("keyword", keyword);
+            
             request.getRequestDispatcher("/view/manager/room-amenity-management.jsp").forward(request, response);
         }
     }
@@ -91,6 +100,6 @@ public class RoomAmenityListController extends HttpServlet {
 
     @Override
     public String getServletInfo() {
-        return "Room Amentity List Controller";
+        return "Room Amenity List Controller";
     }
 }
