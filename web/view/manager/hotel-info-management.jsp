@@ -112,48 +112,48 @@
 
                     <div class="form-group">
                         <label class="input-label">Tên khách sạn*</label>
-                        <input type="text" name="getHotelName()" class="popup-input-field" 
+                        <input type="text" name="hotelName" class="popup-input-field" 
                                value="${hotelInfo.getHotelName()}" required>
                     </div>
 
                     <div class="form-group">
                         <label class="input-label">Mô tả</label>
-                        <textarea name="getDescription()" class="popup-input-field" rows="3">${hotelInfo.getDescription()}</textarea>
+                        <textarea name="description" class="popup-input-field" rows="3">${hotelInfo.getDescription()}</textarea>
                     </div>
 
                     <div class="form-group">
                         <label class="input-label">Giờ check-in</label>
-                        <input type="time" name="getCheckinTime()" class="popup-input-field" 
+                        <input type="time" name="checkinTime"" class="popup-input-field" 
                                value="${hotelInfo.getCheckinTime()}" required>
                     </div>
 
                     <div class="form-group">
                         <label class="input-label">Giờ check-out</label>
-                        <input type="time" name="getCheckoutTime()" class="popup-input-field" 
+                        <input type="time" name="checkoutTime" class="popup-input-field" 
                                value="${hotelInfo.getCheckoutTime()}" required>
                     </div>
 
                     <div class="form-group">
                         <label class="input-label">Địa chỉ*</label>
-                        <input type="text" name="getAddress()" class="popup-input-field" 
+                        <input type="text" name="address" class="popup-input-field" 
                                value="${hotelInfo.getAddress()}" required>
                     </div>
 
                     <div class="form-group">
                         <label class="input-label">URL địa chỉ</label>
-                        <input type="text" name="getAddressUrl()" class="popup-input-field" 
+                        <input type="text" name="addressUrl" class="popup-input-field" 
                                value="${hotelInfo.getAddressUrl()}">
                     </div>
 
                     <div class="form-group">
                         <label class="input-label">Điện thoại*</label>
-                        <input type="text" name="getPhone()" class="popup-input-field" 
+                        <input type="text" name="phone" class="popup-input-field" 
                                value="${hotelInfo.getPhone()}" required>
                     </div>
 
                     <div class="form-group">
                         <label class="input-label">Email*</label>
-                        <input type="getEmail()" name="getEmail()" class="popup-input-field" 
+                        <input type="getEmail()" name="email" class="popup-input-field" 
                                value="${hotelInfo.getEmail()}" required>
                     </div>
 
@@ -198,11 +198,11 @@
                 <form action="HotelImageUpdate" method="POST" id="image-edit-form" class="popup-content">
                     <h2 class="popup-title" id="image-modal-title">Chỉnh sửa ảnh</h2>
 
-                    <input type="hidden" name="getImageId()" id="edit-image-id">
+                    <input type="hidden" name="imageId" id="edit-image-id">
 
                     <div class="form-group">
                         <label class="input-label">Link ảnh mới*</label>
-                        <input type="text" name="getImageUrl()" id="edit-image-url" class="popup-input-field" required>
+                        <input type="text" name="imageUrl" id="edit-image-url" class="popup-input-field" required>
                     </div>
 
                     <div class="popup-action">
@@ -251,7 +251,8 @@
                             <tr class="${news.isActive() ? '' : 'row-inactive'}" 
                                 data-news-id="${news.getNewsId()}"
                                 data-image-url="${news.getImageUrl()}"
-                                data-full-content="${news.getContent()}">
+                                data-full-content="${news.getContent()}"
+                                data-title="${news.getTitle()}">
                                 <td class="col-stt">${(currentPage - 1) * 10 + loop.index + 1}</td>
                                 <td class="col-title">
                                     <a href="javascript:void(0)" class="news-title-link" 
@@ -334,7 +335,7 @@
 
                     <div class="form-group">
                         <label class="input-label">Link ảnh đi kèm</label>
-                        <input type="text" name="getImageUrl()" class="popup-input-field" 
+                        <input type="text" name="imageUrl" class="popup-input-field" 
                                value="${keepImageUrl}">
                     </div>
 
@@ -372,7 +373,7 @@
 
                     <div class="form-group">
                         <label class="input-label">Link ảnh đi kèm</label>
-                        <input type="text" name="getImageUrl()" class="popup-input-field" 
+                        <input type="text" name="imageUrl" class="popup-input-field" 
                                value="${newsToEdit.getImageUrl()}">
                     </div>
 

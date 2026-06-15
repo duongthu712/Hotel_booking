@@ -1,26 +1,16 @@
 document.addEventListener("DOMContentLoaded", function () {
-    //Thông báo lỗi
-    const alerts = document.querySelectorAll(".alert-message");
 
+    const alerts = document.querySelectorAll(".alert-message");
     alerts.forEach(alert => {
         setTimeout(() => {
             alert.style.opacity = "0";
             alert.style.transform = "translateY(-10px)";
             alert.style.transition = "opacity 0.3s ease, transform 0.3s ease";
-
             setTimeout(() => {
                 alert.remove();
             }, 300);
         }, 3000);
     });
-
-//hotel info
-    const infoViewModal = document.getElementById("info-view-modal");
-    const infoEditModal = document.getElementById("info-edit-modal");
-    const btnHotelInfo = document.getElementById("btn-hotel-info");
-    const btnCloseInfo = document.getElementById("btn-close-info");
-    const btnEditInfo = document.getElementById("btn-edit-info");
-    const btnCloseInfoEdit = document.getElementById("btn-close-info-edit");
 
     function toggleModal(modal, show) {
         if (!modal)
@@ -33,6 +23,14 @@ document.addEventListener("DOMContentLoaded", function () {
             modal.style.display = "none";
         }
     }
+
+    // Hotel Info
+    const infoViewModal = document.getElementById("info-view-modal");
+    const infoEditModal = document.getElementById("info-edit-modal");
+    const btnHotelInfo = document.getElementById("btn-hotel-info");
+    const btnCloseInfo = document.getElementById("btn-close-info");
+    const btnEditInfo = document.getElementById("btn-edit-info");
+    const btnCloseInfoEdit = document.getElementById("btn-close-info-edit");
 
     if (btnHotelInfo) {
         btnHotelInfo.addEventListener("click", () => {
@@ -67,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function () {
         toggleModal(infoEditModal, true);
     }
 
-//hotel img
+    // Hotel Image
     const imageEditModal = document.getElementById("image-edit-modal");
     const btnCloseImage = document.getElementById("btn-close-image");
     const editImageId = document.getElementById("edit-image-id");
@@ -89,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-//hotel news
+    // Hotel News Detail
     const newsDetailModal = document.getElementById("news-detail-modal");
     const btnCloseDetail = document.getElementById("btn-close-detail");
     const btnEditFromDetail = document.getElementById("btn-edit-from-detail");
@@ -99,8 +97,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const detailNewsContent = document.getElementById("detail-news-content");
     const detailNewsStatus = document.getElementById("detail-news-status");
     const detailNewsDate = document.getElementById("detail-news-date");
-    const content = newsRow.getAttribute("data-full-content") || "";
-
 
     let currentDetailNewsId = null;
 
@@ -111,11 +107,10 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        const title = newsRow.querySelector(".col-title a")?.innerText || "";
-        const content = newsRow.querySelector(".col-content")?.innerText || "";
+        const title = newsRow.getAttribute("data-title") || "";
+        const content = newsRow.getAttribute("data-full-content") || "";
         const status = newsRow.querySelector(".news-status")?.innerText || "";
         const statusClass = newsRow.querySelector(".news-status")?.classList.contains("status-active") ? "active" : "inactive";
-
         const imageUrl = newsRow.getAttribute("data-image-url") || "";
 
         if (detailNewsTitle)
@@ -156,6 +151,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // News Create
     const newsCreateModal = document.getElementById("news-create-modal");
     const btnCreateNews = document.getElementById("btn-create-news");
     const btnCloseCreate = document.getElementById("btn-close-create");
@@ -181,6 +177,7 @@ document.addEventListener("DOMContentLoaded", function () {
         toggleModal(newsCreateModal, true);
     }
 
+    // News Edit
     const newsEditModal = document.getElementById("news-edit-modal");
     const btnCloseEdit = document.getElementById("btn-close-edit");
 
@@ -199,6 +196,7 @@ document.addEventListener("DOMContentLoaded", function () {
         toggleModal(newsEditModal, true);
     }
 
+    // Scroll to news section
     if (window.location.hash === "#news-section") {
         const newsSection = document.getElementById("news-section");
         if (newsSection) {
@@ -208,17 +206,4 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    document.querySelectorAll(".hotel-popup").forEach(modal => {
-        modal.addEventListener("click", (e) => {
-            if (e.target === modal) {
-                const isEdit = modal.id === "news-edit-modal" && isEditMode;
-                const isCreate = modal.id === "news-create-modal" && isCreateMode;
-                const isInfoEdit = modal.id === "info-edit-modal" && isInfoEditMode;
-
-                if (!isEdit && !isCreate && !isInfoEdit) {
-                    toggleModal(modal, false);
-                }
-            }
-        });
-    });
 });

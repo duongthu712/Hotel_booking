@@ -68,14 +68,14 @@ public class HotelInfoUpdateController extends HttpServlet {
 
         HotelInfo hotelInfo = new HotelInfo();
         hotelInfo.setHotelId(hotelId);
-        hotelInfo.setHotelName(hotelName.trim());
-        hotelInfo.setDescription(description);
+        hotelInfo.setHotelName(hotelName != null ? hotelName.trim() : null);
+        hotelInfo.setDescription(description != null ? description.trim() : null);
         hotelInfo.setCheckinTime(checkinTime != null && !checkinTime.isEmpty() ? checkinTime : "14:00:00");
         hotelInfo.setCheckoutTime(checkoutTime != null && !checkoutTime.isEmpty() ? checkoutTime : "12:00:00");
-        hotelInfo.setAddress(address.trim());
-        hotelInfo.setAddressUrl(addressUrl);
-        hotelInfo.setPhone(phone.trim());
-        hotelInfo.setEmail(email.trim());
+        hotelInfo.setAddress(address != null ? address.trim() : null);
+        hotelInfo.setAddressUrl(addressUrl != null && !addressUrl.trim().isEmpty() ? addressUrl.trim() : null);
+        hotelInfo.setPhone(phone != null ? phone.trim() : null);
+        hotelInfo.setEmail(email != null ? email.trim() : null);
 
         try {
             HotelInfoDAO dao = new HotelInfoDAO();

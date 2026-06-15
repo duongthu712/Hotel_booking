@@ -90,9 +90,9 @@ public class HotelNewsEditController extends HttpServlet {
 
         HotelNews news = new HotelNews();
         news.setNewsId(newsId);
-        news.setTitle(title.trim());
-        news.setContent(content.trim());
-        news.setImageUrl(imageUrl.trim());
+        news.setTitle(title != null ? title.trim() : null);
+        news.setContent(content != null ? content.trim() : null);
+        news.setImageUrl(imageUrl != null && !imageUrl.trim().isEmpty() ? imageUrl.trim() : null);
         news.setActive(isActive);
 
         try {

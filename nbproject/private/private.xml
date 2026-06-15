@@ -3,11 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/admin/staff-management.jsp</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/manager/hotel-service-management.jsp</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/model/HotelService.java</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/WEB-INF/web.xml</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/dao/HotelServiceDAO.java</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/dao/RoomDAO.java</file>
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/HotelServiceDeleteController.java</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/HotelServiceCreateController.java</file>
         </group>
     </open-files>
 </project-private>
