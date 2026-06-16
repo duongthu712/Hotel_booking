@@ -27,7 +27,8 @@
                 <p>Trải nghiệm nghỉ dưỡng sang trọng và thư giãn tuyệt đối tại La Mer.</p>
 
                 <div class="hero-actions">
-                    <a class="btn primary" href="${pageContext.request.contextPath}/view/user/booking-form.jsp">Đặt phòng</a>
+                    <a href="${pageContext.request.contextPath}/quick-booking"
+                       class="booking-btn">Đặt phòng nhanh</a>
                     <a class="btn outline" href="${pageContext.request.contextPath}/search">Khám phá</a>
                 </div>
             </div>
