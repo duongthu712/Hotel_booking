@@ -17,8 +17,7 @@ import model.RoomType;
 import model.StaffAccount;
 
 /**
- * RoomListController.java
- * Display room management page for manager
+ * RoomListController.java Display room management page for manager
  *
  * @author LinhLTHE200306
  * @version 2.0
@@ -101,6 +100,12 @@ public class RoomListController extends HttpServlet {
                 request.setAttribute("guestList", guestList);
                 session.removeAttribute("selectedRoom");
                 session.removeAttribute("guestList");
+            }
+
+            Room editRoom = (Room) session.getAttribute("editRoom");
+            if (editRoom != null) {
+                request.setAttribute("editRoom", editRoom);
+                session.removeAttribute("editRoom");
             }
 
             request.setAttribute("roomList", pagedList);

@@ -1,5 +1,6 @@
 package controller;
 
+import dao.BookingDAO;
 import dao.DepositPaymentDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -47,15 +48,16 @@ public class DepositPaymentListController extends HttpServlet {
         int recordsPerPage = 10;
 
         try {
-            DepositPaymentDAO dao = new DepositPaymentDAO();
+            DepositPaymentDAO dpdao = new DepositPaymentDAO();
+            BookingDAO bdao = new BookingDAO();
             List<DepositPayment> allPayments;
 
             if (keyword != null && !keyword.trim().isEmpty()) {
-                allPayments = dao.searchPayments(keyword.trim());
+                allPayments = dpdao.searchPayments(keyword.trim());
             } else if (status == null || status.isEmpty()) {
-                allPayments = dao.getPendingPayments();
+                allPayments = dpdao.getPendingPayments();
             } else {
-                allPayments = dao.getAllPaymentsByStatus(status);
+                allPayments = dpdao.getAllPaymentsByStatus(status);
             }
 
             if (allPayments == null) {
@@ -69,8 +71,8 @@ public class DepositPaymentListController extends HttpServlet {
             for (DepositPayment payment : allPayments) {
                 int bookingId = payment.getBookingId();
                 if (!bookingCodeMap.containsKey(bookingId)) {
-                    String bookingCode = dao.getBookingCodeByBookingId(bookingId);
-                    String guestName = dao.getGuestNameByBookingId(bookingId);
+                    String bookingCode = bdao.getBookingCodeByBookingId(bookingId);
+                    String guestName = bdao.getGuestNameByBookingId(bookingId);
                     bookingCodeMap.put(bookingId, bookingCode);
                     guestNameMap.put(bookingId, guestName);
                 }

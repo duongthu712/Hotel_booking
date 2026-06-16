@@ -149,6 +149,27 @@ border-radius: var(--radius-custom);
     background: #333;
 }
 
+.btn-reject {
+    background: none;
+    color: var(--text-main);
+    padding: 11px 25px;
+    border-radius: 8px;
+    border: 1px solid var(--text-main);
+    cursor: pointer;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    font-family: var(--font-logo);
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-reject:hover {
+    background: #333;
+    color: #fff;
+}
+
 .btn-close {
     background: transparent;
     border: none;
@@ -189,6 +210,17 @@ border-radius: var(--radius-custom);
     background: var(--text-main);
     color: #ffffff;
     border-color: var(--text-main);
+}
+
+.filter-select {
+    padding: 10px 14px;
+    border: 1px solid #d9d9d9;
+    border-radius: var(--radius-custom);
+    font-family: var(--font-logo);
+    font-size: 14px;
+    background: white;
+    color: var(--text-main);
+    outline: none;
 }
 
 .status-active {
@@ -309,7 +341,7 @@ border-radius: var(--radius-custom);
     border: 1px solid #c8e6c9;
 }
 
-.service-popup, .amenity-popup, .room-modal, .staff-modal {
+.service-popup, .amenity-popup, .room-modal, .staff-modal, .hotel-popup {
     display: none;
     position: fixed;
     inset: 0;
@@ -320,7 +352,7 @@ border-radius: var(--radius-custom);
     z-index: 1000;
 }
 
-.service-popup.active, .amenity-popup.active, .room-modal.active, .staff-modal.show {
+.service-popup.active, .amenity-popup.active, .room-modal.active, .staff-modal.show, .hotel-popup.show{
     display: flex;
 }
 
@@ -333,7 +365,7 @@ border-radius: var(--radius-custom);
     border: 1px solid var(--border-color);
 }
 
-.modal-header {
+.modal-header, .popup-title {
     display: flex;
     justify-content: space-between;
     align-items: center;

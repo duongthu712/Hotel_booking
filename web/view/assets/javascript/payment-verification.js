@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    
+
     const alerts = document.querySelectorAll(".alert-message");
     alerts.forEach(alert => {
         setTimeout(() => {
@@ -13,7 +13,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function toggleModal(modal, show) {
-        if (!modal) return;
+        if (!modal)
+            return;
         if (show) {
             modal.classList.add("show");
             modal.style.display = "flex";
@@ -51,33 +52,55 @@ document.addEventListener("DOMContentLoaded", function () {
         const submittedAt = paymentRow.querySelector(".col-date")?.innerText || "";
         const status = paymentRow.querySelector(".payment-status")?.innerText || "";
         const proofUrl = paymentRow.getAttribute("data-proof-url") || "";
-        const statusClass = paymentRow.querySelector(".payment-status")?.classList.contains("status-pending") ? "pending" : 
-                           (paymentRow.querySelector(".payment-status")?.classList.contains("status-approved") ? "approved" : "rejected");
+        const statusClass = paymentRow.querySelector(".payment-status")?.classList.contains("status-pending") ? "pending" :
+                (paymentRow.querySelector(".payment-status")?.classList.contains("status-approved") ? "approved" : "rejected");
 
-        if (detailBookingCode) detailBookingCode.innerText = bookingCode;
-        if (detailGuestName) detailGuestName.innerText = guestName;
-        if (detailAmount) detailAmount.innerText = amount;
-        if (detailSubmittedAt) detailSubmittedAt.innerText = submittedAt;
+        if (detailBookingCode)
+            detailBookingCode.innerText = bookingCode;
+        if (detailGuestName)
+            detailGuestName.innerText = guestName;
+        if (detailAmount)
+            detailAmount.innerText = amount;
+        if (detailSubmittedAt)
+            detailSubmittedAt.innerText = submittedAt;
         if (detailStatus) {
             detailStatus.innerText = status;
             detailStatus.className = statusClass === "pending" ? "status-pending" : (statusClass === "approved" ? "status-approved" : "status-rejected");
         }
 
         if (proofUrl) {
-            if (proofImg) proofImg.src = proofUrl;
-            if (proofWrapper) proofWrapper.style.display = "block";
+            if (proofImg)
+                proofImg.src = proofUrl;
+            if (proofWrapper)
+                proofWrapper.style.display = "block";
         } else {
-            if (proofWrapper) proofWrapper.style.display = "none";
+            if (proofWrapper)
+                proofWrapper.style.display = "none";
         }
 
-        if (verifyDepositId) verifyDepositId.value = depositId;
-        if (rejectDepositId) rejectDepositId.value = depositId;
+        if (verifyDepositId)
+            verifyDepositId.value = depositId;
+        if (rejectDepositId)
+            rejectDepositId.value = depositId;
 
-        // Hide verification form if already processed
+        const btnReject = document.querySelector(".btn-reject");
+        const btnSubmit = document.querySelector(".btn-submit");
+        const popupAction = document.querySelector(".popup-action");
+
         if (statusClass !== "pending") {
-            if (verificationForm) verificationForm.style.display = "none";
+            if (verificationForm)
+                verificationForm.style.display = "none";
+            if (btnReject)
+                btnReject.style.display = "none";
+            if (btnSubmit)
+                btnSubmit.style.display = "none";
         } else {
-            if (verificationForm) verificationForm.style.display = "block";
+            if (verificationForm)
+                verificationForm.style.display = "block";
+            if (btnReject)
+                btnReject.style.display = "inline-block";
+            if (btnSubmit)
+                btnSubmit.style.display = "inline-block";
         }
 
         toggleModal(paymentDetailModal, true);
@@ -86,13 +109,15 @@ document.addEventListener("DOMContentLoaded", function () {
     if (btnCloseDetail) {
         btnCloseDetail.addEventListener("click", () => {
             toggleModal(paymentDetailModal, false);
-            if (verifyNotes) verifyNotes.value = "";
+            if (verifyNotes)
+                verifyNotes.value = "";
         });
     }
 
     window.prepareReject = function () {
         const notes = verifyNotes ? verifyNotes.value : "";
-        if (rejectNotes) rejectNotes.value = notes;
+        if (rejectNotes)
+            rejectNotes.value = notes;
         return confirm("Bạn có chắc muốn từ chối khoản thanh toán này?");
     };
 
@@ -100,7 +125,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if (verifyForm) {
         verifyForm.addEventListener("submit", function () {
             const notes = verifyNotes ? verifyNotes.value : "";
-            if (verifyNotesHidden) verifyNotesHidden.value = notes;
+            if (verifyNotesHidden)
+                verifyNotesHidden.value = notes;
         });
     }
 
