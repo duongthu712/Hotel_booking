@@ -1,0 +1,622 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Cormorant Garamond', 'Lora', serif;
+}
+
+body {
+    background-color: #F9F5EB !important; 
+    color: #1a446c;
+}
+
+h1, h2, h3, h4, h5, .management-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    color: #1a446c;
+}
+
+.container, .management-wrapper {
+    padding: 20px 50px; 
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.border-bottom-luxury {
+    border-bottom: 1px dashed #ebd9b4;
+}
+
+.divider {
+    border: 0;
+    border-top: 1px dashed #ebd9b4;
+    margin: 20px 0;
+}
+
+.search-card {
+    background-color: #ffffff;
+    border: 1px solid #ebd9b4;
+    padding: 24px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(26, 68, 108, 0.03);
+}
+
+.search-card h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    letter-spacing: 0.5px;
+}
+
+.search-card form {
+    display: flex;
+    gap: 12px;
+}
+
+.search-card input[type="text"] {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #ebd9b4;
+    border-radius: 4px;
+    font-family: 'Lora', serif;
+    font-size: 14px;
+    color: #1a446c;
+    background-color: #fbfbfb;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.search-card input[type="text"]:focus {
+    border-color: #1a446c;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(26, 68, 108, 0.08);
+}
+
+.search-card button {
+    font-family: 'Lora', serif;
+    background-color: #1a446c;
+    color: #ffffff;
+    border: none;
+    padding: 0 24px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.search-card button:hover {
+    background-color: #112d47;
+}
+
+.main-card {
+    background-color: #ffffff;
+    border: 1px solid #ebd9b4;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(26, 68, 108, 0.05);
+}
+
+.searched-booking-card {
+    border: 2px solid #1a446c; 
+    margin-bottom: 30px;
+}
+
+.card-header-flex {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 16px;
+}
+
+.card-header-flex h3 {
+    margin: 0; 
+    color: #1a446c;
+}
+
+.btn-close-view {
+    text-decoration: none; 
+    background-color: #64748b; 
+    color: white; 
+    padding: 6px 14px; 
+    border-radius: 6px; 
+    font-size: 13px; 
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.btn-close-view:hover {
+    background-color: #475569;
+}
+
+.info-block {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 15px;
+    background-color: rgba(249, 245, 235, 0.5);
+    padding: 20px;
+    border-radius: 6px;
+    border: 1px solid rgba(235, 217, 180, 0.5);
+    margin-bottom: 20px;
+}
+
+.info-block p {
+    font-family: 'Lora', serif;
+    font-size: 14px;
+    color: #4f6f8f;
+    margin: 0;
+}
+
+.info-block strong {
+    color: #1a446c;
+}
+
+.text-success-highlight {
+    color: #1a446c; 
+    font-weight: 600;
+}
+
+#checkInForm h5 {
+    font-size: 18px;
+    margin: 25px 0 15px 0;
+    border-left: 3px solid #bfa15f;
+    padding-left: 10px;
+}
+
+#checkInForm label {
+    display: block;
+    font-family: 'Lora', serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    margin-top: 14px;
+    color: #1a446c;
+}
+
+#checkInForm input[type="text"],
+#checkInForm input[type="number"],
+#checkInForm input[type="email"],
+#checkInForm input[type="date"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ebd9b4;
+    border-radius: 4px;
+    font-family: 'Lora', serif;
+    font-size: 14px;
+    color: #1a446c;
+    outline: none;
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+}
+
+#checkInForm input:focus {
+    border-color: #1a446c;
+    box-shadow: 0 0 0 3px rgba(26, 68, 108, 0.05);
+}
+
+#checkInForm input:disabled {
+    background-color: #f1f5f9;
+    color: #64748b;
+    cursor: not-allowed;
+    border-color: #e2e8f0;
+}
+
+.switch-block {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: rgba(191, 161, 95, 0.08);
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-top: 15px;
+    border: 1px solid rgba(191, 161, 95, 0.2);
+}
+
+.switch-block input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #1a446c;
+    cursor: pointer;
+}
+
+.switch-block label {
+    margin: 0 !important;
+    cursor: pointer;
+}
+
+.hide-element {
+    display: none !important;
+}
+
+.stats-row {
+    display: flex;
+    gap: 24px; 
+    margin-bottom: 30px;
+    width: 100%;
+}
+
+.stat-box {
+    flex: 1;
+    background-color: #ffffff;
+    border: 1px solid #ebd9b4;
+    padding: 24px; 
+    border-radius: 4px; 
+    display: flex;
+    flex-direction: column; 
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(26, 68, 108, 0.02);
+    border-left: 3px solid #1a446c; 
+    transition: all 0.3s ease;
+}
+
+.stat-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(26, 68, 108, 0.05);
+}
+
+.stat-icon {
+    display: none !important;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; 
+}
+
+.stat-num {
+    font-family: 'Lora', serif;
+    font-size: 24px; 
+    font-weight: 700;
+    color: #1a446c;
+    letter-spacing: 0.5px;
+}
+
+.stat-label {
+    font-family: 'Lora', serif;
+    font-size: 13px;
+    color: #64748b;
+    text-transform: uppercase; 
+    letter-spacing: 0.5px;
+}
+
+.decor-card {
+    background-color: #ffffff;
+    border: 1px solid #ebd9b4;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(26, 68, 108, 0.03);
+}
+
+.card-title {
+    font-size: 18px;
+    letter-spacing: 0.5px;
+    margin-bottom: 15px;
+    border-bottom: 1px dashed #ebd9b4;
+    padding-bottom: 10px;
+    color: #1a446c;
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+}
+
+.today-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.today-table thead th {
+    color: #1a446c;
+    font-family: 'Lora', serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 14px 12px;
+    border-bottom: 2px solid #ebd9b4;
+    text-align: left;
+}
+
+.today-table tbody td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #ebd9b4;
+    font-family: 'Lora', serif;
+    font-size: 14px;
+    color: #1a446c;
+}
+
+.today-table tbody tr:hover {
+    background-color: rgba(26, 68, 108, 0.02);
+}
+
+.td-code {
+    font-weight: 700;
+    color: #bfa15f;
+}
+
+.td-name {
+    font-weight: 600;
+}
+
+.td-empty {
+    text-align: center;
+    color: #8da4ba;
+    font-style: italic;
+    padding: 30px !important;
+}
+
+.table-actions-flex {
+    display: flex; 
+    gap: 6px; 
+    justify-content: center; 
+    align-items: center;
+}
+
+.form-inline-table {
+    margin: 0; 
+    display: inline;
+}
+
+.btn-select {
+    font-family: 'Lora', serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+    color: #ffffff;
+    background-color: #1a446c;
+    padding: 6px 14px;
+    border-radius: 4px;
+    display: inline-block;
+    transition: background-color 0.2s ease;
+}
+
+.btn-select:hover {
+    background-color: #112d47;
+}
+
+.btn-danger {
+    font-family: 'Lora', serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 12px 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.btn-danger-flat {
+    background-color: #dc2626 !important; 
+    color: white !important;
+    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.1);
+}
+
+.btn-danger-flat:hover {
+    background-color: #991b1b !important;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+    transform: translateY(-1px);
+}
+
+.btn-danger-table-click {
+    background-color: #1a446c; 
+    color: #ffffff;
+    border: none; 
+    padding: 4px 8px; 
+    border-radius: 4px; 
+    font-size: 12px; 
+    font-weight: 500; 
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-danger-table-click:hover {
+    background-color: #112d47;
+}
+
+.badge-success, .badge-warning, .badge-danger {
+    font-family: 'Lora', serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    letter-spacing: 0.5px;
+}
+
+/* Trả lại màu xanh lá cây chuẩn cho trạng thái Đã nhận phòng */
+.badge-success { 
+    background-color: #e8f5e9; 
+    color: #2e7d32; 
+    border: 1px solid #c8e6c9; 
+}
+.badge-warning {
+    background-color: #fffde7;
+    color: #f57f17;
+    border: 1px solid #fff9c4;
+}
+
+.badge-danger {
+    background-color: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fca5a5;
+}
+
+.badge-canceled-text {
+    padding: 4px 8px; 
+    font-size: 12px; 
+    font-weight: 500;
+}
+
+.room-badge {
+    font-family: 'Lora', serif;
+    font-size: 12.5px;
+    background-color: #f1f5f9;
+    color: #334155;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+}
+
+.time-col-text {
+    font-size: 13px; 
+    color: #475569;
+}
+
+.text-success-time {
+    font-weight: 500; 
+    color: #1a446c;
+}
+
+.text-muted-dash {
+    color: #94a3b8;
+}
+
+.btn-success {
+    font-family: 'Lora', serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background-color: #1a446c !important; 
+    color: #ffffff !important;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(26, 68, 108, 0.1);
+}
+
+.btn-success:hover {
+    background-color: #112d47 !important;
+    box-shadow: 0 4px 12px rgba(26, 68, 108, 0.2);
+    transform: translateY(-1px);
+}
+
+.btn-success:active, .btn-danger-flat:active {
+    transform: translateY(0);
+}
+
+.btn-disabled {
+    background-color: #94a3b8 !important; 
+    cursor: not-allowed;
+}
+
+.btn-disabled:hover {
+    background-color: #94a3b8 !important;
+    box-shadow: none;
+    transform: none;
+}
+
+.form-footer {
+    width: 100%;
+}
+
+.footer-buttons-flex {
+    display: flex; 
+    gap: 10px; 
+    justify-content: center; 
+    margin-top: 20px;
+}
+
+.alert-danger {
+    background-color: #fee2e2;
+    color: #dc2626;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-family: 'Lora', serif;
+    font-size: 14px;
+    font-weight: 500;
+    border: 1px solid #fca5a5;
+}
+
+.alert-centered {
+    margin-top: 20px; 
+    margin-bottom: 0; 
+    text-align: center;
+}
+
+.text-center { 
+    text-align: center; 
+}
+
+/* Thêm định dạng đồng bộ cho nút hủy trong form khi muốn gộp cấu trúc */
+.btn-danger-flat-navy {
+    background-color: #1a446c !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 6px rgba(26, 68, 108, 0.1);
+}
+
+.btn-danger-flat-navy:hover {
+    background-color: #112d47 !important;
+    box-shadow: 0 4px 12px rgba(26, 68, 108, 0.2);
+    transform: translateY(-1px);
+}
+/* 1. Ép chung kết cấu kích thước, chiều cao và phông chữ 'Lora' đặc trưng */
+.table-actions-flex .btn-select,
+.table-actions-flex .btn-assign,
+.table-actions-flex a[href*="assign-room"],
+.table-actions-flex .btn-danger-table-click {
+    display: inline-block;
+    box-sizing: border-box;
+    height: 31px;
+    line-height: 19px; 
+    padding: 6px 14px;
+    
+    font-family: 'Lora', serif !important;
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+    
+    border-radius: 4px;
+    border: none !important;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin: 0;
+    vertical-align: middle;
+}
+
+/* 2. Đồng nhất một màu xanh Navy quý phái (#1a446c) giống nút Chọn đơn gốc */
+.table-actions-flex .btn-select,
+.table-actions-flex .btn-assign,
+.table-actions-flex a[href*="assign-room"],
+.table-actions-flex .btn-danger-table-click {
+    background-color: #1a446c !important;
+    color: #ffffff !important;
+}
+
+/* 3. Hiệu ứng Hover đồng bộ tối màu (#112d47) cho cả 3 nút */
+.table-actions-flex .btn-select:hover,
+.table-actions-flex .btn-assign:hover,
+.table-actions-flex a[href*="assign-room"]:hover,
+.table-actions-flex .btn-danger-table-click:hover {
+    background-color: #112d47 !important;
+    color: #ffffff !important;
+    box-shadow: none;
+    transform: none;
+}
+
+/* 4. Khử lệch dòng tuyệt đối cho form chứa nút Hủy */
+.table-actions-flex .form-inline-table {
+    display: inline-block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    vertical-align: middle !important;
+}
+
+/* 5. Cân bằng padding nội bộ của riêng nút Hủy (thẻ button) tránh bị chữ co lệch */
+.table-actions-flex .btn-danger-table-click {
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+}

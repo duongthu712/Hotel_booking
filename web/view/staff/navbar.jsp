@@ -27,9 +27,16 @@
     <a href="${pageContext.request.contextPath}/PolicyList">Chính sách</a>
     <a href="${pageContext.request.contextPath}/FeedbackList">Đánh giá</a>
     <%}else if("RECEPTIONIST".equals(role)){%>
-    <a href="${pageContext.request.contextPath}/dashboard.jsp">Tổng quan</a>
+    <a href="${pageContext.request.contextPath}/receptionist/dashboard">Tổng quan</a>
+    <a href="${pageContext.request.contextPath}/assign-room">Sơ đồ phòng</a>
+    <a href="${pageContext.request.contextPath}/checkin">Nhận phòng</a>
+    <a href="${pageContext.request.contextPath}/receptionist/checkout">Trả phòng</a>
+    <a href="${pageContext.request.contextPath}/receptionist/bookings">Danh sách đặt phòng</a>
+    <a href="${pageContext.request.contextPath}/receptionist/walkin">Đặt phòng tại quầy</a>
+    <a href="${pageContext.request.contextPath}/receptionist/requests">Xử lý yêu cầu</a>
     <a href="${pageContext.request.contextPath}/DepositPaymentList">Danh sách đặt cọc</a>
     <%}else if("ADMIN".equals(role)){%>
+
     <a href="StaffAccountList">Quản lý tài khoản nhân viên</a>
     <%}%>
     <%}%>
