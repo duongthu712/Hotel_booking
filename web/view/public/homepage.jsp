@@ -51,41 +51,7 @@
             </form>
         </header>
 
-        <main class="container">
-            <section class="section">
-                <h2>Dịch vụ & tiện nghi</h2>
-
-                <div class="grid">
-                    <c:choose>
-                        <c:when test="${not empty services}">
-                            <c:forEach var="service" items="${services}">
-                                <div class="card">
-                                    <h3>${service.serviceName}</h3>
-                                    <p>${service.description}</p>
-                                    <span class="price">
-                                        <c:choose>
-                                            <c:when test="${empty service.unitPrice || service.unitPrice < 1}">
-                                                Miễn phí
-                                            </c:when>
-                                            <c:otherwise>
-                                                <fmt:formatNumber value="${service.unitPrice}" type="number"/> ₫
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </span>
-                                </div>
-                            </c:forEach>
-                        </c:when>
-                        <c:otherwise>
-                            <div class="card">
-                                <h3>Rooftop Pool</h3>
-                                <p>Hồ bơi vô cực view biển cực chill.</p>
-                                <span class="price">Miễn phí</span>
-                            </div>
-                        </c:otherwise>
-                    </c:choose>
-                </div>
-            </section>
-
+        <main class="container">          
             <section class="section">
                 <h2>Tin tức & Sự kiện</h2>
 
@@ -118,6 +84,39 @@
                     </c:forEach>
                 </div>
             </section>
+            <section class="section">
+                <h2>Dịch vụ & tiện nghi</h2>
+
+                <div class="grid">
+                <c:choose>
+                    <c:when test="${not empty services}">
+                        <c:forEach var="service" items="${services}">
+                            <div class="card">
+                                <h3>${service.serviceName}</h3>
+                                <p>${service.description}</p>
+                                <span class="price">
+                                    <c:choose>
+                                        <c:when test="${empty service.unitPrice || service.unitPrice < 1}">
+                                            Miễn phí
+                                        </c:when>
+                                        <c:otherwise>
+                                            <fmt:formatNumber value="${service.unitPrice}" type="number"/> ₫
+                                        </c:otherwise>
+                                    </c:choose>
+                                </span>
+                            </div>
+                        </c:forEach>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="card">
+                            <h3>Rooftop Pool</h3>
+                            <p>Hồ bơi vô cực view biển cực chill.</p>
+                            <span class="price">Miễn phí</span>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+        </section>
         </main>
 
         <jsp:include page="/view/common/footer.jsp" />

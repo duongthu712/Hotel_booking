@@ -109,17 +109,20 @@
                                         </div>
 
                                     </div>
+                                        <div class="room-card-footer-bar">
+                                            <div class="room-actions-group">
+                                                <a href="${pageContext.request.contextPath}/room-detail?id=${room.roomTypeId}&checkIn=${param.checkIn}&checkOut=${param.checkOut}&roomQuantity=${not empty param.roomQuantity ? param.roomQuantity : 1}"
+                                                    class="btn-action-view">
+                                                    Xem chi tiết
+                                                </a>
 
-                                    <div class="room-card-footer-bar">
-                                        <div class="room-actions-group">
-                                            <a href="${pageContext.request.contextPath}/room-detail?id=${room.roomTypeId}" class="btn-action-view">
-                                                Xem chi tiết
-                                            </a>
-                                            <a href="${pageContext.request.contextPath}/view/user/booking-form.jsp?roomTypeId=${room.roomTypeId}&checkIn=${param.checkIn}&checkOut=${param.checkOut}&roomQuantity=${not empty param.roomQuantity ? param.roomQuantity : 1}" class="btn-action-book">
-                                                Đặt Phòng
-                                            </a>
-                                        </div>
-                                    </div>
+                                                <a href="${pageContext.request.contextPath}/view/user/booking-form.jsp?roomTypeId=${room.roomTypeId}&checkIn=${param.checkIn}&checkOut=${param.checkOut}&roomQuantity=${not empty param.roomQuantity ? param.roomQuantity : 1}"
+                                                    class="btn-action-book">
+                                                    Đặt Phòng
+                                                </a>
+
+                                                    </div>
+                                                </div>
                                 </div>
 
                             </div>
