@@ -9,9 +9,6 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeUtility;
 import java.time.LocalDate;
-
-import java.util.Properties;
-
 import java.util.Properties;
 
 public class EmailUtil {

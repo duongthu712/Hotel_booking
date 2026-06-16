@@ -41,16 +41,24 @@ public class DepositPaymentDAO extends DBContext {
     public List<DepositPayment> getAllPaymentsByStatus(String status) throws Exception {
         List<DepositPayment> list = new ArrayList<>();
         StringBuilder strSQL = new StringBuilder("""
-                        select dp.*, g.full_name, b.booking_code
-                        from DepositPayments dp
-                        join Bookings b on dp.booking_id = b.booking_id
-                        join Guests g on b.guest_id = g.guest_id
-                        """);
+                                                 select dp.*, g.full_name, b.booking_code
+                                                 from DepositPayments dp
+                                                 join Bookings b on dp.booking_id = b.booking_id
+                                                 join Guests g on b.guest_id = g.guest_id
+                                                 
+                                                 """);
 
         if (status != null && !status.equals("all")) {
             strSQL.append("where dp.verification_status = ? ");
         }
-        strSQL.append("order by dp.submitted_at desc");
+        strSQL.append("""
+                      order by 
+                      case dp.verification_status
+                      when N'Chờ xử lý' then 1
+                      else 2
+                       end asc, 
+                        dp.submitted_at desc
+                      """);
 
         try (PreparedStatement stm = connection.prepareStatement(strSQL.toString())) {
             if (status != null && !status.equals("all")) {

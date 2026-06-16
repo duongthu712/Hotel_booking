@@ -93,6 +93,13 @@
                         </tr>
                     </c:forEach>
                 </tbody>
+                <c:if test="${empty paymentList}">
+                    <tr>
+                        <td colspan="7" class="empty-message">
+                            Không có khoản thanh toán nào đang chờ xử lý.
+                        </td>
+                    </tr>
+                </c:if>
             </table>
 
             <div class="pagination">
@@ -173,4 +180,5 @@
 
         <script src="<%=request.getContextPath()%>/view/assets/javascript/payment-verification.js"></script>
     </body>
+
 </html>
