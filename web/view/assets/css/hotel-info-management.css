@@ -138,16 +138,7 @@
     margin: 40px 0;
 }
 
-.filter-select {
-    padding: 10px 14px;
-    border: 1px solid #d9d9d9;
-    border-radius: var(--radius-custom);
-    font-family: var(--font-logo);
-    font-size: 14px;
-    background: white;
-    color: var(--text-main);
-    outline: none;
-}
+
 
 .col-stt {
     width: 5%;

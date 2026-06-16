@@ -17,7 +17,6 @@
         <filter-name>AuthorizationFilter</filter-name>
         <url-pattern>/view/receptionist/*</url-pattern>
     </filter-mapping>
-    <!-- ================= SERVLETS ================= -->
     <servlet>
         <servlet-name>HomeServlet</servlet-name>
         <servlet-class>controller.HomeServlet</servlet-class>
@@ -166,7 +165,6 @@
         <servlet-name>CreateRoomTypeServlet</servlet-name>
         <servlet-class>controller.CreateRoomTypeServlet</servlet-class>
     </servlet>
-    <!-- ================= MAPPINGS ================= -->
     <servlet>
         <servlet-name>HotelInfoController</servlet-name>
         <servlet-class>controller.HotelInfoController</servlet-class>
@@ -191,6 +189,21 @@
         <servlet-name>HotelNewsDeleteController</servlet-name>
         <servlet-class>controller.HotelNewsDeleteController</servlet-class>
     </servlet>
+    
+    <servlet>
+        <servlet-name>DepositPaymentListController</servlet-name>
+        <servlet-class>controller.DepositPaymentListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DepositPaymentVerifyController</servlet-name>
+        <servlet-class>controller.DepositPaymentVerifyController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DepositPaymentRejectController</servlet-name>
+        <servlet-class>controller.DepositPaymentRejectController</servlet-class>
+    </servlet>
+
+
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>
         <url-pattern>/login</url-pattern>
@@ -358,5 +371,17 @@
     <servlet-mapping>
         <servlet-name>HotelNewsDeleteController</servlet-name>
         <url-pattern>/HotelNewsDelete</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DepositPaymentListController</servlet-name>
+        <url-pattern>/DepositPaymentList</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DepositPaymentVerifyController</servlet-name>
+        <url-pattern>/DepositPaymentVerify</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DepositPaymentRejectController</servlet-name>
+        <url-pattern>/DepositPaymentReject</url-pattern>
     </servlet-mapping>
 </web-app>

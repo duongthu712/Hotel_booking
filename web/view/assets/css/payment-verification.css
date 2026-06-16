@@ -1,0 +1,223 @@
+/* 
+    Created on : Jun 16, 2026, 1:00:36 AM
+    Author     : LinhLTHE200306
+*/
+.popup-action form{
+    display: inline-block; 
+    margin: 0;
+}
+
+.payment-proof-image {
+    margin: 20px 0;
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.payment-proof-image img {
+    max-width: 100%;
+    max-height: 200px;
+}
+
+/* Popup content - 2 cột */
+.payment-detail-content {
+    max-width: 800px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.payment-detail-layout {
+    display: flex;
+    gap: 30px;
+    margin: 20px 0;
+}
+
+.payment-proof-column {
+    flex: 0 0 40%;
+    max-width: 350px;
+}
+
+.payment-proof-image {
+    max-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.payment-proof-image img {
+    max-width: 100%;
+    max-height: 450px;
+}
+
+.payment-info-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.payment-info {
+    padding: 15px;
+}
+
+.payment-info .info-row {
+    display: flex;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.payment-info .info-row:last-child {
+    border-bottom: none;
+}
+
+.payment-info .info-label, .verification-form .input-label {
+    font-family: var(--font-logo);
+    font-weight: 600;
+    color: var(--text-muted);
+    width: 130px;
+    flex-shrink: 0;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.payment-info .info-value {
+    font-family: var(--font-logo);
+    color: var(--text-main);
+    flex: 1;
+    font-size: 0.95rem;
+}
+
+.verification-form {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.verification-form textarea {
+    width: 100%;
+    min-height: 60px;
+    padding: 10px;
+    font-family: var(--font-logo);
+    background-color: none;
+}
+
+.popup-input-field{
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-color);
+}
+
+.popup-action {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    align-items: center;
+}
+
+.col-stt {
+    width: 5%;
+    text-align: center;
+}
+
+.col-booking {
+    width: 15%;
+    text-align: center;
+}
+
+.col-guest {
+    width: 20%;
+    text-align: left;
+}
+
+.col-amount {
+    width: 15%;
+    text-align: left;
+}
+
+.col-date {
+    width: 15%;
+    text-align: center;
+}
+
+.col-status {
+    width: 15%;
+    text-align: center;
+}
+
+.col-action {
+    width: 15%;
+    text-align: center;
+}
+
+.data-table th {
+    padding: 18px 16px;
+    text-align: center;
+    font-family: var(--font-logo);
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-main);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.data-table th.col-guest,
+.data-table th.col-amount {
+    text-align: left;
+}
+
+.data-table td {
+    padding: 18px 16px;
+    font-family: var(--font-logo);
+    font-size: 1rem;
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+.data-table td:not(.col-booking):not(.col-guest):not(.col-amount) {
+    text-align: center;
+}
+
+.data-table td.col-guest,
+.data-table td.col-amount {
+    text-align: left;
+}
+
+.data-table td.col-status .payment-status {
+    display: inline-block;
+}
+
+/* Payment Status - kích thước bằng nhau */
+.status-pending,
+.status-approved,
+.status-rejected {
+    text-align: center;
+    font-size: 0.75em;
+    border-radius: var(--radius-custom);
+    padding: 6px 10px;
+    display: inline-block;
+    font-family: var(--font-logo);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    min-width: 100px;
+    width: 100px;
+    box-sizing: border-box;
+}
+
+.status-pending {
+    background-color: #fff3e0;
+    color: #e65100;
+    border: 1px solid #ffe0b2;
+}
+
+.status-approved {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.status-rejected {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}

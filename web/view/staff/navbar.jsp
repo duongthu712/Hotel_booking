@@ -27,14 +27,15 @@
     <a href="${pageContext.request.contextPath}/PolicyList">Chính sách</a>
     <a href="${pageContext.request.contextPath}/FeedbackList">Đánh giá</a>
     <%}else if("RECEPTIONIST".equals(role)){%>
-
+    <a href="${pageContext.request.contextPath}/dashboard.jsp">Tổng quan</a>
+    <a href="${pageContext.request.contextPath}/DepositPaymentList">Danh sách đặt cọc</a>
     <%}else if("ADMIN".equals(role)){%>
     <a href="StaffAccountList">Quản lý tài khoản nhân viên</a>
     <%}%>
     <%}%>
 
 </nav>
-    <script src="${pageContext.request.contextPath}/view/assets/javascript/staff-navbar.js"></script>
-    
+<script src="${pageContext.request.contextPath}/view/assets/javascript/staff-navbar.js"></script>
+
 
 

@@ -17,7 +17,7 @@
         <title>Quản lý phòng</title>
     </head>
 
-    <body data-detail-mode="${not empty selectedRoom}">
+    <body data-detail-mode="${not empty selectedRoom}" data-edit-mode="${not empty editRoom}">
         <%@ include file="/view/staff/header.jsp" %>
         <%@ include file="/view/staff/navbar.jsp" %>
 
