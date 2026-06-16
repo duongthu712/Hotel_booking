@@ -1,0 +1,169 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Jun 16, 2026, 3:57:59 PM
+    Author     : Minh Thu
+*/
+
+/* Tổng quan khu vực sơ đồ phòng */
+.room-matrix-container {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.matrix-title {
+    color: #1e293b;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    border-left: 5px solid #1d4ed8;
+    padding-left: 10px;
+}
+
+/* Định dạng lưới Grid phân bố ô phòng */
+.room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+/* Thẻ bọc ô vuông của từng căn phòng */
+.room-card {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    background-color: #ffffff;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.room-number {
+    font-size: 20px;
+    font-weight: bold;
+    color: #0f172a;
+    margin-bottom: 2px;
+}
+
+.room-type {
+    font-size: 11px;
+    color: #64748b;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.room-status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+/* Trạng thái 1: Phòng trống */
+.status-available {
+    border-top: 5px solid #22c55e;
+}
+.status-available .room-status-badge {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+/* Trạng thái 2: Phòng có khách */
+.status-occupied {
+    border-top: 5px solid #ef4444;
+    background-color: #fef2f2;
+}
+.status-occupied .room-status-badge {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+/* Trạng thái 3: Đang dọn dẹp */
+.status-dirty {
+    border-top: 5px solid #eab308;
+    background-color: #fefce8;
+}
+.status-dirty .room-status-badge {
+    background-color: #fef9c3;
+    color: #a16207;
+}
+
+/* Trạng thái 4: Đang bảo trì */
+.status-maintenance {
+    border-top: 5px solid #64748b;
+    background-color: #f8fafc;
+    opacity: 0.6;
+}
+.status-maintenance .room-status-badge {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+
+/* Phần hiển thị thông tin bổ sung khi di chuột vào phòng có khách */
+.room-guests-info {
+    font-size: 11px;
+    color: #475569;
+    margin-top: 5px;
+    word-wrap: break-word;
+    font-style: italic;
+}
+
+/* Thành phần tương tác chọn phòng để gán */
+.select-wrapper {
+    margin-top: 8px;
+}
+
+.select-label {
+    display: block;
+    background-color: #2563eb;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.select-label:hover {
+    background-color: #1d4ed8;
+}
+
+.select-radio {
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+/* Thanh hành động xác nhận cuối trang */
+.action-bar {
+    text-align: right;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 20px;
+}
+
+.btn-submit {
+    background-color: #1e3a8a;
+    color: white;
+    padding: 12px 30px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: background-color 0.2s;
+}
+
+.btn-submit:hover {
+    background-color: #172554;
+}

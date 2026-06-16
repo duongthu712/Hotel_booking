@@ -207,4 +207,105 @@ public class RoomDAO extends DBContext {
         }
         return floors;
     }
+    public List<dto.RoomStatusView> getAllRoomStatusViews() throws Exception {
+        List<dto.RoomStatusView> list = new ArrayList<>();
+        String strSQL = """
+                        SELECT 
+                            r.room_number, 
+                            r.[floor], 
+                            r.[status] AS room_status, 
+                            rt.room_type_id, 
+                            rt.[type_name] AS room_type_name, 
+                            b.booking_id, 
+                            b.booking_code, 
+                            ISNULL(STRING_AGG(CAST(gs.full_name AS NVARCHAR(MAX)), ', '), N'') AS guests_in_room 
+                        FROM Rooms r 
+                        JOIN RoomTypes rt ON r.room_type_id = rt.room_type_id 
+                        LEFT JOIN BookingRooms br ON r.room_number = br.room_number 
+                        LEFT JOIN Bookings b ON br.booking_id = b.booking_id AND b.[status] = N'Đã nhận phòng' 
+                        LEFT JOIN GuestStays gs ON br.booking_room_id = gs.booking_room_id 
+                        GROUP BY 
+                            r.room_number, r.[floor], r.[status], 
+                            rt.room_type_id, rt.[type_name], b.booking_id, b.booking_code 
+                        ORDER BY r.[floor], r.room_number ASC
+                        """;
+
+        try (PreparedStatement stm = connection.prepareStatement(strSQL); 
+             ResultSet rs = stm.executeQuery()) {
+
+            while (rs.next()) {
+                dto.RoomStatusView view = new dto.RoomStatusView();
+                view.setRoomNumber(rs.getInt("room_number"));
+                view.setFloor(rs.getInt("floor"));
+                view.setStatus(rs.getString("room_status"));
+                view.setRoomTypeId(rs.getInt("room_type_id"));
+                view.setRoomTypeName(rs.getString("room_type_name"));
+                
+                int bookingId = rs.getInt("booking_id");
+                if (!rs.wasNull()) {
+                    view.setCurrentBookingId(bookingId);
+                    view.setCurrentBookingCode(rs.getString("booking_code"));
+                    view.setGuestFullName(rs.getString("guests_in_room"));
+                } else {
+                    view.setCurrentBookingId(null);
+                    view.setCurrentBookingCode("");
+                    view.setGuestFullName("");
+                }
+                list.add(view);
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể lấy ma trận trạng thái phòng. " + e.getMessage());
+        }
+        return list;
+    }
+
+    public boolean assignRoomAndCheckIn(int bookingId, int roomNumber) throws Exception {
+        PreparedStatement ps1 = null;
+        PreparedStatement ps2 = null;
+        PreparedStatement ps3 = null;
+        
+        try {
+            // Tắt auto-commit để kích hoạt Transaction, đảm bảo an toàn tuyệt đối cho DB
+            connection.setAutoCommit(false); 
+
+            // 1. Ghi nhận số phòng cụ thể vào đơn đặt ở bảng trung gian BookingRooms
+            String sqlBookingRoom = "INSERT INTO BookingRooms (booking_id, room_number, assigned_at) VALUES (?, ?, GETDATE())";
+            ps1 = connection.prepareStatement(sqlBookingRoom);
+            ps1.setInt(1, bookingId);
+            ps1.setInt(2, roomNumber);
+            ps1.executeUpdate();
+
+            // 2. Chuyển trạng thái của chính phòng này sang 'Phòng có khách'
+            String sqlUpdateRoom = "UPDATE Rooms SET [status] = N'Phòng có khách' WHERE room_number = ?";
+            ps2 = connection.prepareStatement(sqlUpdateRoom);
+            ps2.setInt(1, roomNumber);
+            ps2.executeUpdate();
+
+            // 3. Cập nhật trạng thái của tổng đơn đặt phòng sang 'Đã nhận phòng'
+            String sqlUpdateBooking = "UPDATE Bookings SET [status] = N'Đã nhận phòng', actual_checkin_time = GETDATE() WHERE booking_id = ?";
+            ps3 = connection.prepareStatement(sqlUpdateBooking);
+            ps3.setInt(1, bookingId);
+            ps3.executeUpdate();
+
+            // Tất cả mượt mà -> Commit xuống DB thực tế
+            connection.commit(); 
+            return true;
+            
+        } catch (SQLException e) {
+            if (connection != null) {
+                try { 
+                    connection.rollback(); // Có biến cố xảy ra -> Trả lại dữ liệu nguyên vẹn ban đầu
+                } catch (SQLException ex) { 
+                    ex.printStackTrace(); 
+                }
+            }
+            throw new Exception("Lỗi hệ thống: Quá trình gán phòng thất bại. " + e.getMessage());
+        } finally {
+            // Đóng các Statement tạm để giải phóng tài nguyên server
+            try { if (ps1 != null) ps1.close(); if (ps2 != null) ps2.close(); if (ps3 != null) ps3.close(); } catch (SQLException e) {}
+            // Bật lại trạng thái autoCommit cho các hàm CRUD thông thường khác chạy sau không bị ảnh hưởng
+            try { connection.setAutoCommit(true); } catch (SQLException e) {}
+        }
+    }
+    
 }
