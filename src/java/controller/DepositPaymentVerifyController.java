@@ -2,12 +2,14 @@ package controller;
 
 import dao.DepositPaymentDAO;
 import dal.EmailUtil;
+import dao.BookingDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import model.Booking;
 import model.DepositPayment;
 import model.StaffAccount;
 
@@ -51,9 +53,26 @@ public class DepositPaymentVerifyController extends HttpServlet {
             try {
                 String guestEmail = dao.getGuestEmailByBookingId(payment.getBookingId());
                 String guestName = dao.getGuestNameByBookingId(payment.getBookingId());
-                String bookingCode = dao.getBookingCodeByBookingId(payment.getBookingId());
-                
-                EmailUtil.sendDepositVerification(guestEmail, guestName, bookingCode, true, notes);
+
+                BookingDAO bookingDao = new BookingDAO();
+                Booking booking = bookingDao.getBookingById(payment.getBookingId());
+                String roomType = bookingDao.getRoomTypeNameById(booking.getRoomTypeId());
+                String bedType = bookingDao.getBedTypeById(booking.getRoomTypeId());
+
+                EmailUtil.sendDepositVerification(
+                        guestEmail,
+                        guestName,
+                        booking.getBookingCode(),
+                        roomType,
+                        bedType,
+                        booking.getCheckinDate(),
+                        booking.getCheckoutDate(),
+                        booking.getNumRooms(),
+                        booking.getNumGuests(),
+                        true,
+                        notes
+                );
+
             } catch (Exception e) {
                 System.out.println("Gửi email thất bại: " + e.getMessage());
             }
@@ -69,7 +88,7 @@ public class DepositPaymentVerifyController extends HttpServlet {
     private String buildRedirectUrl(HttpServletRequest request, String page, String keyword, String status) {
         StringBuilder url = new StringBuilder(request.getContextPath() + "/DepositPaymentList");
         url.append("?page=").append(page != null && !page.isEmpty() ? page : "1");
-        
+
         if (keyword != null && !keyword.trim().isEmpty()) {
             try {
                 url.append("&keyword=").append(java.net.URLEncoder.encode(keyword.trim(), "UTF-8"));
@@ -77,11 +96,11 @@ public class DepositPaymentVerifyController extends HttpServlet {
                 url.append("&keyword=").append(keyword.trim());
             }
         }
-        
+
         if (status != null && !status.trim().isEmpty() && !status.equals("all")) {
             url.append("&status=").append(status.trim());
         }
-        
+
         return url.toString();
     }
 

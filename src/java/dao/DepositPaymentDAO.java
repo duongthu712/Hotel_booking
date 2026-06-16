@@ -1,7 +1,6 @@
 package dao;
 
 import dal.DBContext;
-import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,9 +10,6 @@ import java.util.List;
 import model.DepositPayment;
 
 /**
- * DepositPaymentDAO.java - Data Access Object for DepositPayments Handles CRUD
- * and verification operations for deposit payments
- *
  * @author LinhLTHE200306
  * @version 1.0
  * @since 2026-06-15
