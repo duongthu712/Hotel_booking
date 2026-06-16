@@ -229,62 +229,7 @@ public class DepositPaymentDAO extends DBContext {
         }
     }
 
-    public String getGuestEmailByBookingId(int bookingId) throws Exception {
-        String sql = """
-                     select g.email 
-                     from Guests g join Bookings b on g.guest_id = b.guest_id 
-                     where b.booking_id = ?
-                     """;
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, bookingId);
-            try (ResultSet rs = stm.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getString("email");
-                }
-            }
-        } catch (SQLException e) {
-            throw new Exception("Lỗi hệ thống: Không thể lấy email khách hàng.");
-        }
-        return "";
-    }
-
-    public String getGuestNameByBookingId(int bookingId) throws Exception {
-        String sql = """
-                     select g.full_name 
-                     from Guests g join Bookings b on g.guest_id = b.guest_id 
-                     where b.booking_id = ?
-                     """;
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, bookingId);
-            try (ResultSet rs = stm.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getString("full_name");
-                }
-            }
-        } catch (SQLException e) {
-            throw new Exception("Lỗi hệ thống: Không thể lấy tên khách hàng.");
-        }
-        return "";
-    }
-
-    public String getBookingCodeByBookingId(int bookingId) throws Exception {
-        String sql = """
-                     select booking_code 
-                     from Bookings 
-                     where booking_id = ?
-                     """;
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, bookingId);
-            try (ResultSet rs = stm.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getString("booking_code");
-                }
-            }
-        } catch (SQLException e) {
-            throw new Exception("Lỗi hệ thống: Không thể lấy được mã đặt phòng.");
-        }
-        return "";
-    }
+    
 
     private DepositPayment mapResultSetToDepositPayment(ResultSet rs) throws SQLException {
         DepositPayment dp = new DepositPayment();

@@ -44,15 +44,16 @@ public class DepositPaymentRejectController extends HttpServlet {
 
         try {
             int depositId = Integer.parseInt(depositIdStr.trim());
-            DepositPaymentDAO dao = new DepositPaymentDAO();
-            DepositPayment payment = dao.getPaymentById(depositId);
+            DepositPaymentDAO dpdao = new DepositPaymentDAO();
+            BookingDAO bdao = new BookingDAO();
+            DepositPayment payment = dpdao.getPaymentById(depositId);
 
-            dao.rejectPayment(depositId, staff.getStaffId(), notes);
+            dpdao.rejectPayment(depositId, staff.getStaffId(), notes);
 
             //Send email
             try {
-                String guestEmail = dao.getGuestEmailByBookingId(payment.getBookingId());
-                String guestName = dao.getGuestNameByBookingId(payment.getBookingId());
+                String guestEmail = bdao.getGuestEmailByBookingId(payment.getBookingId());
+                String guestName = bdao.getGuestNameByBookingId(payment.getBookingId());
 
                 BookingDAO bookingDao = new BookingDAO();
                 Booking booking = bookingDao.getBookingById(payment.getBookingId());

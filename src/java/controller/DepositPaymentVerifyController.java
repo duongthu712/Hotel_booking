@@ -44,21 +44,21 @@ public class DepositPaymentVerifyController extends HttpServlet {
 
         try {
             int depositId = Integer.parseInt(depositIdStr.trim());
-            DepositPaymentDAO dao = new DepositPaymentDAO();
-            DepositPayment payment = dao.getPaymentById(depositId);
+            DepositPaymentDAO dpdao = new DepositPaymentDAO();
+            BookingDAO bdao = new BookingDAO();
+            DepositPayment payment = dpdao.getPaymentById(depositId);
 
-            dao.verifyPayment(depositId, staff.getStaffId(), notes);
+            dpdao.rejectPayment(depositId, staff.getStaffId(), notes);
 
             //Send email
             try {
-                String guestEmail = dao.getGuestEmailByBookingId(payment.getBookingId());
-                String guestName = dao.getGuestNameByBookingId(payment.getBookingId());
+                String guestEmail = bdao.getGuestEmailByBookingId(payment.getBookingId());
+                String guestName = bdao.getGuestNameByBookingId(payment.getBookingId());
 
                 BookingDAO bookingDao = new BookingDAO();
                 Booking booking = bookingDao.getBookingById(payment.getBookingId());
                 String roomType = bookingDao.getRoomTypeNameById(booking.getRoomTypeId());
                 String bedType = bookingDao.getBedTypeById(booking.getRoomTypeId());
-
                 EmailUtil.sendDepositVerification(
                         guestEmail,
                         guestName,
