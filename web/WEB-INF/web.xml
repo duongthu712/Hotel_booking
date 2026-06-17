@@ -189,7 +189,6 @@
         <servlet-name>HotelNewsDeleteController</servlet-name>
         <servlet-class>controller.HotelNewsDeleteController</servlet-class>
     </servlet>
-    
     <servlet>
         <servlet-name>DepositPaymentListController</servlet-name>
         <servlet-class>controller.DepositPaymentListController</servlet-class>
@@ -202,8 +201,22 @@
         <servlet-name>DepositPaymentRejectController</servlet-name>
         <servlet-class>controller.DepositPaymentRejectController</servlet-class>
     </servlet>
-
-
+    <servlet>
+        <servlet-name>BookingDetailController</servlet-name>
+        <servlet-class>controller.BookingDetailController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>BookingFormController</servlet-name>
+        <servlet-class>controller.BookingFormController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>BookingPaymentController</servlet-name>
+        <servlet-class>controller.BookingPaymentController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>BookingSuccessController</servlet-name>
+        <servlet-class>controller.BookingSuccessController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>
         <url-pattern>/login</url-pattern>
@@ -383,5 +396,25 @@
     <servlet-mapping>
         <servlet-name>DepositPaymentRejectController</servlet-name>
         <url-pattern>/DepositPaymentReject</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>BookingDetailController</servlet-name>
+        <url-pattern>/booking-detail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>BookingFormController</servlet-name>
+        <url-pattern>/booking-form</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>BookingFormController</servlet-name>
+        <url-pattern>/quick-booking</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>BookingPaymentController</servlet-name>
+        <url-pattern>/booking-payment</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>BookingSuccessController</servlet-name>
+        <url-pattern>/booking-success</url-pattern>
     </servlet-mapping>
 </web-app>
