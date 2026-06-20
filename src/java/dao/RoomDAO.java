@@ -166,8 +166,8 @@ public class RoomDAO extends DBContext {
                         INNER JOIN Bookings b ON br.booking_id = b.booking_id 
                         WHERE br.room_number = ? 
                         AND b.status = N'Đã nhận phòng'           
-                        AND CAST(GETDATE() AS DATE) >= b.checkin_date   
-                        AND CAST(GETDATE() AS DATE) < b.checkout_date;
+                        AND GETDATE() >= b.actual_checkin_time
+                          AND b.actual_checkout_time IS NULL
                         """;
 
         try (PreparedStatement stm = connection.prepareStatement(strSQL)) {

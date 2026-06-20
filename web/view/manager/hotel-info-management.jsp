@@ -199,9 +199,12 @@
                     <h2 class="popup-title" id="image-modal-title">Chỉnh sửa ảnh</h2>
 
                     <input type="hidden" name="imageId" id="edit-image-id">
-
                     <div class="form-group">
-                        <label class="input-label">Link ảnh mới*</label>
+                        <label class="input-label">Tải ảnh</label>
+                        <input type="file" id="proofImage">
+                    </div>
+                    <div class="form-group">
+                        <label class="input-label">Link ảnh</label>
                         <input type="text" name="imageUrl" id="edit-image-url" class="popup-input-field" required>
                     </div>
 
@@ -396,5 +399,6 @@
         </main>
 
         <script src="<%=request.getContextPath()%>/view/assets/javascript/hotel-info-management.js"></script>
+        <script src="<%=request.getContextPath()%>/view/assets/javascript/upload-img.js"></script>
     </body>
 </html>

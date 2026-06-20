@@ -36,9 +36,10 @@
     <a href="${pageContext.request.contextPath}/receptionist/requests">Xử lý yêu cầu</a>
     <a href="${pageContext.request.contextPath}/DepositPaymentList">Danh sách đặt cọc</a>
     <a href="${pageContext.request.contextPath}/#">Xem hóa đơn</a>
+
     <%}else if("ADMIN".equals(role)){%>
 
-    <a href="StaffAccountList">Quản lý tài khoản nhân viên</a>
+    <a href="${pageContext.request.contextPath}/StaffAccountList">Quản lý tài khoản nhân viên</a>
     <%}%>
     <%}%>
 
