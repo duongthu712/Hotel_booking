@@ -281,6 +281,13 @@
                             </tr>
                         </c:forEach>
                     </tbody>
+                    <c:if test="${empty newsList}">
+                        <tr>
+                            <td colspan="7" class="empty-message">
+                                Không tìm thấy tin tức.
+                            </td>
+                        </tr>
+                    </c:if>
                 </table>
 
                 <div class="pagination">

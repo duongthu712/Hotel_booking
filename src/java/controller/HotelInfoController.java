@@ -90,7 +90,7 @@ public class HotelInfoController extends HttpServlet {
 
             request.setAttribute("newsList", pagedList);
             request.setAttribute("currentPage", page);
-            request.setAttribute("totalPages", totalPages > 0 ? totalPages : 1);
+            request.setAttribute("totalPages", totalPages);
             request.setAttribute("keyword", keyword);
             request.setAttribute("status", status);
 

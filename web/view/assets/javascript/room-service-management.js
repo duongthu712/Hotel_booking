@@ -82,4 +82,5 @@ document.addEventListener("DOMContentLoaded", function () {
     if (btnClose) {
         btnClose.addEventListener("click", () => toggleModal(false));
     }
+    
 });

@@ -14,7 +14,7 @@ import model.StaffAccount;
 
 /**
  * @author LinhLTHE200306
- * @version 1.1
+ * @version 1.2
  * @since 2026-06-09
  */
 public class HotelServiceEditController extends HttpServlet {
@@ -60,11 +60,11 @@ public class HotelServiceEditController extends HttpServlet {
         }
 
         String serviceIdStr = request.getParameter("serviceId");
-        String serviceName = request.getParameter("serviceName");
-        String description = request.getParameter("description");
+        String serviceName = request.getParameter("serviceName").trim();
+        String description = request.getParameter("description").trim();
         String unitPriceStr = request.getParameter("unitPrice");
         String activeStr = request.getParameter("active");
-        String imageUrl = request.getParameter("imageUrl");
+        String imageUrl = request.getParameter("imageUrl").trim();
         
         String page = request.getParameter("page");
         String keyword = request.getParameter("keyword");
@@ -72,47 +72,43 @@ public class HotelServiceEditController extends HttpServlet {
         String errorMsg = dal.InputValidationUtil.validateServiceInput(serviceName, unitPriceStr);
 
         if (errorMsg != null) {
+            session.setAttribute("errorMessage", errorMsg);
+            
+            session.setAttribute("openEditModal", "true");
+            
+            int serviceId = Integer.parseInt(serviceIdStr);
+            BigDecimal tempPrice = BigDecimal.ZERO;
             try {
-                HotelServiceDAO dao = new HotelServiceDAO();
-                int serviceId = Integer.parseInt(serviceIdStr);
-                
-                BigDecimal tempPrice = BigDecimal.ZERO;
-                try {
-                    tempPrice = new BigDecimal(unitPriceStr.trim());
-                } catch (Exception e) {}
-                
-                boolean isActive = "true".equals(activeStr);
-                HotelService serviceToEditTemp = new HotelService(serviceId, serviceName, description, tempPrice, imageUrl, isActive);
-                
-                List<HotelService> serviceList = dao.getAllHotelServices();
-                
-                request.setAttribute("serviceList", serviceList);
-                request.setAttribute("serviceToEdit", serviceToEditTemp);
-                request.setAttribute("errorMessage", errorMsg);
-                request.setAttribute("currentPage", page);
-                request.setAttribute("keyword", keyword);
-                
-                request.getRequestDispatcher("/view/manager/hotel-service-management.jsp").forward(request, response);
-                return;
-            } catch (Exception ex) {
-                session.setAttribute("errorMessage", ex.getMessage());
-                response.sendRedirect(buildRedirectUrl(request, page, keyword));
-                return;
-            }
+                tempPrice = new BigDecimal(unitPriceStr.trim());
+            } catch (Exception e) {}
+            boolean isActive = "true".equals(activeStr);
+            HotelService serviceToEditTemp = new HotelService(serviceId, serviceName, description, tempPrice, imageUrl, isActive);
+            
+            session.setAttribute("serviceToEdit", serviceToEditTemp);
+
+            response.sendRedirect(buildRedirectUrl(request, page, keyword));
+            return;
         }
 
-        int serviceId = Integer.parseInt(serviceIdStr);
-        BigDecimal unitPrice = new BigDecimal(unitPriceStr.trim());
-        boolean isActive = "true".equals(activeStr);
-        
-        HotelService updatedService = new HotelService(serviceId, serviceName, description, unitPrice, imageUrl, isActive);
-
         try {
+            int serviceId = Integer.parseInt(serviceIdStr);
+            BigDecimal unitPrice = new BigDecimal(unitPriceStr.trim());
+            boolean isActive = "true".equals(activeStr);
+            
+            HotelService updatedService = new HotelService(serviceId, serviceName, description, unitPrice, imageUrl, isActive);
+
             HotelServiceDAO dao = new HotelServiceDAO();
             dao.updateHotelService(updatedService);
             session.setAttribute("successMessage", "Cập nhật dịch vụ \"" + serviceName.trim() + "\" thành công.");
         } catch (Exception e) {
-            session.setAttribute("errorMessage", e.getMessage());
+            session.setAttribute("errorMessage", "Cập nhật thất bại: " + e.getMessage());
+            session.setAttribute("openEditModal", "true");
+            
+            int serviceId = Integer.parseInt(serviceIdStr);
+            BigDecimal tempPrice = BigDecimal.ZERO;
+            try { tempPrice = new BigDecimal(unitPriceStr.trim()); } catch (Exception ex) {}
+            HotelService serviceToEditTemp = new HotelService(serviceId, serviceName, description, tempPrice, imageUrl, "true".equals(activeStr));
+            session.setAttribute("serviceToEdit", serviceToEditTemp);
         }
 
         response.sendRedirect(buildRedirectUrl(request, page, keyword));
@@ -120,7 +116,7 @@ public class HotelServiceEditController extends HttpServlet {
 
     private String buildRedirectUrl(HttpServletRequest request, String page, String keyword) {
         StringBuilder url = new StringBuilder(request.getContextPath() + "/HotelServiceList");
-        url.append("?page=").append(page != null ? page : "1");
+        url.append("?page=").append(page != null && !page.isEmpty() ? page : "1");
         if (keyword != null && !keyword.trim().isEmpty()) {
             try {
                 url.append("&keyword=").append(java.net.URLEncoder.encode(keyword.trim(), "UTF-8"));

@@ -29,21 +29,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function toggleModal(show) {
-        if (!modal) return;
-        
+        if (!modal)
+            return;
+
         if (show) {
             modal.classList.add("active");
             modal.style.display = "flex";
         } else {
             modal.classList.remove("active");
             modal.style.display = "none";
-            if (form) {
-                form.reset();
-            }
-            
-            if (isEditMode || isCreateMode) {
-                window.location.href = "HotelServiceList?" + getFilterParams();
-            }
         }
     }
 
@@ -56,9 +50,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     form.reset();
                     const inputs = form.querySelectorAll("input:not([type='hidden'])");
                     inputs.forEach(input => input.value = "");
-                    
+
                     const textarea = form.querySelector("#description");
-                    if (textarea) textarea.value = "";
+                    if (textarea)
+                        textarea.value = "";
                 }
             }
             toggleModal(true);
@@ -80,6 +75,27 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (btnClose) {
-        btnClose.addEventListener("click", () => toggleModal(false));
+        btnClose.addEventListener("click", () => {
+            const isCurrentlyCreate = form && form.action.includes("HotelServiceCreate");
+
+            if (isCurrentlyCreate && form) {
+                form.reset();
+                const inputs = form.querySelectorAll(
+                        "input:not([type='hidden']):not([type='checkbox']):not([type='radio'])"
+                        );
+                inputs.forEach(input => input.value = "");
+                const textarea = form.querySelector("textarea");
+                if (textarea)
+                    textarea.value = "";
+                const checkbox = form.querySelector("input[type='checkbox']");
+                if (checkbox)
+                    checkbox.checked = true;
+            }
+
+            toggleModal(false);
+
+            const cleanUrl = "HotelServiceList?" + getFilterParams();
+            window.history.replaceState(null, "", cleanUrl);
+        });
     }
 });

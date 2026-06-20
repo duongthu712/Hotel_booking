@@ -155,7 +155,7 @@
                         </table>
                     </c:if>
                 </c:if>
-                        
+
 
                 <div class="service-popup-action">
                     <button type="button" class="btn-close" id="btn-close-detail">Đóng</button>
@@ -187,26 +187,15 @@
                 <div class="form-group">
                     <label class="input-label">Trạng thái</label>
                     <select class="service-popup-input-field" name="status" id="editStatus">
-                        <c:choose>
-                            <c:when test="${editRoom.getStatus() == 'Phòng trống'}">
-                                <option value="Phòng trống" selected>Phòng trống</option>
-                                <option value="Đang dọn dẹp">Đang dọn dẹp</option>
-                                <option value="Đang bảo trì">Đang bảo trì</option>
-                            </c:when>
-                            <c:when test="${editRoom.getStatus() == 'Đang dọn dẹp'}">
-                                <option value="Phòng trống">Phòng trống</option>
-                                <option value="Đang dọn dẹp" selected>Đang dọn dẹp</option>
-                                <option value="Đang bảo trì">Đang bảo trì</option>
-                            </c:when>
-                            <c:when test="${editRoom.getStatus() == 'Đang bảo trì'}">
-                                <option value="Phòng trống">Phòng trống</option>
-                                <option value="Đang dọn dẹp">Đang dọn dẹp</option>
-                                <option value="Đang bảo trì" selected>Đang bảo trì</option>
-                            </c:when>
-                            <c:otherwise>
-                                <option value="Phòng có khách" selected>Phòng có khách</option>
-                            </c:otherwise>
-                        </c:choose>
+                        <c:when test="${editRoom.getStatus() == 'Phòng có khách'}">
+                            <option value="Phòng có khách" selected>Phòng có khách</option>
+                        </c:when>
+
+                        <c:otherwise>
+                            <option value="Phòng trống" ${editRoom.getStatus() == 'Phòng trống' ? 'selected' : ''}>Phòng trống</option>
+                            <option value="Đang dọn dẹp" ${editRoom.getStatus() == 'Đang dọn dẹp' ? 'selected' : ''}>Đang dọn dẹp</option>
+                            <option value="Đang bảo trì" ${editRoom.getStatus() == 'Đang bảo trì' ? 'selected' : ''}>Đang bảo trì</option>
+                        </c:otherwise>
                     </select>
                 </div>
 

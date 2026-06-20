@@ -96,7 +96,7 @@
                 <c:if test="${empty paymentList}">
                     <tr>
                         <td colspan="7" class="empty-message">
-                            Không có khoản thanh toán nào đang chờ xử lý.
+                            Không tìm thấy khoản đặt cọc.
                         </td>
                     </tr>
                 </c:if>
