@@ -135,13 +135,26 @@ public class CheckInController extends HttpServlet {
             
             boolean isDifferentGuest = "true".equals(request.getParameter("isDifferentGuest"));
 
+            // Gọi hàm xử lý lưu thông tin khách (Đã bỏ đoạn tự động update 'Đã nhận phòng' như anh em mình sửa)
             boolean success = bookingDAO.updateCheckInAdvance(
                     bookingId, currentGuestId, idFullName, idPhone, idEmail,
                     idNumber, nationality, dateOfBirth, numGuests, isDifferentGuest
             );
 
             if (success) {
-                response.sendRedirect(request.getContextPath() + "/checkin?searchBookingCode=" + bookingCode);
+                // 🚀 ĐOẠN ĐIỀU HƯỚNG THÔNG MINH MỚI: 
+                // Sử dụng hàm đếm phòng đã thêm vào BookingDAO để check xem đã chia đủ phòng chưa
+                int assignedRooms = bookingDAO.countRoomsAssigned(bookingId);
+                
+                if (assignedRooms >= numRooms) {
+                    // Nếu đã đủ số phòng thuê (Ví dụ đơn 1 phòng và đã gán xong trước đó) -> Đổi trạng thái nhận phòng
+                    bookingDAO.updateStatus(bookingId, "Đã nhận phòng");
+                    response.sendRedirect(request.getContextPath() + "/checkin?success=true");
+                } else {
+                    // Nếu chưa gán đủ (Mới lưu hồ sơ xong, chưa chia phòng nào hoặc thiếu phòng)
+                    // Tự động đẩy thẳng lễ tân sang trang Sơ đồ gán phòng để chọn phòng luôn!
+                    response.sendRedirect(request.getContextPath() + "/assign-room?bookingId=" + bookingId);
+                }
             } else {
                 request.setAttribute("errorMsg", "Có lỗi xảy ra trong quá trình cập nhật cơ sở dữ liệu.");
                 doGet(request, response);
