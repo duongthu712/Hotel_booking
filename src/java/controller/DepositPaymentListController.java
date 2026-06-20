@@ -81,8 +81,12 @@ public class DepositPaymentListController extends HttpServlet {
             // Pagination
             int totalRecords = allPayments.size();
             int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
-            if (page < 1) page = 1;
-            if (page > totalPages && totalPages > 0) page = totalPages;
+            if (page < 1) {
+                page = 1;
+            }
+            if (page > totalPages && totalPages > 0) {
+                page = totalPages;
+            }
 
             int start = (page - 1) * recordsPerPage;
             int end = Math.min(start + recordsPerPage, totalRecords);
@@ -98,7 +102,7 @@ public class DepositPaymentListController extends HttpServlet {
             request.setAttribute("bookingCodeMap", bookingCodeMap);
             request.setAttribute("guestNameMap", guestNameMap);
             request.setAttribute("currentPage", page);
-            request.setAttribute("totalPages", totalPages > 0 ? totalPages : 1);
+            request.setAttribute("totalPages", totalPages);
             request.setAttribute("keyword", keyword);
             request.setAttribute("status", status);
 

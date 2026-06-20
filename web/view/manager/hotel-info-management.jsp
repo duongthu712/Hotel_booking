@@ -272,7 +272,7 @@
                                     </div>
                                 </td>
                                 <td class="btn-action">
-                                    <a class="btn-edit" href="HotelNewsEdit?newsId=${news.getNewsId()}">Sửa</a>
+                                    <a class="btn-edit" href="HotelNewsEdit?newsId=${news.getNewsId()}&page=${currentPage}&keyword=${keyword}&status=${status}">Sửa</a>
                                     <form action="HotelNewsDelete" method="post" style="display: inline-block; margin: 0;">
                                         <input type="hidden" name="newsId" value="${news.getNewsId()}">
                                         <button type="submit" onclick="return confirm('Bạn có chắc muốn xóa bài viết ${news.getTitle()}?')">Xóa</button>
@@ -414,7 +414,8 @@
             </div>
 
         </main>
-
+        <c:remove var="newsToEdit" scope="session"/>
+        <c:remove var="openEditModal" scope="session"/>
         <script src="<%=request.getContextPath()%>/view/assets/javascript/hotel-info-management.js"></script>
         <script src="<%=request.getContextPath()%>/view/assets/javascript/upload-img.js"></script>
     </body>

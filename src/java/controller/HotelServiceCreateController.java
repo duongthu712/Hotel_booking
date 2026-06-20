@@ -32,7 +32,7 @@ public class HotelServiceCreateController extends HttpServlet {
         String serviceName = request.getParameter("serviceName").trim();
         String description = request.getParameter("description").trim();
         String unitPriceStr = request.getParameter("unitPrice");
-        String imageUrl = request.getParameter("imageUrl").trim();
+        String imageUrl = request.getParameter("imageUrl");
         String activeStr = request.getParameter("active");
 
         String page = request.getParameter("page");

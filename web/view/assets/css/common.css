@@ -53,6 +53,8 @@ border-radius: var(--radius-custom);
     transition: all 0.3s ease;
 }
 
+
+
 .search-container{
     display: flex;
     align-items: center;
@@ -521,9 +523,9 @@ input:checked + .toggle-slider:before {
 }
 
 .empty-message {
+    
     text-align: center;
-    padding: 40px 20px;
-    color: var(--text-muted);
+    color: var(--text-main);
     font-size: 1.1rem;
     font-family: var(--font-logo);
     font-style: italic;

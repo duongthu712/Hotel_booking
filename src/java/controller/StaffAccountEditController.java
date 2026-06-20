@@ -21,6 +21,7 @@ public class StaffAccountEditController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         HttpSession session = request.getSession();
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
 
@@ -34,14 +35,29 @@ public class StaffAccountEditController extends HttpServlet {
 
             StaffAccountDAO staffDao = new StaffAccountDAO();
             StaffAccount editStaff = staffDao.getStaffAccById(staffId);
-            List<StaffAccount> staffList = staffDao.getAllStaffAcc();
 
-            request.setAttribute("staffList", staffList);
-            request.setAttribute("editStaff", editStaff);
-            request.setAttribute("currentPage", request.getParameter("page"));
-            request.setAttribute("searchText", request.getParameter("searchText"));
-            request.setAttribute("roleFilter", request.getParameter("roleFilter"));
-            request.getRequestDispatcher("/view/admin/staff-management.jsp").forward(request, response);
+            session.setAttribute("editStaff", editStaff);
+
+            String page = request.getParameter("page");
+            String searchText = request.getParameter("searchText");
+            String roleFilter = request.getParameter("roleFilter");
+
+            StringBuilder url = new StringBuilder(
+                    request.getContextPath() + "/StaffAccountList?page="
+                    + (page != null ? page : "1"));
+
+            if (searchText != null && !searchText.trim().isEmpty()) {
+                url.append("&searchText=")
+                        .append(java.net.URLEncoder.encode(searchText.trim(), "UTF-8"));
+            }
+
+            if (roleFilter != null && !roleFilter.trim().isEmpty()) {
+                url.append("&roleFilter=")
+                        .append(java.net.URLEncoder.encode(roleFilter.trim(), "UTF-8"));
+            }
+
+            response.sendRedirect(url.toString());
+
         } catch (Exception e) {
             session.setAttribute("errorMessage", e.getMessage());
             response.sendRedirect(request.getContextPath() + "/StaffAccountList");
@@ -140,9 +156,9 @@ public class StaffAccountEditController extends HttpServlet {
     }
 
     private void forwardWithError(HttpServletRequest request, HttpServletResponse response,
-                                  int staffId, String errorMsg,
-                                  String fullName, String email, String phone, String role, boolean isActive,
-                                  String page, String searchText, String roleFilter)
+            int staffId, String errorMsg,
+            String fullName, String email, String phone, String role, boolean isActive,
+            String page, String searchText, String roleFilter)
             throws ServletException, IOException {
 
         try {

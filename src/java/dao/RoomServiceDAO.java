@@ -169,10 +169,10 @@ public class RoomServiceDAO extends DBContext {
     }
 
     public RoomService updateRoomService(RoomService roomService) throws Exception {
-        if (getRoomServicesById(roomService.getServiceId()) == null) {
-            throw new Exception("Dịch vụ không tồn tại, không thể cập nhật.");
+        RoomService found = getRoomServicesById(roomService.getServiceId());
+        if (found == null) {
+            throw new Exception("Dịch vụ này không tồn tại, không thể cập nhật.");
         }
-
         String strSQL = """
                         update RoomServices 
                         set [service_name] = ?, 

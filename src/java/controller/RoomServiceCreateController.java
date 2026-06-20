@@ -14,7 +14,7 @@ import model.StaffAccount;
 
 /**
  * @author LinhLTHE200306
- * @version 1.0
+ * @version 1.2
  * @since 2026-06-09
  */
 public class RoomServiceCreateController extends HttpServlet {
@@ -29,58 +29,49 @@ public class RoomServiceCreateController extends HttpServlet {
             return;
         }
 
-        String serviceName = request.getParameter("serviceName");
-        String description = request.getParameter("description");
-        String unitPriceStr = request.getParameter("unitPrice");        
-        String imageUrl = request.getParameter("imageUrl");
+        String serviceName = request.getParameter("serviceName").trim();
+        String description = request.getParameter("description").trim();
+        String unitPriceStr = request.getParameter("unitPrice");
         String activeStr = request.getParameter("active");
-       
+
         String page = request.getParameter("page");
         String keyword = request.getParameter("keyword");
 
         String errorMsg = dal.InputValidationUtil.validateServiceInput(serviceName, unitPriceStr);
 
         if (errorMsg != null) {
-            try {
-                RoomServiceDAO dao = new RoomServiceDAO();
-                
-                List<RoomService> serviceList = dao.getAllRoomServices();
-                
-                request.setAttribute("serviceList", serviceList);
-                request.setAttribute("errorMessage", errorMsg);
-                
-                request.setAttribute("openCreateModal", "true"); 
-                
-                request.setAttribute("keepServiceName", serviceName);
-                request.setAttribute("keepDescription", description);
-                request.setAttribute("keepUnitPrice", unitPriceStr);
-                request.setAttribute("keepImageUrl", imageUrl);
-                request.setAttribute("keepActive", activeStr);
-                
-                request.setAttribute("currentPage", page != null ? page : "1");
-                request.setAttribute("keyword", keyword);
+            session.setAttribute("errorMessage", errorMsg);
+            session.setAttribute("openCreateModal", "true");
 
-                request.getRequestDispatcher("/view/manager/room-service-management.jsp").forward(request, response);
-                return;
-            } catch (Exception ex) {
-                session.setAttribute("errorMessage", ex.getMessage());
-                response.sendRedirect(buildRedirectUrl(request, page, keyword));
-                return;
-            }
+            session.setAttribute("keepServiceName", serviceName);
+            session.setAttribute("keepDescription", description);
+            session.setAttribute("keepUnitPrice", unitPriceStr);
+            session.setAttribute("keepActive", activeStr);
+
+            response.sendRedirect(buildRedirectUrl(request, page, keyword));
+            return;
         }
-
-        BigDecimal unitPrice = new BigDecimal(unitPriceStr.trim());
-        boolean isActive = "true".equals(activeStr);
-        RoomService newService = new RoomService(0, serviceName, description, unitPrice, isActive);
 
         try {
+            BigDecimal unitPrice = new BigDecimal(unitPriceStr.trim());
+            boolean isActive = "true".equals(activeStr);
+            RoomService newService = new RoomService(0, serviceName, description, unitPrice, isActive);
+
             RoomServiceDAO dao = new RoomServiceDAO();
             dao.createRoomService(newService);
+            
             session.setAttribute("successMessage", "Thêm dịch vụ \"" + serviceName.trim() + "\" thành công.");
+            
         } catch (Exception e) {
-            session.setAttribute("errorMessage",  e.getMessage());
+            session.setAttribute("errorMessage", e.getMessage());
+            session.setAttribute("openCreateModal", "true");
+
+            session.setAttribute("keepServiceName", serviceName);
+            session.setAttribute("keepDescription", description);
+            session.setAttribute("keepUnitPrice", unitPriceStr);
+            session.setAttribute("keepActive", activeStr);
         }
-        
+
         response.sendRedirect(buildRedirectUrl(request, page, keyword));
     }
 
@@ -101,5 +92,4 @@ public class RoomServiceCreateController extends HttpServlet {
     public String getServletInfo() {
         return "Room Service Create Controller";
     }
-
 }

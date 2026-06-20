@@ -97,6 +97,13 @@ public class StaffAccountListController extends HttpServlet {
             request.setAttribute("currentPage", page);
             request.setAttribute("totalPages", totalPages);
 
+            StaffAccount editStaff = (StaffAccount) session.getAttribute("editStaff");
+
+            if (editStaff != null) {
+                request.setAttribute("editStaff", editStaff);
+                session.removeAttribute("editStaff");
+            }
+
             request.getRequestDispatcher("/view/admin/staff-management.jsp").forward(request, response);
 
         } catch (Exception e) {

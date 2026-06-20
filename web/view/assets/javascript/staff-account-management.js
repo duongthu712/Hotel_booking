@@ -67,15 +67,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (btnCloseEdit) {
         btnCloseEdit.addEventListener("click", function () {
+
+            const form = document.getElementById("edit-form");
+            if (form) {
+                form.reset();
+            }
+
             toggleModal(editModal, false);
-            window.location.href = "StaffAccountList?" + getFilterParams();
+
+            window.history.replaceState(null, "", "StaffAccountList?" + getFilterParams());
         });
     }
 
     if (btnCloseCreate) {
-        btnCloseCreate.addEventListener("click", () => {
+        btnCloseCreate.addEventListener("click", function () {
+            const form = document.getElementById("create-form");
+            if (form) {
+                form.reset();
+            }
+
             toggleModal(createModal, false);
-            window.location.href = "StaffAccountList?" + getFilterParams();
         });
     }
 

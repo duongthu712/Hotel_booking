@@ -38,20 +38,29 @@ public class HotelNewsEditController extends HttpServlet {
             HotelInfoDAO dao = new HotelInfoDAO();
             HotelNews newsToEdit = dao.getNewsById(newsId);
 
-            HotelInfo hotelInfo = dao.getHotelInfoById(hotelId);
-            HotelImage banner = dao.getBannerByHotelId(hotelId);
-            List<HotelImage> smallImages = dao.getSmallImagesByHotelId(hotelId);
-            List<HotelNews> newsList = dao.getAllNewsByHotelId(hotelId);
+            session.setAttribute("newsToEdit", newsToEdit);
+            session.setAttribute("openEditModal", true);
 
-            request.setAttribute("hotelInfo", hotelInfo);
-            request.setAttribute("bannerImage", banner);
-            request.setAttribute("smallImages", smallImages);
-            request.setAttribute("newsList", newsList);
-            request.setAttribute("newsToEdit", newsToEdit);
-            request.setAttribute("openEditModal", true);
+            String page = request.getParameter("page");
+            String keyword = request.getParameter("keyword");
+            String status = request.getParameter("status");
 
-            request.getRequestDispatcher("/view/manager/hotel-info-management.jsp").forward(request, response);
+            StringBuilder url = new StringBuilder(
+                    request.getContextPath() + "/HotelInfo?page="
+                    + (page != null ? page : "1")
+            );
 
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                url.append("&keyword=")
+                        .append(java.net.URLEncoder.encode(keyword.trim(), "UTF-8"));
+            }
+
+            if (status != null && !status.trim().isEmpty()) {
+                url.append("&status=")
+                        .append(java.net.URLEncoder.encode(status.trim(), "UTF-8"));
+            }
+
+            response.sendRedirect(url.toString());
         } catch (Exception e) {
             session.setAttribute("errorMessage", e.getMessage());
             response.sendRedirect(request.getContextPath() + "/HotelInfo");

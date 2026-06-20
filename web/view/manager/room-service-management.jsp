@@ -38,6 +38,7 @@
                 <div class="alert-message alert-error">
                     ${errorMessage}
                 </div>
+                <c:remove var="errorMessage" scope="session"/>
             </c:if>
 
             <c:if test="${not empty sessionScope.successMessage}">
@@ -84,6 +85,13 @@
                             </tr>
                         </c:forEach>
                     </tbody>
+                    <c:if test="${empty serviceList}">
+                        <tr>
+                            <td colspan="7" class="empty-message">
+                                Không tìm thấy dịch vụ.
+                            </td>
+                        </tr>
+                    </c:if>
                 </table>
 
                 <div class="pagination">
@@ -112,6 +120,7 @@
                     <div class="alert-message alert-error">
                         ${errorMessage}
                     </div>
+                    <c:remove var="errorMessage" scope="session"/>
                 </c:if>
 
                 <div class="form-group">
@@ -149,6 +158,14 @@
                 </div>
             </form>
         </div>
+        <c:remove var="serviceToEdit" scope="session"/>
+        <c:remove var="openEditModal" scope="session"/>
+        <c:remove var="openCreateModal" scope="session"/>
+        <c:remove var="keepServiceName" scope="session"/>
+        <c:remove var="keepDescription" scope="session"/>
+        <c:remove var="keepUnitPrice" scope="session"/>
+        <c:remove var="keepImageUrl" scope="session"/>
+        <c:remove var="keepActive" scope="session"/>
 
         <script src="<%=request.getContextPath()%>/view/assets/javascript/room-service-management.js"></script>
     </body>

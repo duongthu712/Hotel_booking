@@ -87,9 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const textarea = form.querySelector("textarea");
                 if (textarea)
                     textarea.value = "";
-                const checkbox = form.querySelector("input[type='checkbox']");
-                if (checkbox)
-                    checkbox.checked = true;
+                
             }
 
             toggleModal(false);
