@@ -1,6 +1,7 @@
 package dto;
 
 public class RoomStatusView {
+
     // 1. Thông tin cơ bản của phòng (Từ bảng Rooms)
     private int roomNumber;
     private int floor;
@@ -11,16 +12,27 @@ public class RoomStatusView {
     private String roomTypeName;
 
     // 3. Thông tin bổ trợ đơn đặt phòng hiện tại (Nếu phòng đang có khách ở - status = N'Phòng có khách')
-    private Integer currentBookingId;   
+    private Integer currentBookingId;
     private String currentBookingCode;
     private String guestFullName;
+    private int capacity;
+    private String guestPhone;      
+    private String guestIdNumber;   
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
 
     // --- CONSTRUCTORS ---
     public RoomStatusView() {
     }
 
-    public RoomStatusView(int roomNumber, int floor, String status, int roomTypeId, String roomTypeName, 
-                          Integer currentBookingId, String currentBookingCode, String guestFullName) {
+    public RoomStatusView(int roomNumber, int floor, String status, int roomTypeId, String roomTypeName,
+            Integer currentBookingId, String currentBookingCode, String guestFullName) {
         this.roomNumber = roomNumber;
         this.floor = floor;
         this.status = status;
@@ -95,4 +107,21 @@ public class RoomStatusView {
     public void setGuestFullName(String guestFullName) {
         this.guestFullName = guestFullName;
     }
+
+    public String getGuestPhone() {
+        return guestPhone;
+    }
+
+    public void setGuestPhone(String guestPhone) {
+        this.guestPhone = guestPhone;
+    }
+
+    public String getGuestIdNumber() {
+        return guestIdNumber;
+    }
+
+    public void setGuestIdNumber(String guestIdNumber) {
+        this.guestIdNumber = guestIdNumber;
+    }
+    
 }

@@ -93,7 +93,7 @@ public class RoomTypeDAO extends DBContext {
             sql += " AND rt.room_type_id = ? ";
         }
 
-        sql += " AND (SELECT COUNT(*) "
+       sql += " AND (SELECT COUNT(*) "
                 + " FROM Rooms r "
                 + " WHERE r.room_type_id = rt.room_type_id "
                 + " AND r.[status] != N'Đang bảo trì' "
@@ -102,12 +102,11 @@ public class RoomTypeDAO extends DBContext {
                 + "      FROM BookingRooms br "
                 + "      JOIN Bookings b ON br.booking_id = b.booking_id "
                 + "      WHERE b.[status] != N'Đã hủy' "
-                + "      AND NOT (b.checkout_date <= ? "
-                + "               OR b.checkin_date >= ?) "
+                + "      AND NOT (CAST(b.checkout_date AS DATE) <= CAST(? AS DATE) " 
+                + "               OR CAST(b.checkin_date AS DATE) >= CAST(? AS DATE)) "
                 + " ) "
                 + ") >= ? "
                 + "ORDER BY rt.room_type_id ASC";
-
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             int index = 1;

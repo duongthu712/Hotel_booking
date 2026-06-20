@@ -1,169 +1,317 @@
-/*
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
-*/
-/* 
-    Created on : Jun 16, 2026, 3:57:59 PM
-    Author     : Minh Thu
-*/
-
-/* Tổng quan khu vực sơ đồ phòng */
-.room-matrix-container {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+.assign-room-wrapper {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
     padding: 20px;
-    background-color: #f8fafc;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
 }
 
-.matrix-title {
-    color: #1e293b;
-    font-size: 22px;
+.split-layout-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    width: 100%;
+}
+
+/* Trái */
+.split-left-panel {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Phải */
+.split-right-panel {
+    width: 420px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 20px;
+}
+
+.guest-stay-card {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.overview-mode-text {
+    color: #bfa15f;
     font-weight: 600;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-    border-left: 5px solid #1d4ed8;
-    padding-left: 10px;
 }
 
-/* Định dạng lưới Grid phân bố ô phòng */
+/* ==========================================================================
+   2. THANH BỘ LỌC SEARCH ĐỘNG
+   ========================================================================== */
+.filter-form-wrapper {
+    margin-bottom: 20px;
+}
+
+.filter-bar-container {
+    max-width: 630px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    background-color: #fdfbf7;
+    padding: 15px 20px;
+    border-radius: 8px;
+    border: 1px solid #ebd9b4;
+    align-items: center;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-group.room-type-width {
+    min-width: 240px;
+}
+
+.filter-group.floor-width {
+    min-width: 160px;
+}
+
+.filter-bar-container label {
+    font-weight: 600;
+    color: #1a446c;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.filter-bar-container select {
+    padding: 6px 12px;
+    border: 1px solid #ebd9b4;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+    width: 100%;
+    outline: none;
+}
+
+.btn-filter-search {
+    padding: 6px 18px;
+    background-color: #1a446c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    height: 34px;
+    transition: background 0.2s;
+}
+
+.btn-filter-search:hover {
+    background-color: #123250;
+}
+
+/* ==========================================================================
+   3. SƠ ĐỒ LƯỚI MA TRẬN PHÒNG (ROOM MATRIX)
+   ========================================================================== */
+.room-matrix-container {
+    padding: 20px !important;
+    margin-bottom: 0 !important;
+}
+
+.card-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.card-header-flex h3 {
+    margin: 0;
+}
+
+.booking-info-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+.badge-info-navy {
+    background-color: #1a446c !important;
+    color: #ffffff !important;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.badge-success-green {
+    background-color: #198754;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.btn-close-view {
+    text-decoration: none;
+}
+
+.divider {
+    border: none;
+    border-top: 1px solid #ebd9b4;
+    margin: 15px 0;
+}
+
 .room-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 15px;
-    margin-bottom: 25px;
+    margin-top: 15px;
 }
 
-/* Thẻ bọc ô vuông của từng căn phòng */
+/* KHỐI PHÒNG CHUNG: Thêm hiệu ứng hover đẩy trồi cho TẤT CẢ các phòng */
 .room-card {
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
     padding: 15px;
     text-align: center;
     background-color: #ffffff;
-    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     position: relative;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    cursor: pointer; 
+    transition: all 0.2s ease-in-out;
+}
+
+.room-card:hover {
+    transform: translateY(-3px);
+}
+
+.room-card.selected-active {
+    border: 2px solid #1a446c !important;
+    background-color: #f0f4f8;
 }
 
 .room-number {
-    font-size: 20px;
-    font-weight: bold;
-    color: #0f172a;
-    margin-bottom: 2px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a446c;
+    margin-bottom: 4px;
 }
 
 .room-type {
-    font-size: 11px;
+    font-size: 12px;
     color: #64748b;
-    font-weight: 500;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .room-status-badge {
     display: inline-block;
-    padding: 4px 8px;
     font-size: 11px;
     font-weight: 600;
+    padding: 2px 8px;
     border-radius: 4px;
     margin-bottom: 8px;
 }
 
-/* Trạng thái 1: Phòng trống */
-.status-available {
-    border-top: 5px solid #22c55e;
-}
-.status-available .room-status-badge {
-    background-color: #dcfce7;
-    color: #15803d;
-}
+/* Màu sắc theo từng trạng thái phòng */
+.status-available { border-top: 4px solid #10b981; }
+.status-available .room-status-badge { background-color: #d1fae5; color: #065f46; }
+.status-available:hover { box-shadow: 0 5px 12px rgba(16, 185, 129, 0.2); }
 
-/* Trạng thái 2: Phòng có khách */
-.status-occupied {
-    border-top: 5px solid #ef4444;
-    background-color: #fef2f2;
-}
-.status-occupied .room-status-badge {
-    background-color: #fee2e2;
-    color: #b91c1c;
-}
+.status-occupied { border-top: 4px solid #3b82f6; background-color: #f8fafc; }
+.status-occupied .room-status-badge { background-color: #dbeafe; color: #1e40af; }
+.status-occupied:hover { box-shadow: 0 5px 12px rgba(59, 130, 246, 0.2); }
 
-/* Trạng thái 3: Đang dọn dẹp */
-.status-dirty {
-    border-top: 5px solid #eab308;
-    background-color: #fefce8;
-}
-.status-dirty .room-status-badge {
-    background-color: #fef9c3;
-    color: #a16207;
-}
+.status-dirty { border-top: 4px solid #f57f17; }
+.status-dirty .room-status-badge { background-color: #fff3e0; color: #e65100; }
+.status-dirty:hover { box-shadow: 0 5px 12px rgba(245, 127, 23, 0.2); }
 
-/* Trạng thái 4: Đang bảo trì */
-.status-maintenance {
-    border-top: 5px solid #64748b;
-    background-color: #f8fafc;
-    opacity: 0.6;
-}
-.status-maintenance .room-status-badge {
-    background-color: #f1f5f9;
-    color: #475569;
-}
+.status-maintenance { border-top: 4px solid #94a3b8; background-color: #f1f5f9; opacity: 0.8; }
+.status-maintenance .room-status-badge { background-color: #e2e8f0; color: #475569; }
+.status-maintenance:hover { box-shadow: 0 5px 12px rgba(148, 163, 184, 0.2); }
 
-/* Phần hiển thị thông tin bổ sung khi di chuột vào phòng có khách */
 .room-guests-info {
-    font-size: 11px;
-    color: #475569;
+    font-size: 11.5px;
+    color: #334155;
+    text-align: left;
+    background: #edf2f7;
+    padding: 6px 8px;
+    border-radius: 4px;
     margin-top: 5px;
-    word-wrap: break-word;
-    font-style: italic;
+    line-height: 1.4;
 }
 
-/* Thành phần tương tác chọn phòng để gán */
-.select-wrapper {
+.room-cleaning-text, .room-locked-text {
+    font-size: 11px;
+    font-style: italic;
     margin-top: 8px;
 }
+.room-cleaning-text { color: #f57f17; }
+.room-locked-text { color: #94a3b8; }
 
-.select-label {
-    display: block;
-    background-color: #2563eb;
-    color: white;
-    padding: 6px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s;
+.clean-btn-wrapper { margin-top: 12px; display: flex; justify-content: center; }
+.btn-clean-finish { background-color: #f57f17 !important; font-size: 11px; padding: 4px 10px; height: 26px; line-height: 14px; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+
+.select-wrapper { margin-top: 5px; font-size: 12px; color: #1a446c; }
+.select-label { cursor: pointer; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
+
+/* ==========================================================================
+   4. KHỐI PANEL THÔNG TIN BÊN PHẢI (CHI TIẾT / GÁN PHÒNG)
+   ========================================================================== */
+.guest-stay-card {
+    border: 1px solid #ebd9b4;
+    background-color: #fcfbf7;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(26, 68, 108, 0.05);
+    box-sizing: border-box;
 }
 
-.select-label:hover {
-    background-color: #1d4ed8;
+.guest-stay-title {
+    font-family: 'Lora', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a446c;
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-left: 4px solid #bfa15f;
+    padding-left: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
 }
 
-.select-radio {
-    margin-right: 5px;
-    cursor: pointer;
-}
+.guest-count-wrapper { margin-bottom: 15px; }
+.guest-count-label { display: block; font-family: 'Lora', serif; font-size: 13.5px; font-weight: 600; margin-bottom: 6px; color: #1a446c; }
+.capacity-alert-text { font-size: 12.5px; font-weight: normal; color: #f57f17; margin-top: 2px; }
+.guest-count-input { width: 100%; padding: 8px 12px; border: 1px solid #ebd9b4; border-radius: 4px; font-size: 14px; font-weight: bold; color: #1a446c; box-sizing: border-box; }
 
-/* Thanh hành động xác nhận cuối trang */
-.action-bar {
-    text-align: right;
-    border-top: 1px solid #e2e8f0;
-    padding-top: 20px;
-}
+.guest-card-divider { border: none; border-top: 1px dashed #ebd9b4; margin-bottom: 15px; }
+.guest-fields-scroll { max-height: 420px; overflow-y: auto; padding-right: 5px; margin-bottom: 15px; }
+.guest-fields-scroll::-webkit-scrollbar { width: 6px; }
+.guest-fields-scroll::-webkit-scrollbar-thumb { background-color: #ebd9b4; border-radius: 4px; }
 
-.btn-submit {
-    background-color: #1e3a8a;
-    color: white;
-    padding: 12px 30px;
-    font-size: 14px;
-    font-weight: bold;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transition: background-color 0.2s;
-}
+.select-room-placeholder { text-align: center; color: #64748b; font-style: italic; padding: 30px 15px; font-size: 13.5px; }
 
-.btn-submit:hover {
-    background-color: #172554;
-}
+/* Các ô điền thông tin khách trú */
+.guest-profile-group { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #ebd9b4; }
+.profile-group-header { margin: 0 0 10px 0; color: #bfa15f; font-family: 'Lora', serif; font-size: 13.5px; font-weight: 600; }
+.form-field-block { margin-bottom: 8px; }
+.form-field-row { display: flex; gap: 12px; }
+.field-col { flex: 1; }
+.field-label { display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 4px; color: #1a446c; }
+
+.field-input-text { width: 100%; padding: 8px 12px; border: 1px solid #ebd9b4; border-radius: 4px; font-size: 13px; box-sizing: border-box; outline: none; }
+.field-input-text:focus { border-color: #1a446c; background-color: #fff; }
+
+/* Bảng hiển thị thông tin xem phòng */
+.table-detail-view { width: 100%; border-collapse: collapse; background: transparent; border: none; margin-bottom: 20px; }
+.table-detail-view tr { border-bottom: 1px dashed #ebd9b4; }
+.table-detail-view td { padding: 12px 5px; font-size: 13px; }
+.table-detail-view td.label-bold { font-weight: 600; color: #1a446c; width: 35%; }
+.table-detail-view td.value-bold { font-weight: 700; color: #1a446c; }
+.table-detail-view td.value-code { font-weight: bold; color: #3b82f6; }
+
+.guest-list-title { color: #1a446c; font-family: 'Lora', serif; margin: 15px 0 10px 0; border-left: 3px solid #bfa15f; padding-left: 8px; }
+.table-guests-list { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table-guests-list th { padding: 8px 5px; background-color: #1a446c; color: white; text-align: left; }
+.table-guests-list td { padding: 10px 5px; }
+
+.action-bar-submit-only { border: none; padding: 5px 0 0 0; margin: 0; }
+.btn-submit-full { width: 100%; padding: 12px; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; }
