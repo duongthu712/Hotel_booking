@@ -182,9 +182,11 @@ public class BookingDAO extends DBContext {
             String idNumber, String nationality, String dobStr, int numGuests, boolean isDifferentGuest) {
 
         String insertNewGuestSql = "INSERT INTO Guests (full_name, phone, email, id_number, nationality, date_of_birth) VALUES (?, ?, ?, ?, ?, ?)";
-        String updateBookingGuestSql = "UPDATE Bookings SET guest_id = ?, num_guests = ?, [status] = N'Đã nhận phòng', actual_checkin_time = GETDATE() WHERE booking_id = ?";
+        // 🚀 ĐÃ SỬA: Bỏ [status] = N'Đã nhận phòng' để giữ lại đơn cho gán tiếp phòng thứ 2
+        String updateBookingGuestSql = "UPDATE Bookings SET guest_id = ?, num_guests = ?, actual_checkin_time = GETDATE() WHERE booking_id = ?";
         String updateOldGuestSql = "UPDATE Guests SET full_name = ?, phone = ?, email = ?, id_number = ?, nationality = ?, date_of_birth = ? WHERE guest_id = ?";
-        String updateBookingOnlySql = "UPDATE Bookings SET num_guests = ?, [status] = N'Đã nhận phòng', actual_checkin_time = GETDATE() WHERE booking_id = ?";
+        // 🚀 ĐÃ SỬA: Fix lỗi cú pháp khai báo và bỏ [status] = N'Đã nhận phòng'
+        String updateBookingOnlySql = "UPDATE Bookings SET num_guests = ?, actual_checkin_time = GETDATE() WHERE booking_id = ?";
 
         try {
             connection.setAutoCommit(false);
@@ -246,13 +248,18 @@ public class BookingDAO extends DBContext {
 
         } catch (Exception e) {
             try {
-                connection.rollback();
+                if (connection != null) {
+                    connection.rollback();
+                }
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
+            e.printStackTrace();
         } finally {
             try {
-                connection.setAutoCommit(true);
+                if (connection != null) {
+                    connection.setAutoCommit(true);
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -260,12 +267,14 @@ public class BookingDAO extends DBContext {
         return false;
     }
 
+
     public BookingCheckInView getBookingForCheckIn(String bookingCode) {
         String sql = "SELECT b.booking_id, b.booking_code, b.num_rooms, b.num_guests, b.payment_status, b.deposit_amount, "
                 + "b.[status], b.actual_checkin_time, "
                 + "g.guest_id, g.full_name, g.phone, g.email, g.id_number, g.date_of_birth, g.nationality, "
                 + "rt.type_name, rt.capacity, "
-                + "r.request_type, r.request_details, r.status AS request_status "
+                + "r.request_type, r.request_details, r.status AS request_status, "
+                + "CONVERT(VARCHAR(19), r.requested_checkin, 120) AS requested_checkin " // ĐÃ THÊM DÒNG NÀY
                 + "FROM Bookings b "
                 + "LEFT JOIN Guests g ON b.guest_id = g.guest_id "
                 + "INNER JOIN RoomTypes rt ON b.room_type_id = rt.room_type_id "
@@ -298,6 +307,9 @@ public class BookingDAO extends DBContext {
                     b.setRequestType(rs.getString("request_type"));
                     b.setRequestDetails(rs.getString("request_details"));
                     b.setRequestStatus(rs.getString("request_status"));
+
+                    b.setRequestedCheckIn(rs.getString("requested_checkin"));
+
                     return b;
                 }
             }
@@ -316,7 +328,8 @@ public class BookingDAO extends DBContext {
                 + "b.[status], b.actual_checkin_time, "
                 + "g.guest_id, g.full_name, g.phone, g.email, g.id_number, g.date_of_birth, g.nationality, "
                 + "rt.type_name, rt.capacity, "
-                + "r.request_type, r.request_details, r.status AS request_status "
+                + "r.request_type, r.request_details, r.status AS request_status, "
+                + "CONVERT(VARCHAR(19), r.requested_checkin, 120) AS requested_checkin " // ĐÃ THÊM DÒNG NÀY
                 + "FROM Bookings b "
                 + "LEFT JOIN Guests g ON b.guest_id = g.guest_id "
                 + "INNER JOIN RoomTypes rt ON b.room_type_id = rt.room_type_id "
@@ -350,6 +363,9 @@ public class BookingDAO extends DBContext {
                     b.setRequestType(rs.getString("request_type"));
                     b.setRequestDetails(rs.getString("request_details"));
                     b.setRequestStatus(rs.getString("request_status"));
+
+                    b.setRequestedCheckIn(rs.getString("requested_checkin"));
+
                     list.add(b);
                 }
             }
@@ -370,6 +386,53 @@ public class BookingDAO extends DBContext {
             return rows > 0;
         } catch (Exception e) {
             System.out.println("Lỗi cancelBooking: " + e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean updateStatus(int bookingId, String status) {
+        String sql = "UPDATE Bookings SET [status] = ? WHERE booking_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setNString(1, status);
+            ps.setInt(2, bookingId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // 1. Hàm đếm số lượng phòng thực tế đã gán vào bảng BookingRooms
+    public int countRoomsAssigned(int bookingId) {
+        String sql = "SELECT COUNT(*) FROM BookingRooms WHERE booking_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, bookingId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+// 2. Hàm kiểm tra xem có phòng nào đã gán nhưng chưa được chia khách vào ở hay không
+    public boolean hasEmptyRoomWithoutGuests(int bookingId) {
+        // Câu lệnh này tìm xem có phòng nào thuộc booking_id này mà KHÔNG xuất hiện trong bảng GuestStays
+        String sql = "SELECT COUNT(*) FROM BookingRooms br "
+                + "LEFT JOIN GuestStays gs ON br.booking_room_id = gs.booking_room_id "
+                + "WHERE br.booking_id = ? AND gs.stay_id IS NULL";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, bookingId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0; // Nếu > 0 tức là có phòng đang bị bỏ trống không có khách
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return false;
     }

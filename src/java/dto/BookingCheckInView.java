@@ -15,6 +15,7 @@ public class BookingCheckInView {
     private String guestFullName;
     private String guestPhone;
     private String guestEmail;
+    private int roomTypeId; // 🚀 THÊM MỚI BIẾN NÀY ĐỂ LƯU ID HẠNG PHÒNG
     private String roomTypeName;
     private int capacity;
     private String status;
@@ -25,10 +26,21 @@ public class BookingCheckInView {
     private String requestType;
     private String requestDetails;
     private String requestStatus;
+    private String requestedCheckIn;
 
     public BookingCheckInView() {
     }
 
+    // 🚀 THÊM CẶP HÀM GETTER / SETTER NÀY VÀO DTO
+    public int getRoomTypeId() {
+        return roomTypeId;
+    }
+
+    public void setRoomTypeId(int roomTypeId) {
+        this.roomTypeId = roomTypeId;
+    }
+
+    // --- Các hàm Getter và Setter cũ bên dưới giữ nguyên hoàn toàn ---
     public int getBookingId() {
         return bookingId;
     }
@@ -188,5 +200,12 @@ public class BookingCheckInView {
     public void setRequestStatus(String requestStatus) {
         this.requestStatus = requestStatus;
     }
-    
+
+    public String getRequestedCheckIn() {
+        return requestedCheckIn;
+    }
+
+    public void setRequestedCheckIn(String requestedCheckIn) {
+        this.requestedCheckIn = requestedCheckIn;
+    }
 }

@@ -493,6 +493,7 @@ h1, h2, h3, h4, h5, .management-title {
     justify-content: center;
     transition: all 0.2s ease;
     box-shadow: 0 2px 6px rgba(26, 68, 108, 0.1);
+    text-decoration: none;
 }
 
 .btn-success:hover {

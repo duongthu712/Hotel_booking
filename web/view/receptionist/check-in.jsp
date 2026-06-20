@@ -63,7 +63,7 @@
                         </p>
                         <c:if test="${booking.status eq 'Đã nhận phòng' and not empty booking.actualCheckInTime}">
                             <p><strong>Thời gian nhận phòng:</strong> <span class="text-success-highlight">${fn:substring(booking.actualCheckInTime, 0, 19)}</span></p>
-                        </c:if>
+                            </c:if>
                     </div>
 
                     <c:if test="${not empty booking.requestType}">
@@ -96,14 +96,14 @@
                         <input type="number" name="numGuests" min="1" required placeholder="Nhập số người lưu trú..." value="${not empty param.numGuests ? param.numGuests : booking.numGuests}" />
 
                         <div class="switch-block <c:if test="${booking.status eq 'Đã nhận phòng' or booking.status eq 'Đã hủy'}">hide-element</c:if>">
-                            <input type="checkbox" name="isDifferentGuest" id="isDifferentGuest" value="true">
-                            <label for="isDifferentGuest"><b>Khách làm thủ tục nhận phòng là người khác (Người đặt hộ)</b></label>
-                        </div>
+                                <input type="checkbox" name="isDifferentGuest" id="isDifferentGuest" value="true">
+                                <label for="isDifferentGuest"><b>Khách làm thủ tục nhận phòng là người khác (Người đặt hộ)</b></label>
+                            </div>
 
-                        <h5>Hồ Sơ Khách Đại Diện Lưu Trú</h5>
+                            <h5>Hồ Sơ Khách Đại Diện Lưu Trú</h5>
 
-                        <label>Họ và tên *</label>
-                        <input type="text" name="idFullName" value="${booking.guestFullName}" required />
+                            <label>Họ và tên *</label>
+                            <input type="text" name="idFullName" value="${booking.guestFullName}" required />
 
                         <label>Số điện thoại</label>
                         <input type="text" name="idPhone" value="${booking.guestPhone}" />
@@ -135,9 +135,6 @@
                                     <button type="button" class="btn-success btn-disabled" disabled>Đơn Đã Bị Hủy</button>
                                 </c:when>
                                 <c:otherwise>
-                                    <a href="${pageContext.request.contextPath}/receptionist/assign-room?bookingId=${booking.bookingId}" class="btn-select" style="background-color: #2563eb; text-align: center; line-height: 2.4; padding: 0 20px;">
-                                        Gán phòng & Sơ đồ
-                                    </a>
                                     <button type="submit" name="action" value="checkin" class="btn-success">Xác Nhận Check-In</button>
                                     <button type="submit" name="action" value="cancel" class="btn-success btn-danger-flat" onclick="return confirm('Bạn có chắc chắn muốn hủy đơn đặt phòng này do khách không đến (No-Show)?');">Hủy Đơn (No-Show)</button>
                                 </c:otherwise>
@@ -157,7 +154,8 @@
                             <th>Khách Hàng</th>
                             <th>Hạng Phòng</th>
                             <th>Trạng Thái</th>
-                            <th>Giờ Vào / Giờ Hẹn</th>
+                            <th>Giờ Hẹn Đến</th>
+                            <th>Giờ Vào Thực Tế</th>
                             <th class="text-center">Thao Tác</th>
                         </tr>
                     </thead>
@@ -167,7 +165,7 @@
                                 <td>${b.bookingCode}</td>
                                 <td>
                                     <span class="td-name">${b.guestFullName}</span>
-                                    
+
                                     <c:if test="${b.requestType eq 'Nhận phòng muộn' and b.status eq 'Đã xác nhận' and b.requestStatus eq 'Đã phê duyệt'}">
                                         <span class="badge-success" style="background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; margin-left: 6px; font-size: 11px; padding: 2px 6px; text-transform: none;">
                                             Đến muộn
@@ -194,25 +192,31 @@
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
+
+                                <%-- CỘT 1: GIỜ HẸN ĐẾN ĐỘNG --%>
                                 <td class="time-col-text">
                                     <c:choose>
-                                        <c:when test="${b.status eq 'Đã nhận phòng' and not empty b.actualCheckInTime}">
-                                            <span class="text-success-time">${fn:substring(b.actualCheckInTime, 11, 19)}</span>
+                                        <c:when test="${(b.requestType eq 'Nhận phòng muộn' or b.requestType eq 'Nhận phòng sớm') and b.requestStatus eq 'Đã phê duyệt' and not empty b.requestedCheckIn}">
+                                            <span style="color: #0369a1; font-weight: 600;">${fn:substring(b.requestedCheckIn, 11, 16)}</span>
                                         </c:when>
-                                        
-                                        <c:when test="${b.status eq 'Đã xác nhận' and b.requestType eq 'Nhận phòng muộn' and b.requestStatus eq 'Đã phê duyệt'}">
-                                            <span style="color: #0369a1; font-weight: 600;">Hẹn: 21:00</span>
-                                        </c:when>
-
-                                        <c:when test="${b.status eq 'Đã xác nhận' and b.requestType eq 'Nhận phòng sớm' and b.requestStatus eq 'Đã phê duyệt'}">
-                                            <span style="color: #0369a1; font-weight: 600;">Hẹn: 08:00</span>
-                                        </c:when>
-                                        
                                         <c:otherwise>
                                             <span class="text-muted-dash">—</span>
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
+
+                                <%-- CỘT 2: GIỜ VÀO THỰC TẾ --%>
+                                <td class="time-col-text">
+                                    <c:choose>
+                                        <c:when test="${b.status eq 'Đã nhận phòng' and not empty b.actualCheckInTime}">
+                                            <span class="text-success-time">${fn:substring(b.actualCheckInTime, 11, 19)}</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="text-muted-dash">—</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
+
                                 <td class="text-center">
                                     <div class="table-actions-flex" style="gap: 5px; justify-content: center;">
                                         <a href="${pageContext.request.contextPath}/checkin?searchBookingCode=${b.bookingCode}" class="btn-select">
@@ -222,16 +226,13 @@
                                             </c:choose>
                                         </a>
 
-                                        <%-- 🚀 VỊ TRÍ 2: NÚT GÁN PHÒNG NHANH Ở TỪNG DÒNG TRONG BẢNG (CHỈ HIỆN KHI ĐƠN CHƯA NHẬN/HỦY) --%>
                                         <c:if test="${b.status eq 'Đã xác nhận'}">
-                                            <a href="${pageContext.request.contextPath}/receptionist/assign-room?bookingId=${b.bookingId}" class="btn-select" style="background-color: #2563eb;">
-                                                Gán phòng
-                                            </a>
-                                            
+                              
+
                                             <form action="${pageContext.request.contextPath}/checkin" method="POST" class="form-inline-table">
                                                 <input type="hidden" name="bookingId" value="${b.bookingId}" />
                                                 <input type="hidden" name="bookingCode" value="${b.bookingCode}" />
-                                                <button type="submit" name="action" value="cancel" class="btn-danger-table-click" onclick="return confirm('⚠️ Bạn có chắc chắn muốn hủy nhanh đơn ${b.bookingCode} (No-Show)?');">Hủy</button>
+                                                <button type="submit" name="action" value="cancel" class="btn-danger-table-click" onclick="return confirm('Bạn có chắc chắn muốn hủy nhanh đơn ${b.bookingCode} (No-Show)?');">Hủy</button>
                                             </form>
                                         </c:if>
                                     </div>
@@ -240,13 +241,13 @@
                         </c:forEach>
                         <c:if test="${empty listToday}">
                             <tr>
-                                <td colspan="6" class="td-empty">Hôm nay chưa có đơn đặt phòng nào đến.</td>
+                                <td colspan="7" class="td-empty">Hôm nay chưa có đơn đặt phòng nào đến.</td>
                             </tr>
                         </c:if>
                     </tbody>
                 </table>
             </div>
         </div>
-        <script src="${pageContext.request.contextPath}/view/assets/js/check-in-validation.js?v=<%=System.currentTimeMillis()%>"></script>
+        <script src="${pageContext.request.contextPath}/view/assets/javascript/check-in.js?v=<%=System.currentTimeMillis()%>"></script>
     </body>
 </html>
