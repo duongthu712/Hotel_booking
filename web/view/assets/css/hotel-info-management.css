@@ -188,40 +188,94 @@
     letter-spacing: 0.03em;
 }
 
-.news-detail-content {
-    max-width: 600px;
-    width: 90%;
-}
-
-.news-detail-image {
-    margin: 20px 0;
-    border-radius: var(--radius-custom);
-    overflow: hidden;
-    border: 1px solid var(--border-color);
-}
-
-.news-detail-image img {
+/* --- POPUP NỀN MỜ TOÀN MÀN HÌNH --- */
+#news-detail-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    max-height: 300px;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Làm tối nền phía sau */
+    display: none; /* Mặc định ẩn, dùng class .show hoặc js để flex */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+    box-sizing: border-box;
+    backdrop-filter: blur(4px); /* Tạo hiệu ứng mờ nhẹ cho nền sau rất sang */
+}
+
+/* Khi có class show thì hiển thị popup */
+#news-detail-modal.show {
+    display: flex !important;
+}
+
+/* --- KHỐI NỘI DUNG CHÍNH (WHITE BOX) --- */
+#news-detail-modal .popup-content {
+    background-color: var(--bg-main);
+    width: 100%;
+    max-width: 700px; /* Độ rộng tối đa vừa mắt để đọc bài viết */
+    max-height: 85vh; /* Không vượt quá 85% chiều cao màn hình */
+    overflow-y: auto; /* Tự động xuất hiện thanh cuộn nếu bài viết quá dài */
+    border-radius: 12px;
+    padding: 30px;
+    box-sizing: border-box;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    position: relative;
+    animation: slideDown 0.3s ease-out; /* Hiệu ứng mở popup mượt */
+}
+
+/* --- TIÊU ĐỀ BÀI VIẾT --- */
+#detail-news-title {
+    font-family: var(--font-logo);
+    color: var(--text-main);
+    font-size: 24px;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 20px;
+    line-height: 1.4;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 15px;
+}
+
+/* --- KHỐI BỌC VÀ HIỂN THỊ ẢNH --- */
+#detail-news-image-wrapper {
+    width: 100%;
+    max-height: 350px; /* Giới hạn chiều cao ảnh tránh chiếm hết chỗ */
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    background-color: #f1f5f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#detail-news-img {
+    width: 100%;
+    max-height: 350px;
     object-fit: cover;
     display: block;
 }
 
-.news-detail-content {
-    font-size: 1rem;
+#detail-news-content {
+    font-size: 15px;
     line-height: 1.6;
-    color: var(--text-main);
-    margin: 20px 0;
+    color: #334155;
     white-space: pre-wrap;
+    margin-bottom: 25px;
+    text-align: justify;
 }
 
 .news-detail-meta {
     display: flex;
     justify-content: space-between;
-    padding: 10px 0;
-    border-top: 1px solid var(--border-color);
-    font-size: 0.85rem;
+    align-items: center;
+    font-size: 13px;
     color: var(--text-muted);
+    border-top: 1px dashed rgba(0, 0, 0, 0.1);
+    padding-top: 15px;
+    margin-bottom: 25px;
 }
 
 .hotel-popup {

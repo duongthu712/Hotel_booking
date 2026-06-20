@@ -201,7 +201,7 @@
                     <input type="hidden" name="imageId" id="edit-image-id">
                     <div class="form-group">
                         <label class="input-label">Tải ảnh</label>
-                        <input type="file" id="proofImage">
+                        <input type="file" id="upImage">
                     </div>
                     <div class="form-group">
                         <label class="input-label">Link ảnh</label>
@@ -336,9 +336,14 @@
                         <textarea name="content" class="popup-input-field" rows="5" required>${keepContent}</textarea>
                     </div>
 
+                    <input type="hidden" name="imageId" id="edit-image-id">
                     <div class="form-group">
-                        <label class="input-label">Link ảnh đi kèm</label>
-                        <input type="text" name="imageUrl" class="popup-input-field" 
+                        <label class="input-label">Tải ảnh</label>
+                        <input type="file" id="upImage">
+                    </div>
+                    <div class="form-group">
+                        <label class="input-label">Link ảnh</label>
+                        <input type="text" name="imageUrl" id="edit-image-url" class="popup-input-field" 
                                value="${keepImageUrl}">
                     </div>
 
@@ -374,9 +379,14 @@
                         <textarea name="content" class="popup-input-field" rows="5" required>${newsToEdit.getContent()}</textarea>
                     </div>
 
+                    <input type="hidden" name="imageId" id="edit-image-id">
                     <div class="form-group">
-                        <label class="input-label">Link ảnh đi kèm</label>
-                        <input type="text" name="imageUrl" class="popup-input-field" 
+                        <label class="input-label">Tải ảnh</label>
+                        <input type="file" id="upImage">
+                    </div>
+                    <div class="form-group">
+                        <label class="input-label">Link ảnh</label>
+                        <input type="text" name="imageUrl" id="edit-image-url" class="popup-input-field" 
                                value="${newsToEdit.getImageUrl()}">
                     </div>
 

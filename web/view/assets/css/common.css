@@ -489,7 +489,7 @@ input:checked + .toggle-slider:before {
     letter-spacing: 0.05em;
 }
 
-#proofImage {
+#upImage {
     width: 100%;
     padding: 10px;
     background-color: var(--bg-main);
@@ -498,17 +498,16 @@ input:checked + .toggle-slider:before {
     transition: all 0.3s ease;
     box-sizing: border-box;
     font-family: var(--font-logo);
-    color: transparent; 
 }
 
-#proofImage::-webkit-file-upload-button {
+#upImage::-webkit-file-upload-button {
     display: none;
 }
-#proofImage::file-selector-button {
+#upImage::file-selector-button {
     display: none;
 }
 
-#proofImage::before {
+#upImage::before {
     content: 'Chọn ảnh từ máy';
     display: inline-block;
     background-color: var(--text-main);
@@ -520,4 +519,3 @@ input:checked + .toggle-slider:before {
     margin-right: 10px;
     transition: background 0.2s;
 }
-
