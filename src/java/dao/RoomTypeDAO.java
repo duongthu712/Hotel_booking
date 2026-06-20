@@ -95,7 +95,6 @@ public class RoomTypeDAO extends DBContext {
             sql += "AND rt.room_type_id = ? ";
         }
 
-
         sql += "AND ( "
                 + "    (SELECT COUNT(*) "
                 + "     FROM Rooms r "
