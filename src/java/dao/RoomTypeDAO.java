@@ -12,6 +12,8 @@ import java.util.List;
 
 public class RoomTypeDAO extends DBContext {
 
+    private static final int HOLD_MINUTES = 15;
+
     // Lấy các loại phòng để hiện lên thanh search cho khách. Da thay doi SQL
     public List<RoomType> getAllRoomTypes() {
         List<RoomType> list = new ArrayList<>();
@@ -90,25 +92,40 @@ public class RoomTypeDAO extends DBContext {
                 + "WHERE rt.is_active = 1 ";
 
         if (roomTypeId != null && !roomTypeId.equals("all")) {
-            sql += " AND rt.room_type_id = ? ";
+            sql += "AND rt.room_type_id = ? ";
         }
 
-       sql += " AND (SELECT COUNT(*) "
-                + " FROM Rooms r "
-                + " WHERE r.room_type_id = rt.room_type_id "
-                + " AND r.[status] != N'Đang bảo trì' "
-                + " AND r.room_number NOT IN ( "
-                + "      SELECT br.room_number "
-                + "      FROM BookingRooms br "
-                + "      JOIN Bookings b ON br.booking_id = b.booking_id "
-                + "      WHERE b.[status] != N'Đã hủy' "
-                + "      AND NOT (CAST(b.checkout_date AS DATE) <= CAST(? AS DATE) " 
-                + "               OR CAST(b.checkin_date AS DATE) >= CAST(? AS DATE)) "
-                + " ) "
+        sql += "AND ( "
+                + "    (SELECT COUNT(*) "
+                + "     FROM Rooms r "
+                + "     WHERE r.room_type_id = rt.room_type_id "
+                + "     AND r.[status] != N'Đang bảo trì') "
+                + "    - "
+                + "    ISNULL(( "
+                + "        SELECT SUM(b.num_rooms) "
+                + "        FROM Bookings b "
+                + "        WHERE b.room_type_id = rt.room_type_id "
+                + "        AND b.[status] != N'Đã hủy' "
+                + "        AND NOT (b.checkout_date <= ? OR b.checkin_date >= ?) "
+                + "        AND ( "
+                + "            b.[status] != N'Chờ xử lý' "
+                + "            OR ISNULL(b.[source], '') != N'Đặt phòng trực tuyến' "
+                + "            OR DATEADD(MINUTE, ?, b.created_at) > GETDATE() "
+                + "            OR EXISTS ( "
+                + "                SELECT 1 "
+                + "                FROM DepositPayments dp "
+                + "                WHERE dp.booking_id = b.booking_id "
+                + "            ) "
+                + "        ) "
+                + "    ), 0) "
                 + ") >= ? "
                 + "ORDER BY rt.room_type_id ASC";
+
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
         try {
-            PreparedStatement ps = connection.prepareStatement(sql);
+            ps = connection.prepareStatement(sql);
             int index = 1;
 
             if (roomTypeId != null && !roomTypeId.equals("all")) {
@@ -117,9 +134,10 @@ public class RoomTypeDAO extends DBContext {
 
             ps.setString(index++, checkIn);
             ps.setString(index++, checkOut);
+            ps.setInt(index++, 15);
             ps.setInt(index++, roomQuantity);
 
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
 
             while (rs.next()) {
                 RoomType rt = new RoomType();
@@ -143,11 +161,22 @@ public class RoomTypeDAO extends DBContext {
                 list.add(rt);
             }
 
-            rs.close();
-            ps.close();
-
         } catch (Exception e) {
+            System.out.println("searchRoomTypesByQuantity: " + e.getMessage());
             e.printStackTrace();
+
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+
+                if (ps != null) {
+                    ps.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         return list;
@@ -926,34 +955,51 @@ public class RoomTypeDAO extends DBContext {
     }
 
     // 7. Đếm số phòng còn trống theo hạng phòng và khoảng ngày (phục vụ public Room Detail)
+    // Đếm số phòng còn trống theo hạng phòng và khoảng ngày
     public int getAvailableRoomCount(int roomTypeId, String checkIn, String checkOut) {
         int availableRooms = 0;
 
-        String sql = "SELECT COUNT(*) AS available_rooms "
-                + "FROM Rooms r "
-                + "WHERE r.room_type_id = ? "
-                + "AND r.[status] != N'Đang bảo trì' "
-                + "AND r.room_number NOT IN ( "
-                + "    SELECT br.room_number "
-                + "    FROM BookingRooms br "
-                + "    JOIN Bookings b ON br.booking_id = b.booking_id "
-                + "    WHERE b.[status] != N'Đã hủy' "
-                + "    AND NOT (b.checkout_date <= ? OR b.checkin_date >= ?) "
-                + ")";
+        String sql = "SELECT ( "
+                + "    (SELECT COUNT(*) "
+                + "     FROM Rooms r "
+                + "     WHERE r.room_type_id = ? "
+                + "     AND r.[status] != N'Đang bảo trì') "
+                + "    - "
+                + "    ISNULL(( "
+                + "        SELECT SUM(b.num_rooms) "
+                + "        FROM Bookings b "
+                + "        WHERE b.room_type_id = ? "
+                + "        AND b.[status] != N'Đã hủy' "
+                + "        AND NOT (b.checkout_date <= ? OR b.checkin_date >= ?) "
+                + "        AND ( "
+                + "            b.[status] != N'Chờ xử lý' "
+                + "            OR ISNULL(b.[source], '') != N'Đặt phòng trực tuyến' "
+                + "            OR DATEADD(MINUTE, ?, b.created_at) > GETDATE() "
+                + "            OR EXISTS ( "
+                + "                SELECT 1 "
+                + "                FROM DepositPayments dp "
+                + "                WHERE dp.booking_id = b.booking_id "
+                + "            ) "
+                + "        ) "
+                + "    ), 0) "
+                + ") AS available_rooms";
 
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
             if (connection == null) {
-                System.out.println(">>> DAO ERROR: Connection đang bị NULL tại getAvailableRoomCount!");
+                System.out.println("getAvailableRoomCount: Connection đang bị null.");
                 return 0;
             }
 
             ps = connection.prepareStatement(sql);
             ps.setInt(1, roomTypeId);
-            ps.setString(2, checkIn);
-            ps.setString(3, checkOut);
+            ps.setInt(2, roomTypeId);
+            ps.setString(3, checkIn);
+            ps.setString(4, checkOut);
+            ps.setInt(5, HOLD_MINUTES);
+
             rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -961,7 +1007,7 @@ public class RoomTypeDAO extends DBContext {
             }
 
         } catch (Exception e) {
-            System.out.println(">>> LỖI LOGIC TẠI getAvailableRoomCount: " + e.getMessage());
+            System.out.println("getAvailableRoomCount: " + e.getMessage());
             e.printStackTrace();
 
         } finally {
@@ -969,6 +1015,7 @@ public class RoomTypeDAO extends DBContext {
                 if (rs != null) {
                     rs.close();
                 }
+
                 if (ps != null) {
                     ps.close();
                 }
