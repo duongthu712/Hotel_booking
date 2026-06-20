@@ -27,7 +27,8 @@
                 <p>Trải nghiệm nghỉ dưỡng sang trọng và thư giãn tuyệt đối tại La Mer.</p>
 
                 <div class="hero-actions">
-                    <a class="btn primary" href="${pageContext.request.contextPath}/view/user/booking-form.jsp">Đặt phòng</a>
+                    <a href="${pageContext.request.contextPath}/quick-booking"
+                       class="booking-btn">Đặt phòng nhanh</a>
                     <a class="btn outline" href="${pageContext.request.contextPath}/search">Khám phá</a>
                 </div>
             </div>
@@ -39,8 +40,8 @@
 
                 <select name="roomTypeId">
                     <option value="all" <c:if test="${empty param.roomTypeId || param.roomTypeId eq 'all'}">selected</c:if>>
-                        Tất cả loại phòng
-                    </option>
+                            Tất cả loại phòng
+                        </option>
                     <c:forEach var="item" items="${allRoomTypesList}">
                         <option value="${item.roomTypeId}" <c:if test="${param.roomTypeId eq item.roomTypeId.toString()}">selected</c:if>>
                             ${item.typeName}
@@ -75,7 +76,7 @@
 
             <section class="section">
                 <h2>Không gian nghỉ dưỡng</h2>
-                
+
                 <div class="luxury-gallery">
                     <c:forEach var="img" items="${smallImages}">
                         <div class="gallery-item">
@@ -88,35 +89,35 @@
                 <h2>Dịch vụ & tiện nghi</h2>
 
                 <div class="grid">
-                <c:choose>
-                    <c:when test="${not empty services}">
-                        <c:forEach var="service" items="${services}">
+                    <c:choose>
+                        <c:when test="${not empty services}">
+                            <c:forEach var="service" items="${services}">
+                                <div class="card">
+                                    <h3>${service.serviceName}</h3>
+                                    <p>${service.description}</p>
+                                    <span class="price">
+                                        <c:choose>
+                                            <c:when test="${empty service.unitPrice || service.unitPrice < 1}">
+                                                Miễn phí
+                                            </c:when>
+                                            <c:otherwise>
+                                                <fmt:formatNumber value="${service.unitPrice}" type="number"/> ₫
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </span>
+                                </div>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
                             <div class="card">
-                                <h3>${service.serviceName}</h3>
-                                <p>${service.description}</p>
-                                <span class="price">
-                                    <c:choose>
-                                        <c:when test="${empty service.unitPrice || service.unitPrice < 1}">
-                                            Miễn phí
-                                        </c:when>
-                                        <c:otherwise>
-                                            <fmt:formatNumber value="${service.unitPrice}" type="number"/> ₫
-                                        </c:otherwise>
-                                    </c:choose>
-                                </span>
+                                <h3>Rooftop Pool</h3>
+                                <p>Hồ bơi vô cực view biển cực chill.</p>
+                                <span class="price">Miễn phí</span>
                             </div>
-                        </c:forEach>
-                    </c:when>
-                    <c:otherwise>
-                        <div class="card">
-                            <h3>Rooftop Pool</h3>
-                            <p>Hồ bơi vô cực view biển cực chill.</p>
-                            <span class="price">Miễn phí</span>
-                        </div>
-                    </c:otherwise>
-                </c:choose>
-            </div>
-        </section>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+            </section>
         </main>
 
         <jsp:include page="/view/common/footer.jsp" />

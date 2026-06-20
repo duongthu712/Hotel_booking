@@ -4,6 +4,7 @@
  */
 package controller;
 
+import dao.BookingDAO;
 import dao.RoomTypeDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,11 +20,12 @@ import model.RoomType;
  *
  * @author Minh Thu
  */
-@WebServlet(name = "SearchRoomServlet", urlPatterns = {"/search"}) 
+@WebServlet(name = "SearchRoomServlet", urlPatterns = {"/search"})
 public class SearchRoomServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         response.setContentType("text/html;charset=UTF-8");
 
         // 1. Đón nhận thông tin tìm kiếm từ thanh search-bar gửi sang
@@ -32,6 +34,10 @@ public class SearchRoomServlet extends HttpServlet {
         String roomQuantityStr = request.getParameter("roomQuantity");
         String roomTypeId = request.getParameter("roomTypeId");
 
+        // Hủy booking online đã quá thời gian giữ phòng
+        BookingDAO bookingDAO = new BookingDAO();
+        bookingDAO.cancelExpiredBookings();
+
         RoomTypeDAO roomTypeDAO = new RoomTypeDAO();
 
         List<RoomType> allRoomTypesList = roomTypeDAO.getAllRoomTypes();
@@ -39,12 +45,19 @@ public class SearchRoomServlet extends HttpServlet {
 
         List<RoomType> list;
 
-        //Lúc chưa nhập ngày checkin checkout
-        if (checkIn == null || checkOut == null || checkIn.trim().isEmpty() || checkOut.trim().isEmpty()) {
+        // Lúc chưa nhập ngày checkin checkout
+        if (checkIn == null || checkOut == null
+                || checkIn.trim().isEmpty()
+                || checkOut.trim().isEmpty()) {
+
             list = allRoomTypesList;
+
         } else {
             int roomQuantity = 1;
-            if (roomQuantityStr != null && !roomQuantityStr.trim().isEmpty()) {
+
+            if (roomQuantityStr != null
+                    && !roomQuantityStr.trim().isEmpty()) {
+
                 try {
                     roomQuantity = Integer.parseInt(roomQuantityStr.trim());
                 } catch (NumberFormatException e) {
@@ -56,23 +69,33 @@ public class SearchRoomServlet extends HttpServlet {
                 roomTypeId = "all";
             }
 
-            list = roomTypeDAO.searchRoomTypesByQuantity(checkIn, checkOut, roomQuantity, roomTypeId);
+            list = roomTypeDAO.searchRoomTypesByQuantity(
+                    checkIn,
+                    checkOut,
+                    roomQuantity,
+                    roomTypeId
+            );
         }
 
         request.setAttribute("availableRoomTypes", list);
 
-        request.getRequestDispatcher("/view/public/search-result.jsp").forward(request, response);
+        request.getRequestDispatcher("/view/public/search-result.jsp")
+                .forward(request, response);
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(HttpServletRequest request,
+            HttpServletResponse response)
             throws ServletException, IOException {
+
         processRequest(request, response);
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(HttpServletRequest request,
+            HttpServletResponse response)
             throws ServletException, IOException {
+
         processRequest(request, response);
     }
 }
