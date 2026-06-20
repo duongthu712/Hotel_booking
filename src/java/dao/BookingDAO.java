@@ -14,6 +14,7 @@ import java.sql.Types;
 import java.math.BigDecimal;
 import java.sql.Statement;
 import java.sql.Date;
+import model.Guest;
 
 public class BookingDAO extends DBContext {
 
@@ -176,7 +177,6 @@ public class BookingDAO extends DBContext {
         return booking;
     }
 
-    
     // Thư
     public boolean updateCheckInAdvance(int bookingId, int currentGuestId, String fullName, String phone, String email,
             String idNumber, String nationality, String dobStr, int numGuests, boolean isDifferentGuest) {
@@ -608,23 +608,75 @@ public class BookingDAO extends DBContext {
         return false;
     }
 
-    // Lưu minh chứng thanh toán
-    public boolean createDepositPayment(int bookingId, BigDecimal amount,
-            String paymentProofUrl) {
+    // Lưu minh chứng và cập nhật booking thành đã đặt cọc
+    public boolean createDepositPayment(int bookingId, BigDecimal amount, String paymentProofUrl) {
+        String insertPaymentSql = """
+                              INSERT INTO DepositPayments
+                              (booking_id, amount, payment_proof_url, verification_status)
+                              VALUES (?, ?, ?, N'Chờ xử lý')
+                              """;
+
+        String updateBookingSql = """
+                              UPDATE Bookings
+                              SET payment_status = N'Đã đặt cọc'
+                              WHERE booking_id = ?
+                                AND [status] = N'Chờ xử lý'
+                                AND payment_status = N'Chưa thanh toán'
+                              """;
+
+        boolean oldAutoCommit = true;
+
         try {
-            String sql = """
-                         INSERT INTO DepositPayments
-                         (booking_id, amount, payment_proof_url, verification_status)
-                         VALUES (?, ?, ?, N'Chờ xử lý')
-                         """;
-            stm = connection.prepareStatement(sql);
-            stm.setInt(1, bookingId);
-            stm.setBigDecimal(2, amount);
-            stm.setString(3, paymentProofUrl);
-            return stm.executeUpdate() > 0;
+            oldAutoCommit = connection.getAutoCommit();
+            connection.setAutoCommit(false);
+
+            int insertedRows;
+
+            try (PreparedStatement insertStm = connection.prepareStatement(insertPaymentSql)) {
+                insertStm.setInt(1, bookingId);
+                insertStm.setBigDecimal(2, amount);
+                insertStm.setString(3, paymentProofUrl);
+                insertedRows = insertStm.executeUpdate();
+            }
+
+            if (insertedRows == 0) {
+                connection.rollback();
+                return false;
+            }
+
+            int updatedRows;
+
+            try (PreparedStatement updateStm = connection.prepareStatement(updateBookingSql)) {
+                updateStm.setInt(1, bookingId);
+                updatedRows = updateStm.executeUpdate();
+            }
+
+            if (updatedRows == 0) {
+                connection.rollback();
+                return false;
+            }
+
+            connection.commit();
+            return true;
+
         } catch (Exception e) {
+            try {
+                connection.rollback();
+            } catch (SQLException rollbackException) {
+                rollbackException.printStackTrace();
+            }
+
             System.out.println("createDepositPayment: " + e.getMessage());
+            e.printStackTrace();
+
+        } finally {
+            try {
+                connection.setAutoCommit(oldAutoCommit);
+            } catch (SQLException e) {
+                System.out.println("createDepositPayment autoCommit: " + e.getMessage());
+            }
         }
+
         return false;
     }
 
@@ -652,4 +704,93 @@ public class BookingDAO extends DBContext {
         return false;
     }
 
+    // Tra cứu booking bằng mã booking và email
+    public Booking getBookingByCodeAndEmail(String bookingCode, String email) {
+        cancelExpiredBookings();
+
+        String sql = """
+                 SELECT b.*
+                 FROM Bookings b
+                 JOIN Guests g ON b.guest_id = g.guest_id
+                 WHERE b.booking_code = ?
+                   AND LOWER(g.email) = LOWER(?)
+                 """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, bookingCode);
+            ps.setString(2, email);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapBooking(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("getBookingByCodeAndEmail: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    // Lấy thông tin khách hàng theo booking
+    public Guest getGuestByBookingId(int bookingId) {
+        String sql = """
+                 SELECT g.*
+                 FROM Guests g
+                 JOIN Bookings b ON g.guest_id = b.guest_id
+                 WHERE b.booking_id = ?
+                 """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, bookingId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Guest guest = new Guest();
+
+                    guest.setGuestId(rs.getInt("guest_id"));
+                    guest.setFullName(rs.getString("full_name"));
+                    guest.setEmail(rs.getString("email"));
+                    guest.setPhone(rs.getString("phone"));
+                    guest.setIdNumber(rs.getString("id_number"));
+                    guest.setNationality(rs.getString("nationality"));
+
+                    Date dateOfBirth = rs.getDate("date_of_birth");
+
+                    if (dateOfBirth != null) {
+                        guest.setDateOfBirth(dateOfBirth.toLocalDate());
+                    }
+
+                    return guest;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("getGuestByBookingId: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    // Lấy trạng thái xác minh minh chứng đặt cọc
+    public String getDepositVerificationStatus(int bookingId) {
+        String sql = """
+                 SELECT verification_status
+                 FROM DepositPayments
+                 WHERE booking_id = ?
+                 """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, bookingId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("verification_status");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("getDepositVerificationStatus: " + e.getMessage());
+        }
+
+        return null;
+    }
 }
