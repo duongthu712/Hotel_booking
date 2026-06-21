@@ -30,10 +30,10 @@
     <a href="${pageContext.request.contextPath}/receptionist/dashboard">Tổng quan</a>
     <a href="${pageContext.request.contextPath}/assign-room">Sơ đồ phòng</a>
     <a href="${pageContext.request.contextPath}/checkin">Nhận phòng</a>
-    <a href="${pageContext.request.contextPath}/receptionist/checkout">Trả phòng</a>
-    <a href="${pageContext.request.contextPath}/receptionist/bookings">Danh sách đặt phòng</a>
-    <a href="${pageContext.request.contextPath}/receptionist/walkin">Đặt phòng tại quầy</a>
-    <a href="${pageContext.request.contextPath}/receptionist/requests">Xử lý yêu cầu</a>
+    <a href="${pageContext.request.contextPath}/Checkout">Trả phòng</a>
+    <a href="${pageContext.request.contextPath}/bookings">Danh sách đặt phòng</a>
+    <a href="${pageContext.request.contextPath}/walkin">Đặt phòng tại quầy</a>
+    <a href="${pageContext.request.contextPath}/requests">Xử lý yêu cầu</a>
     <a href="${pageContext.request.contextPath}/DepositPaymentList">Danh sách đặt cọc</a>
     <a href="${pageContext.request.contextPath}/#">Xem hóa đơn</a>
 

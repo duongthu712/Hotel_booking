@@ -3,9 +3,15 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/model/StaffAccount.java</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/staff/navbar.jsp</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/dao/RoomDAO.java</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/CheckoutController.java</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/assets/javascript/checkout.js</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/assets/css/common.css</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/model/HotelInfo.java</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/assets/css/checkout.css</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/dao/CheckoutDAO.java</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/receptionist/check-out.jsp</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/dao/HotelInfoDAO.java</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/model/BookingRoom.java</file>
         </group>
     </open-files>
 </project-private>

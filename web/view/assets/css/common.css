@@ -86,9 +86,9 @@ border-radius: var(--radius-custom);
     border-color: #999;
 }
 
-.search-btn,.reset-btn{
+.search-btn,.reset-btn, .btn-checkout{
     padding: 10px 16px;
-border-radius: var(--radius-custom);
+    border-radius: var(--radius-custom);
     border: none;
     cursor: pointer;
     text-decoration: none;
@@ -523,10 +523,10 @@ input:checked + .toggle-slider:before {
 }
 
 .empty-message {
-    
     text-align: center;
     color: var(--text-main);
     font-size: 1.1rem;
     font-family: var(--font-logo);
     font-style: italic;
+    margin-top: 10px;
 }
