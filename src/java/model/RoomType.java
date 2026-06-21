@@ -21,6 +21,7 @@ public class RoomType {
 
     private List<RoomTypeService> roomTypeServices;
     private List<RoomAmenity> roomAmenities;
+    private List<RoomTypeAmenity> roomTypeAmenitys;
 
     public RoomType() {
         imageUrl = new ArrayList<>();
@@ -29,6 +30,24 @@ public class RoomType {
         roomAmenities = new ArrayList<>();
     }
 
+    public RoomType(int roomTypeId, String typeName, String description, int capacity, String bedType, int bedCount, BigDecimal areaSqm, BigDecimal basePrice, boolean active, List<String> imageUrl, List<String> imageCaption, List<RoomTypeService> roomTypeServices, List<RoomTypeAmenity> roomTypeAmenitys) {
+        this.roomTypeId = roomTypeId;
+        this.typeName = typeName;
+        this.description = description;
+        this.capacity = capacity;
+        this.bedType = bedType;
+        this.bedCount = bedCount;
+        this.areaSqm = areaSqm;
+        this.basePrice = basePrice;
+        this.active = active;
+        this.imageUrl = imageUrl;
+        this.imageCaption = imageCaption;
+        this.roomTypeServices = roomTypeServices;
+        this.roomTypeAmenitys = roomTypeAmenitys;
+    }
+
+    
+    
     public RoomType(int roomTypeId, String typeName, String description,
             int capacity, String bedType, int bedCount, BigDecimal areaSqm,
             BigDecimal basePrice, boolean active) {
@@ -67,6 +86,14 @@ public class RoomType {
         }
     }
 
+    public List<RoomTypeAmenity> getRoomTypeAmenitys() {
+        return roomTypeAmenitys;
+    }
+
+    public void setRoomTypeAmenitys(List<RoomTypeAmenity> roomTypeAmenitys) {
+        this.roomTypeAmenitys = roomTypeAmenitys;
+    }
+    
     public int getRoomTypeId() {
         return roomTypeId;
     }

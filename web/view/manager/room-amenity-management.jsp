@@ -167,6 +167,6 @@
         <c:remove var="keepImageUrl" scope="session"/>
         <c:remove var="keepActive" scope="session"/>
 
-        <script src="<%=request.getContextPath()%>/view/assets/javascript/room-service-management.js"></script>
+        <script src="<%=request.getContextPath()%>/view/assets/javascript/room-amenity-management.js"></script>
     </body>
 </html>

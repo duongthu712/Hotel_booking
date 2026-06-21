@@ -1,47 +1,151 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const actualTimeInput = document.getElementById("actual-checkout-time");
-    const displayDateTimeSpan = document.getElementById("display-time");
-    const hiddenCheckoutTimeInput = document.getElementById("hidden-checkout-time");
-    const checkoutLinks = document.querySelectorAll(".btn-checkout");
+    const invoiceForm = document.getElementById("invoiceForm");
 
-    function pad2(n) { return n < 10 ? "0" + n : "" + n; }
-
-    //ISO yyyy-MM-ddTHH:mm
-    function toIsoLocalDateTime(date) {
-        return date.getFullYear() + "-" +
-            pad2(date.getMonth() + 1) + "-" +
-            pad2(date.getDate()) + "T" +
-            pad2(date.getHours()) + ":" +
-            pad2(date.getMinutes());
+    function formatCurrency(value) {
+        return new Intl.NumberFormat("vi-VN").format(Math.round(value)) + " đ";
     }
 
-    //nhấn nút CHECK-OUT ở danh sách
-    checkoutLinks.forEach(function (link) {
-        link.addEventListener("click", function () {
-            const now = new Date();
-            const separator = link.href.indexOf("?") > -1 ? "&" : "?";
-            link.href += separator + "actualCheckoutTime=" + encodeURIComponent(toIsoLocalDateTime(now));
+    function parseCurrency(value) {
+        if (typeof value === "number") {
+            return value;
+        }
+        return parseFloat(value.replace(/[^0-9.-]+/g, "")) || 0;
+    }
+
+    function updateSummary() {
+        let servicesTotal = 0;
+        let damagesTotal = 0;
+
+        document.querySelectorAll("input[name='serviceQuantity']").forEach(function (input) {
+            const qty = parseInt(input.value) || 0;
+            const unitPrice = parseFloat(input.dataset.unitPrice) || 0;
+            const freeQty = parseInt(input.dataset.isFree) || 0;
+
+            servicesTotal += Math.max(0, qty - freeQty) * unitPrice;
+        });
+
+        document.querySelectorAll("input[name='damageQuantity']").forEach(function (input) {
+            const qty = parseInt(input.value) || 0;
+            const unitPrice = parseFloat(input.dataset.unitPrice) || 0;
+
+            damagesTotal += qty * unitPrice;
+        });
+
+        const roomCharges =
+            parseFloat(document.getElementById("hiddenRoomCharges").value) || 0;
+
+        const deposit = parseCurrency(
+            document.getElementById("summaryDeposit").textContent
+        );
+
+        const total = roomCharges + servicesTotal + damagesTotal;
+        const remaining = Math.max(0, total - deposit);
+
+        document.getElementById("summaryServices").textContent = formatCurrency(servicesTotal);
+
+        document.getElementById("summaryDamages").textContent = formatCurrency(damagesTotal);
+
+        document.getElementById("summaryTotal").textContent = formatCurrency(total);
+
+        document.getElementById("summaryRemaining").textContent = formatCurrency(remaining);
+    }
+
+    function calculateService(index) {
+        const input = document.getElementById("serviceQty_" + index);
+
+        const qty = parseInt(input.value) || 0;
+        const unitPrice = parseFloat(input.dataset.unitPrice) || 0;
+        const freeQty = parseInt(input.dataset.isFree) || 0;
+
+        const total = Math.max(0, qty - freeQty) * unitPrice;
+
+        document.getElementById("serviceTotal_" + index).textContent = formatCurrency(total);
+
+        updateSummary();
+    }
+
+    function calculateAmenity(index) {
+        const input = document.getElementById("amenityQty_" + index);
+
+        const qty = parseInt(input.value) || 0;
+        const unitPrice = parseFloat(input.dataset.unitPrice) || 0;
+
+        document.getElementById("amenityTotal_" + index).textContent = formatCurrency(qty * unitPrice);
+
+        updateSummary();
+    }
+
+    window.changeQty = function (type, index, delta) {
+        const input = document.getElementById(type + "Qty_" + index);
+
+        let value = (parseInt(input.value) || 0) + delta;
+
+        if (value < 0) {
+            value = 0;
+        }
+
+        if (input.max && value > parseInt(input.max)) {
+            value = parseInt(input.max);
+        }
+
+        input.value = value;
+
+        if (type === "service") {
+            calculateService(index);
+        } else {
+            calculateAmenity(index);
+        }
+    };
+
+    function setupSearch(inputId, tableId) {
+        const input = document.getElementById(inputId);
+        const table = document.getElementById(tableId);
+
+        if (!input || !table) {
+            return;
+        }
+
+        input.addEventListener("input", function () {
+            const keyword = this.value.toLowerCase().trim();
+
+            table.querySelectorAll("tbody tr").forEach(function (row) {
+                const name = (row.dataset.name || "").toLowerCase();
+                row.style.display = name.includes(keyword) ? "" : "none";
+            });
+        });
+    }
+
+    function validateForm() {
+        const paymentMethod = document.querySelector(
+            "select[name='paymentMethod']"
+        ).value;
+
+        if (!paymentMethod) {
+            alert("Vui lòng chọn phương thức thanh toán.");
+            return false;
+        }
+
+        return true;
+    }
+
+    setupSearch("serviceSearch", "serviceTable");
+    setupSearch("amenitySearch", "amenityTable");
+
+    updateSummary();
+
+    if (invoiceForm) {
+        invoiceForm.addEventListener("submit", function (e) {
+            if (!validateForm()) {
+                e.preventDefault();
+            }
+        });
+    }
+
+    document.querySelectorAll(".qty-input").forEach(function (input) {
+        input.addEventListener("keydown", function (e) {
+            if (e.key === "-" || e.key === "e") {
+                e.preventDefault();
+            }
         });
     });
-
-    //giao diện chi tiết
-    if (actualTimeInput) {
-        const params = new URLSearchParams(window.location.search);
-        const isoCheckoutTime = params.get("actualCheckoutTime") || toIsoLocalDateTime(new Date());
-
-        const datePart = isoCheckoutTime.split("T")[0];
-        const timePart = isoCheckoutTime.split("T")[1];
-        
-        const [y, m, d] = datePart.split("-");
-        const formatted24h = d + "/" + m + "/" + y + " " + timePart;
-
-        actualTimeInput.value = formatted24h;
-        
-        if (displayDateTimeSpan) {
-            displayDateTimeSpan.textContent = formatted24h;
-        }
-        if (hiddenCheckoutTimeInput) {
-            hiddenCheckoutTimeInput.value = isoCheckoutTime;
-        }
-    }
 });
