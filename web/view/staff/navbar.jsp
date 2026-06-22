@@ -27,7 +27,7 @@
     <a href="${pageContext.request.contextPath}/PolicyList">Chính sách</a>
     <a href="${pageContext.request.contextPath}/FeedbackList">Đánh giá</a>
     <%}else if("RECEPTIONIST".equals(role)){%>
-    <a href="${pageContext.request.contextPath}/receptionist/dashboard">Tổng quan</a>
+    <a href="${pageContext.request.contextPath}/receptionist-dashboard">Tổng quan</a>
     <a href="${pageContext.request.contextPath}/assign-room">Sơ đồ phòng</a>
     <a href="${pageContext.request.contextPath}/checkin">Nhận phòng</a>
     <a href="${pageContext.request.contextPath}/receptionist/checkout">Trả phòng</a>

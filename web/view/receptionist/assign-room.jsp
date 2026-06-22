@@ -93,8 +93,8 @@
                         <div class="room-grid">
                             <c:forEach items="${roomMatrix}" var="room">
                                 <div class="room-card ${room.status eq 'Phòng trống' ? 'status-available' : 
-                                                      room.status eq 'Phòng có khách' ? 'status-occupied' : 
-                                                      room.status eq 'Đang dọn dẹp' ? 'status-dirty' : 'status-maintenance'}"
+                                                        room.status eq 'Phòng có khách' ? 'status-occupied' : 
+                                                        room.status eq 'Đang dọn dẹp' ? 'status-dirty' : 'status-maintenance'}"
                                      data-view-number="${room.roomNumber}"
                                      data-view-type="${room.roomTypeName} (Tầng ${room.floor})"
                                      data-view-status="${room.status}"
@@ -128,21 +128,8 @@
                                         </c:when>
 
                                         <c:when test="${room.status eq 'Đang dọn dẹp'}">
-                                            <c:if test="${empty targetBookingId}">
-                                                <div class="clean-btn-wrapper">
-                                                    <form action="${pageContext.request.contextPath}/RoomEdit" method="POST" onsubmit="return confirm('Xác nhận dọn sạch?');">
-                                                        <input type="hidden" name="roomNumber" value="${room.roomNumber}">
-                                                        <input type="hidden" name="status" value="Phòng trống">
-                                                        <input type="hidden" name="roomTypeId" value="${room.roomTypeId}">
-                                                        <button type="submit" class="btn-clean-finish">Đã dọn xong</button>
-                                                    </form>
-                                                </div>
-                                            </c:if>
-                                            <c:if test="${not empty targetBookingId}">
-                                                <div class="room-cleaning-text">Phòng đang vệ sinh</div>
-                                            </c:if>
+                                            <div class="room-cleaning-text">Phòng đang vệ sinh</div>
                                         </c:when>
-
                                         <c:otherwise>
                                             <div class="room-locked-text">Tạm thời khóa</div>
                                         </c:otherwise>
@@ -209,7 +196,7 @@
                         <c:if test="${not empty targetBookingId}">
                             <form action="${pageContext.request.contextPath}/assign-room" method="POST" id="assignRoomMainForm">
                                 <input type="hidden" name="bookingId" value="${targetBookingId}" />
-                                
+
                                 <div id="assignRoomFormContainer">
                                     <div class="guest-count-wrapper">
                                         <label class="guest-count-label">

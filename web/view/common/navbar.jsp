@@ -26,8 +26,5 @@
         <a href="${pageContext.request.contextPath}/view/auth/login.jsp" class="staff-login">
             ĐĂNG NHẬP NHÂN VIÊN
         </a>
-        <a href="${pageContext.request.contextPath}/view/user/booking-form.jsp" class="booking-btn">
-            ĐẶT PHÒNG NHANH
-        </a>
     </div>
 </nav>

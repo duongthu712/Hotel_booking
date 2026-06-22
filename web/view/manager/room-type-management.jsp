@@ -26,12 +26,13 @@
         <div class="container-fluid">
             <div class="row">
                 <main class="col-md-12 ms-sm-auto px-md-4">
-                    <div class="management-wrapper mt-4">
+                    <div class="management-wrapper">
 
-                        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom-luxury pb-3">
-                            <h2 class="management-title"><i class="fa-solid fa-bed me-2"></i>Quản Lý Hạng Phòng</h2>
-                            <a href="${pageContext.request.contextPath}/createroomtype" class="btn btn-primary px-4">
-                                <i class="fa-solid fa-plus me-2"></i>Thêm Loại Phòng Mới
+                        <div class="action-bar">
+                            <a href="${pageContext.request.contextPath}/createroomtype"
+                               class="btn btn-primary add-room-btn">
+                                <i class="fa-solid fa-plus me-2"></i>
+                                Thêm Loại Phòng Mới
                             </a>
                         </div>
 
@@ -180,10 +181,10 @@
 
         <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
         <script>
-            Fancybox.bind("[data-fancybox]", {
-                Thumbs: { autoStart: true },
-                Toolbar: { display: { left: ["infobar"], right: ["zoom", "close"] } }
-            });
+                                                                Fancybox.bind("[data-fancybox]", {
+                                                                    Thumbs: {autoStart: true},
+                                                                    Toolbar: {display: {left: ["infobar"], right: ["zoom", "close"]}}
+                                                                });
         </script>
 
         <script src="${pageContext.request.contextPath}/view/assets/javascript/room-type-notification.js?v=<%= System.currentTimeMillis() %>"></script>
