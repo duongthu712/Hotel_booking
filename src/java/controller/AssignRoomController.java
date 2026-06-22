@@ -1,5 +1,6 @@
 package controller;
 
+import dao.BookingDAO;
 import dao.RoomDAO;
 import dto.BookingCheckInView;
 import dto.RoomStatusView;
@@ -21,9 +22,10 @@ public class AssignRoomController extends HttpServlet {
             throws ServletException, IOException {
 
         RoomDAO roomDAO = new RoomDAO();
+        BookingDAO bookingDAO = new BookingDAO();
         int targetRoomTypeId = 0; // Mặc định bằng 0 để xem tổng quan toàn bộ phòng khách sạn
 
-        // Hứng 2 tham số lọc từ Form (.jsp) nộp lên qua phương thức GET
+        //Lọc bằng loại phòng và số tầng
         String filterRoomTypeName = request.getParameter("filterRoomTypeName");
         String filterFloor = request.getParameter("filterFloor");
 
@@ -43,7 +45,7 @@ public class AssignRoomController extends HttpServlet {
                     targetRoomTypeId = targetBooking.getRoomTypeId();
 
                     // Đếm số lượng phòng thực tế đã gán trong bảng BookingRooms của đơn này
-                    int assignedRoomsCount = roomDAO.getAssignedRoomsCount(bookingId);
+                    int assignedRoomsCount = bookingDAO.countRoomsAssigned(bookingId);
                     request.setAttribute("assignedRoomsCount", assignedRoomsCount);
                 }
             } catch (Exception e) {
@@ -61,8 +63,6 @@ public class AssignRoomController extends HttpServlet {
         List<RoomStatusView> roomMatrix = roomDAO.getAllRoomStatusViews(targetRoomTypeId, filterRoomTypeName, filterFloor);
         request.setAttribute("roomMatrix", roomMatrix);
 
-        // 🚀 ĐÃ THÊM: Xóa rác thông báo lỗi cũ trong Session ngay khi luồng GET (Search/Lọc) chạy qua
-        // Chặn đứng việc Pop-up thất bại bị lặp lại khi lễ tân thực hiện thao tác tìm kiếm phòng!
         request.getSession().removeAttribute("notification");
         request.getSession().removeAttribute("notificationType");
 
@@ -75,6 +75,7 @@ public class AssignRoomController extends HttpServlet {
         
         request.setCharacterEncoding("UTF-8");
         RoomDAO roomDAO = new RoomDAO();
+        BookingDAO bookingDAO = new BookingDAO();
         
         try {
             int bookingId = Integer.parseInt(request.getParameter("bookingId"));
@@ -105,7 +106,7 @@ public class AssignRoomController extends HttpServlet {
                 request.getSession().setAttribute("notification", "success");
                 request.getSession().setAttribute("notificationType", "success");
                 
-                int assignedCount = roomDAO.getAssignedRoomsCount(bookingId);
+                int assignedCount = bookingDAO.countRoomsAssigned(bookingId);
                 if (assignedCount < totalRequiredRooms) {
                     // Nếu chưa gán đủ phòng, ở lại trang gán tiếp phòng thứ 2
                     response.sendRedirect(request.getContextPath() + "/assign-room?bookingId=" + bookingId);
