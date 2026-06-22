@@ -7,8 +7,12 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import model.Booking;
 import model.RoomType;
 
@@ -16,7 +20,6 @@ public class BookingPaymentController extends HttpServlet {
 
     private static final int HOLD_MINUTES = 15;
 
-    // Hiển thị trang thanh toán
     @Override
     protected void doGet(HttpServletRequest request,
             HttpServletResponse response)
@@ -25,24 +28,16 @@ public class BookingPaymentController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
 
-        String bookingCode = request.getParameter("bookingCode");
+        String bookingCode = getParameter(request, "bookingCode");
 
-        if (bookingCode == null || bookingCode.trim().isEmpty()) {
-            response.sendRedirect(
-                    request.getContextPath() + "/search"
-            );
+        if (bookingCode.isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/search");
             return;
         }
 
-        showPaymentPage(
-                request,
-                response,
-                bookingCode.trim(),
-                null
-        );
+        showPaymentPage(request, response, bookingCode, null);
     }
 
-    // Nhận mã giao dịch thanh toán
     @Override
     protected void doPost(HttpServletRequest request,
             HttpServletResponse response)
@@ -51,27 +46,18 @@ public class BookingPaymentController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
 
-        String bookingCode
-                = request.getParameter("bookingCode");
+        String bookingCode = getParameter(request, "bookingCode");
 
-        if (bookingCode == null
-                || bookingCode.trim().isEmpty()) {
-
-            response.sendRedirect(
-                    request.getContextPath() + "/search"
-            );
+        if (bookingCode.isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/search");
             return;
         }
 
-        bookingCode = bookingCode.trim();
-
         BookingDAO bookingDAO = new BookingDAO();
 
-        // Hủy những booking đã hết 15 phút giữ phòng
         bookingDAO.cancelExpiredBookings();
 
-        Booking booking
-                = bookingDAO.getBookingByCode(bookingCode);
+        Booking booking = bookingDAO.getBookingByCode(bookingCode);
 
         if (booking == null) {
             showPaymentPage(
@@ -83,50 +69,19 @@ public class BookingPaymentController extends HttpServlet {
             return;
         }
 
-        if ("Đã hủy".equals(booking.getStatus())) {
-            showPaymentPage(
-                    request,
-                    response,
-                    bookingCode,
-                    "Đơn đặt phòng đã bị hủy do hết thời gian giữ phòng."
-            );
-            return;
-        }
+        boolean hasPayment = bookingDAO.hasDepositPayment(
+                booking.getBookingId());
 
-        // Đã gửi mã giao dịch thì chuyển sang trang hoàn tất
-        if (bookingDAO.hasDepositPayment(
-                booking.getBookingId())) {
-
-            response.sendRedirect(
-                    request.getContextPath()
+        if (hasPayment) {
+            response.sendRedirect(request.getContextPath()
                     + "/booking-success?bookingCode="
-                    + bookingCode
-            );
+                    + bookingCode);
             return;
         }
 
-        if (booking.getCreateAt() == null) {
-            showPaymentPage(
-                    request,
-                    response,
-                    bookingCode,
-                    "Không thể xác định thời gian giữ phòng."
-            );
-            return;
-        }
+        if ("Đã hủy".equals(booking.getStatus())
+                || isExpired(booking)) {
 
-        LocalDateTime expiresAt
-                = booking.getCreateAt()
-                        .plusMinutes(HOLD_MINUTES);
-
-        long remainingSeconds
-                = Duration.between(
-                        LocalDateTime.now(),
-                        expiresAt
-                ).getSeconds();
-
-        // Kiểm tra lại thời gian ở server
-        if (remainingSeconds <= 0) {
             bookingDAO.cancelExpiredBookings();
 
             showPaymentPage(
@@ -138,60 +93,20 @@ public class BookingPaymentController extends HttpServlet {
             return;
         }
 
-        /*
-         * Trường paymentProof trước đây là file ảnh.
-         * Bây giờ trường này dùng để nhập mã giao dịch.
-         */
-        String paymentProof
-                = request.getParameter("paymentProof");
+        String paymentProof = getParameter(request, "paymentProof");
 
-        if (paymentProof == null
-                || paymentProof.trim().isEmpty()) {
+        String error = validatePaymentProof(paymentProof);
 
-            showPaymentPage(
-                    request,
-                    response,
-                    bookingCode,
-                    "Vui lòng nhập mã giao dịch."
-            );
+        if (error != null) {
+            showPaymentPage(request, response, bookingCode, error);
             return;
         }
 
-        paymentProof = paymentProof.trim();
-
-        if (paymentProof.length() < 4) {
-            showPaymentPage(
-                    request,
-                    response,
-                    bookingCode,
-                    "Mã giao dịch không hợp lệ."
-            );
-            return;
-        }
-
-        if (paymentProof.length() > 100) {
-            showPaymentPage(
-                    request,
-                    response,
-                    bookingCode,
-                    "Mã giao dịch không được vượt quá 100 ký tự."
-            );
-            return;
-        }
-
-        /*
-         * Method này giữ nguyên:
-         * 1. INSERT DepositPayments
-         * 2. Lưu mã giao dịch vào trường proof
-         * 3. UPDATE Bookings.payment_status = N'Đã đặt cọc'
-         * 4. COMMIT cùng transaction
-         */
-        boolean created
-                = bookingDAO.createDepositPayment(
-                        booking.getBookingId(),
-                        booking.getDepositAmount(),
-                        paymentProof
-                );
+        boolean created = bookingDAO.createDepositPayment(
+                booking.getBookingId(),
+                booking.getDepositAmount(),
+                paymentProof
+        );
 
         if (!created) {
             showPaymentPage(
@@ -203,16 +118,12 @@ public class BookingPaymentController extends HttpServlet {
             return;
         }
 
-        response.sendRedirect(
-                request.getContextPath()
+        response.sendRedirect(request.getContextPath()
                 + "/booking-success?bookingCode="
-                + bookingCode
-        );
+                + bookingCode);
     }
 
-    // Chuẩn bị dữ liệu cho trang thanh toán
-    private void showPaymentPage(
-            HttpServletRequest request,
+    private void showPaymentPage(HttpServletRequest request,
             HttpServletResponse response,
             String bookingCode,
             String error)
@@ -222,8 +133,7 @@ public class BookingPaymentController extends HttpServlet {
 
         bookingDAO.cancelExpiredBookings();
 
-        Booking booking
-                = bookingDAO.getBookingByCode(bookingCode);
+        Booking booking = bookingDAO.getBookingByCode(bookingCode);
 
         if (booking == null) {
             request.setAttribute(
@@ -231,76 +141,184 @@ public class BookingPaymentController extends HttpServlet {
                     "Không tìm thấy đơn đặt phòng."
             );
 
-            request.getRequestDispatcher(
-                    "/view/user/booking-payment.jsp"
-            ).forward(request, response);
-
+            request.getRequestDispatcher("/view/user/booking-payment.jsp")
+                    .forward(request, response);
             return;
         }
 
-        RoomTypeDAO roomTypeDAO = new RoomTypeDAO();
+        boolean hasPayment = bookingDAO.hasDepositPayment(
+                booking.getBookingId());
 
-        RoomType roomType
-                = roomTypeDAO.getRoomDetailById(
-                        booking.getRoomTypeId()
-                );
+        if (!hasPayment && isExpired(booking)) {
+            bookingDAO.cancelExpiredBookings();
 
-        boolean hasPayment
-                = bookingDAO.hasDepositPayment(
-                        booking.getBookingId()
-                );
+            booking = bookingDAO.getBookingByCode(bookingCode);
 
-        long remainingSeconds = 0;
-
-        if (booking.getCreateAt() != null
-                && !"Đã hủy".equals(booking.getStatus())
-                && !hasPayment) {
-
-            LocalDateTime expiresAt
-                    = booking.getCreateAt()
-                            .plusMinutes(HOLD_MINUTES);
-
-            remainingSeconds
-                    = Duration.between(
-                            LocalDateTime.now(),
-                            expiresAt
-                    ).getSeconds();
-
-            if (remainingSeconds < 0) {
-                remainingSeconds = 0;
+            if (booking != null) {
+                hasPayment = bookingDAO.hasDepositPayment(
+                        booking.getBookingId());
             }
         }
 
-        if (!hasPayment
-                && remainingSeconds <= 0
-                && !"Đã hủy".equals(booking.getStatus())) {
+        RoomType roomType = null;
 
-            bookingDAO.cancelExpiredBookings();
+        if (booking != null) {
+            RoomTypeDAO roomTypeDAO = new RoomTypeDAO();
 
-            booking
-                    = bookingDAO.getBookingByCode(
-                            bookingCode
-                    );
+            roomType = roomTypeDAO.getRoomDetailById(
+                    booking.getRoomTypeId());
         }
 
-        if ("Đã hủy".equals(booking.getStatus())
+        if (booking != null
+                && "Đã hủy".equals(booking.getStatus())
                 && error == null) {
 
-            error
-                    = "Đơn đặt phòng đã bị hủy do hết thời gian giữ phòng.";
+            error = "Đơn đặt phòng đã bị hủy do hết thời gian giữ phòng.";
         }
+
+        setPaymentPageData(
+                request,
+                booking,
+                roomType,
+                hasPayment,
+                error
+        );
+
+        request.getRequestDispatcher("/view/user/booking-payment.jsp")
+                .forward(request, response);
+    }
+
+    private void setPaymentPageData(HttpServletRequest request,
+            Booking booking,
+            RoomType roomType,
+            boolean hasPayment,
+            String error) {
+
+        long numberOfNights = 0;
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        String checkInText = "";
+        String checkOutText = "";
+
+        if (booking != null
+                && booking.getCheckinDate() != null
+                && booking.getCheckoutDate() != null) {
+
+            numberOfNights = ChronoUnit.DAYS.between(
+                    booking.getCheckinDate(),
+                    booking.getCheckoutDate()
+            );
+
+            if (numberOfNights < 0) {
+                numberOfNights = 0;
+            }
+
+            totalAmount = booking.getBookedPricePerNight()
+                    .multiply(BigDecimal.valueOf(booking.getNumRooms()))
+                    .multiply(BigDecimal.valueOf(numberOfNights));
+
+            DateTimeFormatter formatter
+                    = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+            checkInText = booking.getCheckinDate().format(formatter);
+            checkOutText = booking.getCheckoutDate().format(formatter);
+        }
+
+        long remainingSeconds = getRemainingSeconds(booking, hasPayment);
+        long expiresAtMillis = getExpiresAtMillis(booking);
+        long serverNowMillis = System.currentTimeMillis();
 
         request.setAttribute("booking", booking);
         request.setAttribute("roomType", roomType);
-        request.setAttribute(
-                "remainingSeconds",
-                remainingSeconds
-        );
+        request.setAttribute("numberOfNights", numberOfNights);
+        request.setAttribute("totalAmount", totalAmount);
+        request.setAttribute("checkInText", checkInText);
+        request.setAttribute("checkOutText", checkOutText);
+        request.setAttribute("remainingSeconds", remainingSeconds);
+        request.setAttribute("expiresAtMillis", expiresAtMillis);
+        request.setAttribute("serverNowMillis", serverNowMillis);
         request.setAttribute("hasPayment", hasPayment);
         request.setAttribute("error", error);
+    }
 
-        request.getRequestDispatcher(
-                "/view/user/booking-payment.jsp"
-        ).forward(request, response);
+    private boolean isExpired(Booking booking) {
+        if (booking == null || booking.getCreateAt() == null) {
+            return false;
+        }
+
+        LocalDateTime expiresAt
+                = booking.getCreateAt().plusMinutes(HOLD_MINUTES);
+
+        return !LocalDateTime.now().isBefore(expiresAt);
+    }
+
+    private long getRemainingSeconds(Booking booking, boolean hasPayment) {
+        if (booking == null
+                || booking.getCreateAt() == null
+                || hasPayment
+                || "Đã hủy".equals(booking.getStatus())) {
+
+            return 0;
+        }
+
+        LocalDateTime expiresAt
+                = booking.getCreateAt().plusMinutes(HOLD_MINUTES);
+
+        long seconds = Duration.between(
+                LocalDateTime.now(),
+                expiresAt
+        ).getSeconds();
+
+        return Math.max(seconds, 0);
+    }
+
+    private long getExpiresAtMillis(Booking booking) {
+        if (booking == null || booking.getCreateAt() == null) {
+            return 0;
+        }
+
+        return booking.getCreateAt()
+                .plusMinutes(HOLD_MINUTES)
+                .atZone(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli();
+    }
+
+    private String validatePaymentProof(String paymentProof) {
+        if (paymentProof.isEmpty()) {
+            return "Vui lòng nhập tên người chuyển và mã giao dịch.";
+        }
+
+        if (paymentProof.length() > 100) {
+            return "Thông tin giao dịch không được vượt quá 100 ký tự.";
+        }
+
+        int separatorIndex = paymentProof.indexOf("-");
+
+        if (separatorIndex <= 0
+                || separatorIndex >= paymentProof.length() - 1) {
+
+            return "Vui lòng nhập đúng dạng: Tên người chuyển - Mã giao dịch.";
+        }
+
+        String senderName
+                = paymentProof.substring(0, separatorIndex).trim();
+
+        String transactionCode
+                = paymentProof.substring(separatorIndex + 1).trim();
+
+        if (senderName.length() < 2) {
+            return "Tên người chuyển không hợp lệ.";
+        }
+
+        if (transactionCode.length() < 4) {
+            return "Mã giao dịch hoặc mã tham chiếu không hợp lệ.";
+        }
+
+        return null;
+    }
+
+    private String getParameter(HttpServletRequest request, String name) {
+        String value = request.getParameter(name);
+        return value == null ? "" : value.trim();
     }
 }

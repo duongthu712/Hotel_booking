@@ -385,16 +385,42 @@ public class BookingDAO extends DBContext {
         return false;
     }
 
-    // Cập nhật trạng thái từ đã xác nhận sang đã nhận phòng
+    // Cập nhật trạng thái booking.
+// Nếu chuyển sang Đã nhận phòng thì lưu thời gian check-in thực tế.
+// Nếu chuyển sang Đã trả phòng thì lưu thời gian check-out thực tế.
     public boolean updateStatus(int bookingId, String status) {
-        String sql = "UPDATE Bookings SET [status] = ? WHERE booking_id = ?";
+        String sql = """
+                 UPDATE Bookings
+                 SET [status] = ?,
+                     actual_checkin_time =
+                         CASE
+                             WHEN ? = N'Đã nhận phòng'
+                                  AND actual_checkin_time IS NULL
+                             THEN GETDATE()
+                             ELSE actual_checkin_time
+                         END,
+                     actual_checkout_time =
+                         CASE
+                             WHEN ? = N'Đã trả phòng'
+                                  AND actual_checkout_time IS NULL
+                             THEN GETDATE()
+                             ELSE actual_checkout_time
+                         END
+                 WHERE booking_id = ?
+                 """;
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setNString(1, status);
-            ps.setInt(2, bookingId);
+            ps.setNString(2, status);
+            ps.setNString(3, status);
+            ps.setInt(4, bookingId);
+
             return ps.executeUpdate() > 0;
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return false;
     }
 
@@ -739,30 +765,6 @@ public class BookingDAO extends DBContext {
             }
         }
 
-        return false;
-    }
-
-    // Lưu yêu cầu đặc biệt của khách
-    public boolean createSpecialRequest(int bookingId, int guestId,
-            String specialRequest) {
-        if (specialRequest == null || specialRequest.trim().isEmpty()) {
-            return true;
-        }
-        try {
-            String sql = """
-                         INSERT INTO GuestRequests
-                         (booking_id, guest_id, request_type,
-                          request_details, [status])
-                         VALUES (?, ?, N'Yêu cầu khác', ?, N'Chờ xử lý')
-                         """;
-            stm = connection.prepareStatement(sql);
-            stm.setInt(1, bookingId);
-            stm.setInt(2, guestId);
-            stm.setString(3, specialRequest);
-            return stm.executeUpdate() > 0;
-        } catch (Exception e) {
-            System.out.println("createSpecialRequest: " + e.getMessage());
-        }
         return false;
     }
 

@@ -50,7 +50,7 @@
                                id="bookingCode"
                                name="bookingCode"
                                maxlength="12"
-                               value="<c:out value='${bookingCode}'/>"
+                               value="${fn:escapeXml(bookingCode)}"
                                placeholder="Ví dụ: LMHB12AB34CD">
                     </div>
 
@@ -61,7 +61,7 @@
                                id="email"
                                name="email"
                                maxlength="100"
-                               value="<c:out value='${email}'/>"
+                               value="${fn:escapeXml(email)}"
                                placeholder="example@gmail.com">
                     </div>
 
@@ -595,7 +595,18 @@
                                         </div>
 
                                         <strong>Nhận phòng</strong>
-                                        <span>${checkInText}</span>
+
+                                        <span>
+                                            <c:choose>
+                                                <c:when test="${not empty booking.actualCheckinTime}">
+                                                    Thực tế: ${timelineCheckInText}
+                                                </c:when>
+
+                                                <c:otherwise>
+                                                    Dự kiến: ${timelineCheckInText}
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </span>
                                     </div>
 
                                     <div class="detail-timeline-line
@@ -613,7 +624,18 @@
                                         </div>
 
                                         <strong>Trả phòng</strong>
-                                        <span>${checkOutText}</span>
+
+                                        <span>
+                                            <c:choose>
+                                                <c:when test="${not empty booking.actualCheckoutTime}">
+                                                    Thực tế: ${timelineCheckOutText}
+                                                </c:when>
+
+                                                <c:otherwise>
+                                                    Dự kiến: ${timelineCheckOutText}
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </span>
                                     </div>
                                 </div>
                             </div>

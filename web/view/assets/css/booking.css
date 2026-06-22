@@ -2034,4 +2034,13 @@ a.progress-item.completed:active .progress-name {
     .booking-detail-home-button {
         min-width: 0;
     }
+    
+    .booking-fields input:disabled,
+    .booking-fields select:disabled,
+    .quantity-control button:disabled {
+        background-color: #f3f4f6;
+        color: #26333b;
+        cursor: not-allowed;
+        opacity: 1;
+    }
 }

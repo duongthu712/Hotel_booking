@@ -198,8 +198,7 @@ public class BookingFormController extends HttpServlet {
         String phone = getValue(request, "phone");
         String idNumber = getValue(request, "idNumber");
         String dateOfBirthString = getValue(request, "dateOfBirth");
-        String specialRequest = getValue(request, "specialRequest");
-
+        
         int roomTypeId = parseInt(request.getParameter("roomTypeId"));
         int numRooms = parseInt(request.getParameter("numRooms"));
         int numGuests = parseInt(request.getParameter("numGuests"));
@@ -227,9 +226,7 @@ public class BookingFormController extends HttpServlet {
                     roomTypeId, checkIn.toString(), checkOut.toString());
         }
 
-        String error = validateCustomerInformation(
-                fullName, email, phone, idNumber,
-                dateOfBirth, specialRequest);
+        String error = validateCustomerInformation(fullName, email, phone, idNumber,dateOfBirth);
 
         if (error == null) {
             error = validateRoomSelection(
@@ -245,7 +242,6 @@ public class BookingFormController extends HttpServlet {
         request.setAttribute("phone", phone);
         request.setAttribute("idNumber", idNumber);
         request.setAttribute("dateOfBirth", dateOfBirthString);
-        request.setAttribute("specialRequest", specialRequest);
 
         if (error != null) {
             request.setAttribute("error", error);
@@ -309,9 +305,6 @@ public class BookingFormController extends HttpServlet {
 
         booking.setBookingId(bookingId);
 
-        bookingDAO.createSpecialRequest(
-                bookingId, guestId, specialRequest);
-
         response.sendRedirect(request.getContextPath()
                 + "/booking-payment?bookingCode="
                 + booking.getBookingCode());
@@ -347,8 +340,7 @@ public class BookingFormController extends HttpServlet {
 
     private String validateCustomerInformation(
             String fullName, String email, String phone,
-            String idNumber, LocalDate dateOfBirth,
-            String specialRequest) {
+            String idNumber, LocalDate dateOfBirth) {
 
         if (fullName.isEmpty()) {
             return "Vui lòng nhập họ và tên.";
@@ -406,10 +398,6 @@ public class BookingFormController extends HttpServlet {
             if (age < 18) {
                 return "Khách đặt phòng phải đủ 18 tuổi.";
             }
-        }
-
-        if (specialRequest.length() > 1000) {
-            return "Yêu cầu đặc biệt không được vượt quá 1000 ký tự.";
         }
 
         return null;

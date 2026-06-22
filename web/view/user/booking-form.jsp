@@ -45,7 +45,7 @@
 
                 <div class="progress-item disabled">
                     <div class="progress-number">2</div>
-                    <div class="progress-name">GỬI MINH CHỨNG ĐẶT CỌC</div>
+                    <div class="progress-name">GỬI THÔNG TIN ĐẶT CỌC</div>
                 </div>
 
                 <div class="progress-line"></div>
@@ -72,6 +72,22 @@
                 <input type="hidden"
                        name="roomTypeId"
                        value="${roomType.roomTypeId}">
+
+                <input type="hidden"
+                       name="checkIn"
+                       value="${checkIn}">
+
+                <input type="hidden"
+                       name="checkOut"
+                       value="${checkOut}">
+
+                <input type="hidden"
+                       name="numRooms"
+                       value="${numRooms}">
+
+                <input type="hidden"
+                       name="numGuests"
+                       value="${numGuests}">
 
                 <div class="booking-layout">
 
@@ -162,26 +178,6 @@
 
                             </div>
 
-                            <div class="special-request-box">
-
-                                <div class="request-icon">i</div>
-
-                                <div class="request-content">
-
-                                    <label for="specialRequest">
-                                        YÊU CẦU ĐẶC BIỆT
-                                        <small>(tùy chọn)</small>
-                                    </label>
-
-                                    <textarea id="specialRequest"
-                                              name="specialRequest"
-                                              maxlength="1000"
-                                              placeholder="Ví dụ: không hút thuốc, tầng cao, phòng gần nhau..."><c:out value="${specialRequest}"/></textarea>
-
-                                </div>
-
-                            </div>
-
                         </section>
 
                         <section class="booking-section">
@@ -198,23 +194,21 @@
                             <div class="booking-fields">
 
                                 <div class="form-group">
-                                    <label for="checkIn">Ngày nhận phòng</label>
+                                    <label for="displayCheckIn">Ngày nhận phòng</label>
 
                                     <input type="date"
-                                           id="checkIn"
-                                           name="checkIn"
-                                           min="<%= java.time.LocalDate.now() %>"
-                                           value="${checkIn}">
+                                           id="displayCheckIn"
+                                           value="${checkIn}"
+                                           disabled>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="checkOut">Ngày trả phòng</label>
+                                    <label for="displayCheckOut">Ngày trả phòng</label>
 
                                     <input type="date"
-                                           id="checkOut"
-                                           name="checkOut"
-                                           min="${checkIn}"
-                                           value="${checkOut}">
+                                           id="displayCheckOut"
+                                           value="${checkOut}"
+                                           disabled>
                                 </div>
 
                                 <div class="form-group">
@@ -231,19 +225,17 @@
 
                                     <div class="quantity-control">
 
-                                        <button type="button" id="decreaseRoom">
+                                        <button type="button" disabled>
                                             −
                                         </button>
 
                                         <input type="number"
-                                               id="numRooms"
-                                               name="numRooms"
+                                               id="displayNumRooms"
                                                min="1"
-                                               max="${availableRooms}"
                                                value="${numRooms}"
-                                               readonly>
+                                               disabled>
 
-                                        <button type="button" id="increaseRoom">
+                                        <button type="button" disabled>
                                             +
                                         </button>
 
@@ -255,9 +247,9 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="numGuests">Số khách</label>
+                                    <label for="displayNumGuests">Số khách</label>
 
-                                    <select id="numGuests" name="numGuests">
+                                    <select id="displayNumGuests" disabled>
 
                                         <c:forEach begin="1"
                                                    end="${roomType.capacity * numRooms}"
@@ -340,27 +332,27 @@
 
                         <div class="summary-row">
                             <span>Ngày nhận phòng</span>
-                            <strong id="summaryCheckIn">${checkIn}</strong>
+                            <strong>${checkIn}</strong>
                         </div>
 
                         <div class="summary-row">
                             <span>Ngày trả phòng</span>
-                            <strong id="summaryCheckOut">${checkOut}</strong>
+                            <strong>${checkOut}</strong>
                         </div>
 
                         <div class="summary-row">
                             <span>Số đêm</span>
-                            <strong id="summaryNights">${numberOfNights} đêm</strong>
+                            <strong>${numberOfNights} đêm</strong>
                         </div>
 
                         <div class="summary-row">
                             <span>Số lượng phòng</span>
-                            <strong id="summaryRooms">${numRooms} phòng</strong>
+                            <strong>${numRooms} phòng</strong>
                         </div>
 
                         <div class="summary-row">
                             <span>Số khách</span>
-                            <strong id="summaryGuests">${numGuests} khách</strong>
+                            <strong>${numGuests} khách</strong>
                         </div>
 
                         <div class="summary-divider"></div>
@@ -380,11 +372,11 @@
 
                         <div class="summary-row">
 
-                            <span id="temporaryLabel">
+                            <span>
                                 Tạm tính (${numRooms} phòng x ${numberOfNights} đêm)
                             </span>
 
-                            <strong id="temporaryAmount">
+                            <strong>
                                 <fmt:formatNumber value="${totalAmount}"
                                                   type="number"
                                                   maxFractionDigits="0"/>
@@ -399,7 +391,7 @@
 
                             <span>Tổng tiền</span>
 
-                            <strong id="totalAmount">
+                            <strong>
                                 <fmt:formatNumber value="${totalAmount}"
                                                   type="number"
                                                   maxFractionDigits="0"/>
@@ -412,7 +404,7 @@
 
                             <span>Tiền cọc cần thanh toán (30%)</span>
 
-                            <strong id="depositAmount">
+                            <strong>
                                 <fmt:formatNumber value="${depositAmount}"
                                                   type="number"
                                                   maxFractionDigits="0"/>
@@ -458,147 +450,6 @@
         </main>
 
         <jsp:include page="/view/common/footer.jsp"/>
-
-        <script>
-            const basePrice = Number("${roomType.basePrice}");
-            const roomCapacity = Number("${roomType.capacity}");
-            const availableRooms = Number("${availableRooms}");
-            const depositRate = 0.30;
-
-            const checkInInput = document.getElementById("checkIn");
-            const checkOutInput = document.getElementById("checkOut");
-            const numRoomsInput = document.getElementById("numRooms");
-            const numGuestsSelect = document.getElementById("numGuests");
-
-            function formatMoney(amount) {
-                return Math.round(amount).toLocaleString("vi-VN") + " VND";
-            }
-
-            function formatDate(value) {
-                if (!value) {
-                    return "--/--/----";
-                }
-
-                const parts = value.split("-");
-                return parts[2] + "/" + parts[1] + "/" + parts[0];
-            }
-
-            function getNumberOfNights() {
-                if (!checkInInput.value || !checkOutInput.value) {
-                    return 0;
-                }
-
-                const checkInDate = new Date(checkInInput.value + "T00:00:00");
-                const checkOutDate = new Date(checkOutInput.value + "T00:00:00");
-                const milliseconds = checkOutDate - checkInDate;
-
-                return Math.max(Math.round(milliseconds / 86400000), 0);
-            }
-
-            function updateGuestOptions() {
-                const numRooms = Number(numRoomsInput.value);
-                const maximumGuests = roomCapacity * numRooms;
-                let selectedGuests = Number(numGuestsSelect.value);
-
-                if (selectedGuests < 1) {
-                    selectedGuests = 1;
-                }
-
-                if (selectedGuests > maximumGuests) {
-                    selectedGuests = maximumGuests;
-                }
-
-                numGuestsSelect.innerHTML = "";
-
-                for (let i = 1; i <= maximumGuests; i++) {
-                    const option = document.createElement("option");
-
-                    option.value = i;
-                    option.textContent = i + " khách";
-                    option.selected = i === selectedGuests;
-
-                    numGuestsSelect.appendChild(option);
-                }
-
-                document.getElementById("capacityMessage").textContent =
-                        "Tối đa " + maximumGuests + " khách cho "
-                        + numRooms + " phòng.";
-            }
-
-            function updateSummary() {
-                const numRooms = Number(numRoomsInput.value);
-                const numGuests = Number(numGuestsSelect.value);
-                const numberOfNights = getNumberOfNights();
-
-                const totalMoney = basePrice * numRooms * numberOfNights;
-                const depositMoney = totalMoney * depositRate;
-
-                document.getElementById("numberOfNights").value =
-                        numberOfNights + " đêm";
-
-                document.getElementById("summaryCheckIn").textContent =
-                        formatDate(checkInInput.value);
-
-                document.getElementById("summaryCheckOut").textContent =
-                        formatDate(checkOutInput.value);
-
-                document.getElementById("summaryNights").textContent =
-                        numberOfNights + " đêm";
-
-                document.getElementById("summaryRooms").textContent =
-                        numRooms + " phòng";
-
-                document.getElementById("summaryGuests").textContent =
-                        numGuests + " khách";
-
-                document.getElementById("temporaryLabel").textContent =
-                        "Tạm tính (" + numRooms + " phòng x "
-                        + numberOfNights + " đêm)";
-
-                document.getElementById("temporaryAmount").textContent =
-                        formatMoney(totalMoney);
-
-                document.getElementById("totalAmount").textContent =
-                        formatMoney(totalMoney);
-
-                document.getElementById("depositAmount").textContent =
-                        formatMoney(depositMoney);
-            }
-
-            document.getElementById("decreaseRoom")
-                    .addEventListener("click", function () {
-
-                        let numRooms = Number(numRoomsInput.value);
-
-                        if (numRooms > 1) {
-                            numRoomsInput.value = numRooms - 1;
-                            updateGuestOptions();
-                            updateSummary();
-                        }
-                    });
-
-            document.getElementById("increaseRoom")
-                    .addEventListener("click", function () {
-
-                        let numRooms = Number(numRoomsInput.value);
-
-                        if (numRooms < availableRooms) {
-                            numRoomsInput.value = numRooms + 1;
-                            updateGuestOptions();
-                            updateSummary();
-                        }
-                    });
-
-            checkInInput.addEventListener("change", function () {
-                checkOutInput.min = checkInInput.value;
-                updateSummary();
-            });
-
-            checkOutInput.addEventListener("change", updateSummary);
-            numGuestsSelect.addEventListener("change", updateSummary);
-
-            updateSummary();
-        </script>
 
     </body>
 </html>
