@@ -470,20 +470,6 @@
                                                 </p>
                                             </c:when>
 
-                                            <c:when test="${verificationStatus eq 'Đã từ chối'}">
-                                                <a href="${paymentUrl}"
-                                                   class="detail-payment-button">
-
-                                                    <span>GỬI LẠI MINH CHỨNG</span>
-                                                    <span class="detail-payment-arrow">→</span>
-                                                </a>
-
-                                                <p class="detail-payment-help rejected">
-                                                    Minh chứng trước chưa được chấp nhận.
-                                                    Vui lòng kiểm tra và gửi lại.
-                                                </p>
-                                            </c:when>
-
                                             <c:when test="${verificationStatus eq 'Chờ xử lý'}">
                                                 <div class="detail-payment-message waiting">
                                                     <span class="detail-payment-message-icon">
