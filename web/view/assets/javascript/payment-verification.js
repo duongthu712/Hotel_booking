@@ -68,9 +68,25 @@ document.addEventListener("DOMContentLoaded", function () {
             detailStatus.className = statusClass === "pending" ? "status-pending" : (statusClass === "approved" ? "status-approved" : "status-rejected");
         }
 
+//        if (proofUrl) {
+//            if (proofImg)
+//                proofImg.src = proofUrl;
+//            if (proofWrapper)
+//                proofWrapper.style.display = "block";
+//        } else {
+//            if (proofWrapper)
+//                proofWrapper.style.display = "none";
+//        }
         if (proofUrl) {
             if (proofImg)
                 proofImg.src = proofUrl;
+
+            const proofUrlLink = document.getElementById("proof-url-link");
+            if (proofUrlLink) {
+                proofUrlLink.href = proofUrl;
+                proofUrlLink.innerText = proofUrl;
+            }
+
             if (proofWrapper)
                 proofWrapper.style.display = "block";
         } else {
