@@ -277,6 +277,25 @@ public class CheckoutDAO extends DBContext {
         return list;
     }
 
+    public LocalDateTime getDepositVerifiedAt(int bookingId) throws Exception {
+        String sql = """
+                 select verified_at from DepositPayments 
+                 where booking_id = ? and verification_status = N'Đã phê duyệt'
+                 """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, bookingId);
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    java.sql.Timestamp ts = rs.getTimestamp("verified_at");
+                    return ts != null ? ts.toLocalDateTime() : null;
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể lấy ngày cọc.");
+        }
+        return null;
+    }
+
     public RoomType getRoomTypeByBookingId(int bookingId) throws Exception {
         String sql = """
                      select rt.* 
@@ -542,7 +561,7 @@ public class CheckoutDAO extends DBContext {
             insert into Invoices (booking_id, room_charges, consumable_charges, 
                 amenity_damages, deposit_deducted, total_amount, remaining_amount,
                 payment_status, payment_method, paid_at, created_by)
-            values (?, ?, ?, ?, ?, ?, ?, N'Đã thanh toán', ?, GETDATE(), ?)
+            values (?, ?, ?, ?, ?, ?, 0, N'Đã thanh toán', ?, GETDATE(), ?)
             """;
 
             try (PreparedStatement stm = connection.prepareStatement(invoiceSql,
@@ -553,9 +572,8 @@ public class CheckoutDAO extends DBContext {
                 stm.setBigDecimal(4, invoice.getAmenityDamages());
                 stm.setBigDecimal(5, invoice.getDepositDeducted());
                 stm.setBigDecimal(6, invoice.getTotalAmount());
-                stm.setBigDecimal(7, invoice.getRemainingAmount());
-                stm.setString(8, invoice.getPaymentMethod());
-                stm.setInt(9, invoice.getCreatedBy());
+                stm.setString(7, invoice.getPaymentMethod());
+                stm.setInt(8, invoice.getCreatedBy());
                 stm.executeUpdate();
             }
 
@@ -617,7 +635,8 @@ public class CheckoutDAO extends DBContext {
                 set payment_status = N'Đã thanh toán', 
                     payment_method = ?,
                     paid_at = GETDATE(),
-                    created_by = ?
+                    created_by = ?,
+                     remaining_amount = 0                 
                 where invoice_id = ?
                 """;
             try (PreparedStatement stm = connection.prepareStatement(updateInvoiceSql)) {
@@ -638,26 +657,6 @@ public class CheckoutDAO extends DBContext {
             throw new Exception("Lỗi hệ thống: Không thể xác nhận thanh toán. " + e.getMessage());
         } finally {
             connection.setAutoCommit(true);
-        }
-    }
-
-    public void updateInvoicePaymentStatus(int invoiceId, String paymentMethod, int staffId) throws Exception {
-        String sql = """
-                     update Invoices 
-                     set payment_status = N'Đã thanh toán', 
-                         payment_method = ?,
-                         paid_at = GETDATE(),
-                         created_by = ?
-                     where invoice_id = ?
-                     """;
-
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setString(1, paymentMethod);
-            stm.setInt(2, staffId);
-            stm.setInt(3, invoiceId);
-            stm.executeUpdate();
-        } catch (SQLException e) {
-            throw new Exception("Lỗi hệ thống: Không thể cập nhật trạng thái hóa đơn.");
         }
     }
 
@@ -755,7 +754,7 @@ public class CheckoutDAO extends DBContext {
             sql.append(" and i.payment_status = ?");
             params.add(status);
         }
-        sql.append(" order by i.invoice_id desc");
+        sql.append(" order by i.paid_at desc, i.invoice_id desc");
 
         try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
             int idx = 1;

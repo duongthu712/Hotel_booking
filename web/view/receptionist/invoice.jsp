@@ -37,7 +37,7 @@
                     <div class="invoice-left">
 
                         <div class="card">
-                            <h3 class="section-title">THÔNG TIN BOOKING: 
+                            <h3 class="section-title">THÔNG TIN ĐẶT PHÒNG: 
                                 <span class="booking-code">${booking.bookingCode}</span>
                                 <span class="booking-status status-active">${booking.status}</span>
                             </h3>
@@ -49,12 +49,14 @@
                                             <div class="info-row">
                                                 <span class="info-label">Phòng</span>
                                                 <span class="info-value">
-                                                    <c:forEach var="br" items="${bookingRooms}" varStatus="loop">${br.roomNumber}<c:if test="${!loop.last}">, </c:if></c:forEach>
-                                                        </span>
-                                                    </div>
-                                                    <div class="info-row">
-                                                        <span class="info-label">Loại phòng</span>
-                                                        <span class="info-value">${roomType.typeName}</span>
+                                                    <c:forEach var="br" items="${bookingRooms}" varStatus="loop">${br.roomNumber}
+                                                        <c:if test="${!loop.last}">, 
+                                                        </c:if></c:forEach>
+                                                    </span>
+                                                </div>
+                                                <div class="info-row">
+                                                    <span class="info-label">Loại phòng</span>
+                                                    <span class="info-value">${roomType.typeName}</span>
                                             </div>
                                             <div class="info-row">
                                                 <span class="info-label">Giá phòng / đêm</span>
@@ -265,7 +267,7 @@
                                 </div>
                                 <div class="deposit-row">
                                     <span class="deposit-label">Ngày cọc</span>
-                                    <span class="deposit-value">${booking.confirmedAt != null ? booking.confirmedAt : 'N/A'}</span>
+                                    <span class="deposit-value">${depositVerifiedAt}</span>
                                 </div>
                                 <div class="deposit-row">
                                     <span class="deposit-label">Trạng thái</span>
@@ -284,7 +286,7 @@
                             </div>
 
                             <div class="invoice-actions">
-                                <button type="submit" class="btn-checkout-primary">TẠO HÓA ĐƠN</button>
+                                <button type="submit" class="btn-checkout-primary">XÁC NHẬN THANH TOÁN</button>
                             </div>
                         </div>
                     </div>
@@ -292,6 +294,7 @@
             </form>
         </main>
 
+        <script src="<%=request.getContextPath()%>/view/assets/javascript/alert.js"></script>
         <script src="${pageContext.request.contextPath}/view/assets/javascript/invoice.js"></script>
     </body>
 </html>

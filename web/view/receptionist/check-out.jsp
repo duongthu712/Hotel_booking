@@ -236,15 +236,10 @@
                     </div>
 
                     <div class="checkout-actions">
-                        <form action="InvoiceCreate" method="GET" class="checkout-form">
-                            <input type="hidden" name="bookingId" value="${selectedBooking.getBookingId()}">
-                            <input type="hidden" name="actualCheckoutTime" value="${currentDateTimeISO}">
-                            <input type="hidden" name="roomCharges" value="${roomCharges}">
-                            <input type="hidden" name="nights" value="${nights}">
-                            <button type="submit" class="btn-checkout-primary">
-                                CHECK-OUT (TẠO HÓA ĐƠN)
-                            </button>
-                        </form>
+                        <a href="${pageContext.request.contextPath}/InvoiceCreate?bookingId=${selectedBooking.bookingId}" 
+                           class="btn-checkout-primary">
+                            CHECK-OUT (TẠO HÓA ĐƠN)
+                        </a>
                         <a href="Checkout" class="btn-cancel-checkout">HỦY TRẢ PHÒNG</a>
                     </div>
 
@@ -252,6 +247,7 @@
             </c:if>
 
         </main>
+                    <script src="<%=request.getContextPath()%>/view/assets/javascript/alert.js"></script>
         <script src="${pageContext.request.contextPath}/view/assets/javascript/checkout.js"></script>
     </body>
 </html>

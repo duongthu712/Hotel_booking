@@ -6,7 +6,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import model.DepositPayment;
 
 /**
@@ -237,7 +240,38 @@ public class DepositPaymentDAO extends DBContext {
         }
     }
 
-    
+    public Map<Integer, String> getVerifiedByNames(List<DepositPayment> payments) throws Exception {
+        Map<Integer, String> map = new HashMap<>();
+        if (payments == null || payments.isEmpty()) {
+            return map;
+        }
+
+        List<Integer> depositIds = new ArrayList<>();
+        for (DepositPayment dp : payments) {
+            depositIds.add(dp.getDepositId());
+        }
+
+        String placeholders = String.join(",", Collections.nCopies(depositIds.size(), "?"));
+        String sql = "select dp.deposit_id, sa.full_name "
+                + "from DepositPayments dp "
+                + "left join StaffAccounts sa on dp.verified_by = sa.staff_id "
+                + "where dp.deposit_id in (" + placeholders + ")";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            for (int i = 0; i < depositIds.size(); i++) {
+                stm.setInt(i + 1, depositIds.get(i));
+            }
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    String name = rs.getString("full_name");
+                    map.put(rs.getInt("deposit_id"), name != null ? name : "-");
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể lấy tên người duyệt.");
+        }
+        return map;
+    }
 
     private DepositPayment mapResultSetToDepositPayment(ResultSet rs) throws SQLException {
         DepositPayment dp = new DepositPayment();

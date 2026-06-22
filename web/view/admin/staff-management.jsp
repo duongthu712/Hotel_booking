@@ -281,6 +281,7 @@
         <c:remove var="keepPhone" scope="session"/>
         <c:remove var="keepRole" scope="session"/>
         <c:remove var="keepActive" scope="session"/>
+        <script src="<%=request.getContextPath()%>/view/assets/javascript/alert.js"></script>
         <script src="${pageContext.request.contextPath}/view/assets/javascript/staff-account-management.js"></script>
     </body>
 </html>

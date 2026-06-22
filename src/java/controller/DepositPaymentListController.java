@@ -67,7 +67,7 @@ public class DepositPaymentListController extends HttpServlet {
             // Create maps for bookingCode and guestName
             Map<Integer, String> bookingCodeMap = new HashMap<>();
             Map<Integer, String> guestNameMap = new HashMap<>();
-            
+
             for (DepositPayment payment : allPayments) {
                 int bookingId = payment.getBookingId();
                 if (!bookingCodeMap.containsKey(bookingId)) {
@@ -98,6 +98,28 @@ public class DepositPaymentListController extends HttpServlet {
                 pagedList = new ArrayList<>();
             }
 
+            Map<Integer, String> verifiedByMap = dpdao.getVerifiedByNames(pagedList);
+
+            Map<String, Object> selectedPayment = null;
+            String depositIdStr = request.getParameter("depositId");
+            if (depositIdStr != null && !depositIdStr.isEmpty()) {
+                try {
+                    int depositId = Integer.parseInt(depositIdStr);
+                    DepositPayment dp = dpdao.getPaymentById(depositId);
+                    if (dp != null) {
+                        Map<String, Object> detail = new HashMap<>();
+                        detail.put("payment", dp);
+                        detail.put("bookingCode", bookingCodeMap.get(dp.getBookingId()));
+                        detail.put("guestName", guestNameMap.get(dp.getBookingId()));
+                        detail.put("verifiedByName", verifiedByMap.get(dp.getDepositId()));
+                        selectedPayment = detail;
+                    }
+                } catch (NumberFormatException ignored) {
+                }
+            }
+
+            request.setAttribute("selectedPayment", selectedPayment);
+            request.setAttribute("verifiedByMap", verifiedByMap);
             request.setAttribute("paymentList", pagedList);
             request.setAttribute("bookingCodeMap", bookingCodeMap);
             request.setAttribute("guestNameMap", guestNameMap);
@@ -115,7 +137,7 @@ public class DepositPaymentListController extends HttpServlet {
             request.setAttribute("totalPages", 1);
             request.setAttribute("keyword", keyword);
             request.setAttribute("status", status);
-            
+
             request.getRequestDispatcher("/view/receptionist/payment-verification.jsp").forward(request, response);
         }
     }

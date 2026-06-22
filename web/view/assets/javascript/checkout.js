@@ -32,11 +32,11 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         const roomCharges =
-            parseFloat(document.getElementById("hiddenRoomCharges").value) || 0;
+                parseFloat(document.getElementById("hiddenRoomCharges").value) || 0;
 
         const deposit = parseCurrency(
-            document.getElementById("summaryDeposit").textContent
-        );
+                document.getElementById("summaryDeposit").textContent
+                );
 
         const total = roomCharges + servicesTotal + damagesTotal;
         const remaining = Math.max(0, total - deposit);
@@ -117,8 +117,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function validateForm() {
         const paymentMethod = document.querySelector(
-            "select[name='paymentMethod']"
-        ).value;
+                "select[name='paymentMethod']"
+                ).value;
 
         if (!paymentMethod) {
             alert("Vui lòng chọn phương thức thanh toán.");

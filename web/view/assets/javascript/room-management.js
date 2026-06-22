@@ -5,17 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const btnCloseEdit = document.getElementById("btn-close-edit");
     const editForm = document.getElementById("edit-form");
 
-    const alerts = document.querySelectorAll(".alert-message");
-
-    alerts.forEach(alert => {
-        setTimeout(() => {
-            alert.style.opacity = "0";
-            alert.style.transform = "translateY(-10px)";
-            setTimeout(() => alert.remove(), 300);
-        }, 3000);
-    });
-
-    // Get status from body
+      // Get status from body
     const isEditMode = document.body.getAttribute("data-edit-mode") === "true";
     const isDetailMode = document.body.getAttribute("data-detail-mode") === "true";
 

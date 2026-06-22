@@ -34,9 +34,9 @@
 
             <form action="BillingList" method="GET" class="filter-bar">
                 <div class="filter-group">
-                    <label class="filter-label">Booking ID</label>
+                    <label class="filter-label">Mã đặt phòng</label>
                     <input type="text" name="keyword" class="filter-input"
-                           placeholder="Nhập Booking ID" value="${keyword}">
+                           placeholder="Nhập Mã đặt phòng" value="${keyword}">
                 </div>
                 <div class="filter-group">
                     <label class="filter-label">Từ ngày</label>
@@ -56,7 +56,7 @@
                 </div>
                 <div class="filter-actions">
                     <button type="submit" class="filter-btn active">Lọc</button>
-                    <a href="BillingList" class="filter-btn">Đặt lại</a>
+                    <a href="BillingList" class="reset-btn">Làm mới</a>
                 </div>
             </form>
 
@@ -69,11 +69,11 @@
                                 <table class="data-table">
                                     <thead class="data-table-thead">
                                         <tr>
-                                            <th>Booking ID</th>
+                                            <th>Mã đặt phòng</th>
                                             <th>Tiền phòng</th>
-                                            <th>Đồ tiêu hao</th>
+                                            <th>Dịch vụ</th>
                                             <th>Hư hỏng</th>
-                                            <th>Tiền cọc trừ</th>
+                                            <th>Tiền cọc</th>
                                             <th>Tổng tiền</th>
                                             <th>Trạng thái</th>
                                             <th>Thao tác</th>
@@ -103,7 +103,7 @@
                                                         ${inv.paymentStatus}
                                                     </span>
                                                 </td>
-                                                
+
                                                 <td class="btn-action">
                                                     <c:url var="viewUrl" value="BillingList">
                                                         <c:param name="invoiceId" value="${inv.invoiceId}"/>
@@ -144,12 +144,6 @@
                         <div class="detail-panel-header">
                             <div class="detail-panel-title">
                                 <h2>Chi tiết hóa đơn</h2>
-                                <div class="detail-panel-meta">
-                                    <span class="detail-invoice-id">INV-${selectedInvoice.invoice.invoiceId}</span>
-                                    <span class="invoice-status ${selectedInvoice.invoice.paymentStatus == 'Đã thanh toán' ? 'status-paid' : 'status-unpaid'}">
-                                        ${selectedInvoice.invoice.paymentStatus}
-                                    </span>
-                                </div>
                             </div>
                             <c:url var="closeUrl" value="BillingList">
                                 <c:param name="keyword"  value="${keyword}"/>
@@ -162,13 +156,8 @@
                         </div>
 
                         <div class="detail-section">
-                            <h3 class="detail-section-title">Thông tin chung</h3>
                             <div class="detail-row">
-                                <span>Invoice ID</span>
-                                <span>INV-${selectedInvoice.invoice.invoiceId}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span>Booking ID</span>
+                                <span>Mã đặt phòng</span>
                                 <span>${selectedInvoice.bookingCode}</span>
                             </div>
                             <div class="detail-row">
@@ -223,11 +212,6 @@
                             </div>
                         </div>
 
-                        <div class="detail-section">
-                            <h3 class="detail-section-title">Ghi chú</h3>
-                            <p class="detail-note">-</p>
-                        </div>
-
                         <div class="detail-panel-actions">
                             <a href="${pageContext.request.contextPath}/InvoicePDF?bookingId=${selectedInvoice.invoice.bookingId}"
                                target="_blank" class="btn-panel-primary">Xuất PDF</a>
@@ -244,5 +228,7 @@
 
             </div>
         </main>
+        <script src="<%=request.getContextPath()%>/view/assets/javascript/alert.js"></script>
+        <script src="<%=request.getContextPath()%>/view/assets/javascript/billing.js"></script>
     </body>
 </html>
