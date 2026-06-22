@@ -48,7 +48,7 @@ public class DepositPaymentVerifyController extends HttpServlet {
             BookingDAO bdao = new BookingDAO();
             DepositPayment payment = dpdao.getPaymentById(depositId);
 
-            dpdao.rejectPayment(depositId, staff.getStaffId(), notes);
+            dpdao.verifyPayment(depositId, staff.getStaffId(), notes);
 
             //Send email
             try {
