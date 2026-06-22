@@ -16,7 +16,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Quản lý dịch vụ khách sạn</title>
     </head>
-    
+
     <body data-edit-mode="${not empty serviceToEdit}"
           data-create-mode="${not empty openCreateModal ? 'true' : 'false'}">
         <%@ include file="/view/staff/header.jsp" %>
@@ -35,9 +35,10 @@
             </div>
 
             <c:if test="${not empty errorMessage and (empty openCreateModal or openCreateModal eq 'false') and empty serviceToEdit}">
-                <div class="alert-message alert-error" style="position: static; margin-bottom: 15px; width: 100%;">
+                <div class="alert-message alert-error">
                     ${errorMessage}
                 </div>
+                <c:remove var="errorMessage" scope="session"/>
             </c:if>
 
             <c:if test="${not empty sessionScope.successMessage}">
@@ -53,6 +54,7 @@
                         <tr>
                             <th class="col-id">STT</th>
                             <th class="col-name">Tên dịch vụ khách sạn</th>
+                            <th class="col-img">Hình ảnh</th>
                             <th class="col-desc">Mô tả</th>
                             <th class="col-price">Đơn giá (VNĐ)</th>
                             <th class="col-status">Trạng thái</th>
@@ -65,6 +67,7 @@
                             <tr>
                                 <td class="col-id">${(currentPage - 1) * 10 + loop.index + 1}</td>
                                 <td class="col-name">${srv.getServiceName()}</td>
+                                <td class="col-img"><img src="${srv.getImageUrl()}" alt="" ></td>
                                 <td class="col-desc">${srv.getDescription()}</td>
                                 <td class="col-price"><fmt:formatNumber value="${srv.getUnitPrice()}" type="number" pattern="#,###" />đ</td>
                                 <td class="col-status">
@@ -84,8 +87,15 @@
                             </tr>
                         </c:forEach>
                     </tbody>
+                    <c:if test="${empty serviceList}">
+                        <tr>
+                            <td colspan="7" class="empty-message">
+                                Không tìm thấy dịch vụ.
+                            </td>
+                        </tr>
+                    </c:if>
                 </table>
-                
+
                 <div class="pagination">
                     <c:forEach begin="1" end="${totalPages}" var="i">
                         <a href="HotelServiceList?page=${i}&keyword=${keyword}" class="${currentPage == i ? 'active' : ''}">${i}</a>
@@ -94,12 +104,12 @@
             </div>
         </main>
 
-       <div class="service-popup ${not empty openCreateModal or not empty serviceToEdit ? 'show' : ''}" 
+        <div class="service-popup ${not empty openCreateModal or not empty serviceToEdit ? 'show' : ''}" 
              id="service-modal" 
              ${not empty openCreateModal or not empty serviceToEdit ? 'style="display: flex;"' : ''}>
-             
+
             <form action="${not empty serviceToEdit ? 'HotelServiceEdit' : 'HotelServiceCreate'}" method="POST" id="service-form" class="popup-content">
-                
+
                 <h2 class="service-popup-title" id="modal-title">
                     ${not empty serviceToEdit ? 'Chỉnh sửa dịch vụ khách sạn' : 'Thêm dịch vụ khách sạn mới'}
                 </h2>
@@ -112,6 +122,7 @@
                     <div class="alert-message alert-error">
                         ${errorMessage}
                     </div>
+                    <c:remove var="errorMessage" scope="session"/>
                 </c:if>
 
                 <div class="form-group">
@@ -123,8 +134,17 @@
 
                 <div class="form-group">
                     <label class="input-label">Hình ảnh</label>
-                    <input class="service-popup-input-field" type="text" name="imageUrl" id="imageUrl"
+                    <input type="hidden" name="imageId" id="edit-image-id">
+                    <div class="form-group">
+                        <label class="input-label">Tải ảnh</label>
+                        <input type="file" id="upImage">
+                    </div>
+                    <div class="form-group">
+                        <label class="input-label">Link ảnh</label>
+                        <input class="service-popup-input-field" type="text" name="imageUrl" id="imageUrl"
                            value="${not empty serviceToEdit ? serviceToEdit.getImageUrl() : keepImageUrl}">
+                    </div>
+                    
                 </div>
 
                 <div class="form-group">
@@ -155,7 +175,15 @@
                 </div>
             </form>
         </div>
-        
+        <c:remove var="serviceToEdit" scope="session"/>
+        <c:remove var="openEditModal" scope="session"/>
+        <c:remove var="openCreateModal" scope="session"/>
+        <c:remove var="keepServiceName" scope="session"/>
+        <c:remove var="keepDescription" scope="session"/>
+        <c:remove var="keepUnitPrice" scope="session"/>
+        <c:remove var="keepImageUrl" scope="session"/>
+        <c:remove var="keepActive" scope="session"/>
         <script src="<%=request.getContextPath()%>/view/assets/javascript/hotel-service-management.js"></script>
+        <script src="<%=request.getContextPath()%>/view/assets/javascript/upload-img.js"></script>
     </body>
 </html>

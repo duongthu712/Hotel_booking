@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.regex.Pattern;
 
 /**
- * Lớp tiện ích kiểm tra tính hợp lệ và chuẩn hóa dữ liệu đầu vào
- *
  * @author LinhLTHE200306
  * @version 2.5
  * @since 2026-06-13

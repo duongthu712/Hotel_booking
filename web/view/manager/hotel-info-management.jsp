@@ -199,9 +199,12 @@
                     <h2 class="popup-title" id="image-modal-title">Chỉnh sửa ảnh</h2>
 
                     <input type="hidden" name="imageId" id="edit-image-id">
-
                     <div class="form-group">
-                        <label class="input-label">Link ảnh mới*</label>
+                        <label class="input-label">Tải ảnh</label>
+                        <input type="file" id="upImage">
+                    </div>
+                    <div class="form-group">
+                        <label class="input-label">Link ảnh</label>
                         <input type="text" name="imageUrl" id="edit-image-url" class="popup-input-field" required>
                     </div>
 
@@ -269,7 +272,7 @@
                                     </div>
                                 </td>
                                 <td class="btn-action">
-                                    <a class="btn-edit" href="HotelNewsEdit?newsId=${news.getNewsId()}">Sửa</a>
+                                    <a class="btn-edit" href="HotelNewsEdit?newsId=${news.getNewsId()}&page=${currentPage}&keyword=${keyword}&status=${status}">Sửa</a>
                                     <form action="HotelNewsDelete" method="post" style="display: inline-block; margin: 0;">
                                         <input type="hidden" name="newsId" value="${news.getNewsId()}">
                                         <button type="submit" onclick="return confirm('Bạn có chắc muốn xóa bài viết ${news.getTitle()}?')">Xóa</button>
@@ -278,6 +281,13 @@
                             </tr>
                         </c:forEach>
                     </tbody>
+                    <c:if test="${empty newsList}">
+                        <tr>
+                            <td colspan="7" class="empty-message">
+                                Không tìm thấy tin tức.
+                            </td>
+                        </tr>
+                    </c:if>
                 </table>
 
                 <div class="pagination">
@@ -333,9 +343,14 @@
                         <textarea name="content" class="popup-input-field" rows="5" required>${keepContent}</textarea>
                     </div>
 
+                    <input type="hidden" name="imageId" id="edit-image-id">
                     <div class="form-group">
-                        <label class="input-label">Link ảnh đi kèm</label>
-                        <input type="text" name="imageUrl" class="popup-input-field" 
+                        <label class="input-label">Tải ảnh</label>
+                        <input type="file" id="upImage">
+                    </div>
+                    <div class="form-group">
+                        <label class="input-label">Link ảnh</label>
+                        <input type="text" name="imageUrl" id="edit-image-url" class="popup-input-field" 
                                value="${keepImageUrl}">
                     </div>
 
@@ -371,9 +386,14 @@
                         <textarea name="content" class="popup-input-field" rows="5" required>${newsToEdit.getContent()}</textarea>
                     </div>
 
+                    <input type="hidden" name="imageId" id="edit-image-id">
                     <div class="form-group">
-                        <label class="input-label">Link ảnh đi kèm</label>
-                        <input type="text" name="imageUrl" class="popup-input-field" 
+                        <label class="input-label">Tải ảnh</label>
+                        <input type="file" id="upImage">
+                    </div>
+                    <div class="form-group">
+                        <label class="input-label">Link ảnh</label>
+                        <input type="text" name="imageUrl" id="edit-image-url" class="popup-input-field" 
                                value="${newsToEdit.getImageUrl()}">
                     </div>
 
@@ -394,7 +414,9 @@
             </div>
 
         </main>
-
+        <c:remove var="newsToEdit" scope="session"/>
+        <c:remove var="openEditModal" scope="session"/>
         <script src="<%=request.getContextPath()%>/view/assets/javascript/hotel-info-management.js"></script>
+        <script src="<%=request.getContextPath()%>/view/assets/javascript/upload-img.js"></script>
     </body>
 </html>

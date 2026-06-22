@@ -15,8 +15,7 @@ import model.HotelNews;
 import model.StaffAccount;
 
 /**
- * HotelInfoController.java
- * Main controller for Hotel Information Management
+ * HotelInfoController.java Main controller for Hotel Information Management
  * Loads hotel info, images, and news list for the management page
  *
  * @author LinhLTHE200306
@@ -64,19 +63,23 @@ public class HotelInfoController extends HttpServlet {
             request.setAttribute("smallImages", smallImages);
 
             List<HotelNews> allNews;
-            if ((keyword != null && !keyword.trim().isEmpty()) || 
-                (status != null && !status.equals("all") && !status.isEmpty())) {
-                allNews = dao.searchNewsByTitle(hotelId, 
-                    keyword != null ? keyword.trim() : null, 
-                    status != null ? status : "all");
+            if ((keyword != null && !keyword.trim().isEmpty())
+                    || (status != null && !status.equals("all") && !status.isEmpty())) {
+                allNews = dao.searchNewsByTitle(hotelId,
+                        keyword != null ? keyword.trim() : null,
+                        status != null ? status : "all");
             } else {
                 allNews = dao.getAllNewsByHotelId(hotelId);
             }
 
             int totalRecords = allNews.size();
             int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
-            if (page < 1) page = 1;
-            if (page > totalPages && totalPages > 0) page = totalPages;
+            if (page < 1) {
+                page = 1;
+            }
+            if (page > totalPages && totalPages > 0) {
+                page = totalPages;
+            }
 
             int start = (page - 1) * recordsPerPage;
             int end = Math.min(start + recordsPerPage, totalRecords);
@@ -88,9 +91,21 @@ public class HotelInfoController extends HttpServlet {
                 pagedList = new ArrayList<>();
             }
 
+            HotelNews newsToEdit = (HotelNews) session.getAttribute("newsToEdit");
+            if (newsToEdit != null) {
+                request.setAttribute("newsToEdit", newsToEdit);
+                session.removeAttribute("newsToEdit");
+            }
+
+            Object openEditModal = session.getAttribute("openEditModal");
+            if (openEditModal != null) {
+                request.setAttribute("openEditModal", openEditModal);
+                session.removeAttribute("openEditModal");
+            }
+
             request.setAttribute("newsList", pagedList);
             request.setAttribute("currentPage", page);
-            request.setAttribute("totalPages", totalPages > 0 ? totalPages : 1);
+            request.setAttribute("totalPages", totalPages);
             request.setAttribute("keyword", keyword);
             request.setAttribute("status", status);
 

@@ -53,6 +53,8 @@ border-radius: var(--radius-custom);
     transition: all 0.3s ease;
 }
 
+
+
 .search-container{
     display: flex;
     align-items: center;
@@ -84,9 +86,9 @@ border-radius: var(--radius-custom);
     border-color: #999;
 }
 
-.search-btn,.reset-btn{
+.search-btn,.reset-btn, .btn-checkout{
     padding: 10px 16px;
-border-radius: var(--radius-custom);
+    border-radius: var(--radius-custom);
     border: none;
     cursor: pointer;
     text-decoration: none;
@@ -487,4 +489,44 @@ input:checked + .toggle-slider:before {
     font-size: 0.8rem;
     color: var(--text-muted);
     letter-spacing: 0.05em;
+}
+
+#upImage {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--bg-main);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    font-family: var(--font-logo);
+}
+
+#upImage::-webkit-file-upload-button {
+    display: none;
+}
+#upImage::file-selector-button {
+    display: none;
+}
+
+#upImage::before {
+    content: 'Chọn ảnh từ máy';
+    display: inline-block;
+    background-color: var(--text-main);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-family: var(--font-logo);
+    margin-right: 10px;
+    transition: background 0.2s;
+}
+
+.empty-message {
+    text-align: center;
+    color: var(--text-main);
+    font-size: 1.1rem;
+    font-family: var(--font-logo);
+    font-style: italic;
+    margin-top: 10px;
 }

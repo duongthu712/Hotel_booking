@@ -33,16 +33,16 @@ public class RoomAmenityEditController extends HttpServlet {
         try {
             int amenityId = Integer.parseInt(request.getParameter("amenityId"));
 
+            String page = request.getParameter("page");
+            String keyword = request.getParameter("keyword");
+
             RoomAmenityDAO dao = new RoomAmenityDAO();
             RoomAmenity amenity = dao.getRoomAmenityById(amenityId);
-            
-            List<RoomAmenity> amenityList = dao.getAllRoomAmenities();
 
-            request.setAttribute("amenityList", amenityList);
-            request.setAttribute("amenityToEdit", amenity);
-            request.setAttribute("currentPage", request.getParameter("page"));
-            request.setAttribute("keyword", request.getParameter("keyword"));
-            request.getRequestDispatcher("/view/manager/room-amenity-management.jsp").forward(request, response);
+            session.setAttribute("amenityToEdit", amenity);
+
+            response.sendRedirect(buildRedirectUrl(request, page, keyword));
+
         } catch (Exception e) {
             session.setAttribute("errorMessage", e.getMessage());
             response.sendRedirect(request.getContextPath() + "/RoomAmenityList");

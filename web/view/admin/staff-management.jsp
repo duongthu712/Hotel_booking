@@ -49,6 +49,7 @@
                 <div class="alert-message alert-error">
                     ${errorMessage}
                 </div>
+                <c:remove var="errorMessage" scope="session"/>
             </c:if>
 
             <c:if test="${not empty sessionScope.successMessage}">
@@ -104,6 +105,13 @@
                             </tr>
                         </c:forEach>
                     </tbody>
+                    <c:if test="${empty staffList}">
+                        <tr>
+                            <td colspan="7" class="empty-message">
+                                Không tìm thấy tài khoản nhân viên.
+                            </td>
+                        </tr>
+                    </c:if>
                 </table>
 
                 <div class="pagination">
@@ -152,6 +160,7 @@
                     <div class="alert-message alert-error">
                         ${errorMessage}
                     </div>
+                    <c:remove var="errorMessage" scope="session"/>
                 </c:if>
                 <div class="form-group">
                     <label class="input-label">ID</label>
@@ -214,6 +223,7 @@
                     <div class="alert-message alert-error">
                         ${errorMessage}
                     </div>
+                    <c:remove var="errorMessage" scope="session"/>
                 </c:if>
 
                 <div class="form-group">
@@ -262,7 +272,15 @@
                 </div>
             </form>
         </div>
+        <c:remove var="editStaff" scope="session"/>
+        <c:remove var="openEditModal" scope="session"/>
+        <c:remove var="openCreateModal" scope="session"/>
 
+        <c:remove var="keepFullName" scope="session"/>
+        <c:remove var="keepEmail" scope="session"/>
+        <c:remove var="keepPhone" scope="session"/>
+        <c:remove var="keepRole" scope="session"/>
+        <c:remove var="keepActive" scope="session"/>
         <script src="${pageContext.request.contextPath}/view/assets/javascript/staff-account-management.js"></script>
     </body>
 </html>

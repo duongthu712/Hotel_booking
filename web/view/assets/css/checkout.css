@@ -1,0 +1,292 @@
+/* 
+    Created on : Jun 21, 2026, 2:34:14 PM
+    Author     : LinhLTHE200306
+*/
+
+.col-action {
+    text-align: center;
+}
+
+.btn-checkout {
+    display: inline-block;
+    padding: 10px 18px;
+    background: var(--text-main);
+    color: #fff;
+    text-decoration: none;
+    border-radius: var(--radius-custom);
+    font-size: 0.85rem;
+    transition: 0.25s;
+}
+
+.btn-checkout:hover {
+    opacity: 0.9;
+}
+
+
+.checkout-detail {
+    display: grid;
+    grid-template-columns: 2.2fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+    align-items: start;
+}
+
+.checkout-detail > .detail-section:nth-child(1),
+.checkout-detail > .detail-section:nth-child(2),
+.checkout-detail > .detail-section:nth-child(3) {
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-custom);
+      margin: 0;
+    padding: 20px;
+}
+
+.checkout-detail > .payment-summary,
+.checkout-detail > .checkout-actions {
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-custom);
+    padding: 20px;
+}
+
+
+.detail-section:nth-child(1) {
+    grid-column: 1;
+}
+
+.detail-section:nth-child(2) {
+    grid-column: 1;
+}
+
+.detail-section:nth-child(3) {
+    grid-column: 1;
+}
+
+.payment-summary {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.checkout-actions {
+    grid-column: 2;
+    grid-row: 2 / span 2;
+}
+
+
+.section-title {
+    margin: 0 0 18px;
+    color: var(--text-main);
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+
+.booking-info-grid {
+    display: flex;
+    gap: 24px;
+}
+
+.room-image {
+    width: 150px;
+    flex-shrink: 0;
+}
+
+.room-image img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    border-radius: var(--radius-custom);
+}
+
+.booking-details {
+    flex: 1;
+}
+
+.booking-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.booking-code {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.booking-status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 0.5fr;
+    gap: 10px;
+}
+
+.info-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.info-label {
+    color: #666;
+    min-width: 150px;
+}
+
+.info-value {
+    color: var(--text-main);
+    text-align: left;
+    font-weight: 500;
+    flex: 1;
+}
+
+.guest-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+}
+
+.time-input {
+    width: 170px;
+    padding: 8px 10px;
+    border: 1px solid #d8d8d8;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    background: #fafafa;
+    color: var(--text-main);
+}
+
+
+.stay-table {
+    margin-top: 10px;
+}
+.stay-table th{
+    text-align: left;
+}
+
+.payment-summary {
+    display: flex;
+    flex-direction: column;
+}
+
+.payment-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+}
+
+.payment-row:not(:last-child) {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.payment-label {
+    color: var(--text-main);
+}
+
+.payment-value {
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+.payment-value.discount {
+    color: #d32f2f;
+}
+
+.total-row {
+    margin-top: 8px;
+    padding-top: 18px;
+}
+
+.total-row .payment-label {
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.total-row .payment-value {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #2e7d32;
+}
+
+.checkout-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.checkout-form {
+    width: 100%;
+}
+
+.btn-checkout-primary,
+.btn-cancel-checkout {
+    display: block;
+    width: 100%;
+    padding: 14px 18px;
+    text-align: center;
+    border-radius: var(--radius-custom);
+    font-family: inherit;
+    font-size: 0.95rem;
+    text-decoration: none;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.btn-checkout-primary {
+    border: none;
+    background: var(--text-main);
+    color: #fff;
+}
+
+.btn-checkout-primary:hover {
+    opacity: 0.92;
+}
+
+.btn-cancel-checkout {
+    background: #fff;
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+}
+
+.btn-cancel-checkout:hover {
+    background: #f5f5f5;
+}
+
+@media (max-width: 992px) {
+    .checkout-detail {
+        grid-template-columns: 1fr;
+    }
+
+    .payment-summary,
+    .checkout-actions {
+        grid-column: 1;
+        grid-row: auto;
+    }
+
+    .booking-info-grid {
+        flex-direction: column;
+    }
+
+    .room-image {
+        width: 100%;
+    }
+
+    .info-grid,
+    .guest-info-grid {
+        grid-template-columns: 1fr;
+    }
+}

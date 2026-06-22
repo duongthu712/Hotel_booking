@@ -1,6 +1,6 @@
 <%-- 
-    Document   : room-amenity-management
-    Created on : Jun 10, 2026, 2:17:49 AM
+    Document   : room-service-management
+    Created on : Jun 9, 2026, 10:15:17 PM
     Author     : LinhLTHE200306
 --%>
 
@@ -38,6 +38,7 @@
                 <div class="alert-message alert-error">
                     ${errorMessage}
                 </div>
+                <c:remove var="errorMessage" scope="session"/>
             </c:if>
 
             <c:if test="${not empty sessionScope.successMessage}">
@@ -73,7 +74,7 @@
                                     </div>
                                 </td>
                                 <td class="btn-action">
-                                    <a class="btn-edit" href="RoomAmenityEdit?serviceId=${srv.getAmenityId()}&page=${currentPage}&keyword=${keyword}">Sửa</a>
+                                    <a class="btn-edit" href="RoomAmenityEdit?amenityId=${srv.getAmenityId()}&page=${currentPage}&keyword=${keyword}">Sửa</a>
                                     <form action="RoomAmenityDelete" method="post" style="display: inline-block; margin: 0;">
                                         <input type="hidden" name="amenityId" value="${srv.getAmenityId()}">
                                         <input type="hidden" name="page" value="${currentPage}">
@@ -84,6 +85,13 @@
                             </tr>
                         </c:forEach>
                     </tbody>
+                    <c:if test="${empty amenityList}">
+                        <tr>
+                            <td colspan="7" class="empty-message">
+                                Không tìm thấy tiện nghi.
+                            </td>
+                        </tr>
+                    </c:if>
                 </table>
 
                 <div class="pagination">
@@ -104,7 +112,7 @@
                     ${not empty amenityToEdit ? 'Chỉnh sửa tiện nghi phòng' : 'Thêm tiện nghi phòng mới'}
                 </h2>
 
-                <input type="hidden" name="amenityId" id="serviceId" value="${amenityToEdit.getAmenityId()}">
+                <input type="hidden" name="amenityId" id="amenityId" value="${amenityToEdit.getAmenityId()}">
                 <input type="hidden" name="page" value="${currentPage}">
                 <input type="hidden" name="keyword" value="${keyword}">
 
@@ -112,13 +120,14 @@
                     <div class="alert-message alert-error">
                         ${errorMessage}
                     </div>
+                    <c:remove var="errorMessage" scope="session"/>
                 </c:if>
 
                 <div class="form-group">
                     <label class="input-label">Tên tiện nghi*</label>
-                    <input class="service-popup-input-field" type="text" name="amenityName" id="amenityName" 
+                    <input class="service-popup-input-field" type="text" name="serviceName" id="serviceName" 
                            placeholder="Nhập tên..." 
-                           value="${not empty amenityToEdit ? amenityToEdit.getAmenityName() : keepAmenityName}" required>
+                           value="${not empty amenityToEdit ? amenityToEdit.getAmenityName() : keepServiceName}" required>
                 </div>
 
                 <div class="form-group">
@@ -149,6 +158,14 @@
                 </div>
             </form>
         </div>
+        <c:remove var="amenityToEdit" scope="session"/>
+        <c:remove var="openEditModal" scope="session"/>
+        <c:remove var="openCreateModal" scope="session"/>
+        <c:remove var="keepServiceName" scope="session"/>
+        <c:remove var="keepDescription" scope="session"/>
+        <c:remove var="keepUnitPrice" scope="session"/>
+        <c:remove var="keepImageUrl" scope="session"/>
+        <c:remove var="keepActive" scope="session"/>
 
         <script src="<%=request.getContextPath()%>/view/assets/javascript/room-amenity-management.js"></script>
     </body>

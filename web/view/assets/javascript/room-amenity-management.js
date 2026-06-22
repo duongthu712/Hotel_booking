@@ -80,6 +80,25 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (btnClose) {
-        btnClose.addEventListener("click", () => toggleModal(false));
+        btnClose.addEventListener("click", () => {
+            const isCurrentlyCreate = form && form.action.includes("RoomAmenityCreate");
+
+            if (isCurrentlyCreate && form) {
+                form.reset();
+                const inputs = form.querySelectorAll(
+                        "input:not([type='hidden']):not([type='checkbox']):not([type='radio'])"
+                        );
+                inputs.forEach(input => input.value = "");
+                const textarea = form.querySelector("textarea");
+                if (textarea)
+                    textarea.value = "";
+                
+            }
+
+            toggleModal(false);
+
+            const cleanUrl = "RoomAmenityList?" + getFilterParams();
+            window.history.replaceState(null, "", cleanUrl);
+        });
     }
 });

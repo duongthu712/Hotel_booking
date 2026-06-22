@@ -28,6 +28,10 @@
 .col-action {
     width: 10%;
 }
+.col-img img{
+   max-height: 50px; 
+   max-width: 100px;
+}
 
 .srvType {
     text-align: center;

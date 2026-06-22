@@ -184,10 +184,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (btnCloseEdit) {
         btnCloseEdit.addEventListener("click", () => {
             toggleModal(newsEditModal, false);
-            const isEditMode = document.body.getAttribute("data-edit-mode") === "true";
-            if (isEditMode) {
-                window.location.href = "HotelInfo";
-            }
         });
     }
 

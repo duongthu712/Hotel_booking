@@ -1,0 +1,132 @@
+/* 
+    Created on : Jun 22, 2026, 12:58:04 AM
+    Author     : LinhLTHE200306
+*/
+
+.invoice-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.card {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: var(--radius-custom);
+    border: 1px solid var(--border-color);
+    margin-bottom: 20px;
+}
+
+.section-title {
+    display: flex;  
+    align-items: center;  
+    justify-content: space-between; 
+    color: var(--text-main);
+    font-size: 1.2rem;
+    margin-top: 0;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+
+.section-title span.booking-code {
+    margin-left: 10px;
+}
+
+
+.booking-status {
+    margin-left: auto;
+    padding: 7px;
+    color: #079548;
+    border-radius: var(--radius-custom);
+}
+
+
+.page-header { margin: 15px; }
+.btn-back {
+    color: var(--text-main);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.info-grid-3col {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 15px;
+}
+
+
+.info-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.info-row {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-label {
+    font-size: 0.85rem;
+    color: var(--text-main);
+    margin-bottom: 2px;
+    font-weight: 600;
+    
+}
+
+.info-value {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.time-input {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+/* Table Section */
+.card-header-with-search { display: flex; justify-content: space-between; align-items: center; }
+.search-input-small { padding: 5px 10px; border: 1px solid #ddd; border-radius: var(--radius-custom); }
+.service-table, .amenity-table { margin-top: 10px; }
+.data-table th{
+    text-align: left;
+}
+.quantity-control { display: flex; align-items: center; gap: 5px; }
+.qty-btn { background: #eee; border: none; padding: 2px 8px; cursor: pointer; border-radius: 3px; }
+.qty-input { width: 40px; text-align: center; border: 1px solid #ddd; }
+
+/* Invoice Right */
+.summary-rows { display: flex; flex-direction: column; gap: 10px; }
+.summary-row { display: flex; justify-content: space-between; }
+.summary-divider { height: 1px; background: var(--border-color); margin: 5px 0; }
+.total-row { font-weight: bold; }
+.discount { color: #c62828; }
+.final-row { color: var(--text-main); font-size: 1.1rem; font-weight: 800; }
+
+.deposit-info { background: #fcfcfc; padding: 15px; border-radius: var(--radius-custom); margin: 20px 0; }
+.sub-title { margin: 10px 0; color: var(--text-main); }
+.deposit-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; }
+
+.payment-select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--radius-custom); }
+.notes-textarea { width: 100%; height: 80px; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--radius-custom); box-sizing: border-box; }
+
+.btn-checkout-primary {
+    width: 100%;
+    padding: 15px;
+    background: var(--text-main);
+    color: white;
+    border: none;
+    border-radius: var(--radius-custom);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 20px;
+    font-family: var(--font-logo);
+}
+

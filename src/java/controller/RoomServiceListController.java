@@ -82,7 +82,7 @@ public class RoomServiceListController extends HttpServlet {
             request.getRequestDispatcher("/view/manager/room-service-management.jsp").forward(request, response);
 
         } catch (Exception e) {
-            request.setAttribute("errorMessage", "Đã xảy ra lỗi hệ thống: " + e.getMessage());
+            request.setAttribute("errorMessage", e.getMessage());
             request.setAttribute("serviceList", new ArrayList<>());
             request.setAttribute("currentPage", 1);
             request.setAttribute("totalPages", 1);
