@@ -36,7 +36,6 @@ public class CheckoutDAO extends DBContext {
     public static final double LATE_CHECKOUT_AFTER_RATE = 1.0;
     public static final int LATE_CHECKOUT_HOUR = 18;
 
-
     public List<Booking> searchActiveBookings(String keyword) throws Exception {
         List<Booking> list = new ArrayList<>();
         String sql = """
@@ -392,7 +391,7 @@ public class CheckoutDAO extends DBContext {
 
         return map;
     }
-    
+
     public List<Map<String, Object>> getRoomTypeServicesWithDetails(int roomTypeId) throws Exception {
         List<Map<String, Object>> list = new ArrayList<>();
         String sql = """
@@ -476,8 +475,8 @@ public class CheckoutDAO extends DBContext {
                     bs.setUnitPrice(rs.getBigDecimal("unit_price"));
                     bs.setQuantityUsed(rs.getInt("quantity_used"));
                     bs.setTotalPrice(rs.getBigDecimal("total_price"));
-                    bs.setAddedAt(rs.getTimestamp("added_at") != null 
-                        ? rs.getTimestamp("added_at").toLocalDateTime() : null);
+                    bs.setAddedAt(rs.getTimestamp("added_at") != null
+                            ? rs.getTimestamp("added_at").toLocalDateTime() : null);
                     list.add(bs);
                 }
             }
@@ -506,8 +505,8 @@ public class CheckoutDAO extends DBContext {
                     rad.setAmenityId(rs.getInt("amenity_id"));
                     rad.setQuantityDamaged(rs.getInt("quantity_damaged"));
                     rad.setTotalPrice(rs.getBigDecimal("total_price"));
-                    rad.setAddedAt(rs.getTimestamp("added_at") != null 
-                        ? rs.getTimestamp("added_at").toLocalDateTime() : null);
+                    rad.setAddedAt(rs.getTimestamp("added_at") != null
+                            ? rs.getTimestamp("added_at").toLocalDateTime() : null);
                     list.add(rad);
                 }
             }
@@ -609,8 +608,8 @@ public class CheckoutDAO extends DBContext {
         }
     }
 
-    public void completeInvoicePayment(int invoiceId, int bookingId, String paymentMethod, 
-                                       int staffId, List<RoomAmenityDamage> damages) throws Exception {
+    public void completeInvoicePayment(int invoiceId, int bookingId, String paymentMethod,
+            int staffId, List<RoomAmenityDamage> damages) throws Exception {
         connection.setAutoCommit(false);
         try {
             String updateInvoiceSql = """
@@ -724,5 +723,181 @@ public class CheckoutDAO extends DBContext {
         inv.setPaidAt(rs.getTimestamp("paid_at") != null ? rs.getTimestamp("paid_at").toLocalDateTime() : null);
         inv.setCreatedBy(rs.getInt("created_by"));
         return inv;
+    }
+
+    //Billing
+    public List<Map<String, Object>> searchInvoices(String keyword, LocalDate fromDate,
+            LocalDate toDate, String status) throws Exception {
+        List<Map<String, Object>> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("""
+        select i.invoice_id, i.booking_id, b.booking_code, i.room_charges, i.consumable_charges,
+               i.amenity_damages, i.deposit_deducted, i.total_amount, i.remaining_amount,
+               i.payment_status, i.payment_method, i.paid_at
+        from Invoices i
+        join Bookings b on i.booking_id = b.booking_id
+        where 1 = 1
+        """);
+        List<Object> params = new ArrayList<>();
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append(" and b.booking_code like ?");
+            params.add("%" + keyword.trim() + "%");
+        }
+        if (fromDate != null) {
+            sql.append(" and i.paid_at >= ?");
+            params.add(java.sql.Date.valueOf(fromDate));
+        }
+        if (toDate != null) {
+            sql.append(" and i.paid_at < ?");
+            params.add(java.sql.Date.valueOf(toDate.plusDays(1)));
+        }
+        if (status != null && !status.trim().isEmpty()) {
+            sql.append(" and i.payment_status = ?");
+            params.add(status);
+        }
+        sql.append(" order by i.invoice_id desc");
+
+        try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
+            int idx = 1;
+            for (Object p : params) {
+                stm.setObject(idx++, p);
+            }
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("invoiceId", rs.getInt("invoice_id"));
+                    map.put("bookingId", rs.getInt("booking_id"));
+                    map.put("bookingCode", rs.getString("booking_code"));
+                    map.put("roomCharges", rs.getBigDecimal("room_charges"));
+                    map.put("consumableCharges", rs.getBigDecimal("consumable_charges"));
+                    map.put("amenityDamages", rs.getBigDecimal("amenity_damages"));
+                    map.put("depositDeducted", rs.getBigDecimal("deposit_deducted"));
+                    map.put("totalAmount", rs.getBigDecimal("total_amount"));
+                    map.put("remainingAmount", rs.getBigDecimal("remaining_amount"));
+                    map.put("paymentStatus", rs.getString("payment_status"));
+                    map.put("paymentMethod", rs.getString("payment_method"));
+                    map.put("paidAt", rs.getTimestamp("paid_at") != null
+                            ? rs.getTimestamp("paid_at").toLocalDateTime()
+                                    .format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                            : "-");
+                    list.add(map);
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể tìm kiếm hóa đơn. " + e.getMessage());
+        }
+        return list;
+    }
+
+    public int countInvoices(String keyword, LocalDate fromDate, LocalDate toDate, String status) throws Exception {
+        StringBuilder sql = new StringBuilder("""
+        select count(*) as total
+        from Invoices i
+        join Bookings b on i.booking_id = b.booking_id
+        where 1 = 1
+        """);
+        List<Object> params = new ArrayList<>();
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append(" and b.booking_code like ?");
+            params.add("%" + keyword.trim() + "%");
+        }
+        if (fromDate != null) {
+            sql.append(" and i.paid_at >= ?");
+            params.add(java.sql.Date.valueOf(fromDate));
+        }
+        if (toDate != null) {
+            sql.append(" and i.paid_at < ?");
+            params.add(java.sql.Date.valueOf(toDate.plusDays(1)));
+        }
+        if (status != null && !status.trim().isEmpty()) {
+            sql.append(" and i.payment_status = ?");
+            params.add(status);
+        }
+
+        try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
+            int idx = 1;
+            for (Object p : params) {
+                stm.setObject(idx++, p);
+            }
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("total");
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể đếm hóa đơn. " + e.getMessage());
+        }
+        return 0;
+    }
+
+    public Map<String, Object> getInvoiceStats(LocalDate fromDate, LocalDate toDate) throws Exception {
+        Map<String, Object> stats = new HashMap<>();
+        StringBuilder sql = new StringBuilder("""
+        select
+            count(*) as total_count,
+            sum(case when payment_status = N'Đã thanh toán' then 1 else 0 end) as paid_count,
+            sum(case when payment_status = N'Chưa thanh toán' then 1 else 0 end) as unpaid_count,
+            sum(case when payment_status = N'Đã thanh toán' then total_amount else 0 end) as revenue
+        from Invoices
+        where 1 = 1
+        """);
+        List<Object> params = new ArrayList<>();
+
+        if (fromDate != null) {
+            sql.append(" and paid_at >= ?");
+            params.add(java.sql.Date.valueOf(fromDate));
+        }
+        if (toDate != null) {
+            sql.append(" and paid_at < ?");
+            params.add(java.sql.Date.valueOf(toDate.plusDays(1)));
+        }
+
+        try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
+            int idx = 1;
+            for (Object p : params) {
+                stm.setObject(idx++, p);
+            }
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    stats.put("totalCount", rs.getInt("total_count"));
+                    stats.put("paidCount", rs.getInt("paid_count"));
+                    stats.put("unpaidCount", rs.getInt("unpaid_count"));
+                    stats.put("revenue", rs.getBigDecimal("revenue"));
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể lấy thống kê hóa đơn. " + e.getMessage());
+        }
+        return stats;
+    }
+
+    public Map<String, Object> getInvoiceDetailById(int invoiceId) throws Exception {
+        String sql = """
+        select i.*, b.booking_code, sa.full_name as staff_name
+        from Invoices i
+        join Bookings b on i.booking_id = b.booking_id
+        left join StaffAccounts sa on i.created_by = sa.staff_id
+        where i.invoice_id = ?
+        """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, invoiceId);
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("invoice", mapInvoice(rs));
+                    map.put("paidAtFormatted", rs.getTimestamp("paid_at") != null
+                            ? rs.getTimestamp("paid_at").toLocalDateTime()
+                                    .format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                            : "-");
+                    map.put("bookingCode", rs.getString("booking_code"));
+                    map.put("staffName", rs.getString("staff_name"));
+                    return map;
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể lấy chi tiết hóa đơn. " + e.getMessage());
+        }
+        return null;
     }
 }

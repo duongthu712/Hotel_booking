@@ -35,7 +35,7 @@
     <a href="${pageContext.request.contextPath}/walkin">Đặt phòng tại quầy</a>
     <a href="${pageContext.request.contextPath}/requests">Xử lý yêu cầu</a>
     <a href="${pageContext.request.contextPath}/DepositPaymentList">Danh sách đặt cọc</a>
-    <a href="${pageContext.request.contextPath}/#">Xem hóa đơn</a>
+    <a href="${pageContext.request.contextPath}/BillingList">Xem hóa đơn</a>
 
     <%}else if("ADMIN".equals(role)){%>
 

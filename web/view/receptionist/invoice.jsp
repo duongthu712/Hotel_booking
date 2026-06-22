@@ -96,7 +96,7 @@
                                                             ${guest.fullName}
                                                         </c:when>
                                                         <c:otherwise>
-                                                            Nhân viên: ${staffName}
+                                                            Lễ tân
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </span>

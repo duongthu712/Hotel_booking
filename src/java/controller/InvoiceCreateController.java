@@ -2,7 +2,6 @@ package controller;
 
 import dao.CheckoutDAO;
 import dao.HotelInfoDAO;
-import dao.StaffAccountDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -126,12 +125,9 @@ public class InvoiceCreateController extends HttpServlet {
                 formattedCheckinTime = booking.getActualCheckinTime().format(TIME_24H);
             }
             
-            StaffAccountDAO sdao = new StaffAccountDAO();
-            String staffName = sdao.getStaffAccById(dao.getBookingById(bookingId).getStaffId()).getFullName();
-
+            
             request.setAttribute("booking", booking);
             request.setAttribute("guest", guest);
-            request.setAttribute("staffName", staffName);
             request.setAttribute("roomType", roomType);
             request.setAttribute("roomImageUrl", roomImageUrl);
             request.setAttribute("bookingRooms", bookingRooms);

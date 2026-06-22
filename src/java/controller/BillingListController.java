@@ -1,81 +1,107 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
-
 package controller;
 
+import dao.CheckoutDAO;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.time.LocalDate;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import model.StaffAccount;
 
 /**
- *
- * @author admin
+ * @author LinhLTHE200306
+ * @version 1.0
+ * @since 2026-06-22
  */
 public class BillingListController extends HttpServlet {
-   
-    /** 
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet BillingListController</title>");  
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet BillingListController at " + request.getContextPath () + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    } 
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
-     * Handles the HTTP <code>GET</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    private static final int DEFAULT_PAGE_SIZE = 10;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        processRequest(request, response);
-    } 
+            throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        StaffAccount staff = (StaffAccount) session.getAttribute("staff");
 
-    /** 
-     * Handles the HTTP <code>POST</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        processRequest(request, response);
+        if (staff == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        try {
+            CheckoutDAO dao = new CheckoutDAO();
+
+            String keyword = request.getParameter("keyword");
+            String status = request.getParameter("status");
+            String fromDateStr = request.getParameter("fromDate");
+            String toDateStr = request.getParameter("toDate");
+
+            LocalDate fromDate = (fromDateStr != null && !fromDateStr.isEmpty())
+                    ? LocalDate.parse(fromDateStr) : null;
+            LocalDate toDate = (toDateStr != null && !toDateStr.isEmpty())
+                    ? LocalDate.parse(toDateStr) : null;
+
+            // Phân trang
+            int page = 1;
+            List<Map<String, Object>> allInvoices = dao.searchInvoices(keyword, fromDate, toDate, status);
+            if (allInvoices == null) {
+                allInvoices = new ArrayList<>();
+            }
+
+            int totalRecords = allInvoices.size();
+            int recordsPerPage = 10;
+            int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+
+            if (page < 1) {
+                page = 1;
+            }
+            if (page > totalPages && totalPages > 0) {
+                page = totalPages;
+            }
+
+            int start = (page - 1) * recordsPerPage;
+            int end = Math.min(start + recordsPerPage, totalRecords);
+
+            List<Map<String, Object>> invoiceList = totalRecords > 0
+                    ? allInvoices.subList(start, end)
+                    : allInvoices;
+
+            
+            Map<String, Object> selectedInvoice = null;
+            String invoiceIdStr = request.getParameter("invoiceId");
+            if (invoiceIdStr != null && !invoiceIdStr.isEmpty()) {
+                try {
+                    selectedInvoice = dao.getInvoiceDetailById(Integer.parseInt(invoiceIdStr));
+                } catch (NumberFormatException ignored) {
+                }
+            }
+
+            request.setAttribute("invoiceList", invoiceList);
+            request.setAttribute("selectedInvoice", selectedInvoice);
+            request.setAttribute("keyword", keyword);
+            request.setAttribute("fromDate", fromDateStr);
+            request.setAttribute("toDate", toDateStr);
+            request.setAttribute("status", status);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("totalRecords", totalRecords);
+            request.setAttribute("invoiceList", invoiceList);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("totalRecords", totalRecords);
+            request.setAttribute("pageSize", recordsPerPage);
+
+            request.getRequestDispatcher("/view/receptionist/billing.jsp").forward(request, response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.setAttribute("errorMessage", e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/Checkout");
+        }
     }
-
-    /** 
-     * Returns a short description of the servlet.
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
 }
