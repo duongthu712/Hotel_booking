@@ -178,14 +178,13 @@ public class BookingDAO extends DBContext {
     }
 
     // Thư
+    
+    // Lấy đơn lên để cập nhật thêm thông tin lúc check in
     public boolean updateCheckInAdvance(int bookingId, int currentGuestId, String fullName, String phone, String email,
             String idNumber, String nationality, String dobStr, int numGuests, boolean isDifferentGuest) {
-
         String insertNewGuestSql = "INSERT INTO Guests (full_name, phone, email, id_number, nationality, date_of_birth) VALUES (?, ?, ?, ?, ?, ?)";
-        // 🚀 ĐÃ SỬA: Bỏ [status] = N'Đã nhận phòng' để giữ lại đơn cho gán tiếp phòng thứ 2
         String updateBookingGuestSql = "UPDATE Bookings SET guest_id = ?, num_guests = ?, actual_checkin_time = GETDATE() WHERE booking_id = ?";
         String updateOldGuestSql = "UPDATE Guests SET full_name = ?, phone = ?, email = ?, id_number = ?, nationality = ?, date_of_birth = ? WHERE guest_id = ?";
-        // 🚀 ĐÃ SỬA: Fix lỗi cú pháp khai báo và bỏ [status] = N'Đã nhận phòng'
         String updateBookingOnlySql = "UPDATE Bookings SET num_guests = ?, actual_checkin_time = GETDATE() WHERE booking_id = ?";
 
         try {
@@ -267,18 +266,20 @@ public class BookingDAO extends DBContext {
         return false;
     }
 
-
-    public BookingCheckInView getBookingForCheckIn(String bookingCode) {
+    // Dùng cho thanh search của check in 
+   public BookingCheckInView getBookingForCheckIn(String bookingCode) {
         String sql = "SELECT b.booking_id, b.booking_code, b.num_rooms, b.num_guests, b.payment_status, b.deposit_amount, "
                 + "b.[status], b.actual_checkin_time, "
                 + "g.guest_id, g.full_name, g.phone, g.email, g.id_number, g.date_of_birth, g.nationality, "
                 + "rt.type_name, rt.capacity, "
                 + "r.request_type, r.request_details, r.status AS request_status, "
-                + "CONVERT(VARCHAR(19), r.requested_checkin, 120) AS requested_checkin " // ĐÃ THÊM DÒNG NÀY
+                + "CONVERT(VARCHAR(19), r.requested_checkin, 120) AS requested_checkin "
                 + "FROM Bookings b "
                 + "LEFT JOIN Guests g ON b.guest_id = g.guest_id "
                 + "INNER JOIN RoomTypes rt ON b.room_type_id = rt.room_type_id "
                 + "LEFT JOIN GuestRequests r ON b.booking_id = r.booking_id "
+                + "                           AND r.[status] = N'Đã phê duyệt' " // 🚀 CHẶN LẶP DÒNG TÌM KIẾM
+                + "                           AND r.request_type IN (N'Nhận phòng sớm', N'Nhận phòng muộn') "
                 + "WHERE b.booking_code = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -303,13 +304,10 @@ public class BookingDAO extends DBContext {
                     b.setNationality(rs.getString("nationality"));
                     b.setRoomTypeName(rs.getString("type_name"));
                     b.setCapacity(rs.getInt("capacity"));
-
                     b.setRequestType(rs.getString("request_type"));
                     b.setRequestDetails(rs.getString("request_details"));
                     b.setRequestStatus(rs.getString("request_status"));
-
                     b.setRequestedCheckIn(rs.getString("requested_checkin"));
-
                     return b;
                 }
             }
@@ -319,26 +317,28 @@ public class BookingDAO extends DBContext {
         return null;
     }
 
+    // Hiện list check in ngày hôm nay
     public List<BookingCheckInView> getBookingsToday() {
         List<BookingCheckInView> list = new ArrayList<>();
         java.time.LocalDate today = java.time.LocalDate.now();
         String todayStr = today.toString();
 
-        String sql = "SELECT b.booking_id, b.booking_code, b.num_rooms, b.num_guests, b.payment_status, b.deposit_amount, "
-                + "b.[status], b.actual_checkin_time, "
-                + "g.guest_id, g.full_name, g.phone, g.email, g.id_number, g.date_of_birth, g.nationality, "
-                + "rt.type_name, rt.capacity, "
-                + "r.request_type, r.request_details, r.status AS request_status, "
-                + "CONVERT(VARCHAR(19), r.requested_checkin, 120) AS requested_checkin " // ĐÃ THÊM DÒNG NÀY
-                + "FROM Bookings b "
-                + "LEFT JOIN Guests g ON b.guest_id = g.guest_id "
-                + "INNER JOIN RoomTypes rt ON b.room_type_id = rt.room_type_id "
-                + "LEFT JOIN GuestRequests r ON b.booking_id = r.booking_id "
-                + "WHERE b.checkin_date = ?";
-
+       String sql = "SELECT b.booking_id, b.booking_code, b.num_rooms, b.num_guests, b.payment_status, b.deposit_amount, "
+        + "b.[status], b.actual_checkin_time, "
+        + "g.guest_id, g.full_name, g.phone, g.email, g.id_number, g.date_of_birth, g.nationality, "
+        + "rt.type_name, rt.capacity, "
+        + "r.request_type, r.request_details, r.status AS request_status, "
+        + "CONVERT(VARCHAR(19), r.requested_checkin, 120) AS requested_checkin "
+        + "FROM Bookings b "
+        + "LEFT JOIN Guests g ON b.guest_id = g.guest_id "
+        + "INNER JOIN RoomTypes rt ON b.room_type_id = rt.room_type_id "
+        + "LEFT JOIN GuestRequests r ON b.booking_id = r.booking_id "
+        + "                           AND r.[status] = N'Đã phê duyệt' "
+        + "                           AND r.request_type IN (N'Nhận phòng sớm', N'Nhận phòng muộn') "
+        + "WHERE b.checkin_date = ? "
+        + "  AND b.[status] IN (N'Đã xác nhận', N'Đã nhận phòng')";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, todayStr);
-
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     BookingCheckInView b = new BookingCheckInView();
@@ -359,13 +359,10 @@ public class BookingDAO extends DBContext {
                     b.setNationality(rs.getString("nationality"));
                     b.setRoomTypeName(rs.getString("type_name"));
                     b.setCapacity(rs.getInt("capacity"));
-
                     b.setRequestType(rs.getString("request_type"));
                     b.setRequestDetails(rs.getString("request_details"));
                     b.setRequestStatus(rs.getString("request_status"));
-
                     b.setRequestedCheckIn(rs.getString("requested_checkin"));
-
                     list.add(b);
                 }
             }
@@ -375,9 +372,7 @@ public class BookingDAO extends DBContext {
         return list;
     }
 
-    PreparedStatement stm;
-    ResultSet rs;
-
+    // Hủy đơn trực tiếp nếu quá giờ check in
     public boolean cancelBooking(int bookingId) {
         String sql = "UPDATE Bookings SET [status] = N'Đã hủy' WHERE booking_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -390,6 +385,7 @@ public class BookingDAO extends DBContext {
         return false;
     }
 
+    // Cập nhật trạng thái từ đã xác nhận sang đã nhận phòng
     public boolean updateStatus(int bookingId, String status) {
         String sql = "UPDATE Bookings SET [status] = ? WHERE booking_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -438,6 +434,9 @@ public class BookingDAO extends DBContext {
     }
 
     // Giang
+    PreparedStatement stm;
+    ResultSet rs;
+
     // Tìm khách cũ theo email và số điện thoại
     public int findGuestId(String email, String phone) {
         try {

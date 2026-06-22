@@ -211,6 +211,7 @@ public class RoomDAO extends DBContext {
     }
 
     //Thư
+    // Gán phòng
   public boolean processRoomAssignment(int bookingId, int roomNumber, String[] fullNames, String[] phones, String[] idNumbers, int totalRequiredRooms) throws SQLException {
         String updateRoomSql = "UPDATE Rooms SET [status] = N'Phòng có khách' WHERE room_number = ?";
         String insertBookingRoomSql = "INSERT INTO BookingRooms (booking_id, room_number, assigned_at) VALUES (?, ?, GETDATE())";
@@ -302,6 +303,8 @@ public class RoomDAO extends DBContext {
             if (connection != null) connection.setAutoCommit(true);
         }
     }
+  
+ // 2. Lấy thông tin chi tiết đơn hàng để hiển thị lên Form Check-in
     public BookingCheckInView getBookingForCheckInById(int bookingId) {
         String sql = "SELECT b.booking_id, b.booking_code, b.num_rooms, b.num_guests, b.payment_status, b.deposit_amount, "
                 + "b.[status], b.actual_checkin_time, "
@@ -353,6 +356,7 @@ public class RoomDAO extends DBContext {
         return null;
     }
 
+    //Lấy sơ đồ trạng thái phòng
 public List<RoomStatusView> getAllRoomStatusViews(int targetRoomTypeId, String filterRoomTypeName, String filterFloor) {
         List<RoomStatusView> list = new ArrayList<>();
         
@@ -416,21 +420,6 @@ public List<RoomStatusView> getAllRoomStatusViews(int targetRoomTypeId, String f
         }
         return list;
     }
-    public int getAssignedRoomsCount(int bookingId) {
-        String sql = "SELECT COUNT(*) FROM BookingRooms WHERE booking_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, bookingId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1); // Trả về số lượng phòng vật lý ĐÃ GÁN xong cho đơn này
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-    
     // Lấy danh sách tên tất cả các hạng phòng đang hoạt động
     public List<String> getAllActiveRoomTypeNames() {
         List<String> list = new ArrayList<>();

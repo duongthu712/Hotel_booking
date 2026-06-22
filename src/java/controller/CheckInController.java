@@ -142,7 +142,6 @@ public class CheckInController extends HttpServlet {
             );
 
             if (success) {
-                // 🚀 ĐOẠN ĐIỀU HƯỚNG THÔNG MINH MỚI: 
                 // Sử dụng hàm đếm phòng đã thêm vào BookingDAO để check xem đã chia đủ phòng chưa
                 int assignedRooms = bookingDAO.countRoomsAssigned(bookingId);
                 

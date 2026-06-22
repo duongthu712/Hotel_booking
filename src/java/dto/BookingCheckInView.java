@@ -15,7 +15,7 @@ public class BookingCheckInView {
     private String guestFullName;
     private String guestPhone;
     private String guestEmail;
-    private int roomTypeId; // 🚀 THÊM MỚI BIẾN NÀY ĐỂ LƯU ID HẠNG PHÒNG
+    private int roomTypeId; // THÊM MỚI BIẾN NÀY ĐỂ LƯU ID HẠNG PHÒNG
     private String roomTypeName;
     private int capacity;
     private String status;
@@ -31,7 +31,7 @@ public class BookingCheckInView {
     public BookingCheckInView() {
     }
 
-    // 🚀 THÊM CẶP HÀM GETTER / SETTER NÀY VÀO DTO
+    // THÊM CẶP HÀM GETTER / SETTER NÀY VÀO DTO
     public int getRoomTypeId() {
         return roomTypeId;
     }

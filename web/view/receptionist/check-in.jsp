@@ -167,14 +167,14 @@
                                     <span class="td-name">${b.guestFullName}</span>
 
                                     <c:if test="${b.requestType eq 'Nhận phòng muộn' and b.status eq 'Đã xác nhận' and b.requestStatus eq 'Đã phê duyệt'}">
-                                        <span class="badge-success" style="background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; margin-left: 6px; font-size: 11px; padding: 2px 6px; text-transform: none;">
-                                            Đến muộn
+                                        <span class="badge-success" style="background-color: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; margin-left: 6px; font-size: 11px; padding: 2px 6px; text-transform: none; font-weight: 500; border-radius: 4px;">
+                                            Nhận phòng muộn
                                         </span>
                                     </c:if>
 
                                     <c:if test="${b.requestType eq 'Nhận phòng sớm' and b.status eq 'Đã xác nhận' and b.requestStatus eq 'Đã phê duyệt'}">
-                                        <span class="badge-success" style="background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; margin-left: 6px; font-size: 11px; padding: 2px 6px; text-transform: none;">
-                                            Đến sớm
+                                        <span class="badge-success" style="background-color: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; margin-left: 6px; font-size: 11px; padding: 2px 6px; text-transform: none; font-weight: 500; border-radius: 4px;">
+                                            Nhận phòng sớm
                                         </span>
                                     </c:if>
                                 </td>
@@ -227,7 +227,7 @@
                                         </a>
 
                                         <c:if test="${b.status eq 'Đã xác nhận'}">
-                              
+
 
                                             <form action="${pageContext.request.contextPath}/checkin" method="POST" class="form-inline-table">
                                                 <input type="hidden" name="bookingId" value="${b.bookingId}" />

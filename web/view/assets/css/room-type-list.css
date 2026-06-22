@@ -18,7 +18,7 @@ h1, h2, h3, h4, .management-title {
 }
 
 .management-wrapper {
-    padding: 10px 0;
+    padding: 10px 50px;
     width: 100%;
 }
 
@@ -40,22 +40,24 @@ h1, h2, h3, h4, .management-title {
 }
 
 .management-wrapper .btn-primary {
-    font-family: 'Lora', serif;
-    font-size: 14px;
-    font-weight: 500;
-    background-color: #1a446c;
-    color: white;
-    border: none;
     padding: 10px 20px;
-    border-radius: 4px;
-    transition: background 0.2s ease;
-    white-space: nowrap;
-    margin-left: auto;
+    font-size: 0.7rem;
+    font-family: 'Lora', serif;
+    text-transform: uppercase;
     text-decoration: none;
+
+    background: #1a446c;
+    color: #fff;
+    border: 1px solid #1a446c;
+    border-radius: 6px;
+
+    transition: all 0.3s ease;
 }
 
 .management-wrapper .btn-primary:hover {
-    background-color: #112d47;
+    background: #112d47;
+    border-color: #112d47;
+    transform: translateY(-1px);
 }
 
 /* === 3. ĐỊNH DẠNG BẢNG DỮ LIỆU TỐI GIẢN === */
@@ -379,4 +381,29 @@ h1, h2, h3, h4, .management-title {
 .amenity-name-highlight {
     color: #bfa15f !important;
     font-weight: 600;
+}
+
+.action-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 35px;
+}
+
+.add-room-btn {
+    background: #1a446c !important;
+    color: #fff !important;
+    padding: 10px 15px !important;
+    min-height: 52px;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.3px;
+    border-radius: 8px !important;
+    border: none !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.add-room-btn:hover {
+    background: #112d47 !important;
 }

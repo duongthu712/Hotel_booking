@@ -73,7 +73,7 @@ public class LoginController extends HttpServlet {
         String role = staff.getRole();
 
         if (role.equalsIgnoreCase("Lễ tân")) {
-            response.sendRedirect(request.getContextPath() + "/view/receptionist/dashboard.jsp");
+            response.sendRedirect(request.getContextPath() + "/receptionist-dashboard");
         } else if (role.equalsIgnoreCase("Quản lý")) {
             response.sendRedirect(request.getContextPath() + "/view/manager/dashboard.jsp");
 
