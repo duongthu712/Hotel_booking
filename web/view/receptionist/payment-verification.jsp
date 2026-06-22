@@ -118,6 +118,9 @@
                             <div class="payment-proof-image" id="payment-proof-wrapper">
                                 <img src="" alt="Payment Proof" id="proof-img">
                             </div>
+                            <div id="proof-url-container" style="margin-top: 10px; word-break: break-all;">
+                                Thông tin: <p id="proof-url-link" href="#" target="_blank"></p>
+                            </div>
                         </div>
 
                         <div class="payment-info-column">
