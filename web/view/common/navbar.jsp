@@ -25,6 +25,6 @@
     <div class="navbar-actions">
         <a href="${pageContext.request.contextPath}/view/auth/login.jsp" class="staff-login">
             ĐĂNG NHẬP NHÂN VIÊN
-        </a>
+        </a>>
     </div>
 </nav>

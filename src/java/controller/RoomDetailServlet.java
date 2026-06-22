@@ -12,348 +12,166 @@ import model.RoomType;
 
 public class RoomDetailServlet extends HttpServlet {
 
-    @Override
-    protected void doGet(
-            HttpServletRequest request,
-            HttpServletResponse response)
-            throws ServletException, IOException {
-
-        processRequest(request, response);
-    }
+    private static final String ROOM_DETAIL_PAGE = "/view/public/room-detail.jsp";
 
     @Override
-    protected void doPost(
-            HttpServletRequest request,
-            HttpServletResponse response)
-            throws ServletException, IOException {
-
-        processRequest(request, response);
-    }
-
-    private void processRequest(
-            HttpServletRequest request,
-            HttpServletResponse response)
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
 
-        String idRaw = firstNonBlank(
-                request.getParameter("roomTypeId"),
-                request.getParameter("id")
-        );
+        LocalDate today = LocalDate.now();
+        setDefaultAttributes(request, today);
 
+        String idRaw = getParam(request, "roomTypeId");
         if (idRaw == null) {
-            response.sendRedirect(
-                    request.getContextPath() + "/home"
-            );
+            idRaw = getParam(request, "id");
+        }
+
+        Integer roomTypeId = parseInt(idRaw);
+        if (roomTypeId == null) {
+            request.setAttribute("error", "Không tìm thấy loại phòng.");
+            forward(request, response);
             return;
         }
 
-        try {
-            int roomTypeId = Integer.parseInt(idRaw);
+        RoomTypeDAO roomTypeDAO = new RoomTypeDAO();
+        RoomType room = roomTypeDAO.getRoomDetailById(roomTypeId);
 
-            String checkInRaw = firstNonBlank(
-                    request.getParameter("checkIn"),
-                    request.getParameter("checkin"),
-                    request.getParameter("checkInDate")
-            );
+        if (room == null) {
+            request.setAttribute("error", "Không tìm thấy loại phòng.");
+            forward(request, response);
+            return;
+        }
 
-            String checkOutRaw = firstNonBlank(
-                    request.getParameter("checkOut"),
-                    request.getParameter("checkout"),
-                    request.getParameter("checkOutDate")
-            );
+        String checkInRaw = getParam(request, "checkIn");
+        String checkOutRaw = getParam(request, "checkOut");
 
-            String roomQuantityRaw = firstNonBlank(
-                    request.getParameter("numRooms"),
-                    request.getParameter("roomQuantity"),
-                    request.getParameter("quantity")
-            );
+        String numRoomsRaw = getParam(request, "numRooms");
+        if (numRoomsRaw == null) {
+            numRoomsRaw = getParam(request, "roomQuantity");
+        }
 
-            String guestQuantityRaw = firstNonBlank(
-                    request.getParameter("numGuests"),
-                    request.getParameter("guestQuantity"),
-                    request.getParameter("guests")
-            );
+        int numRooms = Math.max(parseIntOrDefault(numRoomsRaw, 1), 1);
+        int numGuests = Math.max(parseIntOrDefault(getParam(request, "numGuests"), 1), 1);
 
-            LocalDate today = LocalDate.now();
+        LocalDate checkIn = parseDate(checkInRaw);
+        LocalDate checkOut = parseDate(checkOutRaw);
 
-            LocalDate checkIn = parseDateOrNull(checkInRaw);
-            LocalDate checkOut = parseDateOrNull(checkOutRaw);
+        boolean hasValidDate = false;
+        String dateError = "";
+        String guestRoomWarning = "";
+        String guestRoomError = "";
+        int availableRooms = -1;
+        long nights = 0;
 
-            int selectedRooms = parseIntOrDefault(
-                    roomQuantityRaw,
-                    1
-            );
+        boolean hasDateInput = checkInRaw != null || checkOutRaw != null;
 
-            int numGuests = parseIntOrDefault(
-                    guestQuantityRaw,
-                    1
-            );
-
-            selectedRooms = Math.max(selectedRooms, 1);
-            numGuests = Math.max(numGuests, 1);
-
-            RoomTypeDAO roomTypeDAO = new RoomTypeDAO();
-
-            RoomType room
-                    = roomTypeDAO.getRoomDetailById(roomTypeId);
-
-            if (room == null) {
-                request.setAttribute(
-                        "error",
-                        "Không tìm thấy loại phòng."
+        if (hasDateInput) {
+            if (checkIn == null || checkOut == null) {
+                dateError = "Vui lòng chọn đầy đủ ngày nhận phòng và ngày trả phòng.";
+            } else if (checkIn.isBefore(today)) {
+                dateError = "Ngày nhận phòng không được nhỏ hơn ngày hiện tại.";
+            } else if (!checkOut.isAfter(checkIn)) {
+                dateError = "Ngày trả phòng phải sau ngày nhận phòng.";
+            } else {
+                hasValidDate = true;
+                availableRooms = roomTypeDAO.getAvailableRoomCount(
+                        roomTypeId,
+                        checkIn.toString(),
+                        checkOut.toString()
                 );
 
-                setCommonAttributes(
-                        request,
-                        today,
-                        "",
-                        "",
-                        selectedRooms,
-                        numGuests,
-                        -1,
-                        0L,
-                        false,
-                        "",
-                        "",
-                        "",
-                        1
-                );
+                nights = ChronoUnit.DAYS.between(checkIn, checkOut);
 
-                request.getRequestDispatcher(
-                        "/view/public/room-detail.jsp"
-                ).forward(request, response);
-
-                return;
-            }
-
-            boolean hasValidDate = false;
-            String dateError = "";
-            String guestRoomWarning = "";
-            String guestRoomError = "";
-
-            long nights = 0;
-            int availableRooms = -1;
-
-            boolean hasAnyDateInput
-                    = checkInRaw != null || checkOutRaw != null;
-
-            if (hasAnyDateInput) {
-
-                if (checkIn == null || checkOut == null) {
-
-                    dateError
-                            = "Vui lòng chọn đầy đủ ngày nhận phòng "
-                            + "và ngày trả phòng.";
-
-                } else if (checkIn.isBefore(today)) {
-
-                    dateError
-                            = "Ngày nhận phòng không được nhỏ hơn "
-                            + "ngày hiện tại.";
-
-                } else if (!checkOut.isAfter(checkIn)) {
-
-                    dateError
-                            = "Ngày trả phòng phải sau ngày nhận phòng.";
-
-                } else {
-
-                    hasValidDate = true;
-
-                    availableRooms
-                            = roomTypeDAO.getAvailableRoomCount(
-                                    roomTypeId,
-                                    checkIn.toString(),
-                                    checkOut.toString()
-                            );
-
-                    nights = ChronoUnit.DAYS.between(
-                            checkIn,
-                            checkOut
-                    );
-
-                    if (nights < 1) {
-                        nights = 1;
-                    }
-
-                    if (selectedRooms > availableRooms) {
-
-                        dateError = availableRooms == 0
-                                ? "Hạng phòng này đã hết phòng "
-                                + "trong thời gian bạn chọn."
-                                : "Chỉ còn " + availableRooms
-                                + " phòng khả dụng trong thời gian "
-                                + "bạn chọn.";
-                    }
+                if (numRooms > availableRooms) {
+                    dateError = availableRooms == 0
+                            ? "Hạng phòng này đã hết phòng trong thời gian bạn chọn."
+                            : "Chỉ còn " + availableRooms + " phòng khả dụng trong thời gian bạn chọn.";
                 }
             }
-
-            int maxGuestsByRooms
-                    = room.getCapacity() * selectedRooms;
-
-            if (numGuests > maxGuestsByRooms) {
-
-                numGuests = maxGuestsByRooms;
-
-                guestRoomError
-                        = "Số khách đã được điều chỉnh vì vượt quá "
-                        + "sức chứa tối đa của số phòng đã chọn.";
-            }
-
-            if (numGuests < selectedRooms) {
-
-                guestRoomWarning
-                        = "Số khách đang nhỏ hơn số phòng đặt. "
-                        + "Nếu bạn đặt hộ người khác thì vẫn có thể "
-                        + "tiếp tục.";
-            }
-
-            request.setAttribute("room", room);
-
-            setCommonAttributes(
-                    request,
-                    today,
-                    checkIn == null ? "" : checkIn.toString(),
-                    checkOut == null ? "" : checkOut.toString(),
-                    selectedRooms,
-                    numGuests,
-                    availableRooms,
-                    nights,
-                    hasValidDate,
-                    dateError,
-                    guestRoomWarning,
-                    guestRoomError,
-                    maxGuestsByRooms
-            );
-
-            request.getRequestDispatcher(
-                    "/view/public/room-detail.jsp"
-            ).forward(request, response);
-
-        } catch (NumberFormatException e) {
-
-            response.sendRedirect(
-                    request.getContextPath() + "/home"
-            );
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-            request.setAttribute(
-                    "error",
-                    "Có lỗi xảy ra khi tải chi tiết phòng."
-            );
-
-            request.setAttribute(
-                    "today",
-                    LocalDate.now().toString()
-            );
-
-            request.getRequestDispatcher(
-                    "/view/public/room-detail.jsp"
-            ).forward(request, response);
         }
-    }
 
-    private void setCommonAttributes(
-            HttpServletRequest request,
-            LocalDate today,
-            String checkIn,
-            String checkOut,
-            int numRooms,
-            int numGuests,
-            int availableRooms,
-            long nights,
-            boolean hasValidDate,
-            String dateError,
-            String guestRoomWarning,
-            String guestRoomError,
-            int maxGuestsByRooms) {
+        int maxGuestsByRooms = Math.max(room.getCapacity() * numRooms, 1);
 
-        request.setAttribute("checkIn", checkIn);
-        request.setAttribute("checkOut", checkOut);
+        if (numGuests > maxGuestsByRooms) {
+            numGuests = maxGuestsByRooms;
+            guestRoomError = "Số khách đã được điều chỉnh vì vượt quá sức chứa tối đa của số phòng đã chọn.";
+        }
+
+        if (numGuests < numRooms) {
+            guestRoomWarning = "Số khách đang nhỏ hơn số phòng đặt. Nếu bạn đặt hộ người khác thì vẫn có thể tiếp tục.";
+        }
+
+        request.setAttribute("room", room);
+        request.setAttribute("checkIn", checkIn == null ? "" : checkIn.toString());
+        request.setAttribute("checkOut", checkOut == null ? "" : checkOut.toString());
         request.setAttribute("numRooms", numRooms);
         request.setAttribute("numGuests", numGuests);
         request.setAttribute("availableRooms", availableRooms);
         request.setAttribute("nights", nights);
         request.setAttribute("hasValidDate", hasValidDate);
         request.setAttribute("dateError", dateError);
-        request.setAttribute(
-                "guestRoomWarning",
-                guestRoomWarning
-        );
-        request.setAttribute(
-                "guestRoomError",
-                guestRoomError
-        );
-        request.setAttribute(
-                "today",
-                today.toString()
-        );
-        request.setAttribute(
-                "maxGuestsByRooms",
-                maxGuestsByRooms
-        );
-    }
+        request.setAttribute("guestRoomWarning", guestRoomWarning);
+        request.setAttribute("guestRoomError", guestRoomError);
+        request.setAttribute("today", today.toString());
+        request.setAttribute("maxGuestsByRooms", maxGuestsByRooms);
 
-    private LocalDate parseDateOrNull(String value) {
-
-        try {
-
-            if (value == null || value.trim().isEmpty()) {
-                return null;
-            }
-
-            return LocalDate.parse(value.trim());
-
-        } catch (Exception e) {
-
-            return null;
-        }
-    }
-
-    private int parseIntOrDefault(
-            String value,
-            int defaultValue) {
-
-        try {
-
-            if (value == null || value.trim().isEmpty()) {
-                return defaultValue;
-            }
-
-            return Integer.parseInt(value.trim());
-
-        } catch (Exception e) {
-
-            return defaultValue;
-        }
-    }
-
-    private String firstNonBlank(String... values) {
-
-        if (values == null) {
-            return null;
-        }
-
-        for (String value : values) {
-
-            if (value != null
-                    && !value.trim().isEmpty()) {
-
-                return value.trim();
-            }
-        }
-
-        return null;
+        forward(request, response);
     }
 
     @Override
-    public String getServletInfo() {
-        return "Public room type detail servlet";
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        doGet(request, response);
+    }
+
+    private void setDefaultAttributes(HttpServletRequest request, LocalDate today) {
+        request.setAttribute("checkIn", "");
+        request.setAttribute("checkOut", "");
+        request.setAttribute("numRooms", 1);
+        request.setAttribute("numGuests", 1);
+        request.setAttribute("availableRooms", -1);
+        request.setAttribute("nights", 0L);
+        request.setAttribute("hasValidDate", false);
+        request.setAttribute("dateError", "");
+        request.setAttribute("guestRoomWarning", "");
+        request.setAttribute("guestRoomError", "");
+        request.setAttribute("today", today.toString());
+        request.setAttribute("maxGuestsByRooms", 1);
+    }
+
+    private void forward(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        request.getRequestDispatcher(ROOM_DETAIL_PAGE).forward(request, response);
+    }
+
+    private String getParam(HttpServletRequest request, String name) {
+        String value = request.getParameter(name);
+        return value == null || value.trim().isEmpty() ? null : value.trim();
+    }
+
+    private LocalDate parseDate(String value) {
+        try {
+            return value == null ? null : LocalDate.parse(value);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private Integer parseInt(String value) {
+        try {
+            return value == null ? null : Integer.parseInt(value);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private int parseIntOrDefault(String value, int defaultValue) {
+        Integer number = parseInt(value);
+        return number == null ? defaultValue : number;
     }
 }

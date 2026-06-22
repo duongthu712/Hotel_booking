@@ -7,15 +7,21 @@
     if (session != null && session.getAttribute("staff") != null) {
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
 
-        if (staff != null && staff.getRole() != null) {
-            String role = staff.getRole().trim();
+        if (staff != null) {
+            String role = "";
 
-            if (role.equalsIgnoreCase("Lễ tân")) {
+            if (staff.getRoleEn() != null) {
+                role = staff.getRoleEn().trim();
+            } else if (staff.getRole() != null) {
+                role = staff.getRole().trim();
+            }
+
+            if (role.equalsIgnoreCase("RECEPTIONIST") || role.equalsIgnoreCase("Lễ tân")) {
                 dashboardUrl = request.getContextPath() + "/view/receptionist/dashboard.jsp";
-            } else if (role.equalsIgnoreCase("Quản lý")) {
+            } else if (role.equalsIgnoreCase("MANAGER") || role.equalsIgnoreCase("Quản lý")) {
                 dashboardUrl = request.getContextPath() + "/view/manager/dashboard.jsp";
-            } else if (role.equalsIgnoreCase("Quản trị viên")) {
-                dashboardUrl = request.getContextPath() + "/view/admin/staff-management.jsp";
+            } else if (role.equalsIgnoreCase("ADMIN") || role.equalsIgnoreCase("Quản trị viên")) {
+                dashboardUrl = request.getContextPath() + "/StaffAccountList";
             }
         }
     }
@@ -31,6 +37,7 @@
         <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/footer.css">
         <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/auth.css">
     </head>
+
     <body>
 
         <jsp:include page="/view/common/navbar.jsp" />
