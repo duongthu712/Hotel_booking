@@ -98,7 +98,7 @@
                                                 <td class="text-right">
                                                     <fmt:formatNumber value="${inv.totalAmount}" type="number" pattern="#,###"/>
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <span class="invoice-status ${inv.paymentStatus == 'Đã thanh toán' ? 'status-paid' : 'status-unpaid'}">
                                                         ${inv.paymentStatus}
                                                     </span>
@@ -161,8 +161,14 @@
                                 <span>${selectedInvoice.bookingCode}</span>
                             </div>
                             <div class="detail-row">
+                                <span>Trạng thái booking</span>
+                                <span class="booking-status ${selectedInvoice.bookingStatus == 'Đã trả phòng' ? 'status-checked-out' : (selectedInvoice.bookingStatus == 'Đã hủy' ? 'status-cancelled' : (selectedInvoice.bookingStatus == 'Đã nhận phòng' ? 'status-active' : 'status-confirmed'))}">
+                                    ${selectedInvoice.bookingStatus}
+                                </span>
+                            </div>
+                            <div class="detail-row">
                                 <span>Trạng thái</span>
-                                <span class="invoice-status ${selectedInvoice.invoice.paymentStatus == 'Đã thanh toán' ? 'status-paid' : 'status-unpaid'}">
+                                <span ${selectedInvoice.invoice.paymentStatus == 'Đã thanh toán' ? 'status-paid' : 'status-unpaid'}">
                                     ${selectedInvoice.invoice.paymentStatus}
                                 </span>
                             </div>

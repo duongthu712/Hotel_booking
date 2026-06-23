@@ -36,8 +36,8 @@ public class InvoiceCreateController extends HttpServlet {
     private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy'T'HH:mm:ss");
     private static final DateTimeFormatter DISPLAY_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
     private static final DateTimeFormatter TIME_24H = DateTimeFormatter.ofPattern("HH:mm:ss");
-    private static final DateTimeFormatter  dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    
+    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -67,10 +67,7 @@ public class InvoiceCreateController extends HttpServlet {
                 return;
             }
 
-            Invoice existingInvoice = dao.getUnpaidInvoiceByBookingId(bookingId);
-            boolean isReopening = existingInvoice != null;
-
-            if (!"Đã nhận phòng".equals(booking.getStatus()) && !isReopening) {
+            if (!"Đã nhận phòng".equals(booking.getStatus())) {
                 session.setAttribute("errorMessage", "Không thể tạo/xem hóa đơn cho booking này.");
                 response.sendRedirect(request.getContextPath() + "/Checkout");
                 return;
@@ -101,10 +98,6 @@ public class InvoiceCreateController extends HttpServlet {
 
             List<BookingService> existingServices = null;
             List<RoomAmenityDamage> existingDamages = null;
-            if (isReopening) {
-                existingServices = dao.getBookingServicesByBookingId(bookingId);
-                existingDamages = dao.getRoomAmenityDamagesByBookingId(bookingId);
-            }
 
             String formattedCheckinTime = "14:00:00";
             if (booking.getActualCheckinTime() != null) {
@@ -127,8 +120,6 @@ public class InvoiceCreateController extends HttpServlet {
             request.setAttribute("roomTypeServices", roomTypeServices);
             request.setAttribute("roomTypeAmenities", roomTypeAmenities);
             request.setAttribute("depositAmount", booking.getDepositAmount());
-            request.setAttribute("isReopening", isReopening);
-            request.setAttribute("existingInvoice", existingInvoice);
             request.setAttribute("existingServices", existingServices);
             request.setAttribute("existingDamages", existingDamages);
 
