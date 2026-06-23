@@ -11,71 +11,142 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    const paymentDetailModal = document.getElementById("payment-detail-modal");
-    const btnCloseDetail     = document.getElementById("btn-close-detail");
-    const proofImg           = document.getElementById("proof-img");
-    const proofWrapper       = document.getElementById("payment-proof-wrapper");
-    const proofUrlLink       = document.getElementById("proof-url-link");
-    const detailBookingCode  = document.getElementById("detail-booking-code");
-    const detailGuestName    = document.getElementById("detail-guest-name");
-    const detailAmount       = document.getElementById("detail-amount");
-    const detailSubmittedAt  = document.getElementById("detail-submitted-at");
-    const detailStatus       = document.getElementById("detail-status");
-    const detailVerifiedBy   = document.getElementById("detail-verified-by");
-    const verifyNotes        = document.getElementById("verify-notes");
-    const verifyDepositId    = document.getElementById("verify-deposit-id");
-    const rejectDepositId    = document.getElementById("reject-deposit-id");
-    const verifyNotesHidden  = document.getElementById("verify-notes-hidden");
-    const rejectNotes        = document.getElementById("reject-notes");
-    const verificationForm   = document.getElementById("verification-form");
+    const paymentDetailModal =  document.getElementById("payment-detail-modal");
+    const btnCloseDetail = document.getElementById("btn-close-detail");
+    const proofImg = document.getElementById("proof-img");
+    const proofWrapper = document.getElementById("payment-proof-wrapper");
+    const proofUrlContainer = document.getElementById("proof-url-container");
+    const detailBookingCode = document.getElementById("detail-booking-code");
+    const detailGuestName = document.getElementById("detail-guest-name");
+    const detailAmount = document.getElementById("detail-amount");
+    const detailSubmittedAt = document.getElementById("detail-submitted-at");
+    const detailStatus = document.getElementById("detail-status");
+    const verifyNotes = document.getElementById("verify-notes");
+    const verifyDepositId = document.getElementById("verify-deposit-id");
+    const rejectDepositId = document.getElementById("reject-deposit-id");
+    const verifyNotesHidden = document.getElementById("verify-notes-hidden");
+    const rejectNotes = document.getElementById("reject-notes");
+    const verificationForm = document.getElementById("verification-form");
 
     window.openPaymentDetailModal = function (depositId) {
-        const row = document.querySelector(`tr[data-deposit-id="${depositId}"]`);
-        if (!row) return;
+        const paymentRow = document.querySelector(`tr[data-deposit-id="${depositId}"]`);
 
-        const bookingCode = row.dataset.bookingCode || '-';
-        const guestName   = row.dataset.guestName   || '-';
-        const amount      = row.dataset.amount       || '0';
-        const submittedAt = row.dataset.submittedAt  || '-';
-        const status      = row.dataset.status       || '-';
-        const verifiedBy  = row.dataset.verifiedBy   || '-';
-        const proofUrl    = row.dataset.proofUrl     || '';
-        const notes       = row.dataset.notes        || '';
+        if (!paymentRow) {
+            return;
+        }
 
-        const displayStatus = status === 'Đã phê duyệt' ? 'Đã duyệt' : status;
+        const bookingCode = paymentRow.querySelector(".col-booking")?.innerText || "";
+        const guestName = paymentRow.querySelector(".col-guest")?.innerText || "";
+        const amount = paymentRow.querySelector(".col-amount")?.innerText || "";
+        const submittedAt = paymentRow.querySelector(".col-date")?.innerText || "";
+        const status = paymentRow.querySelector(".payment-status")?.innerText || "";
+        const proofUrl = paymentRow.getAttribute("data-proof-url") || "";
+        const paymentNotes = paymentRow.getAttribute("data-notes") || "";
+        const paymentStatus = paymentRow.querySelector(".payment-status");
+        const statusClass = paymentStatus?.classList.contains("status-pending")
+                ? "pending"  : (paymentStatus?.classList.contains("status-approved")
+                        ? "approved"
+                        : "rejected"
+                        );
 
-        if (detailBookingCode) detailBookingCode.innerText = bookingCode;
-        if (detailGuestName)   detailGuestName.innerText   = guestName;
-        if (detailAmount)      detailAmount.innerText       = new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
-        if (detailSubmittedAt) detailSubmittedAt.innerText  = submittedAt;
-        if (detailVerifiedBy)  detailVerifiedBy.innerText   = verifiedBy;
+        if (detailBookingCode) {
+            detailBookingCode.innerText = bookingCode;
+        }
+
+        if (detailGuestName) {
+            detailGuestName.innerText = guestName;
+        }
+
+        if (detailAmount) {
+            detailAmount.innerText = amount;
+        }
+
+        if (detailSubmittedAt) {
+            detailSubmittedAt.innerText = submittedAt;
+        }
 
         if (detailStatus) {
-            detailStatus.innerText  = displayStatus;
-            detailStatus.className  = 'info-value ' + (
-                status === 'Chờ xử lý'    ? 'status-pending'  :
-                status === 'Đã phê duyệt' ? 'status-approved' : 'status-rejected'
-            );
+            detailStatus.innerText = status;
+
+            detailStatus.className = statusClass === "pending" ? "status-pending" : (statusClass === "approved"
+                            ? "status-approved"
+                            : "status-rejected"
+                            );
         }
 
         if (proofUrl) {
-            if (proofImg)     proofImg.src          = proofUrl;
-            if (proofUrlLink) proofUrlLink.innerText = proofUrl;
-            if (proofWrapper) proofWrapper.style.display = "block";
+            if (proofImg) {
+                proofImg.src = proofUrl;
+            }
+
+            if (proofWrapper) {
+                proofWrapper.style.display = "block";
+            }
         } else {
-            if (proofWrapper) proofWrapper.style.display = "none";
+            if (proofWrapper) {
+                proofWrapper.style.display = "none";
+            }
         }
 
-        if (verifyNotes) verifyNotes.value = notes;
-        if (verifyDepositId) verifyDepositId.value = depositId;
-        if (rejectDepositId) rejectDepositId.value = depositId;
+        if (proofUrlContainer) {
+            proofUrlContainer.innerHTML = `
+                <div class="proof-info-block">
+                    <strong>Link ảnh minh chứng:</strong>
+                    <p style="word-break: break-all; margin-top: 8px;">
+                        ${proofUrl || "Không có ảnh minh chứng."}
+                    </p>
+                </div>
 
-        const isPending = status === 'Chờ xử lý';
+                <div class="proof-info-block" style="margin-top: 16px;">
+                    <strong>Mã giao dịch / Mã tham chiếu:</strong>
+                    <p style="word-break: break-word; margin-top: 8px;">
+                        ${
+                    paymentNotes && paymentNotes.trim() !== ""
+                    ? paymentNotes
+                    : "Chưa có mã giao dịch / mã tham chiếu."
+                    }
+                    </p>
+                </div>
+            `;
+        }
+
+        if (verifyDepositId) {
+            verifyDepositId.value = depositId;
+        }
+
+        if (rejectDepositId) {
+            rejectDepositId.value = depositId;
+        }
+
         const btnReject = document.querySelector(".btn-reject");
-        const btnSubmit = document.querySelector(".btn-submit");
-        if (verificationForm) verificationForm.style.display = isPending ? "block" : "none";
-        if (btnReject)        btnReject.style.display        = isPending ? "inline-block" : "none";
-        if (btnSubmit)        btnSubmit.style.display        = isPending ? "inline-block" : "none";
+
+        const btnSubmit = document.querySelector(".popup-action .btn-submit");
+
+        if (statusClass !== "pending") {
+            if (verificationForm) {
+                verificationForm.style.display = "none";
+            }
+
+            if (btnReject) {
+                btnReject.style.display = "none";
+            }
+
+            if (btnSubmit) {
+                btnSubmit.style.display = "none";
+            }
+        } else {
+            if (verificationForm) {
+                verificationForm.style.display = "block";
+            }
+
+            if (btnReject) {
+                btnReject.style.display = "inline-block";
+            }
+
+            if (btnSubmit) {
+                btnSubmit.style.display = "inline-block";
+            }
+        }
 
         toggleModal(paymentDetailModal, true);
     };
@@ -83,21 +154,33 @@ document.addEventListener("DOMContentLoaded", function () {
     if (btnCloseDetail) {
         btnCloseDetail.addEventListener("click", () => {
             toggleModal(paymentDetailModal, false);
-            if (verifyNotes) verifyNotes.value = "";
+
+            if (verifyNotes) {
+                verifyNotes.value = "";
+            }
         });
     }
 
     window.prepareReject = function () {
         const notes = verifyNotes ? verifyNotes.value : "";
-        if (rejectNotes) rejectNotes.value = notes;
+
+        if (rejectNotes) {
+            rejectNotes.value = notes;
+        }
+
         return confirm("Bạn có chắc muốn từ chối khoản thanh toán này?");
     };
 
-    const verifyForm = document.querySelector("form[action='DepositPaymentVerify']");
+    const verifyForm =
+            document.querySelector("form[action='DepositPaymentVerify']");
+
     if (verifyForm) {
         verifyForm.addEventListener("submit", function () {
             const notes = verifyNotes ? verifyNotes.value : "";
-            if (verifyNotesHidden) verifyNotesHidden.value = notes;
+
+            if (verifyNotesHidden) {
+                verifyNotesHidden.value = notes;
+            }
         });
     }
 

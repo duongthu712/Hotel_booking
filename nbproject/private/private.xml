@@ -3,6 +3,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/receptionist/billing.jsp</file>
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/receptionist/invoice.jsp</file>
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/assets/javascript/upload-img.js</file>
@@ -14,6 +15,7 @@
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/dao/CheckoutDAO.java</file>
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/BillingListController.java</file>
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/receptionist/check-out.jsp</file>
+
         </group>
     </open-files>
 </project-private>

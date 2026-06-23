@@ -125,7 +125,15 @@
                                 <img src="" alt="Payment Proof" id="proof-img">
                             </div>
                             <div id="proof-url-container" style="margin-top: 10px; word-break: break-all;">
-                                Thông tin: <p id="proof-url-link" href="#" target="_blank"></p>
+                                <div>
+                                    <strong>Link ảnh minh chứng:</strong>
+                                    <p id="proof-url-link"></p>
+                                </div>
+
+                                <div style="margin-top: 10px;">
+                                    <strong>Mã giao dịch / Mã tham chiếu:</strong>
+                                    <p id="proof-notes"></p>
+                                </div>
                             </div>
                         </div>
                         <div class="payment-info-column">

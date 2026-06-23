@@ -691,10 +691,18 @@ public class CheckoutDAO extends DBContext {
 
     private void updateBookingStatus(int bookingId) throws Exception {
         String sql = """
-                     update Bookings 
-                     set status = N'Đã trả phòng', payment_status = N'Đã thanh toán'
-                     where booking_id = ?
-                     """;
+                 update Bookings
+                 set status = N'Đã trả phòng',
+                     payment_status = N'Đã thanh toán',
+                     actual_checkout_time =
+                         case
+                             when actual_checkout_time is null
+                             then GETDATE()
+                             else actual_checkout_time
+                         end
+                 where booking_id = ?
+                 """;
+
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, bookingId);
             stm.executeUpdate();

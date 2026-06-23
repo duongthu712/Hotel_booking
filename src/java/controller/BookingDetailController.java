@@ -16,9 +16,15 @@ import model.RoomType;
 
 public class BookingDetailController extends HttpServlet {
 
-    // Hiển thị trang tra cứu
+    private static final DateTimeFormatter DATE_FORMATTER
+            = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER
+            = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(HttpServletRequest request,
+            HttpServletResponse response)
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
@@ -28,9 +34,9 @@ public class BookingDetailController extends HttpServlet {
                 .forward(request, response);
     }
 
-    // Tra cứu booking bằng mã booking và email
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(HttpServletRequest request,
+            HttpServletResponse response)
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
@@ -39,155 +45,157 @@ public class BookingDetailController extends HttpServlet {
         String bookingCode = getParameter(request, "bookingCode");
         String email = getParameter(request, "email");
 
+        request.setAttribute("searched", true);
         request.setAttribute("bookingCode", bookingCode);
         request.setAttribute("email", email);
 
-        String error = validateInput(bookingCode, email);
+        String error = validateLookupInformation(bookingCode, email);
 
         if (error != null) {
             request.setAttribute("error", error);
+
             request.getRequestDispatcher("/view/user/booking-detail.jsp")
                     .forward(request, response);
             return;
         }
 
-        try {
-            BookingDAO bookingDAO = new BookingDAO();
+        BookingDAO bookingDAO = new BookingDAO();
 
-            // Hủy các booking online đã hết 15 phút nhưng chưa gửi minh chứng
-            bookingDAO.cancelExpiredBookings();
+        bookingDAO.cancelExpiredBookings();
 
-            Booking booking = bookingDAO.getBookingByCodeAndEmail(
-                    bookingCode,
-                    email
-            );
+        Booking booking = bookingDAO.getBookingByCodeAndEmail(
+                bookingCode, email);
 
-            if (booking == null) {
-                request.setAttribute(
-                        "error",
-                        "Email hoặc mã đặt phòng không chính xác."
-                );
+        if (booking == null) {
+            request.setAttribute(
+                    "error",
+                    "Không tìm thấy đơn đặt phòng phù hợp với mã đặt phòng và email.");
 
-                request.getRequestDispatcher("/view/user/booking-detail.jsp")
-                        .forward(request, response);
-                return;
-            }
+            request.getRequestDispatcher("/view/user/booking-detail.jsp")
+                    .forward(request, response);
+            return;
+        }
 
-            Guest guest = bookingDAO.getGuestByBookingId(
-                    booking.getBookingId()
-            );
+        Guest guest = bookingDAO.getGuestByBookingId(
+                booking.getBookingId());
 
-            if (guest == null) {
-                request.setAttribute(
-                        "error",
-                        "Không thể tải thông tin khách hàng."
-                );
+        RoomTypeDAO roomTypeDAO = new RoomTypeDAO();
 
-                request.getRequestDispatcher("/view/user/booking-detail.jsp")
-                        .forward(request, response);
-                return;
-            }
+        RoomType roomType = roomTypeDAO.getRoomDetailById(
+                booking.getRoomTypeId());
 
-            RoomTypeDAO roomTypeDAO = new RoomTypeDAO();
+        String verificationStatus
+                = bookingDAO.getDepositVerificationStatus(
+                        booking.getBookingId());
 
-            RoomType roomType = roomTypeDAO.getRoomDetailById(
-                    booking.getRoomTypeId()
-            );
+        if (verificationStatus == null
+                || verificationStatus.trim().isEmpty()) {
 
-            if (roomType == null) {
-                request.setAttribute(
-                        "error",
-                        "Không thể tải thông tin loại phòng."
-                );
+            verificationStatus = "Chưa gửi minh chứng";
+        }
 
-                request.getRequestDispatcher("/view/user/booking-detail.jsp")
-                        .forward(request, response);
-                return;
-            }
+        setBookingDetailData(
+                request,
+                booking,
+                guest,
+                roomType,
+                verificationStatus
+        );
 
-            String verificationStatus
-                    = bookingDAO.getDepositVerificationStatus(
-                            booking.getBookingId()
-                    );
+        request.getRequestDispatcher("/view/user/booking-detail.jsp")
+                .forward(request, response);
+    }
 
-            if (verificationStatus == null
-                    || verificationStatus.trim().isEmpty()) {
+    private void setBookingDetailData(HttpServletRequest request,
+            Booking booking,
+            Guest guest,
+            RoomType roomType,
+            String verificationStatus) {
 
-                verificationStatus = "Chưa gửi minh chứng";
-            }
+        long numberOfNights = 0;
+        BigDecimal totalAmount = BigDecimal.ZERO;
 
-            long numberOfNights = ChronoUnit.DAYS.between(
+        String checkInText = "";
+        String checkOutText = "";
+        String timelineCheckInText = "";
+        String timelineCheckOutText = "";
+        String createdAtText = "";
+        String dateOfBirthText = "";
+
+        if (booking.getCheckinDate() != null) {
+            checkInText = booking.getCheckinDate()
+                    .format(DATE_FORMATTER);
+
+            timelineCheckInText = checkInText;
+        }
+
+        if (booking.getCheckoutDate() != null) {
+            checkOutText = booking.getCheckoutDate()
+                    .format(DATE_FORMATTER);
+
+            timelineCheckOutText = checkOutText;
+        }
+
+        if (booking.getCheckinDate() != null
+                && booking.getCheckoutDate() != null) {
+
+            numberOfNights = ChronoUnit.DAYS.between(
                     booking.getCheckinDate(),
                     booking.getCheckoutDate()
             );
 
-            BigDecimal totalAmount = booking.getBookedPricePerNight()
+            if (numberOfNights < 0) {
+                numberOfNights = 0;
+            }
+        }
+
+        if (booking.getBookedPricePerNight() != null) {
+            totalAmount = booking.getBookedPricePerNight()
                     .multiply(BigDecimal.valueOf(booking.getNumRooms()))
                     .multiply(BigDecimal.valueOf(numberOfNights));
-
-            DateTimeFormatter dateFormatter
-                    = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-            DateTimeFormatter dateTimeFormatter
-                    = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-
-            String checkInText = booking.getCheckinDate()
-                    .format(dateFormatter);
-
-            String checkOutText = booking.getCheckoutDate()
-                    .format(dateFormatter);
-
-            String createdAtText = "Chưa có thông tin";
-
-            if (booking.getCreateAt() != null) {
-                createdAtText = booking.getCreateAt()
-                        .format(dateTimeFormatter);
-            }
-
-            String dateOfBirthText = "Chưa cung cấp";
-
-            if (guest.getDateOfBirth() != null) {
-                dateOfBirthText = guest.getDateOfBirth()
-                        .format(dateFormatter);
-            }
-
-            request.setAttribute("searched", true);
-            request.setAttribute("booking", booking);
-            request.setAttribute("guest", guest);
-            request.setAttribute("roomType", roomType);
-            request.setAttribute("numberOfNights", numberOfNights);
-            request.setAttribute("totalAmount", totalAmount);
-            request.setAttribute("checkInText", checkInText);
-            request.setAttribute("checkOutText", checkOutText);
-            request.setAttribute("createdAtText", createdAtText);
-            request.setAttribute("dateOfBirthText", dateOfBirthText);
-            request.setAttribute(
-                    "verificationStatus",
-                    verificationStatus
-            );
-
-            request.getRequestDispatcher("/view/user/booking-detail.jsp")
-                    .forward(request, response);
-
-        } catch (Exception e) {
-            System.out.println(
-                    "BookingDetailController: " + e.getMessage()
-            );
-
-            e.printStackTrace();
-
-            request.setAttribute(
-                    "error",
-                    "Không thể tra cứu đơn đặt phòng lúc này."
-            );
-
-            request.getRequestDispatcher("/view/user/booking-detail.jsp")
-                    .forward(request, response);
         }
+
+        if (booking.getCreateAt() != null) {
+            createdAtText = booking.getCreateAt()
+                    .format(DATE_TIME_FORMATTER);
+        }
+
+        if (booking.getActualCheckinTime() != null) {
+            timelineCheckInText = booking.getActualCheckinTime()
+                    .format(DATE_TIME_FORMATTER);
+        }
+
+        if (booking.getActualCheckoutTime() != null) {
+            timelineCheckOutText = booking.getActualCheckoutTime()
+                    .format(DATE_TIME_FORMATTER);
+        }
+
+        if (guest != null && guest.getDateOfBirth() != null) {
+            dateOfBirthText = guest.getDateOfBirth()
+                    .format(DATE_FORMATTER);
+        }
+
+        request.setAttribute("booking", booking);
+        request.setAttribute("guest", guest);
+        request.setAttribute("roomType", roomType);
+        request.setAttribute("verificationStatus", verificationStatus);
+
+        request.setAttribute("numberOfNights", numberOfNights);
+        request.setAttribute("totalAmount", totalAmount);
+
+        request.setAttribute("checkInText", checkInText);
+        request.setAttribute("checkOutText", checkOutText);
+
+        request.setAttribute("timelineCheckInText", timelineCheckInText);
+        request.setAttribute("timelineCheckOutText", timelineCheckOutText);
+
+        request.setAttribute("createdAtText", createdAtText);
+        request.setAttribute("dateOfBirthText", dateOfBirthText);
     }
 
-    // Kiểm tra dữ liệu tra cứu
-    private String validateInput(String bookingCode, String email) {
+    private String validateLookupInformation(
+            String bookingCode, String email) {
+
         if (bookingCode.isEmpty()) {
             return "Vui lòng nhập mã đặt phòng.";
         }
@@ -205,9 +213,11 @@ public class BookingDetailController extends HttpServlet {
         }
 
         if (email.contains(" ")
+                || email.startsWith(".")
+                || email.contains("..")
+                || email.contains(".@")
                 || !email.matches(
-                        "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
-                )) {
+                        "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
 
             return "Email không đúng định dạng.";
         }
@@ -215,17 +225,8 @@ public class BookingDetailController extends HttpServlet {
         return null;
     }
 
-    // Lấy parameter và loại bỏ khoảng trắng đầu cuối
-    private String getParameter(
-            HttpServletRequest request,
-            String parameterName) {
-
-        String value = request.getParameter(parameterName);
-
-        if (value == null) {
-            return "";
-        }
-
-        return value.trim();
+    private String getParameter(HttpServletRequest request, String name) {
+        String value = request.getParameter(name);
+        return value == null ? "" : value.trim();
     }
 }
