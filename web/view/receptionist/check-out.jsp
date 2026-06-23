@@ -70,8 +70,8 @@
                                             <td class="col-booking">${booking.getBookingCode()}</td>
                                             <td class="col-guest">${guestMap[booking.getBookingId()].getFullName()}</td>
                                             <td class="col-room">${booking.getNumRooms()} phòng</td>
-                                            <td class="col-checkin">${booking.getCheckinDate()}</td>
-                                            <td class="col-checkout">${booking.getCheckoutDate()}</td>
+                                            <td class="col-checkin">${checkinDateMap[booking.bookingId]}</td>
+                                            <td class="col-checkout">${checkoutDateMap[booking.bookingId]}</td>
                                             <td class="col-action">
                                                 <a href="Checkout?bookingId=${booking.getBookingId()}" class="btn-checkout">Check-out</a>
                                             </td>
@@ -133,12 +133,11 @@
                                     <div class="info-col">
                                         <div class="info-row">
                                             <span class="info-label">Check-in:</span>
-                                            <span class="info-value"> ${selectedBooking.getCheckinDate()} ${formattedCheckinTime}</span>
+                                            <span class="info-value">${checkinDateDisplay} ${formattedCheckinTime}</span>
                                         </div>
-
                                         <div class="info-row">
                                             <span class="info-label">Check-out dự kiến:</span>
-                                            <span class="info-value">${selectedBooking.getCheckoutDate()} ${hotelInfo.getCheckoutTime()}</span>
+                                            <span class="info-value">${checkoutDateDisplay} ${hotelInfo.getCheckoutTime()}</span>
                                         </div>
 
                                         <div class="info-row">
@@ -247,7 +246,7 @@
             </c:if>
 
         </main>
-                    <script src="<%=request.getContextPath()%>/view/assets/javascript/alert.js"></script>
+        <script src="<%=request.getContextPath()%>/view/assets/javascript/alert.js"></script>
         <script src="${pageContext.request.contextPath}/view/assets/javascript/checkout.js"></script>
     </body>
 </html>

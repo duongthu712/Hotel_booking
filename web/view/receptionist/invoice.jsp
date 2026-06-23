@@ -72,11 +72,11 @@
                                         <div class="info-col">
                                             <div class="info-row">
                                                 <span class="info-label">Check-in</span>
-                                                <span class="info-value">${booking.checkinDate} ${formattedCheckinTime}</span>
+                                                <span class="info-value">${checkinDateDisplay} ${formattedCheckinTime}</span>
                                             </div>
                                             <div class="info-row">
                                                 <span class="info-label">Check-out dự kiến</span>
-                                                <span class="info-value">${booking.checkoutDate} ${hotelInfo.checkoutTime}</span>
+                                                <span class="info-value">${checkoutDateDisplay} ${hotelInfo.checkoutTime}</span>
                                             </div>
                                             <div class="info-row">
                                                 <span class="info-label">Check-out thực tế</span>

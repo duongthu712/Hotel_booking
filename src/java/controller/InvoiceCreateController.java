@@ -34,9 +34,10 @@ import model.StaffAccount;
 public class InvoiceCreateController extends HttpServlet {
 
     private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy'T'HH:mm:ss");
-    private static final DateTimeFormatter DISPLAY_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter DISPLAY_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
     private static final DateTimeFormatter TIME_24H = DateTimeFormatter.ofPattern("HH:mm:ss");
-
+    private static final DateTimeFormatter  dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -120,6 +121,8 @@ public class InvoiceCreateController extends HttpServlet {
             request.setAttribute("nights", nights);
             request.setAttribute("roomCharges", roomCharges);
             request.setAttribute("formattedCheckinTime", formattedCheckinTime);
+            request.setAttribute("checkinDateDisplay", booking.getCheckinDate().format(dateFormatter));
+            request.setAttribute("checkoutDateDisplay", booking.getCheckoutDate().format(dateFormatter));
             request.setAttribute("actualCheckoutTime", LocalDateTime.now().format(DISPLAY_FORMATTER));
             request.setAttribute("roomTypeServices", roomTypeServices);
             request.setAttribute("roomTypeAmenities", roomTypeAmenities);

@@ -13,7 +13,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import model.Booking;
 import model.StaffAccount;
 
@@ -25,9 +27,10 @@ import model.StaffAccount;
 public class CheckoutController extends HttpServlet {
 
     private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy'T'HH:mm:ss");
-    private static final DateTimeFormatter DISPLAY_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter DISPLAY_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
     private static final DateTimeFormatter TIME_24H = DateTimeFormatter.ofPattern("HH:mm:ss");
-
+    private static final DateTimeFormatter  dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -98,6 +101,10 @@ public class CheckoutController extends HttpServlet {
                     request.setAttribute("selectedBooking", booking);
                     request.setAttribute("nights", nights);
                     request.setAttribute("roomCharges", roomCharges);
+                    request.setAttribute("checkinDisplay", dao);
+
+                    request.setAttribute("checkinDateDisplay", booking.getCheckinDate().format(dateFormatter));
+                    request.setAttribute("checkoutDateDisplay", booking.getCheckoutDate().format(dateFormatter));
                 }
             } else if (keyword != null && !keyword.trim().isEmpty()) {
                 allBookings = dao.searchActiveBookings(keyword.trim());
@@ -110,6 +117,22 @@ public class CheckoutController extends HttpServlet {
             page = Math.max(1, Math.min(page, totalPages > 0 ? totalPages : 1));
 
             List<Booking> pagedList = (totalRecords > 0) ? allBookings.subList((page - 1) * recordsPerPage, Math.min(page * recordsPerPage, totalRecords)) : new ArrayList<>();
+
+            Map<Integer, String> checkinDateMap = new HashMap<>();
+            Map<Integer, String> checkoutDateMap = new HashMap<>();
+           
+
+            for (Booking b : pagedList) {
+                if (b.getCheckinDate() != null) {
+                    checkinDateMap.put(b.getBookingId(), b.getCheckinDate().format(dateFormatter));
+                }
+                if (b.getCheckoutDate() != null) {
+                    checkoutDateMap.put(b.getBookingId(), b.getCheckoutDate().format(dateFormatter));
+                }
+            }
+
+            request.setAttribute("checkinDateMap", checkinDateMap);
+            request.setAttribute("checkoutDateMap", checkoutDateMap);
 
             request.setAttribute("guestMap", dao.getGuestsByBookings(pagedList));
             request.setAttribute("bookingList", pagedList);
