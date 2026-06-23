@@ -1,42 +1,7 @@
-
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ page import="model.Booking" %>
-<%@ page import="java.math.BigDecimal" %>
-<%@ page import="java.time.format.DateTimeFormatter" %>
-
-<%
-    Booking bookingData = (Booking) request.getAttribute("booking");
-    long numberOfNights = 0;
-    BigDecimal totalAmount = BigDecimal.ZERO;
-    String checkInText = "";
-    String checkOutText = "";
-
-    if (bookingData != null) {
-        numberOfNights = bookingData.getCheckoutDate().toEpochDay()
-                - bookingData.getCheckinDate().toEpochDay();
-
-        totalAmount = bookingData.getBookedPricePerNight()
-                .multiply(BigDecimal.valueOf(bookingData.getNumRooms()))
-                .multiply(BigDecimal.valueOf(numberOfNights));
-
-        DateTimeFormatter formatter
-                = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-        checkInText
-                = bookingData.getCheckinDate().format(formatter);
-
-        checkOutText
-                = bookingData.getCheckoutDate().format(formatter);
-    }
-
-    request.setAttribute("numberOfNights", numberOfNights);
-    request.setAttribute("totalAmount", totalAmount);
-    request.setAttribute("checkInText", checkInText);
-    request.setAttribute("checkOutText", checkOutText);
-%>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -50,10 +15,8 @@
 
         <link rel="stylesheet"
               href="${pageContext.request.contextPath}/view/assets/css/navbar.css?v=<%= System.currentTimeMillis() %>">
-
         <link rel="stylesheet"
               href="${pageContext.request.contextPath}/view/assets/css/footer.css?v=<%= System.currentTimeMillis() %>">
-
         <link rel="stylesheet"
               href="${pageContext.request.contextPath}/view/assets/css/booking.css?v=<%= System.currentTimeMillis() %>">
     </head>
@@ -62,11 +25,9 @@
         <jsp:include page="/view/common/navbar.jsp"/>
 
         <main class="booking-page">
-
             <div class="booking-progress">
                 <div class="progress-item completed">
                     <div class="progress-number">1</div>
-
                     <div class="progress-name">
                         THÔNG TIN ĐẶT PHÒNG
                     </div>
@@ -93,6 +54,13 @@
                 </div>
             </div>
 
+            <c:if test="${empty booking and not empty error}">
+                <div class="booking-error">
+                    <strong>Thông báo:</strong>
+                    <c:out value="${error}"/>
+                </div>
+            </c:if>
+
             <c:if test="${not empty booking}">
 
                 <c:choose>
@@ -116,22 +84,22 @@
                     <c:when test="${booking.status eq 'Đã hủy'
                                     or remainingSeconds <= 0}">
 
-                        <div class="hold-time-box expired">
-                            <div>
-                                <strong>
-                                    Đã hết thời gian giữ phòng
-                                </strong>
+                            <div class="hold-time-box expired">
+                                <div>
+                                    <strong>
+                                        Đã hết thời gian giữ phòng
+                                    </strong>
 
-                                <span>
-                                    Đơn không còn đủ điều kiện gửi
-                                    thông tin thanh toán
-                                </span>
-                            </div>
+                                    <span>
+                                        Đơn không còn đủ điều kiện gửi
+                                        thông tin thanh toán
+                                    </span>
+                                </div>
 
-                            <div id="countdown">
-                                HẾT THỜI GIAN
+                                <div id="countdown">
+                                    HẾT THỜI GIAN
+                                </div>
                             </div>
-                        </div>
                     </c:when>
 
                     <c:otherwise>
@@ -148,7 +116,8 @@
                             </div>
 
                             <div id="countdown"
-                                 data-seconds="${remainingSeconds}">
+                                 data-expires-at="${expiresAtMillis}"
+                                 data-server-now="${serverNowMillis}">
                                 00:00
                             </div>
                         </div>
@@ -167,8 +136,8 @@
                                 </h1>
 
                                 <p>
-                                    Sau khi chuyển khoản, vui lòng nhập
-                                    tên người chuyển và mã giao dịch hoặc
+                                    Sau khi chuyển khoản, vui lòng tải ảnh
+                                    minh chứng và nhập mã giao dịch hoặc
                                     mã tham chiếu để khách sạn kiểm tra.
                                 </p>
                             </div>
@@ -262,23 +231,23 @@
                                       or (not hasPayment
                                       and remainingSeconds <= 0)}">
 
-                            <div class="payment-expired-box"
-                                 id="expiredMessage">
+                              <div class="payment-expired-box"
+                                   id="expiredMessage">
 
-                                <h3>
-                                    ĐÃ HẾT THỜI GIAN GIỮ PHÒNG
-                                </h3>
+                                  <h3>
+                                      ĐÃ HẾT THỜI GIAN GIỮ PHÒNG
+                                  </h3>
 
-                                <p>
-                                    Đơn đặt phòng đã bị hủy tự động vì
-                                    chưa gửi thông tin thanh toán trong
-                                    thời gian giữ phòng 15 phút.
-                                </p>
+                                  <p>
+                                      Đơn đặt phòng đã bị hủy tự động vì
+                                      chưa gửi thông tin thanh toán trong
+                                      thời gian giữ phòng 15 phút.
+                                  </p>
 
-                                <a href="${pageContext.request.contextPath}/quick-booking">
-                                    ĐẶT PHÒNG LẠI
-                                </a>
-                            </div>
+                                  <a href="${pageContext.request.contextPath}/quick-booking">
+                                      ĐẶT PHÒNG LẠI
+                                  </a>
+                              </div>
                         </c:if>
 
                         <c:if test="${hasPayment}">
@@ -303,87 +272,112 @@
                                       and booking.status ne 'Đã hủy'
                                       and remainingSeconds > 0}">
 
-                            <form action="${pageContext.request.contextPath}/booking-payment"
-                                  method="post"
-                                  id="paymentForm"
-                                  novalidate>
+                              <form action="${pageContext.request.contextPath}/booking-payment"
+                                    method="post"
+                                    id="paymentForm"
+                                    novalidate>
 
-                                <input type="hidden"
-                                       name="bookingCode"
-                                       value="<c:out value='${booking.bookingCode}'/>">
+                                  <input type="hidden"
+                                         name="bookingCode"
+                                         value="${booking.bookingCode}">
 
-                                <div class="upload-title">
-                                    <span>▤</span>
-                                    NHẬP THÔNG TIN GIAO DỊCH
-                                </div>
+                                  <input type="hidden"
+                                         id="payment-proof-url"
+                                         name="paymentProofUrl"
+                                         value="${fn:escapeXml(param.paymentProofUrl)}">
 
-                                <div id="paymentMessageArea">
+                                  <div class="upload-title">
+                                      <span>▤</span>
+                                      NHẬP THÔNG TIN GIAO DỊCH
+                                  </div>
 
-                                    <c:if test="${not empty error}">
-                                        <div class="booking-error"
-                                             id="serverPaymentError">
+                                  <div id="paymentMessageArea">
 
-                                            <strong>Thông báo:</strong>
-                                            <c:out value="${error}"/>
-                                        </div>
-                                    </c:if>
+                                      <c:if test="${not empty error}">
+                                          <div class="booking-error"
+                                               id="serverPaymentError">
 
-                                    <div id="pageMessage"
-                                         class="payment-information-note payment-page-message">
-                                    </div>
-                                </div>
+                                              <strong>Thông báo:</strong>
+                                              <c:out value="${error}"/>
+                                          </div>
+                                      </c:if>
 
-                                <div class="transaction-proof-field">
+                                      <div id="pageMessage"
+                                           class="payment-information-note payment-page-message">
+                                      </div>
+                                  </div>
 
-                                    <label for="transactionProof">
-                                        Tên người chuyển - Mã giao dịch /
-                                        Mã tham chiếu
-                                        <span>*</span>
-                                    </label>
+                                  <div class="transaction-proof-field">
 
-                                    <input type="text"
-                                           id="transactionProof"
-                                           name="paymentProof"
-                                           class="transaction-proof-input"
-                                           maxlength="100"
-                                           value="<c:out value='${param.paymentProof}'/>"
-                                           placeholder="Ví dụ: NGUYEN VAN AN - FT26123456789"
-                                           autocomplete="off"
-                                           required>
+                                      <label>
+                                          Ảnh minh chứng chuyển khoản
+                                          <span>*</span>
+                                      </label>
 
-                                    <small>
-                                        Nhập theo đúng định dạng:
-                                        <strong>
-                                            Tên người chuyển - Mã giao dịch
-                                        </strong>.
-                                    </small>
-                                </div>
+                                      <div class="payment-upload-box">
 
-                                <div class="payment-information-note">
-                                    Sau khi gửi thông tin, lễ tân sẽ đối chiếu
-                                    tên người chuyển, mã giao dịch, số tiền và
-                                    nội dung chuyển khoản trước khi xác nhận đơn.
-                                </div>
+                                          <input type="file"
+                                                 id="paymentImage"
+                                                 class="payment-file-input"
+                                                 accept="image/png, image/jpeg, image/jpg">
 
-                                <div class="payment-actions">
-                                    <a href="${pageContext.request.contextPath}/search"
-                                       class="payment-back-button">
+                                          <label for="paymentImage" class="payment-upload-label">
+                                              <div class="payment-upload-content">
+                                                  <small>Hỗ trợ định dạng JPG, JPEG, PNG</small>
+                                              </div>
+                                          </label>
+                                      </div>
 
-                                        ← CHỌN PHÒNG KHÁC
-                                    </a>
+                                  </div>
 
-                                    <button type="submit"
-                                            class="payment-submit-button"
-                                            id="submitPayment">
+                                  <div class="transaction-proof-field">
 
-                                        GỬI THÔNG TIN GIAO DỊCH
-                                    </button>
-                                </div>
+                                      <label for="transactionReference">
+                                          Mã giao dịch / Mã tham chiếu
+                                          <span>*</span>
+                                      </label>
 
-                                <div class="payment-security">
-                                    🔒 Thông tin thanh toán của bạn được bảo mật
-                                </div>
-                            </form>
+                                      <input type="text"
+                                             id="transactionReference"
+                                             name="transactionReference"
+                                             class="transaction-proof-input"
+                                             maxlength="100"
+                                             value="${fn:escapeXml(param.transactionReference)}"
+                                             placeholder="Ví dụ: FT26123456789"
+                                             autocomplete="off"
+                                             required>
+
+                                      <small>
+                                          Nhập mã giao dịch hoặc mã tham chiếu
+                                          hiển thị trên biên lai chuyển khoản.
+                                      </small>
+                                  </div>
+
+                                  <div class="payment-information-note">
+                                      Sau khi gửi thông tin, lễ tân sẽ đối chiếu
+                                      ảnh minh chứng, mã giao dịch, số tiền và
+                                      nội dung chuyển khoản trước khi xác nhận đơn.
+                                  </div>
+
+                                  <div class="payment-actions">
+                                      <a href="${pageContext.request.contextPath}/search"
+                                         class="payment-back-button">
+
+                                          ← CHỌN PHÒNG KHÁC
+                                      </a>
+
+                                      <button type="submit"
+                                              class="payment-submit-button"
+                                              id="submitPayment">
+
+                                          GỬI THÔNG TIN GIAO DỊCH
+                                      </button>
+                                  </div>
+
+                                  <div class="payment-security">
+                                      🔒 Thông tin thanh toán của bạn được bảo mật
+                                  </div>
+                              </form>
                         </c:if>
                     </section>
 
@@ -500,19 +494,22 @@
                                                 or (not hasPayment
                                                 and remainingSeconds <= 0)}">
 
-                                    <strong class="status-cancelled">
-                                        Đã hủy do hết hạn
-                                    </strong>
+                                        <strong class="status-cancelled"
+                                                id="paymentStatusText">
+                                            Đã hủy do hết hạn
+                                        </strong>
                                 </c:when>
 
                                 <c:when test="${hasPayment}">
-                                    <strong class="status-waiting">
+                                    <strong class="status-waiting"
+                                            id="paymentStatusText">
                                         Đã gửi - Chờ xác nhận
                                     </strong>
                                 </c:when>
 
                                 <c:otherwise>
-                                    <strong class="status-unpaid">
+                                    <strong class="status-unpaid"
+                                            id="paymentStatusText">
                                         Chưa thanh toán
                                     </strong>
                                 </c:otherwise>
@@ -570,8 +567,16 @@
             const paymentForm =
                     document.getElementById("paymentForm");
 
-            const transactionProof =
-                    document.getElementById("transactionProof");
+            const paymentFilePreview = document.getElementById("paymentFilePreview");
+
+            const paymentFileName = document.getElementById("paymentFileName");
+
+            const clearPaymentImage = document.getElementById("clearPaymentImage");
+
+            const paymentProofUrl = document.getElementById("payment-proof-url");
+
+            const transactionReference =
+                    document.getElementById("transactionReference");
 
             const submitPayment =
                     document.getElementById("submitPayment");
@@ -626,13 +631,37 @@
             const countdown =
                     document.getElementById("countdown");
 
-            if (countdown && countdown.dataset.seconds) {
-                let remainingSeconds =
-                        Number(countdown.dataset.seconds);
+            if (countdown && countdown.dataset.expiresAt) {
+                const expiresAtMillis =
+                        Number(countdown.dataset.expiresAt);
+
+                const serverNowMillis =
+                        Number(countdown.dataset.serverNow);
+
+                const serverClientOffset =
+                        serverNowMillis - Date.now();
 
                 let countdownInterval;
+                let expiredHandled = false;
+
+                function getCurrentServerTimeMillis() {
+                    return Date.now() + serverClientOffset;
+                }
+
+                function getRemainingSeconds() {
+                    return Math.ceil(
+                            (expiresAtMillis
+                                    - getCurrentServerTimeMillis()) / 1000
+                            );
+                }
 
                 function disablePaymentWhenExpired() {
+                    if (expiredHandled) {
+                        return;
+                    }
+
+                    expiredHandled = true;
+
                     countdown.textContent =
                             "HẾT THỜI GIAN";
 
@@ -645,8 +674,27 @@
                                 "ĐÃ HẾT THỜI GIAN";
                     }
 
-                    if (transactionProof) {
-                        transactionProof.disabled = true;
+                    if (paymentImage) {
+                        paymentImage.disabled = true;
+                    }
+
+                    if (paymentProofUrl) {
+                        paymentProofUrl.disabled = true;
+                    }
+
+                    if (transactionReference) {
+                        transactionReference.disabled = true;
+                    }
+
+                    const paymentStatusText =
+                            document.getElementById("paymentStatusText");
+
+                    if (paymentStatusText) {
+                        paymentStatusText.textContent =
+                                "Đã hủy do hết hạn";
+
+                        paymentStatusText.className =
+                                "status-cancelled";
                     }
 
                     showPageMessage(
@@ -657,6 +705,9 @@
                 }
 
                 function updateCountdown() {
+                    const remainingSeconds =
+                            getRemainingSeconds();
+
                     if (remainingSeconds <= 0) {
                         clearInterval(countdownInterval);
                         disablePaymentWhenExpired();
@@ -673,14 +724,54 @@
                             String(minutes).padStart(2, "0")
                             + ":"
                             + String(seconds).padStart(2, "0");
-
-                    remainingSeconds--;
                 }
 
                 updateCountdown();
 
                 countdownInterval =
                         setInterval(updateCountdown, 1000);
+
+                window.addEventListener("pageshow", updateCountdown);
+
+                document.addEventListener("visibilitychange", function () {
+                    if (!document.hidden) {
+                        updateCountdown();
+                    }
+                });
+            }
+            
+            if (paymentImage) {
+    paymentImage.addEventListener("change", function () {
+        if (paymentImage.files.length > 0) {
+            const fileName = paymentImage.files[0].name;
+
+            if (paymentFileName) {
+                paymentFileName.textContent = fileName;
+            }
+
+            if (paymentFilePreview) {
+                paymentFilePreview.style.display = "flex";
+            }
+        }
+    });
+}
+
+            if (clearPaymentImage) {
+                clearPaymentImage.addEventListener("click", function () {
+                    paymentImage.value = "";
+
+                    if (paymentProofUrl) {
+                        paymentProofUrl.value = "";
+                    }
+
+                    if (paymentFileName) {
+                        paymentFileName.textContent = "";
+                    }
+
+                    if (paymentFilePreview) {
+                        paymentFilePreview.style.display = "none";
+                    }
+                });
             }
 
             if (paymentForm) {
@@ -688,64 +779,40 @@
                         "submit",
                         function (event) {
 
-                            const proofValue =
-                                    transactionProof.value.trim();
-
-                            if (proofValue === "") {
-                                event.preventDefault();
-
-                                showPageMessage(
-                                        "Vui lòng nhập tên người chuyển "
-                                        + "và mã giao dịch.",
-                                        true
-                                        );
-
-                                transactionProof.focus();
-                                return;
-                            }
-
-                            const separatorIndex =
-                                    proofValue.indexOf("-");
-
-                            if (separatorIndex <= 0
-                                    || separatorIndex
-                                    >= proofValue.length - 1) {
+                            if (!paymentImage
+                                    || paymentImage.files.length === 0) {
 
                                 event.preventDefault();
 
                                 showPageMessage(
-                                        "Vui lòng nhập đúng dạng: "
-                                        + "Tên người chuyển - Mã giao dịch.",
+                                        "Vui lòng tải ảnh minh chứng chuyển khoản.",
                                         true
                                         );
 
-                                transactionProof.focus();
+                                if (paymentImage) {
+                                    paymentImage.focus();
+                                }
+
                                 return;
                             }
 
-                            const senderName =
-                                    proofValue
-                                    .substring(0, separatorIndex)
-                                    .trim();
+                            const referenceValue =
+                                    transactionReference.value.trim();
 
-                            const transactionCode =
-                                    proofValue
-                                    .substring(separatorIndex + 1)
-                                    .trim();
-
-                            if (senderName.length < 2) {
+                            if (referenceValue === "") {
                                 event.preventDefault();
 
                                 showPageMessage(
-                                        "Tên người chuyển không hợp lệ.",
+                                        "Vui lòng nhập mã giao dịch "
+                                        + "hoặc mã tham chiếu.",
                                         true
                                         );
 
-                                transactionProof.focus();
+                                transactionReference.focus();
                                 return;
                             }
 
-                            if (transactionCode.length < 4) {
+                            if (referenceValue.length < 4) {
                                 event.preventDefault();
 
                                 showPageMessage(
@@ -754,20 +821,16 @@
                                         true
                                         );
 
-                                transactionProof.focus();
+                                transactionReference.focus();
                                 return;
                             }
 
-                            transactionProof.value =
-                                    senderName + " - " + transactionCode;
-
-                            submitPayment.disabled = true;
-
-                            submitPayment.textContent =
-                                    "ĐANG GỬI...";
+                            transactionReference.value = referenceValue;
                         }
                 );
             }
         </script>
+
+        <script src="${pageContext.request.contextPath}/view/assets/javascript/upload-img.js"></script>
     </body>
 </html>

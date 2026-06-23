@@ -10,9 +10,9 @@
         if (staff != null) {
             String role = "";
 
-            if (staff.getRoleEn() != null) {
+            if (staff.getRoleEn() != null && !staff.getRoleEn().trim().isEmpty()) {
                 role = staff.getRoleEn().trim();
-            } else if (staff.getRole() != null) {
+            } else if (staff.getRole() != null && !staff.getRole().trim().isEmpty()) {
                 role = staff.getRole().trim();
             }
 

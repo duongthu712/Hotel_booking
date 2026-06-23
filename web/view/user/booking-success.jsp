@@ -70,7 +70,7 @@
                     </div>
 
                     <p>
-                        Vui lòng lưu mã này để tra cứu và làm việc với khách sạn.
+                        Vui lòng lưu mã này để tra cứu, check-in và làm việc với khách sạn.
                     </p>
                 </div>
 
