@@ -122,6 +122,7 @@
                                             <tr>
                                                 <td>
                                                     <label class="check-box-wrapper">
+                                                        <%-- Trả về cái id của service đã chọn --%>
                                                         <input type="checkbox" name="selectedServices" value="${s.serviceId}" 
                                                                ${isServed ? 'checked' : ''}
                                                                onchange="document.getElementById('qty_srv_${s.serviceId}').disabled = !this.checked; document.getElementById('free_srv_${s.serviceId}').disabled = !this.checked;" />

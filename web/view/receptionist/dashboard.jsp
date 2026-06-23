@@ -29,8 +29,8 @@
                     <p class="number">${dashboardData.totalDeparturesToday}</p>
                 </div>
                 <div class="metric-card in-house">
-                    <h3>Đơn Đang Lưu Trú</h3>
-                    <p class="number">${dashboardData.totalInHouseGuests}</p>
+                    <h3>Giao dịch chờ xác nhận</h3>
+                    <p class="number">${dashboardData.pendingDeposits}</p>
                 </div>
                 <div class="metric-card pending-req">
                     <h3>Yêu Cầu Chờ Xử Lý</h3>
@@ -174,46 +174,7 @@
                     </div>
                 </section>
 
-                <section class="table-section">
-                    <h2>DANH SÁCH YÊU CẦU ĐẶC BIỆT ĐANG CHỜ XỬ LÝ</h2>
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Khách Hàng</th>
-                                    <th style="text-align: center;">Mã Đơn Đặt</th>
-                                    <th>Loại Yêu Cầu</th>
-                                    <th style="width: 45%;">Chi Tiết Yêu Cầu</th>
-                                    <th>Thời Gian Gửi</th>
-                                    <th style="text-align: center;">Trạng Thái</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <c:forEach items="${dashboardData.pendingRequestsList}" var="req" varStatus="status">
-                                    <c:if test="${status.index < 10}">
-                                        <tr>
-                                            <td>${req.responseNotes}</td>
-                                            <td style="text-align: center;"><strong>BK-${req.bookingId}</strong></td>
-                                            <td><span class="badge badge-warning">${req.requestType}</span></td>
-                                            <td style="color: #4f6f8f;">${req.requestDetails}</td>
-                                            <td>${req.submittedAt}</td>
-                                            <td style="text-align: center;"><span class="status-text">${req.status}</span></td>
-                                        </tr>
-                                    </c:if>
-                                </c:forEach>
-                                <c:if test="${empty dashboardData.pendingRequestsList}">
-                                    <tr><td colspan="6" class="text-center" style="color: #2e7d32;">Tuyệt vời! Không có yêu cầu nào đang tồn đọng.</td></tr>
-                                </c:if>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="view-all-footer">
-                        <a href="${pageContext.request.contextPath}/view/receptionist/request-processing.jsp" class="view-all-link">
-                            Xem tất cả yêu cầu chờ xử lý <span class="arrow-icon">→</span>
-                        </a>
-                    </div>
-                </section>
-
+                
             </div>
         </div>
     </body>

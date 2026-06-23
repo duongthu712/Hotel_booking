@@ -190,6 +190,18 @@
                                         <tbody id="viewGuestsTableBody"></tbody>
                                     </table>
                                 </div>
+                                
+                                <c:if test="${not empty targetBookingId}">
+                                    <form action="${pageContext.request.contextPath}/unassign-room" method="POST" id="unassignRoomForm">
+                                        <input type="hidden" name="bookingId" value="${targetBookingId}" />
+                                        <input type="hidden" name="roomNumber" id="unassignRoomNumber" value="" />
+                                        <button type="button" onclick="confirmUnassign()" class="btn-unassign">
+                                            HỦY GÁN PHÒNG NÀY
+                                        </button>
+                                    </form>
+                                    <input type="hidden" id="currentAssigningBookingCode" value="${targetBooking.bookingCode}" />
+                                </c:if>
+
                             </div>
                         </div>
 
