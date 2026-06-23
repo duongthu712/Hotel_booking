@@ -10,14 +10,14 @@
         if (staff != null) {
             String role = "";
 
-            if (staff.getRoleEn() != null) {
+            if (staff.getRoleEn() != null && !staff.getRoleEn().trim().isEmpty()) {
                 role = staff.getRoleEn().trim();
-            } else if (staff.getRole() != null) {
+            } else if (staff.getRole() != null && !staff.getRole().trim().isEmpty()) {
                 role = staff.getRole().trim();
             }
 
             if (role.equalsIgnoreCase("RECEPTIONIST") || role.equalsIgnoreCase("Lễ tân")) {
-                dashboardUrl = request.getContextPath() + "/view/receptionist/dashboard.jsp";
+                dashboardUrl = request.getContextPath() + "/receptionist-dashboard";
             } else if (role.equalsIgnoreCase("MANAGER") || role.equalsIgnoreCase("Quản lý")) {
                 dashboardUrl = request.getContextPath() + "/view/manager/dashboard.jsp";
             } else if (role.equalsIgnoreCase("ADMIN") || role.equalsIgnoreCase("Quản trị viên")) {

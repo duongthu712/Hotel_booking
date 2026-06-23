@@ -3,13 +3,17 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/receptionist/billing.jsp</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/InvoicePDFController.java</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/receptionist/invoice.jsp</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/assets/css/common.css</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/InvoiceCreateController.java</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/dao/CheckoutDAO.java</file>
-            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/BillingListController.java</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/src/java/controller/BookingFormController.java</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/src/java/controller/BookingDetailController.java</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/src/java/dao/CheckoutDAO.java</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/web/view/assets/css/booking.css</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/web/view/assets/javascript/payment-verification.js</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/web/view/user/booking-form.jsp</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/web/view/receptionist/payment-verification.jsp</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/src/java/controller/BookingPaymentController.java</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/src/java/dao/BookingDAO.java</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/web/view/user/booking-payment.jsp</file>
+            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/web/view/user/booking-detail.jsp</file>
         </group>
     </open-files>
 </project-private>
