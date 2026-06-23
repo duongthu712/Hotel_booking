@@ -17,7 +17,7 @@
             }
 
             if (role.equalsIgnoreCase("RECEPTIONIST") || role.equalsIgnoreCase("Lễ tân")) {
-                dashboardUrl = request.getContextPath() + "/view/receptionist/dashboard.jsp";
+                dashboardUrl = request.getContextPath() + "/receptionist-dashboard";
             } else if (role.equalsIgnoreCase("MANAGER") || role.equalsIgnoreCase("Quản lý")) {
                 dashboardUrl = request.getContextPath() + "/view/manager/dashboard.jsp";
             } else if (role.equalsIgnoreCase("ADMIN") || role.equalsIgnoreCase("Quản trị viên")) {

@@ -53,7 +53,7 @@ public class RoomTypeEditServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // 1. Lấy ID hạng phòng từ URL danh sách truyền sang (/roomtypeedit?id=...)
+            //Lấy id hạng phòng cần edit
             String idStr = request.getParameter("id");
             if (idStr == null || idStr.trim().isEmpty()) {
                 response.sendRedirect(request.getContextPath() + "/roomtypelist");
@@ -61,7 +61,7 @@ public class RoomTypeEditServlet extends HttpServlet {
             }
             int roomTypeId = Integer.parseInt(idStr);
 
-            // 2. Lấy toàn bộ thực thể dữ liệu gốc từ DB lên
+            // Lấy toàn bộ thông tin về hạng phòng có id đc chọn
             RoomType roomTypeGoc = roomTypeDAO.getRoomTypeById(roomTypeId);
             if (roomTypeGoc == null) {
                 response.sendRedirect(request.getContextPath() + "/roomtypelist");
@@ -69,7 +69,7 @@ public class RoomTypeEditServlet extends HttpServlet {
             }
             request.setAttribute("roomType", roomTypeGoc);
 
-            // 3. Nạp danh sách Dịch vụ và Tiện nghi toàn hệ thống để render các hàng checkbox chọn
+            // Nạp danh sách Dịch vụ và Tiện nghi toàn hệ thống để render các hàng checkbox chọn
             List<RoomService> availableServices = serviceDAO.getAllRoomServices();
             List<RoomAmenity> availableAmenities = amenityDAO.getAllRoomAmenities();
             request.setAttribute("availableServices", availableServices);
@@ -86,38 +86,11 @@ public class RoomTypeEditServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // 1. Đọc ID và Tên hạng phòng từ Form gửi lên để làm bộ lọc kiểm tra
+        request.setCharacterEncoding("UTF-8");
+
+        // 1. Đọc dữ liệu từ form
         int roomTypeId = Integer.parseInt(request.getParameter("roomTypeId"));
         String typeName = request.getParameter("typeName");
-
-        // 2. LOGIC CHECK TRÙNG NÂNG CẤP: Dùng hàm riêng loại trừ chính ID đang sửa
-        if (roomTypeDAO.isRoomTypeNameExistForEdit(typeName, roomTypeId)) {
-            request.setAttribute("status", "duplicate");
-            request.setAttribute("invalidName", typeName);
-
-            String description = request.getParameter("description");
-            int capacity = Integer.parseInt(request.getParameter("capacity"));
-            String bedType = request.getParameter("bedType");
-            int bedCount = Integer.parseInt(request.getParameter("bedCount"));
-            BigDecimal areaSqm = new BigDecimal(request.getParameter("areaSqm"));
-            BigDecimal basePrice = new BigDecimal(request.getParameter("basePrice"));
-            boolean isActive = request.getParameter("isActive") != null;
-
-            RoomType fakeRoomType = new RoomType(roomTypeId, typeName, description, capacity, bedType, bedCount, areaSqm, basePrice, isActive);
-            request.setAttribute("roomType", fakeRoomType);
-
-            try {
-                request.setAttribute("availableServices", serviceDAO.getAllRoomServices());
-                request.setAttribute("availableAmenities", amenityDAO.getAllRoomAmenities());
-            } catch (Exception e) {
-                throw new ServletException(e);
-            }
-
-            request.getRequestDispatcher("view/manager/edit-room-type.jsp").forward(request, response);
-            return;
-        }
-
-        // 3. NẾU KHÔNG TRÙNG -> TIẾP TỤC ĐỌC CÁC THÔNG SỐ CƠ BẢN
         String description = request.getParameter("description");
         int capacity = Integer.parseInt(request.getParameter("capacity"));
         String bedType = request.getParameter("bedType");
@@ -128,7 +101,27 @@ public class RoomTypeEditServlet extends HttpServlet {
 
         RoomType rt = new RoomType(roomTypeId, typeName, description, capacity, bedType, bedCount, areaSqm, basePrice, isActive);
 
-        // --- ĐỌC MẢNG ALBUM ẢNH PHỤ MỚI ---
+        // 2. Validation 
+        boolean hasError = false;
+        String errorMessage = "";
+
+        // Check trùng tên (loại trừ chính nó)
+        if (roomTypeDAO.isRoomTypeNameExistForEdit(typeName, roomTypeId)) {
+            hasError = true;
+            errorMessage = "Tên hạng phòng \"" + typeName + "\" đã tồn tại!";
+            request.setAttribute("status", "duplicate");
+        }
+        // Check constraints
+        if (bedCount < 1 || bedCount > 20) {
+            hasError = true;
+            errorMessage = "Số lượng giường phải từ 1 đến 20.";
+        }
+        if (areaSqm.compareTo(new BigDecimal("999.99")) > 0) {
+            hasError = true;
+            errorMessage = "Diện tích phòng tối đa 999.99 m².";
+        }
+
+        // 3. Gom Data Phụ (Ảnh, Dịch vụ, Tiện nghi) để giữ trạng thái trên form
         String[] imageUrls = request.getParameterValues("imageUrls");
         List<String> imageList = new ArrayList<>();
         if (imageUrls != null) {
@@ -138,93 +131,59 @@ public class RoomTypeEditServlet extends HttpServlet {
                 }
             }
         }
-        rt.setImageUrl(imageList); // Đồng bộ album ảnh phụ vào object phòng
+        rt.setImageUrl(imageList);
 
-        // --- BƯỚC CHIẾN THUẬT 1: GOM SẠCH DỊCH VỤ TỪ FORM VÀ ĐÁNH DẤU CỜ LỖI ---
         String[] selectedServiceIds = request.getParameterValues("selectedServices");
-        List<model.RoomTypeService> serviceList = new ArrayList<>();
-        boolean hasServiceError = false;
-
+        List<RoomTypeService> serviceList = new ArrayList<>();
         if (selectedServiceIds != null) {
-            for (String serviceIdStr : selectedServiceIds) {
-                int serviceId = Integer.parseInt(serviceIdStr);
-                int quantity = Integer.parseInt(request.getParameter("quantity_" + serviceId));
-                int isFree = Integer.parseInt(request.getParameter("isFree_" + serviceId));
-
-                // Bật cờ báo lỗi nếu lượng free lố lượng setup nhưng KHÔNG return vội, tiếp tục duyệt để gom data
-                if (isFree > quantity) {
-                    hasServiceError = true;
+            for (String sId : selectedServiceIds) {
+                int id = Integer.parseInt(sId);
+                int qty = Integer.parseInt(request.getParameter("quantity_" + id));
+                int isFree = Integer.parseInt(request.getParameter("isFree_" + id));
+                if (isFree > qty) {
+                    hasError = true;
+                    errorMessage = "Số lượng miễn phí không được vượt quá số lượng trang bị!";
                 }
-
-                model.RoomTypeService rts = new model.RoomTypeService();
-                rts.setServiceId(serviceId);
-                rts.setQuantity(quantity);
+                RoomTypeService rts = new RoomTypeService();
+                rts.setServiceId(id);
+                rts.setQuantity(qty);
                 rts.setIsFree(isFree);
                 serviceList.add(rts);
             }
         }
+        rt.setRoomTypeServices(serviceList);
 
-        // --- BƯỚC CHIẾN THUẬT 2: GOM SẠCH TIỆN NGHI TỪ FORM ---
         String[] selectedAmenityIds = request.getParameterValues("selectedAmenities");
         List<RoomAmenity> amenityList = new ArrayList<>();
         if (selectedAmenityIds != null) {
-            for (String amenityIdStr : selectedAmenityIds) {
-                int amenityId = Integer.parseInt(amenityIdStr);
-                String qtyParam = request.getParameter("quantity_amenity_" + amenityId);
-                String quantityStr = (qtyParam != null) ? qtyParam : "1";
-
+            for (String aId : selectedAmenityIds) {
                 RoomAmenity ra = new RoomAmenity();
-                ra.setAmenityId(amenityId);
-                ra.setDescription(quantityStr); // Giữ lại số lượng tiện nghi thô đã nhập
-                ra.setActive(true);
-
+                ra.setAmenityId(Integer.parseInt(aId));
+                ra.setDescription(request.getParameter("quantity_amenity_" + aId));
                 amenityList.add(ra);
             }
         }
+        rt.setRoomAmenities(amenityList);
 
-        // --- BƯỚC CHIẾN THUẬT 3: KIỂM TRA CHẶN LỖI TẬP TRUNG ---
-        if (hasServiceError) {
-            // Đóng gói toàn bộ mớ data vừa gom được trên form nhét vào xác Object rt để đổ ngược lên JSP cứu vớt checkbox
-            rt.setRoomTypeServices(serviceList);
-            rt.setRoomAmenities(amenityList);
-
-            request.setAttribute("errorMessage", "Cập nhật thất bại: Số lượng miễn phí không được vượt quá số lượng trang bị sẵn tại phòng!");
-
-            // Nạp lại mảng dịch vụ & tiện nghi nền của hệ thống, gánh SQLException tại chỗ
+        // 4. Nếu lỗi -> Forward về Edit (Giữ nguyên dữ liệu)
+        if (hasError) {
+            request.setAttribute("errorMessage", errorMessage);
+            request.setAttribute("roomType", rt);
             try {
                 request.setAttribute("availableServices", serviceDAO.getAllRoomServices());
                 request.setAttribute("availableAmenities", amenityDAO.getAllRoomAmenities());
             } catch (Exception e) {
-                System.out.println(">>> LỖI KHI NẠP LẠI DATA NỀN TẠI SERVLET: " + e.getMessage());
+                e.printStackTrace();
             }
-
-            request.setAttribute("roomType", rt);
             request.getRequestDispatcher("view/manager/edit-room-type.jsp").forward(request, response);
-            return; // Chặn đứng luồng ghi vào Database!
+            return;
         }
 
-        // 4. GỌI DAO THỰC THI TRANSACTION UPDATE KHI MỌI THỨ HỢP LỆ
-        boolean isUpdated = false;
-        try {
-            isUpdated = roomTypeDAO.updateRoomType(rt, imageList, serviceList, amenityList);
-        } catch (Exception e) {
-            throw new ServletException("Lỗi nghiêm trọng khi thực thi Update Batch Transaction", e);
-        }
-
-        // 5. ĐIỀU HƯỚNG KẾT QUẢ VỀ MANAGE LIST
-        if (isUpdated) {
+        // 5. Nếu không lỗi -> Gọi DAO update
+        if (roomTypeDAO.updateRoomType(rt, imageList, serviceList, amenityList)) {
             response.sendRedirect(request.getContextPath() + "/roomtypelist?status=updated");
         } else {
-            request.setAttribute("errorMessage", "Hệ thống gặp lỗi kết nối DB khi cập nhật hạng phòng!");
-            rt.setRoomTypeServices(serviceList);
-            rt.setRoomAmenities(amenityList);
-            request.setAttribute("roomType", rt);
-            try {
-                request.setAttribute("availableServices", serviceDAO.getAllRoomServices());
-                request.setAttribute("availableAmenities", amenityDAO.getAllRoomAmenities());
-            } catch (Exception e) {
-                throw new ServletException(e);
-            }
+            request.setAttribute("errorMessage", "Hệ thống gặp lỗi kết nối DB khi cập nhật!");
             request.getRequestDispatcher("view/manager/edit-room-type.jsp").forward(request, response);
         }
     }

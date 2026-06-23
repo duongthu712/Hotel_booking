@@ -45,7 +45,7 @@ public class RoomTypeDeleteServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         try {
-            // 1. Đi thẳng lấy ID hạng phòng cần xóa từ tham số URL truyền sang
+            //Lấy ID hạng phòng cần xóa từ tham số URL truyền sang
             String idStr = request.getParameter("id");
             if (idStr == null || idStr.trim().isEmpty()) {
                 response.sendRedirect(request.getContextPath() + "/roomtypelist");
@@ -53,7 +53,6 @@ public class RoomTypeDeleteServlet extends HttpServlet {
             }
             int roomTypeId = Integer.parseInt(idStr);
 
-            // 2. Gọi thẳng xuống hàm delete của RoomTypeDAO có sẵn trong máy Vũ
             boolean isDeleted = roomTypeDAO.deleteRoomType(roomTypeId);
 
             // 3. Điều hướng quay về trang danh sách kèm tín hiệu trạng thái thành công/thất bại
@@ -65,7 +64,7 @@ public class RoomTypeDeleteServlet extends HttpServlet {
             }
 
         } catch (Exception e) {
-            System.out.println(">>> LỖI NGHIÊM TRỌNG TẠI RoomTypeDeleteServlet: " + e.getMessage());
+            System.out.println(" LỖI TẠI RoomTypeDeleteServlet: " + e.getMessage());
             response.sendRedirect(request.getContextPath() + "/roomtypelist?status=delete_error");
         }
     } 
