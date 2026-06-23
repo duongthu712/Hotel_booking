@@ -1,7 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
 
     function toggleModal(modal, show) {
-        if (!modal) return;
+        if (!modal)
+            return;
         if (show) {
             modal.classList.add("show");
             modal.style.display = "flex";
@@ -11,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    const paymentDetailModal =  document.getElementById("payment-detail-modal");
+    const paymentDetailModal = document.getElementById("payment-detail-modal");
     const btnCloseDetail = document.getElementById("btn-close-detail");
     const proofImg = document.getElementById("proof-img");
     const proofWrapper = document.getElementById("payment-proof-wrapper");
@@ -44,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const paymentNotes = paymentRow.getAttribute("data-notes") || "";
         const paymentStatus = paymentRow.querySelector(".payment-status");
         const statusClass = paymentStatus?.classList.contains("status-pending")
-                ? "pending"  : (paymentStatus?.classList.contains("status-approved")
+                ? "pending" : (paymentStatus?.classList.contains("status-approved")
                         ? "approved"
                         : "rejected"
                         );
@@ -69,9 +70,9 @@ document.addEventListener("DOMContentLoaded", function () {
             detailStatus.innerText = status;
 
             detailStatus.className = statusClass === "pending" ? "status-pending" : (statusClass === "approved"
-                            ? "status-approved"
-                            : "status-rejected"
-                            );
+                    ? "status-approved"
+                    : "status-rejected"
+                    );
         }
 
         if (proofUrl) {
@@ -90,14 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (proofUrlContainer) {
             proofUrlContainer.innerHTML = `
-                <div class="proof-info-block">
-                    <strong>Link ảnh minh chứng:</strong>
-                    <p style="word-break: break-all; margin-top: 8px;">
-                        ${proofUrl || "Không có ảnh minh chứng."}
-                    </p>
-                </div>
-
-                <div class="proof-info-block" style="margin-top: 16px;">
+                          <div class="proof-info-block" style="margin-top: 16px;">
                     <strong>Mã giao dịch / Mã tham chiếu:</strong>
                     <p style="word-break: break-word; margin-top: 8px;">
                         ${
@@ -186,7 +180,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.querySelectorAll(".hotel-popup").forEach(modal => {
         modal.addEventListener("click", (e) => {
-            if (e.target === modal) toggleModal(modal, false);
+            if (e.target === modal)
+                toggleModal(modal, false);
         });
     });
 });
