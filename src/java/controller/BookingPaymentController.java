@@ -9,16 +9,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import model.Booking;
 import model.RoomType;
 
 public class BookingPaymentController extends HttpServlet {
 
     private static final int HOLD_MINUTES = 15;
+
+    private static final DateTimeFormatter DATE_FORMATTER
+            = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @Override
     protected void doGet(HttpServletRequest request,
@@ -28,7 +30,7 @@ public class BookingPaymentController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
 
-        String bookingCode = getParameter(request, "bookingCode");
+        String bookingCode = getValue(request, "bookingCode");
 
         if (bookingCode.isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/search");
@@ -46,81 +48,98 @@ public class BookingPaymentController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
 
-        String bookingCode = getParameter(request, "bookingCode");
+        String bookingCode = getValue(request, "bookingCode");
 
         if (bookingCode.isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/search");
             return;
         }
 
+        String paymentProofUrl = getValue(request, "paymentProofUrl");
+        String transactionReference = getValue(request, "transactionReference");
+
         BookingDAO bookingDAO = new BookingDAO();
 
-        bookingDAO.cancelExpiredBookings();
-
-        Booking booking = bookingDAO.getBookingByCode(bookingCode);
-
-        if (booking == null) {
-            showPaymentPage(
-                    request,
-                    response,
-                    bookingCode,
-                    "Không tìm thấy đơn đặt phòng."
-            );
-            return;
-        }
-
-        boolean hasPayment = bookingDAO.hasDepositPayment(
-                booking.getBookingId());
-
-        if (hasPayment) {
-            response.sendRedirect(request.getContextPath()
-                    + "/booking-success?bookingCode="
-                    + bookingCode);
-            return;
-        }
-
-        if ("Đã hủy".equals(booking.getStatus())
-                || isExpired(booking)) {
-
+        try {
             bookingDAO.cancelExpiredBookings();
 
+            Booking booking = bookingDAO.getBookingByCode(bookingCode);
+
+            if (booking == null) {
+                showPaymentPage(
+                        request,
+                        response,
+                        bookingCode,
+                        "Không tìm thấy đơn đặt phòng."
+                );
+                return;
+            }
+
+            if (bookingDAO.hasDepositPayment(booking.getBookingId())) {
+                response.sendRedirect(
+                        request.getContextPath()
+                        + "/booking-success?bookingCode="
+                        + booking.getBookingCode()
+                );
+                return;
+            }
+
+            if ("Đã hủy".equals(booking.getStatus())
+                    || isHoldExpired(booking)) {
+
+                bookingDAO.cancelExpiredBookings();
+
+                showPaymentPage(
+                        request,
+                        response,
+                        bookingCode,
+                        "Đơn đặt phòng đã hết thời gian giữ phòng."
+                );
+                return;
+            }
+
+            String error = validatePaymentInformation(
+                    paymentProofUrl,
+                    transactionReference
+            );
+
+            if (error != null) {
+                showPaymentPage(request, response, bookingCode, error);
+                return;
+            }
+
+            boolean created = bookingDAO.createDepositPayment(
+                    booking.getBookingId(),
+                    booking.getDepositAmount(),
+                    paymentProofUrl,
+                    transactionReference
+            );
+
+            if (!created) {
+                showPaymentPage(
+                        request,
+                        response,
+                        bookingCode,
+                        "Không thể gửi thông tin giao dịch. "
+                        + "Vui lòng thử lại."
+                );
+                return;
+            }
+
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/booking-success?bookingCode="
+                    + booking.getBookingCode()
+            );
+
+        } catch (Exception e) {
             showPaymentPage(
                     request,
                     response,
                     bookingCode,
-                    "Đơn đặt phòng đã bị hủy do hết thời gian giữ phòng."
+                    "Đã xảy ra lỗi hệ thống. Vui lòng thử lại."
             );
-            return;
         }
-
-        String paymentProof = getParameter(request, "paymentProof");
-
-        String error = validatePaymentProof(paymentProof);
-
-        if (error != null) {
-            showPaymentPage(request, response, bookingCode, error);
-            return;
-        }
-
-        boolean created = bookingDAO.createDepositPayment(
-                booking.getBookingId(),
-                booking.getDepositAmount(),
-                paymentProof
-        );
-
-        if (!created) {
-            showPaymentPage(
-                    request,
-                    response,
-                    bookingCode,
-                    "Không thể lưu mã giao dịch thanh toán."
-            );
-            return;
-        }
-
-        response.sendRedirect(request.getContextPath()
-                + "/booking-success?bookingCode="
-                + bookingCode);
     }
 
     private void showPaymentPage(HttpServletRequest request,
@@ -130,62 +149,46 @@ public class BookingPaymentController extends HttpServlet {
             throws ServletException, IOException {
 
         BookingDAO bookingDAO = new BookingDAO();
+        RoomTypeDAO roomTypeDAO = new RoomTypeDAO();
 
-        bookingDAO.cancelExpiredBookings();
+        try {
+            bookingDAO.cancelExpiredBookings();
 
-        Booking booking = bookingDAO.getBookingByCode(bookingCode);
+            Booking booking = bookingDAO.getBookingByCode(bookingCode);
 
-        if (booking == null) {
+            if (booking == null) {
+                request.setAttribute("error", "Không tìm thấy đơn đặt phòng.");
+
+                request.getRequestDispatcher("/view/user/booking-payment.jsp")
+                        .forward(request, response);
+                return;
+            }
+
+            boolean hasPayment
+                    = bookingDAO.hasDepositPayment(booking.getBookingId());
+
+            if (!hasPayment && isHoldExpired(booking)) {
+                bookingDAO.cancelExpiredBookings();
+                booking = bookingDAO.getBookingByCode(bookingCode);
+            }
+
+            RoomType roomType
+                    = roomTypeDAO.getRoomDetailById(booking.getRoomTypeId());
+
+            setPaymentPageData(request, booking, roomType, hasPayment, error);
+
+            request.getRequestDispatcher("/view/user/booking-payment.jsp")
+                    .forward(request, response);
+
+        } catch (Exception e) {
             request.setAttribute(
                     "error",
-                    "Không tìm thấy đơn đặt phòng."
+                    "Đã xảy ra lỗi hệ thống. Vui lòng thử lại."
             );
 
             request.getRequestDispatcher("/view/user/booking-payment.jsp")
                     .forward(request, response);
-            return;
         }
-
-        boolean hasPayment = bookingDAO.hasDepositPayment(
-                booking.getBookingId());
-
-        if (!hasPayment && isExpired(booking)) {
-            bookingDAO.cancelExpiredBookings();
-
-            booking = bookingDAO.getBookingByCode(bookingCode);
-
-            if (booking != null) {
-                hasPayment = bookingDAO.hasDepositPayment(
-                        booking.getBookingId());
-            }
-        }
-
-        RoomType roomType = null;
-
-        if (booking != null) {
-            RoomTypeDAO roomTypeDAO = new RoomTypeDAO();
-
-            roomType = roomTypeDAO.getRoomDetailById(
-                    booking.getRoomTypeId());
-        }
-
-        if (booking != null
-                && "Đã hủy".equals(booking.getStatus())
-                && error == null) {
-
-            error = "Đơn đặt phòng đã bị hủy do hết thời gian giữ phòng.";
-        }
-
-        setPaymentPageData(
-                request,
-                booking,
-                roomType,
-                hasPayment,
-                error
-        );
-
-        request.getRequestDispatcher("/view/user/booking-payment.jsp")
-                .forward(request, response);
     }
 
     private void setPaymentPageData(HttpServletRequest request,
@@ -195,129 +198,123 @@ public class BookingPaymentController extends HttpServlet {
             String error) {
 
         long numberOfNights = 0;
+
+        LocalDate checkIn = booking.getCheckinDate();
+        LocalDate checkOut = booking.getCheckoutDate();
+
+        if (checkIn != null && checkOut != null
+                && checkOut.isAfter(checkIn)) {
+
+            numberOfNights
+                    = checkOut.toEpochDay() - checkIn.toEpochDay();
+        }
+
         BigDecimal totalAmount = BigDecimal.ZERO;
-        String checkInText = "";
-        String checkOutText = "";
 
-        if (booking != null
-                && booking.getCheckinDate() != null
-                && booking.getCheckoutDate() != null) {
-
-            numberOfNights = ChronoUnit.DAYS.between(
-                    booking.getCheckinDate(),
-                    booking.getCheckoutDate()
-            );
-
-            if (numberOfNights < 0) {
-                numberOfNights = 0;
-            }
-
+        if (booking.getBookedPricePerNight() != null) {
             totalAmount = booking.getBookedPricePerNight()
                     .multiply(BigDecimal.valueOf(booking.getNumRooms()))
                     .multiply(BigDecimal.valueOf(numberOfNights));
-
-            DateTimeFormatter formatter
-                    = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-            checkInText = booking.getCheckinDate().format(formatter);
-            checkOutText = booking.getCheckoutDate().format(formatter);
         }
 
-        long remainingSeconds = getRemainingSeconds(booking, hasPayment);
-        long expiresAtMillis = getExpiresAtMillis(booking);
-        long serverNowMillis = System.currentTimeMillis();
+        long remainingSeconds
+                = calculateRemainingSeconds(booking, hasPayment);
+
+        long serverNowMillis
+                = System.currentTimeMillis();
+
+        long expiresAtMillis
+                = serverNowMillis;
+
+        if (booking.getCreateAt() != null) {
+            expiresAtMillis = booking.getCreateAt()
+                    .plusMinutes(HOLD_MINUTES)
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant()
+                    .toEpochMilli();
+        }
 
         request.setAttribute("booking", booking);
         request.setAttribute("roomType", roomType);
         request.setAttribute("numberOfNights", numberOfNights);
         request.setAttribute("totalAmount", totalAmount);
-        request.setAttribute("checkInText", checkInText);
-        request.setAttribute("checkOutText", checkOutText);
         request.setAttribute("remainingSeconds", remainingSeconds);
         request.setAttribute("expiresAtMillis", expiresAtMillis);
         request.setAttribute("serverNowMillis", serverNowMillis);
         request.setAttribute("hasPayment", hasPayment);
         request.setAttribute("error", error);
+
+        if (checkIn != null) {
+            request.setAttribute("checkInText", checkIn.format(DATE_FORMATTER));
+        }
+
+        if (checkOut != null) {
+            request.setAttribute(
+                    "checkOutText",
+                    checkOut.format(DATE_FORMATTER)
+            );
+        }
     }
 
-    private boolean isExpired(Booking booking) {
-        if (booking == null || booking.getCreateAt() == null) {
-            return false;
+    private String validatePaymentInformation(
+            String paymentProofUrl,
+            String transactionReference) {
+
+        if (paymentProofUrl.isEmpty()) {
+            return "Vui lòng tải ảnh minh chứng chuyển khoản.";
         }
 
-        LocalDateTime expiresAt
-                = booking.getCreateAt().plusMinutes(HOLD_MINUTES);
-
-        return !LocalDateTime.now().isBefore(expiresAt);
-    }
-
-    private long getRemainingSeconds(Booking booking, boolean hasPayment) {
-        if (booking == null
-                || booking.getCreateAt() == null
-                || hasPayment
-                || "Đã hủy".equals(booking.getStatus())) {
-
-            return 0;
+        if (paymentProofUrl.length() > 255) {
+            return "Link ảnh minh chứng không được vượt quá 255 ký tự.";
         }
 
-        LocalDateTime expiresAt
-                = booking.getCreateAt().plusMinutes(HOLD_MINUTES);
+        if (!paymentProofUrl.startsWith("http://")
+                && !paymentProofUrl.startsWith("https://")) {
 
-        long seconds = Duration.between(
-                LocalDateTime.now(),
-                expiresAt
-        ).getSeconds();
-
-        return Math.max(seconds, 0);
-    }
-
-    private long getExpiresAtMillis(Booking booking) {
-        if (booking == null || booking.getCreateAt() == null) {
-            return 0;
+            return "Link ảnh minh chứng không hợp lệ.";
         }
 
-        return booking.getCreateAt()
-                .plusMinutes(HOLD_MINUTES)
-                .atZone(ZoneId.systemDefault())
-                .toInstant()
-                .toEpochMilli();
-    }
-
-    private String validatePaymentProof(String paymentProof) {
-        if (paymentProof.isEmpty()) {
-            return "Vui lòng nhập tên người chuyển và mã giao dịch.";
+        if (transactionReference.isEmpty()) {
+            return "Vui lòng nhập mã giao dịch hoặc mã tham chiếu.";
         }
 
-        if (paymentProof.length() > 100) {
-            return "Thông tin giao dịch không được vượt quá 100 ký tự.";
-        }
-
-        int separatorIndex = paymentProof.indexOf("-");
-
-        if (separatorIndex <= 0
-                || separatorIndex >= paymentProof.length() - 1) {
-
-            return "Vui lòng nhập đúng dạng: Tên người chuyển - Mã giao dịch.";
-        }
-
-        String senderName
-                = paymentProof.substring(0, separatorIndex).trim();
-
-        String transactionCode
-                = paymentProof.substring(separatorIndex + 1).trim();
-
-        if (senderName.length() < 2) {
-            return "Tên người chuyển không hợp lệ.";
-        }
-
-        if (transactionCode.length() < 4) {
+        if (transactionReference.length() < 4) {
             return "Mã giao dịch hoặc mã tham chiếu không hợp lệ.";
+        }
+
+        if (transactionReference.length() > 100) {
+            return "Mã giao dịch hoặc mã tham chiếu không được vượt quá 100 ký tự.";
         }
 
         return null;
     }
 
-    private String getParameter(HttpServletRequest request, String name) {
+    private long calculateRemainingSeconds(
+            Booking booking,
+            boolean hasPayment) {
+
+        if (hasPayment || booking.getCreateAt() == null) {
+            return 0;
+        }
+
+        long seconds = Duration.between(
+                java.time.LocalDateTime.now(),
+                booking.getCreateAt().plusMinutes(HOLD_MINUTES)
+        ).getSeconds();
+
+        return Math.max(seconds, 0);
+    }
+
+    private boolean isHoldExpired(Booking booking) {
+        if (booking.getCreateAt() == null) {
+            return false;
+        }
+
+        return java.time.LocalDateTime.now()
+                .isAfter(booking.getCreateAt().plusMinutes(HOLD_MINUTES));
+    }
+
+    private String getValue(HttpServletRequest request, String name) {
         String value = request.getParameter(name);
         return value == null ? "" : value.trim();
     }

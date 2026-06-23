@@ -198,7 +198,7 @@ public class BookingFormController extends HttpServlet {
         String phone = getValue(request, "phone");
         String idNumber = getValue(request, "idNumber");
         String dateOfBirthString = getValue(request, "dateOfBirth");
-        
+
         int roomTypeId = parseInt(request.getParameter("roomTypeId"));
         int numRooms = parseInt(request.getParameter("numRooms"));
         int numGuests = parseInt(request.getParameter("numGuests"));
@@ -226,7 +226,7 @@ public class BookingFormController extends HttpServlet {
                     roomTypeId, checkIn.toString(), checkOut.toString());
         }
 
-        String error = validateCustomerInformation(fullName, email, phone, idNumber,dateOfBirth);
+        String error = validateCustomerInformation(fullName, email, phone, idNumber, dateOfBirth);
 
         if (error == null) {
             error = validateRoomSelection(
@@ -378,12 +378,12 @@ public class BookingFormController extends HttpServlet {
             return "Số điện thoại không hợp lệ.";
         }
 
-        if (!idNumber.isEmpty() && idNumber.length() > 50) {
-            return "Số CMND/CCCD/Hộ chiếu không được vượt quá 50 ký tự.";
-        } else if (!idNumber.isEmpty()
-                && !idNumber.matches("^[A-Za-z0-9]+$")) {
+        if (idNumber != null && !idNumber.trim().isEmpty()) {
+            String trimmedIdNumber = idNumber.trim();
 
-            return "Số CMND/CCCD/Hộ chiếu chỉ được chứa chữ cái và chữ số.";
+            if (!trimmedIdNumber.matches("^([0-9]{12}|[A-Z][0-9]{7,8})$")) {
+                return "Số CCCD hoặc Hộ chiếu không hợp lệ.";
+            }
         }
 
         // Ngày sinh không bắt buộc, chỉ kiểm tra khi khách có nhập

@@ -697,20 +697,41 @@ public class BookingDAO extends DBContext {
     }
 
     // Lưu minh chứng và cập nhật booking thành đã đặt cọc
-    public boolean createDepositPayment(int bookingId, BigDecimal amount, String paymentProofUrl) {
+    // Lưu minh chứng đặt cọc kiểu cũ, giữ lại để tránh lỗi nếu chỗ khác còn gọi 3 tham số
+    public boolean createDepositPayment(
+            int bookingId,
+            BigDecimal amount,
+            String paymentProofUrl) {
+
+        return createDepositPayment(
+                bookingId,
+                amount,
+                paymentProofUrl,
+                ""
+        );
+    }
+
+// Lưu minh chứng đặt cọc gồm ảnh và mã giao dịch/mã tham chiếu
+    public boolean createDepositPayment(
+            int bookingId,
+            BigDecimal amount,
+            String paymentProofUrl,
+            String transactionReference) {
+
         String insertPaymentSql = """
-                              INSERT INTO DepositPayments
-                              (booking_id, amount, payment_proof_url, verification_status)
-                              VALUES (?, ?, ?, N'Chờ xử lý')
-                              """;
+                          INSERT INTO DepositPayments
+                          (booking_id, amount, payment_proof_url,
+                           notes, verification_status)
+                          VALUES (?, ?, ?, ?, N'Chờ xử lý')
+                          """;
 
         String updateBookingSql = """
-                              UPDATE Bookings
-                              SET payment_status = N'Đã đặt cọc'
-                              WHERE booking_id = ?
-                                AND [status] = N'Chờ xử lý'
-                                AND payment_status = N'Chưa thanh toán'
-                              """;
+                          UPDATE Bookings
+                          SET payment_status = N'Đã đặt cọc'
+                          WHERE booking_id = ?
+                            AND [status] = N'Chờ xử lý'
+                            AND payment_status = N'Chưa thanh toán'
+                          """;
 
         boolean oldAutoCommit = true;
 
@@ -720,10 +741,25 @@ public class BookingDAO extends DBContext {
 
             int insertedRows;
 
-            try (PreparedStatement insertStm = connection.prepareStatement(insertPaymentSql)) {
+            try (PreparedStatement insertStm
+                    = connection.prepareStatement(insertPaymentSql)) {
+
                 insertStm.setInt(1, bookingId);
                 insertStm.setBigDecimal(2, amount);
                 insertStm.setString(3, paymentProofUrl);
+
+                if (transactionReference == null
+                        || transactionReference.trim().isEmpty()) {
+
+                    insertStm.setNString(4, null);
+                } else {
+                    insertStm.setNString(
+                            4,
+                            "Mã giao dịch/Mã tham chiếu: "
+                            + transactionReference.trim()
+                    );
+                }
+
                 insertedRows = insertStm.executeUpdate();
             }
 
@@ -734,7 +770,9 @@ public class BookingDAO extends DBContext {
 
             int updatedRows;
 
-            try (PreparedStatement updateStm = connection.prepareStatement(updateBookingSql)) {
+            try (PreparedStatement updateStm
+                    = connection.prepareStatement(updateBookingSql)) {
+
                 updateStm.setInt(1, bookingId);
                 updatedRows = updateStm.executeUpdate();
             }
@@ -761,7 +799,10 @@ public class BookingDAO extends DBContext {
             try {
                 connection.setAutoCommit(oldAutoCommit);
             } catch (SQLException e) {
-                System.out.println("createDepositPayment autoCommit: " + e.getMessage());
+                System.out.println(
+                        "createDepositPayment autoCommit: "
+                        + e.getMessage()
+                );
             }
         }
 

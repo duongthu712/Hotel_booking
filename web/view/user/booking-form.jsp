@@ -154,8 +154,9 @@
                                     <input type="text"
                                            id="idNumber"
                                            name="idNumber"
-                                           maxlength="50"
-                                           placeholder="Nhập số giấy tờ tùy thân"
+                                           maxlength="12"
+                                           pattern="^([0-9]{12}|[A-Z][0-9]{7,8})$"
+                                           placeholder="Ví dụ: 012345678901 hoặc B1234567"
                                            value="${fn:escapeXml(idNumber)}">
                                 </div>
 

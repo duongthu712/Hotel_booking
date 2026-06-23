@@ -279,7 +279,7 @@
                                             <c:when test="${not empty booking.cancellationReason}">
                                                 <p>
                                                     Lý do:
-                                                <c:out value="${booking.cancellationReason}"/>
+                                                    <c:out value="${booking.cancellationReason}"/>
                                                 </p>
                                             </c:when>
 
@@ -452,59 +452,59 @@
                                               and booking.status ne 'Đã nhận phòng'
                                               and booking.status ne 'Đã trả phòng'}">
 
-                                    <div class="detail-payment-action">
-                                        <c:choose>
-                                            <c:when test="${empty verificationStatus
-                                                            or verificationStatus eq 'Chưa gửi minh chứng'}">
+                                      <div class="detail-payment-action">
+                                          <c:choose>
+                                              <c:when test="${empty verificationStatus
+                                                              or verificationStatus eq 'Chưa gửi minh chứng'}">
 
-                                                <a href="${paymentUrl}"
-                                                   class="detail-payment-button">
+                                                      <a href="${paymentUrl}"
+                                                         class="detail-payment-button">
 
-                                                    <span>TIẾP TỤC THANH TOÁN</span>
-                                                    <span class="detail-payment-arrow">→</span>
-                                                </a>
+                                                          <span>TIẾP TỤC THANH TOÁN</span>
+                                                          <span class="detail-payment-arrow">→</span>
+                                                      </a>
 
-                                                <p class="detail-payment-help">
-                                                    Xem thông tin chuyển khoản và gửi
-                                                    ảnh minh chứng đặt cọc.
-                                                </p>
-                                            </c:when>
+                                                      <p class="detail-payment-help">
+                                                          Xem thông tin chuyển khoản và gửi
+                                                          ảnh minh chứng đặt cọc.
+                                                      </p>
+                                              </c:when>
 
-                                            <c:when test="${verificationStatus eq 'Chờ xử lý'}">
-                                                <div class="detail-payment-message waiting">
-                                                    <span class="detail-payment-message-icon">
-                                                        ◷
-                                                    </span>
+                                              <c:when test="${verificationStatus eq 'Chờ xử lý'}">
+                                                  <div class="detail-payment-message waiting">
+                                                      <span class="detail-payment-message-icon">
+                                                          ◷
+                                                      </span>
 
-                                                    <div>
-                                                        <strong>Minh chứng đang chờ xử lý</strong>
+                                                      <div>
+                                                          <strong>Minh chứng đang chờ xử lý</strong>
 
-                                                        <p>
-                                                            Khách sạn đang kiểm tra
-                                                            minh chứng đặt cọc của bạn.
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </c:when>
+                                                          <p>
+                                                              Khách sạn đang kiểm tra
+                                                              minh chứng đặt cọc của bạn.
+                                                          </p>
+                                                      </div>
+                                                  </div>
+                                              </c:when>
 
-                                            <c:when test="${verificationStatus eq 'Đã phê duyệt'}">
-                                                <div class="detail-payment-message approved">
-                                                    <span class="detail-payment-message-icon">
-                                                        ✓
-                                                    </span>
+                                              <c:when test="${verificationStatus eq 'Đã phê duyệt'}">
+                                                  <div class="detail-payment-message approved">
+                                                      <span class="detail-payment-message-icon">
+                                                          ✓
+                                                      </span>
 
-                                                    <div>
-                                                        <strong>Đã xác nhận đặt cọc</strong>
+                                                      <div>
+                                                          <strong>Đã xác nhận đặt cọc</strong>
 
-                                                        <p>
-                                                            Minh chứng thanh toán đã
-                                                            được khách sạn phê duyệt.
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </c:when>
-                                        </c:choose>
-                                    </div>
+                                                          <p>
+                                                              Minh chứng thanh toán đã
+                                                              được khách sạn phê duyệt.
+                                                          </p>
+                                                      </div>
+                                                  </div>
+                                              </c:when>
+                                          </c:choose>
+                                      </div>
                                 </c:if>
                             </section>
                         </div>
@@ -685,7 +685,7 @@
                                                     <c:when test="${not empty booking.cancellationReason}">
                                                         <p>
                                                             Lý do:
-                                                        <c:out value="${booking.cancellationReason}"/>
+                                                            <c:out value="${booking.cancellationReason}"/>
                                                         </p>
                                                     </c:when>
 
@@ -756,16 +756,16 @@
                                     <c:when test="${booking.status eq 'Chờ xử lý'
                                                     or booking.status eq 'Đã xác nhận'}">
 
-                                        <a href="${cancelBookingUrl}"
-                                           class="detail-management-button cancel">
+                                            <a href="${cancelBookingUrl}"
+                                               class="detail-management-button cancel">
 
-                                            <span class="detail-management-icon">×</span>
+                                                <span class="detail-management-icon">×</span>
 
-                                            <span>
-                                                <strong>Hủy đặt phòng</strong>
-                                                <small>Gửi yêu cầu hủy đơn</small>
-                                            </span>
-                                        </a>
+                                                <span>
+                                                    <strong>Hủy đặt phòng</strong>
+                                                    <small>Gửi yêu cầu hủy đơn</small>
+                                                </span>
+                                            </a>
                                     </c:when>
 
                                     <c:otherwise>

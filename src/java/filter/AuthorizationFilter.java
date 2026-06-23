@@ -15,8 +15,42 @@ import model.StaffAccount;
 
 public class AuthorizationFilter implements Filter {
 
-    private final Set<String> adminUrls = Set.of(
-            "/view/admin",
+    private final Set<String> publicUrls = Set.of(
+            "/",
+            "/home",
+            "/login",
+            "/logout",
+            "/forgot-password",
+            "/verify-code",
+            "/reset-password",
+            "/access-denied",
+            "/policies",
+            "/room-detail",
+            "/booking-form",
+            "/quick-booking",
+            "/booking-payment",
+            "/booking-success",
+            "/booking-detail"
+    );
+
+    private final Set<String> staffOnlyUrls = Set.of(
+            "/profile",
+            "/profile/change-password"
+    );
+
+    private final Set<String> adminJspPrefixes = Set.of(
+            "/view/admin"
+    );
+
+    private final Set<String> managerJspPrefixes = Set.of(
+            "/view/manager"
+    );
+
+    private final Set<String> receptionistJspPrefixes = Set.of(
+            "/view/receptionist"
+    );
+
+    private final Set<String> adminServletUrls = Set.of(
             "/StaffAccountList",
             "/StaffAccountDetail",
             "/StaffAccountEdit",
@@ -24,9 +58,7 @@ public class AuthorizationFilter implements Filter {
             "/StaffAccountDelete"
     );
 
-    private final Set<String> managerUrls = Set.of(
-            "/view/manager",
-            "/dashboard.jsp",
+    private final Set<String> managerServletUrls = Set.of(
             "/HotelInfo",
             "/HotelInfoUpdate",
             "/HotelImageUpdate",
@@ -51,33 +83,21 @@ public class AuthorizationFilter implements Filter {
             "/ServiceCreate",
             "/ServiceEdit",
             "/ServiceDelete",
-            "/PolicyList",
             "/FeedbackList",
             "/HotelNewsCreate",
             "/HotelNewsEdit",
             "/HotelNewsDelete"
     );
 
-    private final Set<String> receptionistUrls = Set.of(
-            "/view/receptionist",
-            "/receptionist/dashboard",
-            "/receptionist/checkout",
-            "/receptionist/bookings",
-            "/receptionist/walkin",
-            "/receptionist/requests",
-            "/assign-room",
-            "/billing",
-            "/booking-list",
-            "/checkin",
-            "/check-in",
-            "/check-out",
-            "/invoice",
-            "/payment-verification",
-            "/request-processing",
-            "/walk-in-booking",
+    private final Set<String> receptionistServletUrls = Set.of(
+            "/receptionist-dashboard",
             "/DepositPaymentList",
             "/DepositPaymentVerify",
-            "/DepositPaymentReject"
+            "/DepositPaymentReject",
+            "/Checkout",
+            "/InvoiceCreate",
+            "/InvoicePDF",
+            "/BillingList"
     );
 
     @Override
@@ -92,12 +112,18 @@ public class AuthorizationFilter implements Filter {
         HttpServletResponse res = (HttpServletResponse) response;
 
         String contextPath = req.getContextPath();
-        String uri = req.getRequestURI();
-        String path = uri.substring(contextPath.length());
+        String path = req.getRequestURI().substring(contextPath.length());
 
-        int semicolonIndex = path.indexOf(";");
-        if (semicolonIndex != -1) {
-            path = path.substring(0, semicolonIndex);
+        path = removePathParameter(path);
+
+        if (isStaticResource(path)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if (publicUrls.contains(path)) {
+            chain.doFilter(request, response);
+            return;
         }
 
         if (!path.equals("/logout") && path.endsWith("/logout")) {
@@ -111,8 +137,9 @@ public class AuthorizationFilter implements Filter {
         }
 
         String requiredRole = getRequiredRole(path);
+        boolean needStaffLogin = requiredRole != null || staffOnlyUrls.contains(path);
 
-        if (requiredRole == null) {
+        if (!needStaffLogin) {
             chain.doFilter(request, response);
             return;
         }
@@ -125,15 +152,19 @@ public class AuthorizationFilter implements Filter {
         }
 
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
+        String currentRole = getCurrentRole(staff);
 
-        if (staff == null || staff.getRoleEn() == null) {
+        if (currentRole.isEmpty()) {
             res.sendRedirect(contextPath + "/access-denied");
             return;
         }
 
-        String role = staff.getRoleEn().trim();
+        if (staffOnlyUrls.contains(path)) {
+            chain.doFilter(request, response);
+            return;
+        }
 
-        if (!role.equalsIgnoreCase(requiredRole)) {
+        if (!currentRole.equals(requiredRole)) {
             res.sendRedirect(contextPath + "/access-denied");
             return;
         }
@@ -142,28 +173,83 @@ public class AuthorizationFilter implements Filter {
     }
 
     private String getRequiredRole(String path) {
-        if (matches(path, adminUrls)) {
+        if (matchesPrefix(path, adminJspPrefixes) || adminServletUrls.contains(path)) {
             return "ADMIN";
         }
 
-        if (matches(path, managerUrls)) {
+        if (matchesPrefix(path, managerJspPrefixes) || managerServletUrls.contains(path)) {
             return "MANAGER";
         }
 
-        if (matches(path, receptionistUrls)) {
+        if (matchesPrefix(path, receptionistJspPrefixes) || receptionistServletUrls.contains(path)) {
             return "RECEPTIONIST";
         }
 
         return null;
     }
 
-    private boolean matches(String path, Set<String> urls) {
-        for (String url : urls) {
-            if (path.equals(url) || path.startsWith(url + "/")) {
+    private boolean matchesPrefix(String path, Set<String> prefixes) {
+        for (String prefix : prefixes) {
+            if (path.equals(prefix) || path.startsWith(prefix + "/")) {
                 return true;
             }
         }
+
         return false;
+    }
+
+    private String getCurrentRole(StaffAccount staff) {
+        if (staff == null) {
+            return "";
+        }
+
+        String role = "";
+
+        if (staff.getRoleEn() != null && !staff.getRoleEn().trim().isEmpty()) {
+            role = staff.getRoleEn().trim();
+        } else if (staff.getRole() != null && !staff.getRole().trim().isEmpty()) {
+            role = staff.getRole().trim();
+        }
+
+        if (role.equalsIgnoreCase("ADMIN") || role.equalsIgnoreCase("Quản trị viên")) {
+            return "ADMIN";
+        }
+
+        if (role.equalsIgnoreCase("MANAGER") || role.equalsIgnoreCase("Quản lý")) {
+            return "MANAGER";
+        }
+
+        if (role.equalsIgnoreCase("RECEPTIONIST") || role.equalsIgnoreCase("Lễ tân")) {
+            return "RECEPTIONIST";
+        }
+
+        return "";
+    }
+
+    private String removePathParameter(String path) {
+        int semicolonIndex = path.indexOf(";");
+
+        if (semicolonIndex != -1) {
+            return path.substring(0, semicolonIndex);
+        }
+
+        return path;
+    }
+
+    private boolean isStaticResource(String path) {
+        return path.startsWith("/view/assets/")
+                || path.startsWith("/assets/")
+                || path.startsWith("/css/")
+                || path.startsWith("/js/")
+                || path.startsWith("/images/")
+                || path.endsWith(".css")
+                || path.endsWith(".js")
+                || path.endsWith(".png")
+                || path.endsWith(".jpg")
+                || path.endsWith(".jpeg")
+                || path.endsWith(".gif")
+                || path.endsWith(".svg")
+                || path.endsWith(".ico");
     }
 
     @Override

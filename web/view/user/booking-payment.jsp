@@ -32,6 +32,7 @@
                         THÔNG TIN ĐẶT PHÒNG
                     </div>
                 </div>
+
                 <div class="progress-line completed"></div>
 
                 <div class="progress-item active">
@@ -135,8 +136,8 @@
                                 </h1>
 
                                 <p>
-                                    Sau khi chuyển khoản, vui lòng nhập
-                                    tên người chuyển và mã giao dịch hoặc
+                                    Sau khi chuyển khoản, vui lòng tải ảnh
+                                    minh chứng và nhập mã giao dịch hoặc
                                     mã tham chiếu để khách sạn kiểm tra.
                                 </p>
                             </div>
@@ -280,6 +281,11 @@
                                          name="bookingCode"
                                          value="${booking.bookingCode}">
 
+                                  <input type="hidden"
+                                         id="payment-proof-url"
+                                         name="paymentProofUrl"
+                                         value="${fn:escapeXml(param.paymentProofUrl)}">
+
                                   <div class="upload-title">
                                       <span>▤</span>
                                       NHẬP THÔNG TIN GIAO DỊCH
@@ -303,33 +309,53 @@
 
                                   <div class="transaction-proof-field">
 
-                                      <label for="transactionProof">
-                                          Tên người chuyển - Mã giao dịch /
-                                          Mã tham chiếu
+                                      <label>
+                                          Ảnh minh chứng chuyển khoản
+                                          <span>*</span>
+                                      </label>
+
+                                      <div class="payment-upload-box">
+
+                                          <input type="file"
+                                                 id="paymentImage"
+                                                 class="payment-file-input"
+                                                 accept="image/png, image/jpeg, image/jpg">
+
+                                          <label for="paymentImage" class="payment-upload-label">
+                                              <div class="payment-upload-content">
+                                                  <small>Hỗ trợ định dạng JPG, JPEG, PNG</small>
+                                              </div>
+                                          </label>
+                                      </div>
+
+                                  </div>
+
+                                  <div class="transaction-proof-field">
+
+                                      <label for="transactionReference">
+                                          Mã giao dịch / Mã tham chiếu
                                           <span>*</span>
                                       </label>
 
                                       <input type="text"
-                                             id="transactionProof"
-                                             name="paymentProof"
+                                             id="transactionReference"
+                                             name="transactionReference"
                                              class="transaction-proof-input"
                                              maxlength="100"
-                                             value="${fn:escapeXml(param.paymentProof)}"
-                                             placeholder="Ví dụ: NGUYEN VAN AN - FT26123456789"
+                                             value="${fn:escapeXml(param.transactionReference)}"
+                                             placeholder="Ví dụ: FT26123456789"
                                              autocomplete="off"
                                              required>
 
                                       <small>
-                                          Nhập theo đúng định dạng:
-                                          <strong>
-                                              Tên người chuyển - Mã giao dịch
-                                          </strong>.
+                                          Nhập mã giao dịch hoặc mã tham chiếu
+                                          hiển thị trên biên lai chuyển khoản.
                                       </small>
                                   </div>
 
                                   <div class="payment-information-note">
                                       Sau khi gửi thông tin, lễ tân sẽ đối chiếu
-                                      tên người chuyển, mã giao dịch, số tiền và
+                                      ảnh minh chứng, mã giao dịch, số tiền và
                                       nội dung chuyển khoản trước khi xác nhận đơn.
                                   </div>
 
@@ -541,8 +567,16 @@
             const paymentForm =
                     document.getElementById("paymentForm");
 
-            const transactionProof =
-                    document.getElementById("transactionProof");
+            const paymentFilePreview = document.getElementById("paymentFilePreview");
+
+            const paymentFileName = document.getElementById("paymentFileName");
+
+            const clearPaymentImage = document.getElementById("clearPaymentImage");
+
+            const paymentProofUrl = document.getElementById("payment-proof-url");
+
+            const transactionReference =
+                    document.getElementById("transactionReference");
 
             const submitPayment =
                     document.getElementById("submitPayment");
@@ -640,8 +674,16 @@
                                 "ĐÃ HẾT THỜI GIAN";
                     }
 
-                    if (transactionProof) {
-                        transactionProof.disabled = true;
+                    if (paymentImage) {
+                        paymentImage.disabled = true;
+                    }
+
+                    if (paymentProofUrl) {
+                        paymentProofUrl.disabled = true;
+                    }
+
+                    if (transactionReference) {
+                        transactionReference.disabled = true;
                     }
 
                     const paymentStatusText =
@@ -697,70 +739,80 @@
                     }
                 });
             }
+            
+            if (paymentImage) {
+    paymentImage.addEventListener("change", function () {
+        if (paymentImage.files.length > 0) {
+            const fileName = paymentImage.files[0].name;
+
+            if (paymentFileName) {
+                paymentFileName.textContent = fileName;
+            }
+
+            if (paymentFilePreview) {
+                paymentFilePreview.style.display = "flex";
+            }
+        }
+    });
+}
+
+            if (clearPaymentImage) {
+                clearPaymentImage.addEventListener("click", function () {
+                    paymentImage.value = "";
+
+                    if (paymentProofUrl) {
+                        paymentProofUrl.value = "";
+                    }
+
+                    if (paymentFileName) {
+                        paymentFileName.textContent = "";
+                    }
+
+                    if (paymentFilePreview) {
+                        paymentFilePreview.style.display = "none";
+                    }
+                });
+            }
 
             if (paymentForm) {
                 paymentForm.addEventListener(
                         "submit",
                         function (event) {
 
-                            const proofValue =
-                                    transactionProof.value.trim();
-
-                            if (proofValue === "") {
-                                event.preventDefault();
-
-                                showPageMessage(
-                                        "Vui lòng nhập tên người chuyển "
-                                        + "và mã giao dịch.",
-                                        true
-                                        );
-
-                                transactionProof.focus();
-                                return;
-                            }
-
-                            const separatorIndex =
-                                    proofValue.indexOf("-");
-
-                            if (separatorIndex <= 0
-                                    || separatorIndex
-                                    >= proofValue.length - 1) {
+                            if (!paymentImage
+                                    || paymentImage.files.length === 0) {
 
                                 event.preventDefault();
 
                                 showPageMessage(
-                                        "Vui lòng nhập đúng dạng: "
-                                        + "Tên người chuyển - Mã giao dịch.",
+                                        "Vui lòng tải ảnh minh chứng chuyển khoản.",
                                         true
                                         );
 
-                                transactionProof.focus();
+                                if (paymentImage) {
+                                    paymentImage.focus();
+                                }
+
                                 return;
                             }
 
-                            const senderName =
-                                    proofValue
-                                    .substring(0, separatorIndex)
-                                    .trim();
+                            const referenceValue =
+                                    transactionReference.value.trim();
 
-                            const transactionCode =
-                                    proofValue
-                                    .substring(separatorIndex + 1)
-                                    .trim();
-
-                            if (senderName.length < 2) {
+                            if (referenceValue === "") {
                                 event.preventDefault();
 
                                 showPageMessage(
-                                        "Tên người chuyển không hợp lệ.",
+                                        "Vui lòng nhập mã giao dịch "
+                                        + "hoặc mã tham chiếu.",
                                         true
                                         );
 
-                                transactionProof.focus();
+                                transactionReference.focus();
                                 return;
                             }
 
-                            if (transactionCode.length < 4) {
+                            if (referenceValue.length < 4) {
                                 event.preventDefault();
 
                                 showPageMessage(
@@ -769,20 +821,16 @@
                                         true
                                         );
 
-                                transactionProof.focus();
+                                transactionReference.focus();
                                 return;
                             }
 
-                            transactionProof.value =
-                                    senderName + " - " + transactionCode;
-
-                            submitPayment.disabled = true;
-
-                            submitPayment.textContent =
-                                    "ĐANG GỬI...";
+                            transactionReference.value = referenceValue;
                         }
                 );
             }
         </script>
+
+        <script src="${pageContext.request.contextPath}/view/assets/javascript/upload-img.js"></script>
     </body>
 </html>
