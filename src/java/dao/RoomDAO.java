@@ -356,8 +356,8 @@ public class RoomDAO extends DBContext {
         return null;
     }
 
-    //Lấy sơ đồ trạng thái phòng
-public List<RoomStatusView> getAllRoomStatusViews(int targetRoomTypeId, String filterRoomTypeName, String filterFloor) {
+   // Lấy sơ đồ trạng thái phòng
+    public List<RoomStatusView> getAllRoomStatusViews(int targetRoomTypeId, String filterRoomTypeName, String filterFloor) {
         List<RoomStatusView> list = new ArrayList<>();
         
         String sql = "SELECT r.room_number, r.floor, r.room_type_id, rt.type_name, rt.capacity, r.[status], "
@@ -368,7 +368,7 @@ public List<RoomStatusView> getAllRoomStatusViews(int targetRoomTypeId, String f
                 + "FROM Rooms r "
                 + "INNER JOIN RoomTypes rt ON r.room_type_id = rt.room_type_id "
                 + "LEFT JOIN BookingRooms br ON r.room_number = br.room_number "
-                + "LEFT JOIN Bookings b ON br.booking_id = b.booking_id AND b.[status] = N'Đã nhận phòng' " // 🚀 ĐÃ SỬA: Chỉ lấy đơn đang lưu trú thực tế
+                + "LEFT JOIN Bookings b ON br.booking_id = b.booking_id AND b.[status] IN (N'Đã xác nhận', N'Đã nhận phòng') " 
                 + "LEFT JOIN GuestStays g ON br.booking_room_id = g.booking_room_id "
                 + "WHERE 1=1 ";
 
@@ -449,4 +449,70 @@ public List<RoomStatusView> getAllRoomStatusViews(int targetRoomTypeId, String f
         }
         return list;
     }
+    
+    // Lấy lại phòng đã gán
+    public boolean unassignRoom(int bookingId, int roomNumber) throws SQLException {
+        String getBookingRoomIdSql = "SELECT booking_room_id FROM BookingRooms WHERE booking_id = ? AND room_number = ?";
+        String deleteGuestStaysSql = "DELETE FROM GuestStays WHERE booking_room_id = ?";
+        String deleteBookingRoomSql = "DELETE FROM BookingRooms WHERE booking_room_id = ?";
+        String updateRoomSql = "UPDATE Rooms SET [status] = N'Phòng trống' WHERE room_number = ?";
+        String rollbackBookingStatusSql = "UPDATE Bookings SET [status] = N'Đã xác nhận', actual_checkin_time = NULL WHERE booking_id = ? AND [status] = N'Đã nhận phòng'";
+
+        int targetBookingRoomId = -1;
+
+        try {
+            connection.setAutoCommit(false);
+
+            // Lấy booking_room_id
+            try (PreparedStatement psGet = connection.prepareStatement(getBookingRoomIdSql)) {
+                psGet.setInt(1, bookingId);
+                psGet.setInt(2, roomNumber);
+                try (ResultSet rs = psGet.executeQuery()) {
+                    if (rs.next()) {
+                        targetBookingRoomId = rs.getInt("booking_room_id");
+                    }
+                }
+            }
+
+            if (targetBookingRoomId != -1) {
+                // Xóa dữ liệu khách lưu trú của phòng đã gán
+                try (PreparedStatement psDelGuest = connection.prepareStatement(deleteGuestStaysSql)) {
+                    psDelGuest.setInt(1, targetBookingRoomId);
+                    psDelGuest.executeUpdate();
+                }
+
+                // Xóa liên kết giữa đơn đặt và phòng
+                try (PreparedStatement psDelRoom = connection.prepareStatement(deleteBookingRoomSql)) {
+                    psDelRoom.setInt(1, targetBookingRoomId);
+                    psDelRoom.executeUpdate();
+                }
+
+                // Đặt lại trạng thái phòng thành phòng trống
+                try (PreparedStatement psUpdRoom = connection.prepareStatement(updateRoomSql)) {
+                    psUpdRoom.setInt(1, roomNumber);
+                    psUpdRoom.executeUpdate();
+                }
+
+                // Lùi trạng thái đơn đặt nếu trước đó đã được đánh dấu là nhận đủ phòng
+                try (PreparedStatement psUpdBooking = connection.prepareStatement(rollbackBookingStatusSql)) {
+                    psUpdBooking.setInt(1, bookingId);
+                    psUpdBooking.executeUpdate(); 
+                }
+            }
+
+            connection.commit();
+            return true;
+
+        } catch (SQLException e) {
+            if (connection != null) {
+                connection.rollback();
+            }
+            throw e;
+        } finally {
+            if (connection != null) {
+                connection.setAutoCommit(true);
+            }
+        }
+    }
 }
+

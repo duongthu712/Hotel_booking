@@ -15,6 +15,7 @@ public class RoomType {
     private BigDecimal areaSqm;
     private BigDecimal basePrice;
     private boolean active;
+    private int availableRooms;
 
     private List<String> imageUrl;
     private List<String> imageCaption;
@@ -46,8 +47,6 @@ public class RoomType {
         this.roomTypeAmenitys = roomTypeAmenitys;
     }
 
-    
-    
     public RoomType(int roomTypeId, String typeName, String description,
             int capacity, String bedType, int bedCount, BigDecimal areaSqm,
             BigDecimal basePrice, boolean active) {
@@ -93,7 +92,7 @@ public class RoomType {
     public void setRoomTypeAmenitys(List<RoomTypeAmenity> roomTypeAmenitys) {
         this.roomTypeAmenitys = roomTypeAmenitys;
     }
-    
+
     public int getRoomTypeId() {
         return roomTypeId;
     }
@@ -197,4 +196,13 @@ public class RoomType {
     public void setRoomAmenities(List<RoomAmenity> roomAmenities) {
         this.roomAmenities = roomAmenities;
     }
+
+    public int getAvailableRooms() {
+        return availableRooms;
+    }
+
+    public void setAvailableRooms(int availableRooms) {
+        this.availableRooms = availableRooms;
+    }
+    
 }
