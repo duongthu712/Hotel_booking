@@ -125,10 +125,6 @@
                                 <img src="" alt="Payment Proof" id="proof-img">
                             </div>
                             <div id="proof-url-container" style="margin-top: 10px; word-break: break-all;">
-                                <div>
-                                    <strong>Link ảnh minh chứng:</strong>
-                                    <p id="proof-url-link"></p>
-                                </div>
 
                                 <div style="margin-top: 10px;">
                                     <strong>Mã giao dịch / Mã tham chiếu:</strong>
@@ -199,7 +195,7 @@
 
         <script src="<%=request.getContextPath()%>/view/assets/javascript/payment-verification.js"></script>
         <script src="<%=request.getContextPath()%>/view/assets/javascript/alert.js"></script>
-    
+
     </body>
 
 </html>
