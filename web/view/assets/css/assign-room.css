@@ -315,3 +315,41 @@
 
 .action-bar-submit-only { border: none; padding: 5px 0 0 0; margin: 0; }
 .btn-submit-full { width: 100%; padding: 12px; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; }
+/* ==========================================================================
+   FORM & NÚT HỦY GÁN PHÒNG (UNASSIGN)
+   ========================================================================== */
+
+/* Container form hủy gán phòng (Ẩn mặc định, JS sẽ gọi hiện lên) */
+#unassignRoomForm {
+    display: none;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px dashed #cbd5e1; /* Thêm đường viền gạch đứt để ngăn cách với thông tin ở trên */
+}
+
+/* Style cho nút Hủy Gán màu đỏ (Cảnh báo) */
+.btn-unassign {
+    width: 100%;
+    padding: 12px 16px;
+    background-color: #1a446c; /* Màu đỏ mận (Danger) */
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Lora', serif; /* Đồng bộ font chữ với hệ thống */
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2); /* Đổ bóng nhẹ */
+}
+
+/* Hiệu ứng khi di chuột vào nút */
+.btn-unassign:hover {
+   background-color: #133250; /* Đỏ sậm hơn khi hover */
+    box-shadow: 0 4px 6px rgba(26, 68, 108, 0.3);
+}
+
+/* Hiệu ứng khi click (nhấn nút xuống) */
+.btn-unassign:active {
+    transform: translateY(1px);
+}

@@ -2,22 +2,23 @@ package dto;
 
 import java.util.List;
 import java.util.Map;
-import dto.BookingCheckInView; // Import đúng class View của ông
-import model.GuestRequest;       // Import đúng model Request của ông
+import dto.BookingCheckInView;
+import model.GuestRequest;
 
 public class ReceptionistDashboard {
 
-    // 1. Khối chứa số liệu đếm nhanh cho các ô Widget ở trên cùng
+    // Các chỉ số thống kê (4 ô thông tin trên cùng)
     private int totalArrivalsToday;
     private int totalDeparturesToday;
-    private int totalInHouseGuests;
+    private int pendingDeposits;
     private int pendingRequests;
+    
+    // Key: Tên trạng thái (VD: "Empty", "Occupied"), Value: Số lượng phòng tương ứng
     private Map<String, Integer> roomStatusCount;
 
-    // 2. Khối chứa 3 danh sách dữ liệu thực tế để ông duyệt c:forEach đổ ra bảng
+   // Danh sách chi tiết (2 bảng thông tin bên dưới)
     private List<BookingCheckInView> checkInTodayList;  // List 1: Check-in hôm nay
     private List<BookingCheckInView> checkOutTodayList; // List 2: Check-out hôm nay
-    private List<GuestRequest> pendingRequestsList;     // List 3: Yêu cầu chờ xử lý
 
     public int getTotalArrivalsToday() {
         return totalArrivalsToday;
@@ -35,13 +36,6 @@ public class ReceptionistDashboard {
         this.totalDeparturesToday = totalDeparturesToday;
     }
 
-    public int getTotalInHouseGuests() {
-        return totalInHouseGuests;
-    }
-
-    public void setTotalInHouseGuests(int totalInHouseGuests) {
-        this.totalInHouseGuests = totalInHouseGuests;
-    }
 
     public int getPendingRequests() {
         return pendingRequests;
@@ -76,11 +70,13 @@ public class ReceptionistDashboard {
         this.checkOutTodayList = checkOutTodayList;
     }
 
-    public List<GuestRequest> getPendingRequestsList() {
-        return pendingRequestsList;
+    public void setPendingDeposits(int pendingDeposits) {
+        this.pendingDeposits = pendingDeposits;
     }
 
-    public void setPendingRequestsList(List<GuestRequest> pendingRequestsList) {
-        this.pendingRequestsList = pendingRequestsList;
+    public int getPendingDeposits() {
+        return pendingDeposits;
     }
+
+   
 }

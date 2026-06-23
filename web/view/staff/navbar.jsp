@@ -34,7 +34,7 @@
     <a href="${pageContext.request.contextPath}/checkin">Nhận phòng</a>
     <a href="${pageContext.request.contextPath}/Checkout">Trả phòng</a>
     <a href="${pageContext.request.contextPath}/bookings">Danh sách đặt phòng</a>
-    <a href="${pageContext.request.contextPath}/walkin">Đặt phòng tại quầy</a>
+    <a href="${pageContext.request.contextPath}/view/receptionist/walk-in-booking.jsp">Đặt phòng tại quầy</a>
     <a href="${pageContext.request.contextPath}/requests">Xử lý yêu cầu</a>
     <a href="${pageContext.request.contextPath}/DepositPaymentList">Danh sách đặt cọc</a>
     <a href="${pageContext.request.contextPath}/BillingList">Xem hóa đơn</a>

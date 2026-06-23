@@ -31,7 +31,6 @@ public class BookingCheckInView {
     public BookingCheckInView() {
     }
 
-    // THÊM CẶP HÀM GETTER / SETTER NÀY VÀO DTO
     public int getRoomTypeId() {
         return roomTypeId;
     }
@@ -40,7 +39,6 @@ public class BookingCheckInView {
         this.roomTypeId = roomTypeId;
     }
 
-    // --- Các hàm Getter và Setter cũ bên dưới giữ nguyên hoàn toàn ---
     public int getBookingId() {
         return bookingId;
     }

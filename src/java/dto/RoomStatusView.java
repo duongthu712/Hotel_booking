@@ -27,7 +27,6 @@ public class RoomStatusView {
         this.capacity = capacity;
     }
 
-    // --- CONSTRUCTORS ---
     public RoomStatusView() {
     }
 
@@ -43,7 +42,6 @@ public class RoomStatusView {
         this.guestFullName = guestFullName;
     }
 
-    // --- GETTERS & SETTERS ---
     public int getRoomNumber() {
         return roomNumber;
     }
