@@ -183,6 +183,7 @@
         <c:remove var="keepUnitPrice" scope="session"/>
         <c:remove var="keepImageUrl" scope="session"/>
         <c:remove var="keepActive" scope="session"/>
+        <script src="<%=request.getContextPath()%>/view/assets/javascript/alert.js"></script>
         <script src="<%=request.getContextPath()%>/view/assets/javascript/hotel-service-management.js"></script>
         <script src="<%=request.getContextPath()%>/view/assets/javascript/upload-img.js"></script>
     </body>

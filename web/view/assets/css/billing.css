@@ -417,7 +417,10 @@
     background: var(--bg-main);
 }
 
-/* ===== RESPONSIVE ===== */
+.text-center{
+    align-items: center;
+}
+
 @media (max-width: 1200px) {
     .billing-layout {
         grid-template-columns: 1fr;

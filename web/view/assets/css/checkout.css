@@ -122,6 +122,10 @@
     font-size: 0.85rem;
 }
 
+.data-table-thead th{
+    text-align: left !important;
+}
+
 .info-grid {
     display: grid;
     grid-template-columns: 1.5fr 0.5fr;
