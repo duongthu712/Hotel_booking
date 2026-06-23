@@ -154,33 +154,42 @@
                     </div>
 
                     <div class="detail-section">
+
                         <h3 class="section-title">THÔNG TIN KHÁCH HÀNG</h3>
+                        <c:if test="${not empty guest}">
+                            <div class="guest-info-grid">
+                                <div class="info-col">
+                                    <div class="info-row">
+                                        <span class="info-label">Họ và tên</span>
+                                        <span class="info-value">${guest.getFullName()}</span>
+                                    </div>
 
-                        <div class="guest-info-grid">
-                            <div class="info-col">
-                                <div class="info-row">
-                                    <span class="info-label">Họ và tên</span>
-                                    <span class="info-value">${guest.getFullName()}</span>
+                                    <div class="info-row">
+                                        <span class="info-label">Điện thoại</span>
+                                        <span class="info-value">${guest.getPhone()}</span>
+                                    </div>
                                 </div>
 
-                                <div class="info-row">
-                                    <span class="info-label">Điện thoại</span>
-                                    <span class="info-value">${guest.getPhone()}</span>
+                                <div class="info-col">
+                                    <div class="info-row">
+                                        <span class="info-label">Quốc tịch</span>
+                                        <span class="info-value">${guest.getNationality()}</span>
+                                    </div>
+
+                                    <div class="info-row">
+                                        <span class="info-label">Số CMND/Hộ chiếu</span>
+                                        <span class="info-value">${guest.getIdNumber()}</span>
+                                    </div>
                                 </div>
                             </div>
-
-                            <div class="info-col">
-                                <div class="info-row">
-                                    <span class="info-label">Quốc tịch</span>
-                                    <span class="info-value">${guest.getNationality()}</span>
-                                </div>
-
-                                <div class="info-row">
-                                    <span class="info-label">Số CMND/Hộ chiếu</span>
-                                    <span class="info-value">${guest.getIdNumber()}</span>
-                                </div>
+                        </c:if>
+                        <c:if test="${empty guest}">
+                            <div class="info-row">
+                                <span class="info-label">Ghi chú</span>
+                                <span class="info-value">Booking walk-in</span>
                             </div>
-                        </div>
+                        </c:if>
+
                     </div>
 
                     <div class="detail-section">
@@ -230,7 +239,9 @@
 
                         <div class="payment-row total-row">
                             <span class="payment-label">TỔNG TIỀN</span>
-                            <span class="payment-value total"><fmt:formatNumber value="${roomCharges - selectedBooking.getDepositAmount().doubleValue()}" type="number" pattern="#,###"/>đ</span>
+                            <span class="payment-value total">
+                                <fmt:formatNumber value="${roomCharges - (selectedBooking.depositAmount != null ? selectedBooking.depositAmount.doubleValue() : 0)}" type="number" pattern="#,###"/>đ
+                            </span>
                         </div>
                     </div>
 

@@ -143,7 +143,7 @@
                                                 <td class="col-qty">
                                                     <div class="quantity-control">
                                                         <button type="button" class="qty-btn qty-minus" onclick="changeQty('service', ${loop.index}, -1)">−</button>
-                                                        <input type="number" name="serviceQuantity" id="serviceQty_${loop.index}" class="qty-input" value="0" min="0" data-unit-price="${svc.unitPrice}" data-is-free="${svc.isFree}" onchange="calculateServiceTotal(${loop.index})">
+                                                        <input type="number" name="serviceQuantity" id="serviceQty_${loop.index}" class="qty-input" value="0" min="0" data-unit-price="${svc.unitPrice}" data-is-free="${svc.isFree}" onchange="calculateService(${loop.index})">
                                                         <button type="button" class="qty-btn qty-plus" onclick="changeQty('service', ${loop.index}, 1)">+</button>
                                                     </div>
                                                     <input type="hidden" name="serviceId" value="${svc.serviceId}">
@@ -191,7 +191,7 @@
                                                 <td class="col-qty">
                                                     <div class="quantity-control">
                                                         <button type="button" class="qty-btn qty-minus" onclick="changeQty('amenity', ${loop.index}, -1)">−</button>
-                                                        <input type="number" name="damageQuantity" id="amenityQty_${loop.index}" class="qty-input" value="0" min="0" max="${amen.quantity}" data-unit-price="${amen.unitPrice}" onchange="calculateAmenityTotal(${loop.index})">
+                                                        <input type="number" name="damageQuantity" id="amenityQty_${loop.index}" class="qty-input" value="0" min="0" max="${amen.quantity}" data-unit-price="${amen.unitPrice}" onchange="calculateAmenity(${loop.index})">
                                                         <button type="button" class="qty-btn qty-plus" onclick="changeQty('amenity', ${loop.index}, 1)">+</button>
                                                     </div>
                                                     <input type="hidden" name="amenityId" value="${amen.amenityId}">

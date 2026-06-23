@@ -557,17 +557,17 @@ public class CheckoutDAO extends DBContext {
         connection.setAutoCommit(false);
         try {
             String invoiceSql = """
-                update Invoices
-                set consumable_charges = ?,
-                    amenity_damages = ?,
-                    total_amount = ?,
-                    remaining_amount = 0,
-                    payment_status = N'Đã thanh toán',
-                    payment_method = ?,
-                    paid_at = GETDATE(),
-                    created_by = ?
-                where booking_id = ?
-                """;
+            update Invoices
+            set consumable_charges = ?,
+                amenity_damages = ?,
+                total_amount = ?,
+                remaining_amount = 0,
+                payment_status = N'Đã thanh toán',
+                payment_method = ?,
+                paid_at = GETDATE(),
+                created_by = ?
+            where booking_id = ?
+            """;
             try (PreparedStatement stm = connection.prepareStatement(invoiceSql)) {
                 stm.setBigDecimal(1, invoice.getConsumableCharges());
                 stm.setBigDecimal(2, invoice.getAmenityDamages());
@@ -580,10 +580,10 @@ public class CheckoutDAO extends DBContext {
 
             if (services != null && !services.isEmpty()) {
                 String serviceSql = """
-                    insert into BookingServices (booking_id, room_type_service_id, unit_price,
-                        quantity_used, total_price, added_at)
-                    values (?, ?, ?, ?, ?, GETDATE())
-                    """;
+                insert into BookingServices (booking_id, room_type_service_id, unit_price,
+                    quantity_used, total_price, added_at)
+                values (?, ?, ?, ?, ?, GETDATE())
+                """;
                 try (PreparedStatement stm = connection.prepareStatement(serviceSql)) {
                     for (BookingService s : services) {
                         stm.setInt(1, s.getBookingId());
@@ -599,10 +599,10 @@ public class CheckoutDAO extends DBContext {
 
             if (damages != null && !damages.isEmpty()) {
                 String damageSql = """
-                    insert into RoomAmenityDamages (booking_id, amenity_id, quantity_damaged,
-                        total_price, added_at)
-                    values (?, ?, ?, ?, GETDATE())
-                    """;
+                insert into RoomAmenityDamages (booking_id, amenity_id, quantity_damaged,
+                    total_price, added_at)
+                values (?, ?, ?, ?, GETDATE())
+                """;
                 try (PreparedStatement stm = connection.prepareStatement(damageSql)) {
                     for (RoomAmenityDamage d : damages) {
                         stm.setInt(1, d.getBookingId());
@@ -613,6 +613,16 @@ public class CheckoutDAO extends DBContext {
                     }
                     stm.executeBatch();
                 }
+            }
+
+            // Lưu thời gian checkout thực tế
+            String updateCheckoutTimeSql = """
+            update Bookings set actual_checkout_time = GETDATE()
+            where booking_id = ?
+            """;
+            try (PreparedStatement stm = connection.prepareStatement(updateCheckoutTimeSql)) {
+                stm.setInt(1, invoice.getBookingId());
+                stm.executeUpdate();
             }
 
             updateBookingStatus(invoice.getBookingId());
@@ -669,7 +679,7 @@ public class CheckoutDAO extends DBContext {
             stm.setInt(1, bookingId);
             try (ResultSet rs = stm.executeQuery()) {
                 if (rs.next()) {
-                    
+
                     return mapInvoice(rs);
                 }
             }
@@ -783,7 +793,7 @@ public class CheckoutDAO extends DBContext {
                             : "-");
                     map.put("bookingStatus", rs.getString("booking_status"));
                     list.add(map);
-                    
+
                 }
             }
         } catch (SQLException e) {

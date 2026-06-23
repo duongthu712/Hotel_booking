@@ -232,25 +232,20 @@ public class InvoiceCreateController extends HttpServlet {
 
             String paymentMethod = request.getParameter("paymentMethod");
 
-            if (isReopening) {
-                dao.completeInvoicePayment(existingInvoice.getInvoiceId(), bookingId, paymentMethod, staff.getStaffId(), damages);
-                session.setAttribute("successMessage", "Xác nhận thanh toán thành công!");
-            } else {
-                Invoice invoice = new Invoice();
-                invoice.setBookingId(bookingId);
-                invoice.setRoomCharges(roomCharges);
-                invoice.setConsumableCharges(consumableCharges);
-                invoice.setAmenityDamages(amenityDamages);
-                invoice.setDepositDeducted(depositDeducted);
-                invoice.setTotalAmount(totalAmount);
-                invoice.setRemainingAmount(remainingAmount);
-                invoice.setPaymentMethod(paymentMethod);
-                invoice.setCreatedBy(staff.getStaffId());
+            Invoice invoice = new Invoice();
+            invoice.setBookingId(bookingId);
+            invoice.setRoomCharges(roomCharges);
+            invoice.setConsumableCharges(consumableCharges);
+            invoice.setAmenityDamages(amenityDamages);
+            invoice.setDepositDeducted(depositDeducted);
+            invoice.setTotalAmount(totalAmount);
+            invoice.setRemainingAmount(remainingAmount);
+            invoice.setPaymentMethod(paymentMethod);
+            invoice.setCreatedBy(staff.getStaffId());
 
-                List<Room> rooms = dao.getRoomsByBookingId(bookingId);
-                dao.createInvoice(invoice, services, damages, rooms);
-                session.setAttribute("successMessage", "Tạo hóa đơn thành công!");
-            }
+            List<Room> rooms = dao.getRoomsByBookingId(bookingId);
+            dao.createInvoice(invoice, services, damages, rooms);
+            session.setAttribute("successMessage", "Tạo hóa đơn thành công!");
 
             response.sendRedirect(request.getContextPath() + "/BillingList?invoiceId=" + dao.getInvoiceByBookingId(bookingId).getInvoiceId());
 

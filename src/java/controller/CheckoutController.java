@@ -101,7 +101,6 @@ public class CheckoutController extends HttpServlet {
                     request.setAttribute("selectedBooking", booking);
                     request.setAttribute("nights", nights);
                     request.setAttribute("roomCharges", roomCharges);
-                    request.setAttribute("checkinDisplay", dao);
 
                     request.setAttribute("checkinDateDisplay", booking.getCheckinDate().format(dateFormatter));
                     request.setAttribute("checkoutDateDisplay", booking.getCheckoutDate().format(dateFormatter));
