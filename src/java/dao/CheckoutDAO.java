@@ -22,7 +22,6 @@ import model.Invoice;
 import model.Room;
 import model.RoomAmenityDamage;
 import model.RoomType;
-import model.StaffAccount;
 
 /**
  * @author LinhLTHE200306
@@ -275,6 +274,25 @@ public class CheckoutDAO extends DBContext {
         }
 
         return list;
+    }
+
+    public LocalDateTime getDepositVerifiedAt(int bookingId) throws Exception {
+        String sql = """
+                 select verified_at from DepositPayments 
+                 where booking_id = ? and verification_status = N'Đã phê duyệt'
+                 """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, bookingId);
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    java.sql.Timestamp ts = rs.getTimestamp("verified_at");
+                    return ts != null ? ts.toLocalDateTime() : null;
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể lấy ngày cọc.");
+        }
+        return null;
     }
 
     public RoomType getRoomTypeByBookingId(int bookingId) throws Exception {
@@ -539,29 +557,30 @@ public class CheckoutDAO extends DBContext {
         connection.setAutoCommit(false);
         try {
             String invoiceSql = """
-            insert into Invoices (booking_id, room_charges, consumable_charges, 
-                amenity_damages, deposit_deducted, total_amount, remaining_amount,
-                payment_status, payment_method, paid_at, created_by)
-            values (?, ?, ?, ?, ?, ?, ?, N'Đã thanh toán', ?, GETDATE(), ?)
+            update Invoices
+            set consumable_charges = ?,
+                amenity_damages = ?,
+                total_amount = ?,
+                remaining_amount = 0,
+                payment_status = N'Đã thanh toán',
+                payment_method = ?,
+                paid_at = GETDATE(),
+                created_by = ?
+            where booking_id = ?
             """;
-
-            try (PreparedStatement stm = connection.prepareStatement(invoiceSql,
-                    java.sql.Statement.RETURN_GENERATED_KEYS)) {
-                stm.setInt(1, invoice.getBookingId());
-                stm.setBigDecimal(2, invoice.getRoomCharges());
-                stm.setBigDecimal(3, invoice.getConsumableCharges());
-                stm.setBigDecimal(4, invoice.getAmenityDamages());
-                stm.setBigDecimal(5, invoice.getDepositDeducted());
-                stm.setBigDecimal(6, invoice.getTotalAmount());
-                stm.setBigDecimal(7, invoice.getRemainingAmount());
-                stm.setString(8, invoice.getPaymentMethod());
-                stm.setInt(9, invoice.getCreatedBy());
+            try (PreparedStatement stm = connection.prepareStatement(invoiceSql)) {
+                stm.setBigDecimal(1, invoice.getConsumableCharges());
+                stm.setBigDecimal(2, invoice.getAmenityDamages());
+                stm.setBigDecimal(3, invoice.getTotalAmount());
+                stm.setString(4, invoice.getPaymentMethod());
+                stm.setInt(5, invoice.getCreatedBy());
+                stm.setInt(6, invoice.getBookingId());
                 stm.executeUpdate();
             }
 
             if (services != null && !services.isEmpty()) {
                 String serviceSql = """
-                insert into BookingServices (booking_id, room_type_service_id, unit_price, 
+                insert into BookingServices (booking_id, room_type_service_id, unit_price,
                     quantity_used, total_price, added_at)
                 values (?, ?, ?, ?, ?, GETDATE())
                 """;
@@ -580,7 +599,7 @@ public class CheckoutDAO extends DBContext {
 
             if (damages != null && !damages.isEmpty()) {
                 String damageSql = """
-                insert into RoomAmenityDamages (booking_id, amenity_id, quantity_damaged, 
+                insert into RoomAmenityDamages (booking_id, amenity_id, quantity_damaged,
                     total_price, added_at)
                 values (?, ?, ?, ?, GETDATE())
                 """;
@@ -594,6 +613,16 @@ public class CheckoutDAO extends DBContext {
                     }
                     stm.executeBatch();
                 }
+            }
+
+            // Lưu thời gian checkout thực tế
+            String updateCheckoutTimeSql = """
+            update Bookings set actual_checkout_time = GETDATE()
+            where booking_id = ?
+            """;
+            try (PreparedStatement stm = connection.prepareStatement(updateCheckoutTimeSql)) {
+                stm.setInt(1, invoice.getBookingId());
+                stm.executeUpdate();
             }
 
             updateBookingStatus(invoice.getBookingId());
@@ -617,7 +646,8 @@ public class CheckoutDAO extends DBContext {
                 set payment_status = N'Đã thanh toán', 
                     payment_method = ?,
                     paid_at = GETDATE(),
-                    created_by = ?
+                    created_by = ?,
+                     remaining_amount = 0                 
                 where invoice_id = ?
                 """;
             try (PreparedStatement stm = connection.prepareStatement(updateInvoiceSql)) {
@@ -641,26 +671,6 @@ public class CheckoutDAO extends DBContext {
         }
     }
 
-    public void updateInvoicePaymentStatus(int invoiceId, String paymentMethod, int staffId) throws Exception {
-        String sql = """
-                     update Invoices 
-                     set payment_status = N'Đã thanh toán', 
-                         payment_method = ?,
-                         paid_at = GETDATE(),
-                         created_by = ?
-                     where invoice_id = ?
-                     """;
-
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setString(1, paymentMethod);
-            stm.setInt(2, staffId);
-            stm.setInt(3, invoiceId);
-            stm.executeUpdate();
-        } catch (SQLException e) {
-            throw new Exception("Lỗi hệ thống: Không thể cập nhật trạng thái hóa đơn.");
-        }
-    }
-
     public Invoice getInvoiceByBookingId(int bookingId) throws Exception {
         String sql = """
                      select * from Invoices where booking_id = ?
@@ -669,6 +679,7 @@ public class CheckoutDAO extends DBContext {
             stm.setInt(1, bookingId);
             try (ResultSet rs = stm.executeQuery()) {
                 if (rs.next()) {
+
                     return mapInvoice(rs);
                 }
             }
@@ -738,13 +749,13 @@ public class CheckoutDAO extends DBContext {
             LocalDate toDate, String status) throws Exception {
         List<Map<String, Object>> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder("""
-        select i.invoice_id, i.booking_id, b.booking_code, i.room_charges, i.consumable_charges,
-               i.amenity_damages, i.deposit_deducted, i.total_amount, i.remaining_amount,
-               i.payment_status, i.payment_method, i.paid_at
-        from Invoices i
-        join Bookings b on i.booking_id = b.booking_id
-        where 1 = 1
-        """);
+                                              select i.invoice_id, i.booking_id, b.booking_code, b.status as booking_status,
+                                                     i.room_charges, i.consumable_charges, i.amenity_damages, i.deposit_deducted,
+                                                     i.total_amount, i.remaining_amount, i.payment_status, i.payment_method, i.paid_at
+                                              from Invoices i
+                                              join Bookings b on i.booking_id = b.booking_id
+                                              where 1 = 1
+                                              """);
         List<Object> params = new ArrayList<>();
 
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -763,7 +774,7 @@ public class CheckoutDAO extends DBContext {
             sql.append(" and i.payment_status = ?");
             params.add(status);
         }
-        sql.append(" order by i.invoice_id desc");
+        sql.append(" order by i.paid_at desc, i.invoice_id desc");
 
         try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
             int idx = 1;
@@ -788,7 +799,9 @@ public class CheckoutDAO extends DBContext {
                             ? rs.getTimestamp("paid_at").toLocalDateTime()
                                     .format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
                             : "-");
+                    map.put("bookingStatus", rs.getString("booking_status"));
                     list.add(map);
+
                 }
             }
         } catch (SQLException e) {
@@ -882,12 +895,12 @@ public class CheckoutDAO extends DBContext {
 
     public Map<String, Object> getInvoiceDetailById(int invoiceId) throws Exception {
         String sql = """
-        select i.*, b.booking_code, sa.full_name as staff_name
-        from Invoices i
-        join Bookings b on i.booking_id = b.booking_id
-        left join StaffAccounts sa on i.created_by = sa.staff_id
-        where i.invoice_id = ?
-        """;
+    select i.*, b.booking_code, b.status as booking_status, sa.full_name as staff_name
+    from Invoices i
+    join Bookings b on i.booking_id = b.booking_id
+    left join StaffAccounts sa on i.created_by = sa.staff_id
+    where i.invoice_id = ?
+    """;
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, invoiceId);
             try (ResultSet rs = stm.executeQuery()) {
@@ -900,6 +913,7 @@ public class CheckoutDAO extends DBContext {
                             : "-");
                     map.put("bookingCode", rs.getString("booking_code"));
                     map.put("staffName", rs.getString("staff_name"));
+                    map.put("bookingStatus", rs.getString("booking_status"));
                     return map;
                 }
             }

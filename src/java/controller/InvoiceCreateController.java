@@ -26,7 +26,6 @@ import model.RoomAmenityDamage;
 import model.RoomType;
 import model.StaffAccount;
 
-
 /**
  * @author LinhLTHE200306
  * @version 1.0
@@ -35,8 +34,9 @@ import model.StaffAccount;
 public class InvoiceCreateController extends HttpServlet {
 
     private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy'T'HH:mm:ss");
-    private static final DateTimeFormatter DISPLAY_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter DISPLAY_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
     private static final DateTimeFormatter TIME_24H = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -67,10 +67,7 @@ public class InvoiceCreateController extends HttpServlet {
                 return;
             }
 
-            Invoice existingInvoice = dao.getUnpaidInvoiceByBookingId(bookingId);
-            boolean isReopening = existingInvoice != null;
-
-            if (!"Đã nhận phòng".equals(booking.getStatus()) && !isReopening) {
+            if (!"Đã nhận phòng".equals(booking.getStatus())) {
                 session.setAttribute("errorMessage", "Không thể tạo/xem hóa đơn cho booking này.");
                 response.sendRedirect(request.getContextPath() + "/Checkout");
                 return;
@@ -85,47 +82,28 @@ public class InvoiceCreateController extends HttpServlet {
             HotelInfoDAO hdao = new HotelInfoDAO();
             HotelInfo hotelInfo = hdao.getHotelInfoById(1);
 
-            String roomChargesParam = request.getParameter("roomCharges");
-            String nightsParam = request.getParameter("nights");
+            long nights = java.time.temporal.ChronoUnit.DAYS.between(booking.getCheckinDate(), booking.getCheckoutDate());
 
-            Double roomCharges;
-            Long nights;
-
-            if (roomChargesParam != null && nightsParam != null) {
-                roomCharges = Double.parseDouble(roomChargesParam);
-                nights = Long.parseLong(nightsParam);
-                session.setAttribute("checkout_roomCharges_" + bookingId, roomCharges);
-                session.setAttribute("checkout_nights_" + bookingId, nights);
-            } else {
-                roomCharges = (Double) session.getAttribute("checkout_roomCharges_" + bookingId);
-                nights = (Long) session.getAttribute("checkout_nights_" + bookingId);
-            }
+            double roomCharges = nights * booking.getBookedPricePerNight().doubleValue() * booking.getNumRooms();
 
             session.removeAttribute("checkout_roomCharges_" + bookingId);
             session.removeAttribute("checkout_nights_" + bookingId);
 
-            if (roomCharges == null || nights == null) {
-                session.setAttribute("errorMessage", "Vui lòng thực hiện check-out trước khi tạo hóa đơn.");
-                response.sendRedirect(request.getContextPath() + "/Checkout");
-                return;
-            }
+            java.time.LocalDateTime depositVerifiedAt = dao.getDepositVerifiedAt(bookingId);
+            String depositVerifiedAtStr = depositVerifiedAt != null ? depositVerifiedAt.format(DISPLAY_FORMATTER) : "N/A";
+            request.setAttribute("depositVerifiedAt", depositVerifiedAtStr);
 
             List<Map<String, Object>> roomTypeServices = dao.getRoomTypeServicesWithDetails(booking.getRoomTypeId());
             List<Map<String, Object>> roomTypeAmenities = dao.getRoomTypeAmenitiesWithDetails(booking.getRoomTypeId());
 
             List<BookingService> existingServices = null;
             List<RoomAmenityDamage> existingDamages = null;
-            if (isReopening) {
-                existingServices = dao.getBookingServicesByBookingId(bookingId);
-                existingDamages = dao.getRoomAmenityDamagesByBookingId(bookingId);
-            }
 
             String formattedCheckinTime = "14:00:00";
             if (booking.getActualCheckinTime() != null) {
                 formattedCheckinTime = booking.getActualCheckinTime().format(TIME_24H);
             }
-            
-            
+
             request.setAttribute("booking", booking);
             request.setAttribute("guest", guest);
             request.setAttribute("roomType", roomType);
@@ -136,12 +114,12 @@ public class InvoiceCreateController extends HttpServlet {
             request.setAttribute("nights", nights);
             request.setAttribute("roomCharges", roomCharges);
             request.setAttribute("formattedCheckinTime", formattedCheckinTime);
+            request.setAttribute("checkinDateDisplay", booking.getCheckinDate().format(dateFormatter));
+            request.setAttribute("checkoutDateDisplay", booking.getCheckoutDate().format(dateFormatter));
             request.setAttribute("actualCheckoutTime", LocalDateTime.now().format(DISPLAY_FORMATTER));
             request.setAttribute("roomTypeServices", roomTypeServices);
             request.setAttribute("roomTypeAmenities", roomTypeAmenities);
             request.setAttribute("depositAmount", booking.getDepositAmount());
-            request.setAttribute("isReopening", isReopening);
-            request.setAttribute("existingInvoice", existingInvoice);
             request.setAttribute("existingServices", existingServices);
             request.setAttribute("existingDamages", existingDamages);
 
@@ -254,29 +232,22 @@ public class InvoiceCreateController extends HttpServlet {
 
             String paymentMethod = request.getParameter("paymentMethod");
 
-            if (isReopening) {
-                dao.completeInvoicePayment(existingInvoice.getInvoiceId(), bookingId,
-                        paymentMethod, staff.getStaffId(), damages);
-                session.setAttribute("successMessage", "Xác nhận thanh toán thành công!");
-            } else {
-                Invoice invoice = new Invoice();
-                invoice.setBookingId(bookingId);
-                invoice.setRoomCharges(roomCharges);
-                invoice.setConsumableCharges(consumableCharges);
-                invoice.setAmenityDamages(amenityDamages);
-                invoice.setDepositDeducted(depositDeducted);
-                invoice.setTotalAmount(totalAmount);
-                invoice.setRemainingAmount(remainingAmount);
-                invoice.setPaymentMethod(paymentMethod);
-                invoice.setCreatedBy(staff.getStaffId());
+            Invoice invoice = new Invoice();
+            invoice.setBookingId(bookingId);
+            invoice.setRoomCharges(roomCharges);
+            invoice.setConsumableCharges(consumableCharges);
+            invoice.setAmenityDamages(amenityDamages);
+            invoice.setDepositDeducted(depositDeducted);
+            invoice.setTotalAmount(totalAmount);
+            invoice.setRemainingAmount(remainingAmount);
+            invoice.setPaymentMethod(paymentMethod);
+            invoice.setCreatedBy(staff.getStaffId());
 
-                List<Room> rooms = dao.getRoomsByBookingId(bookingId);
-                dao.createInvoice(invoice, services, damages, rooms);
+            List<Room> rooms = dao.getRoomsByBookingId(bookingId);
+            dao.createInvoice(invoice, services, damages, rooms);
+            session.setAttribute("successMessage", "Tạo hóa đơn thành công!");
 
-                session.setAttribute("successMessage", "Tạo hóa đơn thành công!");
-            }
-
-            response.sendRedirect(request.getContextPath() + "/BillingList?bookingId=" + bookingId);
+            response.sendRedirect(request.getContextPath() + "/BillingList?invoiceId=" + dao.getInvoiceByBookingId(bookingId).getInvoiceId());
 
         } catch (Exception e) {
             e.printStackTrace();

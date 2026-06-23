@@ -100,7 +100,7 @@
                 </c:forEach>
                 <c:if test="${empty roomList}">
                     <p class="empty-message">Không tìm thấy phòng.<p>
-                </c:if>
+                    </c:if>
             </div>
 
             <div class="pagination">
@@ -219,7 +219,7 @@
                 </div>
             </form>
         </div>
-
+        <script src="<%=request.getContextPath()%>/view/assets/javascript/alert.js"></script>
         <script src="${pageContext.request.contextPath}/view/assets/javascript/room-management.js"></script>
     </body>
 </html>

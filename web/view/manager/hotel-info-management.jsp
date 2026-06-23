@@ -31,16 +31,12 @@
         <main class="content-container">
 
             <c:if test="${not empty sessionScope.successMessage}">
-                <div class="alert-message alert-success">
-                    ${sessionScope.successMessage}
-                </div>
+                <div class="alert-message alert-success">${sessionScope.successMessage}</div>
                 <c:remove var="successMessage" scope="session"/>
             </c:if>
 
             <c:if test="${not empty sessionScope.errorMessage}">
-                <div class="alert-message alert-error">
-                    ${sessionScope.errorMessage}
-                </div>
+                <div class="alert-message alert-error">${sessionScope.errorMessage}</div>
                 <c:remove var="errorMessage" scope="session"/>
             </c:if>
 
@@ -416,6 +412,7 @@
         </main>
         <c:remove var="newsToEdit" scope="session"/>
         <c:remove var="openEditModal" scope="session"/>
+        <script src="<%=request.getContextPath()%>/view/assets/javascript/alert.js"></script>
         <script src="<%=request.getContextPath()%>/view/assets/javascript/hotel-info-management.js"></script>
         <script src="<%=request.getContextPath()%>/view/assets/javascript/upload-img.js"></script>
     </body>

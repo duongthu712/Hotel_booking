@@ -5,19 +5,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("service-form");
     const modalTitle = document.getElementById("modal-title");
 
-    const alerts = document.querySelectorAll(".alert-message");
-    alerts.forEach(alert => {
-        setTimeout(() => {
-            alert.style.opacity = "0";
-            alert.style.transform = "translateY(-10px)";
-            alert.style.transition = "opacity 0.3s ease, transform 0.3s ease";
-
-            setTimeout(() => {
-                alert.remove();
-            }, 300);
-        }, 3000);
-    });
-
     const isEditMode = document.body.getAttribute("data-edit-mode") === "true";
     const isCreateMode = document.body.getAttribute("data-create-mode") === "true";
 

@@ -79,7 +79,7 @@ function updateSummary() {
     const deposit = parseCurrency(depositText);
     
     const totalAmount = roomCharges + servicesTotal + damagesTotal;
-    const remaining = Math.max(0, totalAmount - deposit);
+    const remaining = Math.max(0, totalAmount + deposit);
     
     document.getElementById('summaryServices').textContent = formatCurrency(servicesTotal);
     document.getElementById('summaryDamages').textContent = formatCurrency(damagesTotal);

@@ -20,14 +20,13 @@ import model.StaffAccount;
  */
 public class BillingListController extends HttpServlet {
 
-    private static final int DEFAULT_PAGE_SIZE = 10;
+    private static final int RECORDS_PER_PAGE = 10;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
-
         if (staff == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
@@ -41,37 +40,58 @@ public class BillingListController extends HttpServlet {
             String fromDateStr = request.getParameter("fromDate");
             String toDateStr = request.getParameter("toDate");
 
-            LocalDate fromDate = (fromDateStr != null && !fromDateStr.isEmpty())
-                    ? LocalDate.parse(fromDateStr) : null;
-            LocalDate toDate = (toDateStr != null && !toDateStr.isEmpty())
-                    ? LocalDate.parse(toDateStr) : null;
+            String bookingIdParam = request.getParameter("bookingId");
+            if ((keyword == null || keyword.trim().isEmpty())
+                    && bookingIdParam != null && !bookingIdParam.trim().isEmpty()) {
+                keyword = bookingIdParam.trim();
+            }
 
-            // Phân trang
+            LocalDate fromDate = null;
+            LocalDate toDate = null;
+            try {
+                if (fromDateStr != null && !fromDateStr.isEmpty()) {
+                    fromDate = LocalDate.parse(fromDateStr);
+                }
+            } catch (Exception ignored) {
+            }
+            try {
+                if (toDateStr != null && !toDateStr.isEmpty()) {
+                    toDate = LocalDate.parse(toDateStr);
+                }
+            } catch (Exception ignored) {
+            }
+
             int page = 1;
+            try {
+                String pageParam = request.getParameter("page");
+                if (pageParam != null && !pageParam.isEmpty()) {
+                    page = Integer.parseInt(pageParam);
+                }
+            } catch (NumberFormatException ignored) {
+            }
+
             List<Map<String, Object>> allInvoices = dao.searchInvoices(keyword, fromDate, toDate, status);
             if (allInvoices == null) {
                 allInvoices = new ArrayList<>();
             }
 
             int totalRecords = allInvoices.size();
-            int recordsPerPage = 10;
-            int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+            int totalPages = totalRecords == 0 ? 1
+                    : (int) Math.ceil((double) totalRecords / RECORDS_PER_PAGE);
 
             if (page < 1) {
                 page = 1;
             }
-            if (page > totalPages && totalPages > 0) {
+            if (page > totalPages) {
                 page = totalPages;
             }
 
-            int start = (page - 1) * recordsPerPage;
-            int end = Math.min(start + recordsPerPage, totalRecords);
-
+            int start = (page - 1) * RECORDS_PER_PAGE;
+            int end = Math.min(start + RECORDS_PER_PAGE, totalRecords);
             List<Map<String, Object>> invoiceList = totalRecords > 0
                     ? allInvoices.subList(start, end)
-                    : allInvoices;
+                    : new ArrayList<>();
 
-            
             Map<String, Object> selectedInvoice = null;
             String invoiceIdStr = request.getParameter("invoiceId");
             if (invoiceIdStr != null && !invoiceIdStr.isEmpty()) {
@@ -90,11 +110,7 @@ public class BillingListController extends HttpServlet {
             request.setAttribute("currentPage", page);
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("totalRecords", totalRecords);
-            request.setAttribute("invoiceList", invoiceList);
-            request.setAttribute("currentPage", page);
-            request.setAttribute("totalPages", totalPages);
-            request.setAttribute("totalRecords", totalRecords);
-            request.setAttribute("pageSize", recordsPerPage);
+            request.setAttribute("pageSize", RECORDS_PER_PAGE);
 
             request.getRequestDispatcher("/view/receptionist/billing.jsp").forward(request, response);
 
@@ -103,5 +119,16 @@ public class BillingListController extends HttpServlet {
             session.setAttribute("errorMessage", e.getMessage());
             response.sendRedirect(request.getContextPath() + "/Checkout");
         }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doGet(request, response);
+    }
+
+    @Override
+    public String getServletInfo() {
+        return "Billing List Controller";
     }
 }

@@ -72,8 +72,14 @@
                     <c:forEach var="payment" items="${paymentList}" varStatus="loop">
                         <tr data-deposit-id="${payment.depositId}"
                             data-booking-id="${payment.bookingId}"
+                            data-booking-code="${bookingCodeMap[payment.bookingId]}"
+                            data-guest-name="${guestNameMap[payment.bookingId]}"
+                            data-amount="${payment.amount}"
+                            data-submitted-at="${payment.submittedAt.toLocalTime().toString().substring(0, 5)} ${payment.submittedAt.getDayOfMonth()}/${payment.submittedAt.getMonthValue()}/${payment.submittedAt.getYear()}"
+                            data-status="${payment.verificationStatus}"
+                            data-verified-by="${not empty verifiedByMap[payment.depositId] ? verifiedByMap[payment.depositId] : '-'}"
                             data-proof-url="${payment.paymentProofUrl}"
-                            data-notes="${payment.notes}">
+                            data-notes="${not empty payment.notes ? payment.notes : ''}">
                             <td class="col-stt">${(currentPage - 1) * 10 + loop.index + 1}</td>
                             <td class="col-booking">${bookingCodeMap[payment.getBookingId()]}</td>
                             <td class="col-guest">${guestNameMap[payment.getBookingId()]}</td>
@@ -119,10 +125,6 @@
                                 <img src="" alt="Payment Proof" id="proof-img">
                             </div>
                             <div id="proof-url-container" style="margin-top: 10px; word-break: break-all;">
-                                <div>
-                                    <strong>Link ảnh minh chứng:</strong>
-                                    <p id="proof-url-link"></p>
-                                </div>
 
                                 <div style="margin-top: 10px;">
                                     <strong>Mã giao dịch / Mã tham chiếu:</strong>
@@ -130,7 +132,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="payment-info-column">
                             <div class="payment-info">
                                 <div class="info-row">
@@ -153,8 +154,11 @@
                                     <span class="info-label">Trạng thái:</span>
                                     <span class="info-value" id="detail-status"></span>
                                 </div>
+                                <div class="info-row">
+                                    <span class="info-label">Người duyệt:</span>
+                                    <span class="info-value" id="detail-verified-by"></span>
+                                </div>
                             </div>
-
                             <div class="verification-form" id="verification-form">
                                 <div class="form-group">
                                     <label class="input-label">Ghi chú</label>
@@ -190,6 +194,8 @@
         </main>
 
         <script src="<%=request.getContextPath()%>/view/assets/javascript/payment-verification.js"></script>
+        <script src="<%=request.getContextPath()%>/view/assets/javascript/alert.js"></script>
+
     </body>
 
 </html>
