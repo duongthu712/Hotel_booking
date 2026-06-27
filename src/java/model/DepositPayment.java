@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * Last update 23:40 02/06/2026
+ * Last update 16:15 27/06/2026
  *
  * @author LinhLTHE200306
  */
@@ -18,13 +18,12 @@ public class DepositPayment {
     private String verificationStatus;
     private LocalDateTime verifiedAt;
     private String notes;
-    private int verifiedBy;
+    private Integer verifiedBy; // Đổi sang Integer để hỗ trợ giá trị null (DB cho phép null)
 
-    //Constructor
     public DepositPayment() {
     }
 
-    public DepositPayment(int depositId, int bookingId, BigDecimal amount, String paymentProofUrl, LocalDateTime submittedAt, String verificationStatus, LocalDateTime verifiedAt, String notes, int verifiedBy) {
+    public DepositPayment(int depositId, int bookingId, BigDecimal amount, String paymentProofUrl, LocalDateTime submittedAt, String verificationStatus, LocalDateTime verifiedAt, String notes, Integer verifiedBy) {
         this.depositId = depositId;
         this.bookingId = bookingId;
         this.amount = amount;
@@ -36,7 +35,6 @@ public class DepositPayment {
         this.verifiedBy = verifiedBy;
     }
 
-    //Getter & Setter
     public int getDepositId() {
         return depositId;
     }
@@ -45,11 +43,11 @@ public class DepositPayment {
         this.depositId = depositId;
     }
 
-    public int getVerifiedBy() {
+    public Integer getVerifiedBy() {
         return verifiedBy;
     }
 
-    public void setVerifiedBy(int verifiedBy) {
+    public void setVerifiedBy(Integer verifiedBy) {
         this.verifiedBy = verifiedBy;
     }
 
