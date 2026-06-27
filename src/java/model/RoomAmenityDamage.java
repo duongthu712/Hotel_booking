@@ -1,19 +1,18 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
+ * Last update 16:55 27/06/2026
  *
  * @author admin
  */
 public class RoomAmenityDamage {
+
     private int damageId;
     private int bookingId;
+    private int roomId;       
     private int amenityId;
     private int quantityDamaged;
     private BigDecimal totalPrice;
@@ -22,9 +21,10 @@ public class RoomAmenityDamage {
     public RoomAmenityDamage() {
     }
 
-    public RoomAmenityDamage(int damageId, int bookingId, int amenityId, int quantityDamaged, BigDecimal totalPrice, LocalDateTime addedAt) {
+    public RoomAmenityDamage(int damageId, int bookingId, int roomId, int amenityId, int quantityDamaged, BigDecimal totalPrice, LocalDateTime addedAt) {
         this.damageId = damageId;
         this.bookingId = bookingId;
+        this.roomId = roomId;
         this.amenityId = amenityId;
         this.quantityDamaged = quantityDamaged;
         this.totalPrice = totalPrice;
@@ -46,6 +46,14 @@ public class RoomAmenityDamage {
     public void setBookingId(int bookingId) {
         this.bookingId = bookingId;
     }
+
+    public int getRoomId() {
+        return roomId;
+    } // BỔ SUNG
+
+    public void setRoomId(int roomId) {
+        this.roomId = roomId;
+    } // BỔ SUNG
 
     public int getAmenityId() {
         return amenityId;
@@ -78,6 +86,4 @@ public class RoomAmenityDamage {
     public void setAddedAt(LocalDateTime addedAt) {
         this.addedAt = addedAt;
     }
-    
-    
 }

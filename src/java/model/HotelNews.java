@@ -1,10 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
-import java.util.Date;
+
+import java.time.LocalDateTime;
+
 /**
+ * Last update 16:55 27/06/2026
  *
  * @author Minh Thu
  */
@@ -16,13 +15,13 @@ public class HotelNews {
     private String content;
     private String imageUrl;
     private boolean active;
-    private Date createdAt;
+    private LocalDateTime createdAt;
     private int createdBy;
 
     public HotelNews() {
     }
 
-    public HotelNews(int newsId, int hotelId, String title, String content, String imageUrl, boolean active, Date createdAt, int createdBy) {
+    public HotelNews(int newsId, int hotelId, String title, String content, String imageUrl, boolean active, LocalDateTime createdAt, int createdBy) {
         this.newsId = newsId;
         this.hotelId = hotelId;
         this.title = title;
@@ -81,11 +80,11 @@ public class HotelNews {
         this.active = active;
     }
 
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 

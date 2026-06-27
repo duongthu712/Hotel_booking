@@ -3,9 +3,10 @@ package model;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime; // Thêm import này
 
 /**
- * Last update 23:53 02/06/2026
+ * Last update 15:40 27/06/2026
  *
  * @author LinhLTHE200306
  */
@@ -14,13 +15,16 @@ public class Booking {
     private int bookingId;
     private String bookingCode;
     private int guestId;
-    private Integer staffId; //staff can be null
+    private Integer staffId;
     private int roomTypeId;
     private int numRooms;
     private BigDecimal bookedPricePerNight;
     private LocalDate checkinDate;
     private LocalDate checkoutDate;
     private int numGuests;
+    private int numChildren;
+    private LocalTime expectedCheckInTime;
+    private LocalDateTime autoCancelDeadline;
     private String status;
     private String paymentStatus;
     private BigDecimal depositAmount;
@@ -31,12 +35,18 @@ public class Booking {
     private LocalDateTime actualCheckinTime;
     private LocalDateTime actualCheckoutTime;
     private LocalDateTime createAt;
-    
-    //Constructor
+
+    // Constructor
     public Booking() {
     }
 
-    public Booking(int bookingId, String bookingCode, int guestId, Integer staffId, int roomTypeId, int numRooms, BigDecimal bookedPricePerNight, LocalDate checkinDate, LocalDate checkoutDate, int numGuests, String status, String paymentStatus, BigDecimal depositAmount, String source, LocalDateTime confirmedAt, LocalDateTime cancelledAt, String cancellationReason, LocalDateTime actualCheckinTime, LocalDateTime actualCheckoutTime, LocalDateTime createAt) {
+    // Constructor đầy đủ (đã cập nhật)
+    public Booking(int bookingId, String bookingCode, int guestId, Integer staffId, int roomTypeId, int numRooms,
+            BigDecimal bookedPricePerNight, LocalDate checkinDate, LocalDate checkoutDate, int numGuests,
+            int numChildren, LocalTime expectedCheckInTime, LocalDateTime autoCancelDeadline,
+            String status, String paymentStatus, BigDecimal depositAmount, String source,
+            LocalDateTime confirmedAt, LocalDateTime cancelledAt, String cancellationReason,
+            LocalDateTime actualCheckinTime, LocalDateTime actualCheckoutTime, LocalDateTime createAt) {
         this.bookingId = bookingId;
         this.bookingCode = bookingCode;
         this.guestId = guestId;
@@ -47,6 +57,9 @@ public class Booking {
         this.checkinDate = checkinDate;
         this.checkoutDate = checkoutDate;
         this.numGuests = numGuests;
+        this.numChildren = numChildren;
+        this.expectedCheckInTime = expectedCheckInTime;
+        this.autoCancelDeadline = autoCancelDeadline;
         this.status = status;
         this.paymentStatus = paymentStatus;
         this.depositAmount = depositAmount;
@@ -59,7 +72,32 @@ public class Booking {
         this.createAt = createAt;
     }
 
-    //Getter & Setter
+    // --- CÁC GETTER & SETTER MỚI ---
+    public int getNumChildren() {
+        return numChildren;
+    }
+
+    public void setNumChildren(int numChildren) {
+        this.numChildren = numChildren;
+    }
+
+    public LocalTime getExpectedCheckInTime() {
+        return expectedCheckInTime;
+    }
+
+    public void setExpectedCheckInTime(LocalTime expectedCheckInTime) {
+        this.expectedCheckInTime = expectedCheckInTime;
+    }
+
+    public LocalDateTime getAutoCancelDeadline() {
+        return autoCancelDeadline;
+    }
+
+    public void setAutoCancelDeadline(LocalDateTime autoCancelDeadline) {
+        this.autoCancelDeadline = autoCancelDeadline;
+    }
+
+    // --- CÁC GETTER & SETTER CŨ (giữ nguyên) ---
     public int getBookingId() {
         return bookingId;
     }
@@ -219,5 +257,4 @@ public class Booking {
     public void setCreateAt(LocalDateTime createAt) {
         this.createAt = createAt;
     }
-
 }

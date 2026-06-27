@@ -12,6 +12,8 @@ public class RoomType {
     private int capacity;
     private String bedType;
     private int bedCount;
+    private int numGuests;
+    private int numChildren;
     private BigDecimal areaSqm;
     private BigDecimal basePrice;
     private boolean active;
@@ -141,6 +143,23 @@ public class RoomType {
         this.bedCount = bedCount;
     }
 
+    public int getNumGuests() {
+        return numGuests;
+    }
+
+    public void setNumGuests(int numGuests) {
+        this.numGuests = numGuests;
+    }
+
+    public int getNumChildren() {
+        return numChildren;
+    }
+
+    public void setNumChildren(int numChildren) {
+        this.numChildren = numChildren;
+    }
+
+    
     public BigDecimal getAreaSqm() {
         return areaSqm;
     }

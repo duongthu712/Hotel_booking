@@ -1,26 +1,26 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
-import java.util.Date;
+
+import java.time.LocalDateTime;
+
 /**
+ * Last update 16:30 27/06/2026
  *
  * @author Minh Thu
  */
 public class EmailNotification {
+
     private int notificationId;
     private Integer bookingId;
     private String recipientEmail;
     private String subject;
     private String notificationType;
-    private Date sentAt;
+    private LocalDateTime sentAt; // Chuyển sang LocalDateTime
     private String status;
 
     public EmailNotification() {
     }
 
-    public EmailNotification(int notificationId, Integer bookingId, String recipientEmail, String subject, String notificationType, Date sentAt, String status) {
+    public EmailNotification(int notificationId, Integer bookingId, String recipientEmail, String subject, String notificationType, LocalDateTime sentAt, String status) {
         this.notificationId = notificationId;
         this.bookingId = bookingId;
         this.recipientEmail = recipientEmail;
@@ -70,11 +70,11 @@ public class EmailNotification {
         this.notificationType = notificationType;
     }
 
-    public Date getSentAt() {
+    public LocalDateTime getSentAt() {
         return sentAt;
     }
 
-    public void setSentAt(Date sentAt) {
+    public void setSentAt(LocalDateTime sentAt) {
         this.sentAt = sentAt;
     }
 

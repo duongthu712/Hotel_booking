@@ -176,6 +176,7 @@
                                     </tr>
                                 </table>
 
+                                <%--Nếu có đơn--%> 
                                 <div id="viewGuestsTableContainer" style="display: none;">
                                     <h5 class="guest-list-title">DANH SÁCH KHÁCH LƯU TRÚ</h5>
                                     <table class="table-guests-list">
@@ -190,7 +191,6 @@
                                         <tbody id="viewGuestsTableBody"></tbody>
                                     </table>
                                 </div>
-                                
                                 <c:if test="${not empty targetBookingId}">
                                     <form action="${pageContext.request.contextPath}/unassign-room" method="POST" id="unassignRoomForm">
                                         <input type="hidden" name="bookingId" value="${targetBookingId}" />

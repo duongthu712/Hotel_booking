@@ -7,7 +7,6 @@ public class HotelPolicy {
     private String policyType;
     private boolean is_active; 
 
-    //Constructor
     public HotelPolicy() {
     }
 
@@ -20,7 +19,6 @@ public class HotelPolicy {
         this.is_active = is_active;
     }
     
-    //Getter & Setter
     public int getPolicyId() {
         return policyId;
     }
