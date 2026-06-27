@@ -1,19 +1,18 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
+ * Last update 17:05 27/06/2026
  *
  * @author admin
  */
 public class BookingService {
+
     private int bookingServiceId;
     private int bookingId;
+    private int roomId; // CẬP NHẬT: Thay đổi từ roomNumber sang roomId
     private int roomTypeServiceId;
     private BigDecimal unitPrice;
     private int quantityUsed;
@@ -23,9 +22,10 @@ public class BookingService {
     public BookingService() {
     }
 
-    public BookingService(int bookingServiceId, int bookingId, int roomTypeServiceId, BigDecimal unitPrice, int quantityUsed, BigDecimal totalPrice, LocalDateTime addedAt) {
+    public BookingService(int bookingServiceId, int bookingId, int roomId, int roomTypeServiceId, BigDecimal unitPrice, int quantityUsed, BigDecimal totalPrice, LocalDateTime addedAt) {
         this.bookingServiceId = bookingServiceId;
         this.bookingId = bookingId;
+        this.roomId = roomId; // CẬP NHẬT
         this.roomTypeServiceId = roomTypeServiceId;
         this.unitPrice = unitPrice;
         this.quantityUsed = quantityUsed;
@@ -48,6 +48,14 @@ public class BookingService {
     public void setBookingId(int bookingId) {
         this.bookingId = bookingId;
     }
+
+    public int getRoomId() {
+        return roomId;
+    } // CẬP NHẬT
+
+    public void setRoomId(int roomId) {
+        this.roomId = roomId;
+    } // CẬP NHẬT
 
     public int getRoomTypeServiceId() {
         return roomTypeServiceId;
@@ -88,6 +96,4 @@ public class BookingService {
     public void setAddedAt(LocalDateTime addedAt) {
         this.addedAt = addedAt;
     }
-
-    
 }

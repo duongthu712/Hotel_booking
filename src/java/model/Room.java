@@ -1,24 +1,37 @@
 package model;
 
+/**
+ * Last update 16:50 27/06/2026
+ *
+ * @author LinhLTHE200306
+ */
 public class Room {
 
-    private int roomNumber;
+    private int roomId;       
+    private int roomNumber;   
     private int floor;
     private String status;
     private int roomTypeId;
 
-    //Constructor
     public Room() {
     }
 
-    public Room(int roomNumber, int floor, String status, int roomTypeId) {
+    public Room(int roomId, int roomNumber, int floor, String status, int roomTypeId) {
+        this.roomId = roomId;
         this.roomNumber = roomNumber;
         this.floor = floor;
         this.status = status;
         this.roomTypeId = roomTypeId;
     }
 
-    //Getter & Setter
+    public int getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(int roomId) {
+        this.roomId = roomId;
+    }
+
     public int getRoomNumber() {
         return roomNumber;
     }
@@ -50,5 +63,4 @@ public class Room {
     public void setRoomTypeId(int roomTypeId) {
         this.roomTypeId = roomTypeId;
     }
-
 }

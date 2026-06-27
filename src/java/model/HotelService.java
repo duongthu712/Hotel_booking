@@ -3,6 +3,7 @@ package model;
 import java.math.BigDecimal;
 
 /**
+ * Last update 17:05 27/06/2026
  *
  * @author Minh Thu
  */
@@ -10,11 +11,11 @@ public class HotelService {
 
     private int hotelServiceId;
     private String serviceName;
+    private int hotelId;
     private String description;
     private BigDecimal unitPrice;
-    private String imageUrl; // Trường ảnh mới lưu link ảnh dịch vụ
+    private String imageUrl;
     private boolean isActive;
-    private int hotelId;
 
     public HotelService() {
     }
@@ -22,27 +23,13 @@ public class HotelService {
     public HotelService(int hotelServiceId, String serviceName, int hotelId, String description, BigDecimal unitPrice, String imageUrl, boolean isActive) {
         this.hotelServiceId = hotelServiceId;
         this.serviceName = serviceName;
-        this.description = description;
-        this.unitPrice = unitPrice;
-        this.imageUrl = imageUrl;
-        this.isActive = isActive;
         this.hotelId = hotelId;
-    }
-
-    
-    
-    public HotelService(int hotelServiceId, String serviceName, String description, BigDecimal unitPrice, String imageUrl, boolean isActive) {
-        this.hotelServiceId = hotelServiceId;
-        this.serviceName = serviceName;
         this.description = description;
         this.unitPrice = unitPrice;
         this.imageUrl = imageUrl;
         this.isActive = isActive;
     }
 
-    
-
-    // Getter & Setter
     public int getHotelServiceId() {
         return hotelServiceId;
     }
@@ -57,6 +44,14 @@ public class HotelService {
 
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
+    }
+
+    public int getHotelId() {
+        return hotelId;
+    }
+
+    public void setHotelId(int hotelId) {
+        this.hotelId = hotelId;
     }
 
     public String getDescription() {

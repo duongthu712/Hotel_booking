@@ -3,6 +3,11 @@ package model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * Last update 17:10 27/06/2026
+ *
+ * @author LinhLTHE200306
+ */
 public class Invoice {
 
     private int invoiceId;
@@ -16,13 +21,15 @@ public class Invoice {
     private String paymentStatus;
     private String paymentMethod;
     private LocalDateTime paidAt;
-    private int createdBy;
+    private Integer createdBy; // Cập nhật sang Integer để hỗ trợ giá trị NULL
 
-    //Constructor
     public Invoice() {
     }
 
-    public Invoice(int invoiceId, int bookingId, BigDecimal roomCharges, BigDecimal consumableCharges, BigDecimal amenityDamages, BigDecimal depositDeducted, BigDecimal totalAmount, BigDecimal remainingAmount, String paymentStatus, String paymentMethod, LocalDateTime paidAt, int createdBy) {
+    public Invoice(int invoiceId, int bookingId, BigDecimal roomCharges, BigDecimal consumableCharges,
+            BigDecimal amenityDamages, BigDecimal depositDeducted, BigDecimal totalAmount,
+            BigDecimal remainingAmount, String paymentStatus, String paymentMethod,
+            LocalDateTime paidAt, Integer createdBy) {
         this.invoiceId = invoiceId;
         this.bookingId = bookingId;
         this.roomCharges = roomCharges;
@@ -37,7 +44,39 @@ public class Invoice {
         this.createdBy = createdBy;
     }
 
-    //Getter & Setter
+    public Integer getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(Integer createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    // Các Getter & Setter khác giữ nguyên
+    public int getInvoiceId() {
+        return invoiceId;
+    }
+
+    public void setInvoiceId(int invoiceId) {
+        this.invoiceId = invoiceId;
+    }
+
+    public int getBookingId() {
+        return bookingId;
+    }
+
+    public void setBookingId(int bookingId) {
+        this.bookingId = bookingId;
+    }
+
+    public BigDecimal getRoomCharges() {
+        return roomCharges;
+    }
+
+    public void setRoomCharges(BigDecimal roomCharges) {
+        this.roomCharges = roomCharges;
+    }
+
     public BigDecimal getConsumableCharges() {
         return consumableCharges;
     }
@@ -52,30 +91,6 @@ public class Invoice {
 
     public void setAmenityDamages(BigDecimal amenityDamages) {
         this.amenityDamages = amenityDamages;
-    }
-
-    public int getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(int createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public int getInvoiceId() {
-        return invoiceId;
-    }
-
-    public void setInvoiceId(int invoiceId) {
-        this.invoiceId = invoiceId;
-    }
-
-    public BigDecimal getRoomCharges() {
-        return roomCharges;
-    }
-
-    public void setRoomCharges(BigDecimal roomCharges) {
-        this.roomCharges = roomCharges;
     }
 
     public BigDecimal getDepositDeducted() {
@@ -118,14 +133,6 @@ public class Invoice {
         this.paymentMethod = paymentMethod;
     }
 
-    public int getBookingId() {
-        return bookingId;
-    }
-
-    public void setBookingId(int bookingId) {
-        this.bookingId = bookingId;
-    }
-
     public LocalDateTime getPaidAt() {
         return paidAt;
     }
@@ -133,5 +140,4 @@ public class Invoice {
     public void setPaidAt(LocalDateTime paidAt) {
         this.paidAt = paidAt;
     }
-
 }
