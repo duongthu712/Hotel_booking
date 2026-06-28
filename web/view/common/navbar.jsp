@@ -4,8 +4,13 @@
     Author     : Minh Thu
 --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="dao.HotelInfoDAO" %>
+<%
+    HotelInfoDAO dao = new HotelInfoDAO();
+    String hotelName = dao.getHotelName();
+    %>
 <nav class="navbar">
-    <a href="${pageContext.request.contextPath}/" class="navbar-logo" style="text-decoration: none">La Mer</a>
+    <a href="${pageContext.request.contextPath}/" class="navbar-logo" style="text-decoration: none"><%= hotelName %></a>
 
     <ul class="navbar-menu">
         <li>

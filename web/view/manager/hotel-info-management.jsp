@@ -50,6 +50,9 @@
                  id="info-view-modal"
                  ${not empty openInfoModal ? 'style="display: flex;"' : ''}>
                 <div class="popup-content info-popup-content">
+                    <div class="popup-action">
+                        <button type="button" class="btn-close" id="btn-close-info" style="font-size: 35px; margin-top: -25px; right: 5px;">&times;</button>
+                    </div>
                     <h2 class="popup-title">Thông tin khách sạn</h2>
 
                     <div class="info-display">
@@ -88,7 +91,6 @@
                     </div>
 
                     <div class="popup-action">
-                        <button type="button" class="btn-close" id="btn-close-info">Đóng</button>
                         <button type="button" class="btn-submit" id="btn-edit-info">Chỉnh sửa</button>
                     </div>
                 </div>
@@ -99,6 +101,9 @@
                  ${not empty infoEditMode ? 'style="display: flex;"' : ''}>
                 <form action="HotelInfoUpdate" method="POST" id="info-edit-form" class="popup-content info-popup-content">
                     <h2 class="popup-title">Chỉnh sửa thông tin khách sạn</h2>
+                    <div class="popup-action">
+                        <button type="button" class="btn-close" id="btn-close-info-edit" style="font-size: 35px; margin-top: -25px; right: 5px;">&times;</button>
+                    </div>
 
                     <c:if test="${not empty infoErrorMessage}">
                         <div class="alert-message alert-error">
@@ -119,7 +124,7 @@
 
                     <div class="form-group">
                         <label class="input-label">Giờ check-in</label>
-                        <input type="time" name="checkinTime"" class="popup-input-field" 
+                        <input type="time" name="checkinTime" class="popup-input-field" 
                                value="${hotelInfo.getCheckinTime()}" required>
                     </div>
 
@@ -149,12 +154,11 @@
 
                     <div class="form-group">
                         <label class="input-label">Email*</label>
-                        <input type="getEmail()" name="email" class="popup-input-field" 
+                        <input type="email" name="email" class="popup-input-field" 
                                value="${hotelInfo.getEmail()}" required>
                     </div>
 
                     <div class="popup-action">
-                        <button type="button" class="btn-close" id="btn-close-info-edit">Huỷ</button>
                         <button type="submit" class="btn-submit">Lưu thay đổi</button>
                     </div>
                 </form>
@@ -192,6 +196,10 @@
 
             <div class="hotel-popup" id="image-edit-modal">
                 <form action="HotelImageUpdate" method="POST" id="image-edit-form" class="popup-content">
+                    <div class="popup-action">
+                        <button type="button" class="btn-close" id="btn-close-image" style="font-size: 35px; margin-top: -25px; right: 5px;">&times;</button>
+
+                    </div>
                     <h2 class="popup-title" id="image-modal-title">Chỉnh sửa ảnh</h2>
 
                     <input type="hidden" name="imageId" id="edit-image-id">
@@ -205,7 +213,6 @@
                     </div>
 
                     <div class="popup-action">
-                        <button type="button" class="btn-close" id="btn-close-image">Huỷ</button>
                         <button type="submit" class="btn-submit">Lưu</button>
                     </div>
                 </form>
@@ -296,6 +303,9 @@
 
             <div class="hotel-popup" id="news-detail-modal">
                 <div class="popup-content news-detail-content">
+                    <div class="popup-action">
+                        <button type="button" class="btn-close" id="btn-close-detail" style="font-size: 35px; margin-top: -25px; right: 5px;">&times;</button>
+                    </div>
                     <h2 class="popup-title" id="detail-news-title"></h2>
 
                     <div class="news-detail-image" id="detail-news-image-wrapper">
@@ -310,7 +320,6 @@
                     </div>
 
                     <div class="popup-action">
-                        <button type="button" class="btn-close" id="btn-close-detail">Đóng</button>
                         <button type="button" class="btn-submit" id="btn-edit-from-detail">Chỉnh sửa</button>
                     </div>
                 </div>
@@ -320,6 +329,9 @@
                  id="news-create-modal"
                  ${not empty openCreateModal ? 'style="display: flex;"' : ''}>
                 <form action="HotelNewsCreate" method="POST" id="news-create-form" class="popup-content">
+                    <div class="popup-action">
+                        <button type="button" class="btn-close" id="btn-close-create" style="font-size: 35px; margin-top: -25px; right: 5px;">&times;</button>
+                    </div>
                     <h2 class="popup-title">Thêm bài viết mới</h2>
 
                     <c:if test="${not empty createErrorMessage}">
@@ -351,7 +363,6 @@
                     </div>
 
                     <div class="popup-action">
-                        <button type="button" class="btn-close" id="btn-close-create">Huỷ</button>
                         <button type="submit" class="btn-submit">Lưu</button>
                     </div>
                 </form>
@@ -361,6 +372,9 @@
                  id="news-edit-modal"
                  ${not empty newsToEdit ? 'style="display: flex;"' : ''}>
                 <form action="HotelNewsEdit" method="POST" id="news-edit-form" class="popup-content">
+                    <div class="popup-action">
+                        <button type="button" class="btn-close" id="btn-close-edit" style="font-size: 35px; margin-top: -25px; right: 5px;">&times;</button>
+                    </div>
                     <h2 class="popup-title">Chỉnh sửa bài viết</h2>
 
                     <input type="hidden" name="newsId" value="${newsToEdit.getNewsId()}">
@@ -403,7 +417,6 @@
                     </div>
 
                     <div class="popup-action">
-                        <button type="button" class="btn-close" id="btn-close-edit">Huỷ</button>
                         <button type="submit" class="btn-submit">Lưu thay đổi</button>
                     </div>
                 </form>

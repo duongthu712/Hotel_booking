@@ -57,7 +57,7 @@ public class HotelServiceCreateController extends HttpServlet {
         try {
             BigDecimal unitPrice = new BigDecimal(unitPriceStr.trim());
             boolean isActive = "true".equals(activeStr);
-            HotelService newService = new HotelService(0, serviceName, description, unitPrice, imageUrl, isActive);
+            HotelService newService = new HotelService(0, serviceName, 1, description, unitPrice, imageUrl, isActive);
 
             HotelServiceDAO dao = new HotelServiceDAO();
             dao.createHotelService(newService);

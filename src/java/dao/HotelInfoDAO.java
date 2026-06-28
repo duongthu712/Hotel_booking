@@ -14,6 +14,7 @@ import model.HotelInfo;
 import model.HotelNews;
 import model.HotelService;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -100,6 +101,7 @@ public class HotelInfoDAO extends DBContext {
         }
         return info;
     }
+    
 
     // Lấy 3 bài báo mới nhất
     public List<HotelNews> getTop3LatestNews() {
@@ -117,7 +119,7 @@ public class HotelInfoDAO extends DBContext {
                         rs.getNString("content"),
                         rs.getString("image_url"),
                         rs.getBoolean("is_active"),
-                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("created_at").toLocalDateTime(),
                         rs.getInt("created_by")
                 );
                 list.add(news);
@@ -404,7 +406,7 @@ public class HotelInfoDAO extends DBContext {
                     news.setContent(rs.getString("content"));
                     news.setImageUrl(rs.getString("image_url"));
                     news.setActive(rs.getBoolean("is_active"));
-                    news.setCreatedAt(rs.getTimestamp("created_at"));
+                    news.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                     news.setCreatedBy(rs.getInt("created_by"));
                     list.add(news);
                 }
@@ -434,7 +436,7 @@ public class HotelInfoDAO extends DBContext {
                     news.setContent(rs.getString("content"));
                     news.setImageUrl(rs.getString("image_url"));
                     news.setActive(rs.getBoolean("is_active"));
-                    news.setCreatedAt(rs.getTimestamp("created_at"));
+                    news.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                     news.setCreatedBy(rs.getInt("created_by"));
                     return news;
                 } else {
@@ -575,7 +577,7 @@ public class HotelInfoDAO extends DBContext {
                     news.setContent(rs.getString("content"));
                     news.setImageUrl(rs.getString("image_url"));
                     news.setActive(rs.getBoolean("is_active"));
-                    news.setCreatedAt(rs.getTimestamp("created_at"));
+                    news.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                     news.setCreatedBy(rs.getInt("created_by"));
                     list.add(news);
                 }
@@ -584,5 +586,18 @@ public class HotelInfoDAO extends DBContext {
             throw new Exception("Lỗi hệ thống: Không thể tìm kiếm bài viết.");
         }
         return list;
+    }
+    
+    public String getHotelName() {
+        String sql = "SELECT TOP 1 hotel_name FROM HotelInfo";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getString("hotel_name");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "La Mer";
     }
 }

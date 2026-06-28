@@ -64,7 +64,7 @@
                             </div>
                             <div class="split-content">
                                 <span class="split-num">
-                                    <fmt:formatDate value="${news.createdAt}" pattern="dd/MM/yyyy"/>
+                                    ${news.createdAtFormatted}
                                 </span>
                                 <h3 class="split-title">${news.title}</h3>
                                 <p class="split-desc">${news.content}</p>

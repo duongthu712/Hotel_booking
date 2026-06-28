@@ -1,6 +1,7 @@
 package model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Last update 16:55 27/06/2026
@@ -95,4 +96,13 @@ public class HotelNews {
     public void setCreatedBy(int createdBy) {
         this.createdBy = createdBy;
     }
+    
+    public String getCreatedAtFormatted() {
+    if (createdAt == null) {
+        return "";
+    }
+    return createdAt.format(
+        DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+    );
+}
 }

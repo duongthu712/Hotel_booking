@@ -16,30 +16,26 @@ public class StaffAccountDAO extends DBContext {
     PreparedStatement stm;
     ResultSet rs;
 
-    public StaffAccount getStaffById(int staffId) {
-        StaffAccount staff = null;
+    public StaffAccount getStaffById(int staffId) throws Exception {
+        String strSQL = """
+                    select * 
+                    from StaffAccounts 
+                    where staff_id = ? and deleted_at is null
+                    """;
 
-        try {
-            String sql = """
-                         SELECT *
-                         FROM StaffAccounts
-                         WHERE staff_id = ?
-                           AND is_active = 1
-                         """;
-
-            stm = connection.prepareStatement(sql);
+        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
             stm.setInt(1, staffId);
-            rs = stm.executeQuery();
 
-            if (rs.next()) {
-                staff = mapStaff(rs);
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    return mapStaff(rs);
+                } else {
+                    throw new Exception("Nhân viên này không tồn tại hoặc đã bị xóa.");
+                }
             }
-
-        } catch (Exception e) {
-            System.out.println("getStaffById: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Vui lòng thử lại sau.");
         }
-
-        return staff;
     }
 
     public StaffAccount getStaffByEmail(String email) {
@@ -283,9 +279,12 @@ public class StaffAccountDAO extends DBContext {
         staff.setPhone(rs.getString("phone"));
         staff.setRole(rs.getString("role"));
         staff.setActive(rs.getBoolean("is_active"));
-        staff.setCreatedAt(rs.getTimestamp("created_at"));
+        Timestamp createdAt = rs.getTimestamp("created_at");
+        staff.setCreatedAt(createdAt == null ? null : createdAt.toLocalDateTime());
+
+        Timestamp resetExpiry = rs.getTimestamp("reset_expiry");
+        staff.setResetExpiry(resetExpiry == null ? null : resetExpiry.toLocalDateTime());
         staff.setResetCode(rs.getString("reset_code"));
-        staff.setResetExpiry(rs.getTimestamp("reset_expiry"));
         staff.setResetUsed(rs.getBoolean("reset_used"));
 
         return staff;
@@ -310,28 +309,6 @@ public class StaffAccountDAO extends DBContext {
             throw new Exception("Lỗi hệ thống: Không thể lấy danh sách nhân viên.");
         }
         return list;
-    }
-
-    public StaffAccount getStaffAccById(int staffId) throws Exception {
-        String strSQL = """
-                        select * 
-                        from StaffAccounts 
-                        where staff_id = ? and deleted_at is null
-                        """;
-
-        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
-            stm.setInt(1, staffId);
-
-            try (ResultSet rs = stm.executeQuery()) {
-                if (rs.next()) {
-                    return mapStaff(rs);
-                } else {
-                    throw new Exception("Nhân viên này không tồn tại hoặc đã bị xóa.");
-                }
-            }
-        } catch (SQLException e) {
-            throw new Exception("Lỗi hệ thống: Vui lòng thử lại sau.");
-        }
     }
 
     public List<StaffAccount> searchStaffAccByName(String keyword) throws Exception {
@@ -451,7 +428,7 @@ public class StaffAccountDAO extends DBContext {
     }
 
     public StaffAccount deleteStaffAcc(int staffId) throws Exception {
-        StaffAccount found = getStaffAccById(staffId);
+        StaffAccount found = getStaffById(staffId);
         if (found == null) {
             throw new Exception("Nhân viên cần xóa không tồn tại.");
         }
@@ -476,7 +453,7 @@ public class StaffAccountDAO extends DBContext {
             throw new Exception("Lỗi hệ thống: Không thể thực hiện thao tác xóa.");
         }
     }
-    
+
     public void createStaff(StaffAccount staff) {
         try {
             String sql = """
@@ -501,7 +478,7 @@ public class StaffAccountDAO extends DBContext {
             System.out.println("createStaff: " + e.getMessage());
         }
     }
-    
+
     public StaffAccount getStaffByUsername(String username) {
         StaffAccount staff = null;
 

@@ -8,20 +8,21 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import model.GuestStay;
 import model.Room;
 import model.RoomType;
 import model.StaffAccount;
 
 /**
- * RoomListController.java Display room management page for manager
- *
  * @author LinhLTHE200306
- * @version 2.0
- * @since 2026-06-10
+ * @version 3.0
+ * @since 2026-06-28
  */
 public class RoomListController extends HttpServlet {
 
@@ -48,18 +49,6 @@ public class RoomListController extends HttpServlet {
             roomTypeId = null;
         }
 
-        // Pagination
-        int page = 1;
-        try {
-            String pageParam = request.getParameter("page");
-            if (pageParam != null && !pageParam.isEmpty()) {
-                page = Integer.parseInt(pageParam);
-            }
-        } catch (NumberFormatException e) {
-            page = 1;
-        }
-        int recordsPerPage = 10;
-
         RoomDAO rDao = new RoomDAO();
         RoomTypeDAO rtDao = new RoomTypeDAO();
 
@@ -71,27 +60,19 @@ public class RoomListController extends HttpServlet {
                 roomTypeMap.put(rt.getRoomTypeId(), rt.getTypeName());
             }
 
-            List<Room> roomList = rDao.searchAndFilterRooms(null, roomTypeId, keyword);
+            List<Room> allRooms = rDao.searchAndFilterRooms(null, roomTypeId, keyword);
 
-            int totalRecords = roomList.size();
-            int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
-            if (page < 1) {
-                page = 1;
-            }
-            if (page > totalPages && totalPages > 0) {
-                page = totalPages;
+            Map<Integer, List<Room>> floorMap = new TreeMap<>();
+            for (Room room : allRooms) {
+                int floor = room.getFloor();
+                floorMap.computeIfAbsent(floor, k -> new ArrayList<>()).add(room);
             }
 
-            int start = (page - 1) * recordsPerPage;
-            int end = Math.min(start + recordsPerPage, totalRecords);
-            List<Room> pagedList;
-
-            if (totalRecords > 0) {
-                pagedList = roomList.subList(start, end);
-            } else {
-                pagedList = roomList;
+            for (List<Room> rooms : floorMap.values()) {
+                rooms.sort(Comparator.comparingInt(Room::getRoomNumber));
             }
 
+            // Detail modal
             Room selectedRoom = (Room) session.getAttribute("selectedRoom");
             List<GuestStay> guestList = (List<GuestStay>) session.getAttribute("guestList");
 
@@ -102,19 +83,33 @@ public class RoomListController extends HttpServlet {
                 session.removeAttribute("guestList");
             }
 
+            // Edit modal
             Room editRoom = (Room) session.getAttribute("editRoom");
             if (editRoom != null) {
                 request.setAttribute("editRoom", editRoom);
                 session.removeAttribute("editRoom");
             }
 
-            request.setAttribute("roomList", pagedList);
+            // Create modal
+            Boolean openCreateModal = (Boolean) session.getAttribute("openCreateModal");
+            if (openCreateModal != null) {
+                request.setAttribute("openCreateModal", openCreateModal);
+                session.removeAttribute("openCreateModal");
+            }
+
+            // Giữ giá trị form khi lỗi
+            request.setAttribute("keepRoomNumber", session.getAttribute("keepRoomNumber"));
+            request.setAttribute("keepFloor", session.getAttribute("keepFloor"));
+            request.setAttribute("keepRoomTypeId", session.getAttribute("keepRoomTypeId"));
+            session.removeAttribute("keepRoomNumber");
+            session.removeAttribute("keepFloor");
+            session.removeAttribute("keepRoomTypeId");
+
+            request.setAttribute("floorMap", floorMap);
             request.setAttribute("roomTypeList", roomTypeList);
             request.setAttribute("roomTypeMap", roomTypeMap);
             request.setAttribute("selectedRoomTypeId", roomTypeId);
             request.setAttribute("keyword", keyword);
-            request.setAttribute("currentPage", page);
-            request.setAttribute("totalPages", totalPages);
 
             request.getRequestDispatcher("/view/manager/room-management.jsp").forward(request, response);
 
