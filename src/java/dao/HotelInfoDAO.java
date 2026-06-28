@@ -15,6 +15,7 @@ import model.HotelNews;
 import model.HotelService;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 /**
  *
@@ -66,8 +67,9 @@ public class HotelInfoDAO extends DBContext {
                         rs.getInt("hotel_id"),
                         rs.getNString("hotel_name"),
                         rs.getNString("description"),
-                        rs.getString("checkin"),
-                        rs.getString("checkout"),
+                        // Sử dụng LocalTime.class để map trực tiếp từ SQL TIME
+                        rs.getObject("checkin_time", LocalTime.class),
+                        rs.getObject("checkout_time", LocalTime.class),
                         rs.getNString("address"),
                         rs.getString("address_url"),
                         rs.getString("phone"),
@@ -101,7 +103,6 @@ public class HotelInfoDAO extends DBContext {
         }
         return info;
     }
-    
 
     // Lấy 3 bài báo mới nhất
     public List<HotelNews> getTop3LatestNews() {
@@ -180,8 +181,13 @@ public class HotelInfoDAO extends DBContext {
 
                     java.sql.Time checkinTime = rs.getTime("checkin_time");
                     java.sql.Time checkoutTime = rs.getTime("checkout_time");
-                    hotel.setCheckinTime(checkinTime != null ? checkinTime.toString() : "14:00:00");
-                    hotel.setCheckoutTime(checkoutTime != null ? checkoutTime.toString() : "12:00:00");
+                    // Sử dụng getObject với LocalTime.class
+                    java.time.LocalTime checkin = rs.getObject("checkin_time", java.time.LocalTime.class);
+                    java.time.LocalTime checkout = rs.getObject("checkout_time", java.time.LocalTime.class);
+
+                    // Gán giá trị, nếu null thì gán giá trị mặc định
+                    hotel.setCheckinTime(checkin != null ? checkin : java.time.LocalTime.of(14, 0));
+                    hotel.setCheckoutTime(checkout != null ? checkout : java.time.LocalTime.of(12, 0));
 
                     hotel.setAddress(rs.getString("address"));
                     hotel.setAddressUrl(rs.getString("address_url"));
@@ -220,8 +226,8 @@ public class HotelInfoDAO extends DBContext {
         try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
             stm.setString(1, hotelInfo.getHotelName());
             stm.setString(2, hotelInfo.getDescription());
-            stm.setString(3, hotelInfo.getCheckinTime());
-            stm.setString(4, hotelInfo.getCheckoutTime());
+            stm.setObject(3, hotelInfo.getCheckinTime());
+            stm.setObject(4, hotelInfo.getCheckoutTime());
             stm.setString(5, hotelInfo.getAddress());
             stm.setString(6, hotelInfo.getAddressUrl());
             stm.setString(7, hotelInfo.getPhone());
@@ -587,11 +593,10 @@ public class HotelInfoDAO extends DBContext {
         }
         return list;
     }
-    
+
     public String getHotelName() {
         String sql = "SELECT TOP 1 hotel_name FROM HotelInfo";
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 return rs.getString("hotel_name");
             }
