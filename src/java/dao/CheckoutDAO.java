@@ -1,6 +1,7 @@
 package dao;
 
 import dal.DBContext;
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -193,22 +194,21 @@ public class CheckoutDAO extends DBContext {
     public List<Room> getRoomsByBookingId(int bookingId) throws Exception {
         List<Room> list = new ArrayList<>();
         String sql = """
-                     select r.room_number, r.floor, r.status, rt.type_name, rt.base_price, rt.bed_type
-                     from BookingRooms br
-                     join Rooms r on br.room_number = r.room_number
-                     join RoomTypes rt on r.room_type_id = rt.room_type_id
-                     where br.booking_id = ?
-                     """;
-
+                 select r.*
+                 from BookingRooms br
+                 join Rooms r on br.room_id = r.room_id
+                 where br.booking_id = ?
+                 """;
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, bookingId);
-
             try (ResultSet rs = stm.executeQuery()) {
                 while (rs.next()) {
                     Room room = new Room();
+                    room.setRoomId(rs.getInt("room_id"));
                     room.setRoomNumber(rs.getInt("room_number"));
                     room.setFloor(rs.getInt("floor"));
                     room.setStatus(rs.getString("status"));
+                    room.setRoomTypeId(rs.getInt("room_type_id"));
                     list.add(room);
                 }
             }
@@ -552,81 +552,72 @@ public class CheckoutDAO extends DBContext {
         return null;
     }
 
-    public void createInvoice(Invoice invoice, List<BookingService> services,
-            List<RoomAmenityDamage> damages, List<Room> rooms) throws Exception {
+    public void createInvoice(Invoice invoice, List<Room> rooms) throws Exception {
         connection.setAutoCommit(false);
         try {
+            // Tổng hợp consumable_charges từ BookingServices đã ghi trong lúc lưu trú
+            String servicesSql = """
+                select isnull(sum(total_price), 0) as total
+                from BookingServices
+                where booking_id = ?
+                """;
+            BigDecimal consumableCharges = BigDecimal.ZERO;
+            try (PreparedStatement stm = connection.prepareStatement(servicesSql)) {
+                stm.setInt(1, invoice.getBookingId());
+                try (ResultSet rs = stm.executeQuery()) {
+                    if (rs.next()) {
+                        consumableCharges = rs.getBigDecimal("total");
+                    }
+                }
+            }
+
+            // Tổng hợp amenity_damages từ RoomAmenityDamages đã ghi trong lúc lưu trú
+            String damagesSql = """
+                select isnull(sum(total_price), 0) as total
+                from RoomAmenityDamages
+                where booking_id = ?
+                """;
+            BigDecimal amenityDamages = BigDecimal.ZERO;
+            try (PreparedStatement stm = connection.prepareStatement(damagesSql)) {
+                stm.setInt(1, invoice.getBookingId());
+                try (ResultSet rs = stm.executeQuery()) {
+                    if (rs.next()) {
+                        amenityDamages = rs.getBigDecimal("total");
+                    }
+                }
+            }
+
+            BigDecimal totalAmount = invoice.getRoomCharges()
+                    .add(consumableCharges)
+                    .add(amenityDamages);
+            BigDecimal deposit = invoice.getDepositDeducted() != null
+                    ? invoice.getDepositDeducted() : BigDecimal.ZERO;
+            BigDecimal remaining = totalAmount.subtract(deposit).max(BigDecimal.ZERO);
+
             String invoiceSql = """
-            update Invoices
-            set consumable_charges = ?,
-                amenity_damages = ?,
-                total_amount = ?,
-                remaining_amount = 0,
-                payment_status = N'Đã thanh toán',
-                payment_method = ?,
-                paid_at = GETDATE(),
-                created_by = ?
-            where booking_id = ?
-            """;
+                update Invoices
+                set consumable_charges = ?,
+                    amenity_damages = ?,
+                    total_amount = ?,
+                    remaining_amount = 0,
+                    payment_status = N'Đã thanh toán',
+                    payment_method = ?,
+                    paid_at = GETDATE(),
+                    created_by = ?
+                where booking_id = ?
+                """;
             try (PreparedStatement stm = connection.prepareStatement(invoiceSql)) {
-                stm.setBigDecimal(1, invoice.getConsumableCharges());
-                stm.setBigDecimal(2, invoice.getAmenityDamages());
-                stm.setBigDecimal(3, invoice.getTotalAmount());
+                stm.setBigDecimal(1, consumableCharges);
+                stm.setBigDecimal(2, amenityDamages);
+                stm.setBigDecimal(3, totalAmount);
                 stm.setString(4, invoice.getPaymentMethod());
                 stm.setInt(5, invoice.getCreatedBy());
                 stm.setInt(6, invoice.getBookingId());
                 stm.executeUpdate();
             }
 
-            if (services != null && !services.isEmpty()) {
-                String serviceSql = """
-                insert into BookingServices (booking_id, room_type_service_id, unit_price,
-                    quantity_used, total_price, added_at)
-                values (?, ?, ?, ?, ?, GETDATE())
-                """;
-                try (PreparedStatement stm = connection.prepareStatement(serviceSql)) {
-                    for (BookingService s : services) {
-                        stm.setInt(1, s.getBookingId());
-                        stm.setInt(2, s.getRoomTypeServiceId());
-                        stm.setBigDecimal(3, s.getUnitPrice());
-                        stm.setInt(4, s.getQuantityUsed());
-                        stm.setBigDecimal(5, s.getTotalPrice());
-                        stm.addBatch();
-                    }
-                    stm.executeBatch();
-                }
-            }
-
-            if (damages != null && !damages.isEmpty()) {
-                String damageSql = """
-                insert into RoomAmenityDamages (booking_id, amenity_id, quantity_damaged,
-                    total_price, added_at)
-                values (?, ?, ?, ?, GETDATE())
-                """;
-                try (PreparedStatement stm = connection.prepareStatement(damageSql)) {
-                    for (RoomAmenityDamage d : damages) {
-                        stm.setInt(1, d.getBookingId());
-                        stm.setInt(2, d.getAmenityId());
-                        stm.setInt(3, d.getQuantityDamaged());
-                        stm.setBigDecimal(4, d.getTotalPrice());
-                        stm.addBatch();
-                    }
-                    stm.executeBatch();
-                }
-            }
-
-            // Lưu thời gian checkout thực tế
-            String updateCheckoutTimeSql = """
-            update Bookings set actual_checkout_time = GETDATE()
-            where booking_id = ?
-            """;
-            try (PreparedStatement stm = connection.prepareStatement(updateCheckoutTimeSql)) {
-                stm.setInt(1, invoice.getBookingId());
-                stm.executeUpdate();
-            }
-
             updateBookingStatus(invoice.getBookingId());
-            updateRoomStatus(rooms, damages);
+            updateRoomStatus(rooms, invoice.getBookingId());
 
             connection.commit();
         } catch (SQLException e) {
@@ -660,7 +651,7 @@ public class CheckoutDAO extends DBContext {
             updateBookingStatus(bookingId);
 
             List<Room> rooms = getRoomsByBookingId(bookingId);
-            updateRoomStatus(rooms, damages);
+            updateRoomStatus(rooms, bookingId);
 
             connection.commit();
         } catch (SQLException e) {
@@ -711,17 +702,30 @@ public class CheckoutDAO extends DBContext {
         }
     }
 
-    private void updateRoomStatus(List<Room> rooms, List<RoomAmenityDamage> damages) throws Exception {
-        boolean hasDamage = damages != null && !damages.isEmpty();
-        String roomStatus = hasDamage ? "Đang bảo trì" : "Đang dọn dẹp";
-        String sql = "update Rooms set status = ? where room_number = ?";
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+    private void updateRoomStatus(List<Room> rooms, int bookingId) throws Exception {
+        String sql = """
+            update Rooms set status = ?
+            where room_id = ?
+            """;
+        String checkDamageSql = """
+            select count(*) from RoomAmenityDamages
+            where booking_id = ? and room_id = ?
+            """;
+        try (PreparedStatement updateStm = connection.prepareStatement(sql); PreparedStatement checkStm = connection.prepareStatement(checkDamageSql)) {
             for (Room room : rooms) {
-                stm.setString(1, roomStatus);
-                stm.setInt(2, room.getRoomNumber());
-                stm.addBatch();
+                checkStm.setInt(1, bookingId);
+                checkStm.setInt(2, room.getRoomId());
+                boolean hasDamage = false;
+                try (ResultSet rs = checkStm.executeQuery()) {
+                    if (rs.next()) {
+                        hasDamage = rs.getInt(1) > 0;
+                    }
+                }
+                updateStm.setString(1, hasDamage ? "Đang bảo trì" : "Đang dọn dẹp");
+                updateStm.setInt(2, room.getRoomId());
+                updateStm.addBatch();
             }
-            stm.executeBatch();
+            updateStm.executeBatch();
         } catch (SQLException e) {
             throw new Exception("Lỗi hệ thống: Không thể cập nhật trạng thái phòng.");
         }
@@ -742,6 +746,137 @@ public class CheckoutDAO extends DBContext {
         inv.setPaidAt(rs.getTimestamp("paid_at") != null ? rs.getTimestamp("paid_at").toLocalDateTime() : null);
         inv.setCreatedBy(rs.getInt("created_by"));
         return inv;
+    }
+
+    // Lấy danh sách phòng chờ checkout, mặc định hôm nay, có thể filter theo keyword
+    public List<Map<String, Object>> getRoomsForCheckout(String keyword) throws Exception {
+        List<Map<String, Object>> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("""
+            select br.booking_room_id, br.booking_id, br.room_id,
+                   r.room_number, b.checkout_date, b.booking_code,
+                   isnull(g.full_name, sa.full_name) as guest_name
+            from BookingRooms br
+            join Bookings b on br.booking_id = b.booking_id
+            join Rooms r on br.room_id = r.room_id
+            left join Guests g on b.guest_id = g.guest_id
+            left join StaffAccounts sa on b.staff_id = sa.staff_id
+            where br.checkout_status = N'Chưa checkout'
+            and b.status = N'Đã nhận phòng'
+            """);
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append(" and (cast(r.room_number as varchar) like ? or isnull(g.full_name, sa.full_name) like ?)");
+        } else {
+            sql.append(" and cast(b.checkout_date as date) = cast(getdate() as date)");
+        }
+        sql.append(" order by b.checkout_date asc, r.room_number asc");
+
+        try (PreparedStatement stm = connection.prepareStatement(sql.toString())) {
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                String word = "%" + keyword.trim() + "%";
+                stm.setString(1, word);
+                stm.setString(2, word);
+            }
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("bookingRoomId", rs.getInt("booking_room_id"));
+                    map.put("bookingId", rs.getInt("booking_id"));
+                    map.put("roomId", rs.getInt("room_id"));
+                    map.put("roomNumber", rs.getInt("room_number"));
+                    map.put("checkoutDate", rs.getDate("checkout_date") != null
+                            ? rs.getDate("checkout_date").toLocalDate() : null);
+                    map.put("bookingCode", rs.getString("booking_code"));
+                    map.put("guestName", rs.getString("guest_name"));
+                    list.add(map);
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể lấy danh sách phòng chờ checkout.");
+        }
+        return list;
+    }
+
+// Update checkout_status cho các phòng đã chọn
+    public void updateBookingRoomsCheckoutStatus(List<Integer> roomIds) throws Exception {
+        if (roomIds == null || roomIds.isEmpty()) {
+            return;
+        }
+        String placeholders = String.join(",", Collections.nCopies(roomIds.size(), "?"));
+        String sql = "update BookingRooms set checkout_status = N'Đã checkout', checkout_at = GETDATE() "
+                + "where room_id in (" + placeholders + ") and checkout_status = N'Chưa checkout'";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            for (int i = 0; i < roomIds.size(); i++) {
+                stm.setInt(i + 1, roomIds.get(i));
+            }
+            stm.executeUpdate();
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể cập nhật trạng thái checkout phòng.");
+        }
+    }
+
+// Kiểm tra tất cả phòng trong booking đã checkout chưa
+    public boolean isAllRoomsCheckedOut(int bookingId) throws Exception {
+        String sql = """
+            select count(*) from BookingRooms
+            where booking_id = ? and checkout_status = N'Chưa checkout'
+            """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, bookingId);
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) == 0;
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể kiểm tra trạng thái checkout.");
+        }
+        return false;
+    }
+
+// Lấy booking_code theo bookingId (dùng để build success message)
+    public String getBookingCodeById(int bookingId) throws Exception {
+        String sql = "select booking_code from Bookings where booking_id = ?";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, bookingId);
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("booking_code");
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể lấy mã booking.");
+        }
+        return null;
+    }
+
+// Lấy danh sách Room theo list room_id (dùng để update status sau checkout)
+    public List<Room> getRoomsByRoomIds(List<Integer> roomIds) throws Exception {
+        List<Room> list = new ArrayList<>();
+        if (roomIds == null || roomIds.isEmpty()) {
+            return list;
+        }
+        String placeholders = String.join(",", Collections.nCopies(roomIds.size(), "?"));
+        String sql = "select * from Rooms where room_id in (" + placeholders + ")";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            for (int i = 0; i < roomIds.size(); i++) {
+                stm.setInt(i + 1, roomIds.get(i));
+            }
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    Room room = new Room();
+                    room.setRoomId(rs.getInt("room_id"));
+                    room.setRoomNumber(rs.getInt("room_number"));
+                    room.setFloor(rs.getInt("floor"));
+                    room.setStatus(rs.getString("status"));
+                    room.setRoomTypeId(rs.getInt("room_type_id"));
+                    list.add(room);
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể lấy thông tin phòng.");
+        }
+        return list;
     }
 
     //Billing

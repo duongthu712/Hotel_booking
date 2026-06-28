@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.time.LocalTime;
 import model.HotelInfo;
 import model.StaffAccount;
 
@@ -70,8 +71,8 @@ public class HotelInfoUpdateController extends HttpServlet {
         hotelInfo.setHotelId(hotelId);
         hotelInfo.setHotelName(hotelName != null ? hotelName.trim() : null);
         hotelInfo.setDescription(description != null ? description.trim() : null);
-        hotelInfo.setCheckinTime(checkinTime != null && !checkinTime.isEmpty() ? checkinTime : "14:00:00");
-        hotelInfo.setCheckoutTime(checkoutTime != null && !checkoutTime.isEmpty() ? checkoutTime : "12:00:00");
+        hotelInfo.setCheckinTime((checkinTime != null && !checkinTime.isEmpty()) ? LocalTime.parse(checkinTime) : LocalTime.of(14, 0));
+        hotelInfo.setCheckoutTime((checkoutTime != null && !checkoutTime.isEmpty()) ? LocalTime.parse(checkoutTime) : LocalTime.of(12, 0));
         hotelInfo.setAddress(address != null ? address.trim() : null);
         hotelInfo.setAddressUrl(addressUrl != null && !addressUrl.trim().isEmpty() ? addressUrl.trim() : null);
         hotelInfo.setPhone(phone != null ? phone.trim() : null);

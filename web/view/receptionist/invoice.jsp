@@ -143,7 +143,12 @@
                                                 <td class="col-qty">
                                                     <div class="quantity-control">
                                                         <button type="button" class="qty-btn qty-minus" onclick="changeQty('service', ${loop.index}, -1)">−</button>
-                                                        <input type="number" name="serviceQuantity" id="serviceQty_${loop.index}" class="qty-input" value="0" min="0" data-unit-price="${svc.unitPrice}" data-is-free="${svc.isFree}" onchange="calculateService(${loop.index})">
+                                                        <input type="number" name="serviceQuantity" id="serviceQty_${loop.index}" 
+                                                               class="qty-input" value="0" min="0" 
+                                                               data-unit-price="${svc.unitPrice}" 
+                                                               data-is-free="${svc.isFree}"
+                                                               data-num-rooms="${booking.numRooms}"
+                                                               onchange="calculateService(${loop.index})">
                                                         <button type="button" class="qty-btn qty-plus" onclick="changeQty('service', ${loop.index}, 1)">+</button>
                                                     </div>
                                                     <input type="hidden" name="serviceId" value="${svc.serviceId}">
@@ -294,7 +299,7 @@
             </form>
         </main>
 
-        <script src="<%=request.getContextPath()%>/view/assets/javascript/alert.js"></script>
+        <script src="${pageContext.request.contextPath}/view/assets/javascript/alert.js"></script>
         <script src="${pageContext.request.contextPath}/view/assets/javascript/invoice.js"></script>
     </body>
 </html>

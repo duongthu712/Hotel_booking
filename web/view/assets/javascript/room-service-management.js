@@ -17,8 +17,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function toggleModal(show) {
-        if (!modal) return;
-        
+        if (!modal)
+            return;
+
         if (show) {
             modal.classList.add("active");
             modal.style.display = "flex";
@@ -28,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (form) {
                 form.reset();
             }
-            
+
             if (isEditMode || isCreateMode) {
                 window.location.href = "RoomServiceList?" + getFilterParams();
             }
@@ -42,11 +43,22 @@ document.addEventListener("DOMContentLoaded", function () {
                 form.action = "RoomServiceCreate";
                 if (!isCreateMode) {
                     form.reset();
-                    const inputs = form.querySelectorAll("input:not([type='hidden'])");
+
+                    const inputs = form.querySelectorAll(
+                            "input:not([type='hidden']):not([type='checkbox'])"
+                            );
+
                     inputs.forEach(input => input.value = "");
-                    
+
                     const textarea = form.querySelector("#description");
-                    if (textarea) textarea.value = "";
+                    if (textarea)
+                        textarea.value = "";
+
+                    const activeCheckbox = document.getElementById("active");
+                    if (activeCheckbox) {
+                        activeCheckbox.checked = true;
+                        activeCheckbox.value = "true";
+                    }
                 }
             }
             toggleModal(true);
@@ -80,7 +92,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const textarea = form.querySelector("textarea");
                 if (textarea)
                     textarea.value = "";
-                
+
             }
 
             toggleModal(false);
@@ -89,5 +101,5 @@ document.addEventListener("DOMContentLoaded", function () {
             window.history.replaceState(null, "", cleanUrl);
         });
     }
-    
+
 });
