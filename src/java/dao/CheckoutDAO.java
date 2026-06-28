@@ -265,7 +265,7 @@ public class CheckoutDAO extends DBContext {
                     BookingRoom br = new BookingRoom();
                     br.setBookingRoomId(rs.getInt("booking_room_id"));
                     br.setBookingId(rs.getInt("booking_id"));
-                    br.setRoomNumber(rs.getInt("room_number"));
+                    br.setRoomId(rs.getInt("room_id"));
                     list.add(br);
                 }
             }

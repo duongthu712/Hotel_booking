@@ -30,6 +30,15 @@ public class HotelService {
         this.isActive = isActive;
     }
 
+    public boolean isIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    
     public int getHotelServiceId() {
         return hotelServiceId;
     }

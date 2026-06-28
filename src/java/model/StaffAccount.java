@@ -1,6 +1,7 @@
 package model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Last update 17:50 27/06/2026
@@ -92,4 +93,11 @@ public class StaffAccount {
             default: return role;
         }
     }
+    
+    public String getCreatedAtFormatted() {
+    if (createdAt == null) {
+        return "";
+    }
+    return createdAt.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+}
 }

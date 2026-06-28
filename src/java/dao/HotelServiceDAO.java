@@ -36,7 +36,7 @@ public class HotelServiceDAO extends DBContext {
                 boolean active = rs.getBoolean("is_active");
                 String imgUrl = rs.getString("image_url");
 
-                HotelService newHotelService = new HotelService(id, name, description, price, imgUrl, active);
+                HotelService newHotelService = new HotelService(id, name, 1, description, price, imgUrl, active);
                 list.add(newHotelService);
             }
         } catch (SQLException e) {
@@ -68,7 +68,7 @@ public class HotelServiceDAO extends DBContext {
                     boolean active = rs.getBoolean("is_active");
                     String imgUrl = rs.getString("image_url");
 
-                    return new HotelService(serviceId, name, description, price, imgUrl, active);
+                    return new HotelService(serviceId, name, 1, description, price, imgUrl, active);
                 } else {
                     throw new Exception("Dịch vụ này không tồn tại trong hệ thống.");
                 }
@@ -96,7 +96,7 @@ public class HotelServiceDAO extends DBContext {
                     boolean active = rs.getBoolean("is_active");
                     String imgUrl = rs.getString("image_url");
 
-                    return new HotelService(id, serviceName, description, price, imgUrl, active);
+                    return new HotelService(id, serviceName, 1, description, price, imgUrl, active);
                 } else {
                     throw new Exception("Dịch vụ này không tồn tại trong hệ thống.");
                 }
@@ -140,7 +140,7 @@ public class HotelServiceDAO extends DBContext {
                     boolean active = rs.getBoolean("is_active");
                     String imgUrl = rs.getString("image_url");
                     String name = rs.getString("service_name");
-                    HotelService service = new HotelService(id, name, description, price, imgUrl, active);
+                    HotelService service = new HotelService(id, name, 1, description, price, imgUrl, active);
                     list.add(service);
                 }
             }

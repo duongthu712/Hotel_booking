@@ -126,7 +126,11 @@
         </main>
 
         <div class="staff-modal" id="detail-modal">
+
             <div class="modal-content">
+                <div class="service-popup-action">
+                    <button type="button" class="btn-close" id="btn-close-detail" style="font-size: 35px;margin-top: -25px;right: 10px;">×</button>
+                </div>
                 <h2 class="staff-popup-title">Chi tiết nhân viên</h2>
                 <div class="modal-body">
                     <c:if test="${selectedStaff != null}">
@@ -137,11 +141,10 @@
                         <div class="detail-row"><strong>Số điện thoại:</strong> ${selectedStaff.getPhone()}</div>
                         <div class="detail-row"><strong>Chức vụ:</strong> ${selectedStaff.getRole()}</div>
                         <div class="detail-row"><strong>Trạng thái:</strong> ${selectedStaff.isActive() ? 'Đang hoạt động' : 'Ngừng hoạt động'}</div>
-                        <div class="detail-row"><strong>Ngày tạo:</strong> <fmt:formatDate value="${selectedStaff.getCreatedAt()}" pattern="dd/MM/yyyy HH:mm"/></div>
+                        <div class="detail-row"><strong>Ngày tạo:</strong> ${selectedStaff.createdAtFormatted}</div>
                     </c:if>
                 </div>
                 <div class="service-popup-action">
-                    <button type="button" class="btn-close" id="btn-close-detail">Đóng</button>
                     <a class="btn-submit" href="StaffAccountEdit?staffId=${selectedStaff.getStaffId()}&page=${currentPage}&searchText=${searchText}&roleFilter=${roleFilter}">Sửa</a>
                 </div>
             </div>
@@ -149,6 +152,9 @@
 
         <div class="staff-modal" id="edit-modal">
             <form action="StaffAccountEdit" method="post" id="edit-form" class="modal-content">
+                <div class="service-popup-action">
+                    <button type="button" class="btn-close" id="btn-close-edit" style="font-size: 35px; margin-top: -25px; right: 5px;">&times;</button>
+                </div>
                 <h2 class="staff-popup-title" id="edit-modal-title">Chỉnh sửa nhân viên</h2>
 
                 <input type="hidden" name="staffId" value="${editStaff.getStaffId()}">
@@ -162,10 +168,6 @@
                     </div>
                     <c:remove var="errorMessage" scope="session"/>
                 </c:if>
-                <div class="form-group">
-                    <label class="input-label">ID</label>
-                    <input class="service-popup-input-field" type="text" value="${editStaff.getStaffId()}" readonly>
-                </div>
 
                 <div class="form-group">
                     <label class="input-label">Tên đăng nhập</label>
@@ -205,7 +207,6 @@
                 </div>
 
                 <div class="service-popup-action">
-                    <button type="button" class="btn-close" id="btn-close-edit">Huỷ</button>
                     <button type="submit" class="btn-submit">Lưu thay đổi</button>
                 </div>
             </form>
@@ -213,6 +214,11 @@
 
         <div class="staff-modal ${not empty openCreateModal ? 'show' : ''}" id="create-modal" ${not empty openCreateModal ? 'style="display: flex;"' : ''}>
             <form action="StaffAccountCreate" method="POST" id="staff-form" class="modal-content">
+
+                <div class="service-popup-action">
+                    <button type="button" class="btn-close" id="btn-close-create" style="font-size: 35px; margin-top: -25px; right: 5px;">&times;</button>
+                </div>
+
                 <h2 class="staff-popup-title" id="modal-title">Thêm nhân viên mới</h2>
 
                 <input type="hidden" name="page" value="${currentPage}">
@@ -267,7 +273,6 @@
                 </div>
 
                 <div class="service-popup-action">
-                    <button type="button" class="btn-close" id="btn-close-create">Huỷ</button>
                     <button type="submit" class="btn-submit">Xác nhận lưu</button>
                 </div>
             </form>
@@ -281,7 +286,7 @@
         <c:remove var="keepPhone" scope="session"/>
         <c:remove var="keepRole" scope="session"/>
         <c:remove var="keepActive" scope="session"/>
-        <script src="<%=request.getContextPath()%>/view/assets/javascript/alert.js"></script>
+        <script src="${pageContext.request.contextPath}/view/assets/javascript/alert.js"></script>
         <script src="${pageContext.request.contextPath}/view/assets/javascript/staff-account-management.js"></script>
     </body>
 </html>

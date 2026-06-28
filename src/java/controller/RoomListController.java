@@ -8,17 +8,17 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import model.GuestStay;
 import model.Room;
 import model.RoomType;
 import model.StaffAccount;
 
 /**
- * RoomListController.java Display room management page for manager
- *
  * @author LinhLTHE200306
  * @version 2.0
  * @since 2026-06-10
@@ -71,9 +71,15 @@ public class RoomListController extends HttpServlet {
                 roomTypeMap.put(rt.getRoomTypeId(), rt.getTypeName());
             }
 
-            List<Room> roomList = rDao.searchAndFilterRooms(null, roomTypeId, keyword);
+            List<Room> allRooms = rDao.searchAndFilterRooms(null, roomTypeId, keyword);
 
-            int totalRecords = roomList.size();
+            Map<Integer, List<Room>> floorMap = new TreeMap<>();
+            for (Room room : allRooms) {
+                int floor = room.getFloor();
+                floorMap.computeIfAbsent(floor, k -> new ArrayList<>()).add(room);
+            }
+
+            int totalRecords = allRooms.size();
             int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
             if (page < 1) {
                 page = 1;
@@ -84,14 +90,25 @@ public class RoomListController extends HttpServlet {
 
             int start = (page - 1) * recordsPerPage;
             int end = Math.min(start + recordsPerPage, totalRecords);
-            List<Room> pagedList;
 
+            List<Room> pagedRooms;
             if (totalRecords > 0) {
-                pagedList = roomList.subList(start, end);
+                pagedRooms = allRooms.subList(start, end);
             } else {
-                pagedList = roomList;
+                pagedRooms = allRooms;
             }
 
+            Map<Integer, List<Room>> pagedFloorMap = new TreeMap<>();
+            for (Room room : pagedRooms) {
+                int floor = room.getFloor();
+                pagedFloorMap.computeIfAbsent(floor, k -> new ArrayList<>()).add(room);
+            }
+
+            for (List<Room> rooms : pagedFloorMap.values()) {
+                rooms.sort((r1, r2) -> Integer.compare(r1.getRoomNumber(), r2.getRoomNumber()));
+            }
+
+            // Detail modal
             Room selectedRoom = (Room) session.getAttribute("selectedRoom");
             List<GuestStay> guestList = (List<GuestStay>) session.getAttribute("guestList");
 
@@ -102,13 +119,29 @@ public class RoomListController extends HttpServlet {
                 session.removeAttribute("guestList");
             }
 
+            // Edit modal
             Room editRoom = (Room) session.getAttribute("editRoom");
             if (editRoom != null) {
                 request.setAttribute("editRoom", editRoom);
                 session.removeAttribute("editRoom");
             }
 
-            request.setAttribute("roomList", pagedList);
+            // Create modal
+            Boolean openCreateModal = (Boolean) session.getAttribute("openCreateModal");
+            if (openCreateModal != null) {
+                request.setAttribute("openCreateModal", openCreateModal);
+                session.removeAttribute("openCreateModal");
+            }
+
+            request.setAttribute("keepRoomNumber", session.getAttribute("keepRoomNumber"));
+            request.setAttribute("keepFloor", session.getAttribute("keepFloor"));
+            request.setAttribute("keepRoomTypeId", session.getAttribute("keepRoomTypeId"));
+            session.removeAttribute("keepRoomNumber");
+            session.removeAttribute("keepFloor");
+            session.removeAttribute("keepRoomTypeId");
+
+            request.setAttribute("floorMap", pagedFloorMap);
+            request.setAttribute("roomList", pagedRooms);
             request.setAttribute("roomTypeList", roomTypeList);
             request.setAttribute("roomTypeMap", roomTypeMap);
             request.setAttribute("selectedRoomTypeId", roomTypeId);

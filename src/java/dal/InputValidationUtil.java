@@ -1,7 +1,10 @@
 package dal;
 
+import dao.RoomDAO;
+import dao.RoomTypeDAO;
 import java.math.BigDecimal;
 import java.util.regex.Pattern;
+import model.RoomType;
 
 /**
  * @author LinhLTHE200306
@@ -21,7 +24,6 @@ public class InputValidationUtil {
 
     public static String validateStaffInput(String fullName, String email, String phone) {
 
-        
         if (!NAME_PATTERN.matcher(fullName).matches()) {
             return "Họ và tên không được chứa số hoặc ký tự đặc biệt.";
         }
@@ -85,7 +87,7 @@ public class InputValidationUtil {
 
         return null;
     }
-    
+
     public static String validateHotelInput(String email, String phone) {
         if (!EMAIL_PATTERN.matcher(email.trim()).matches()) {
             return "Định dạng email không hợp lệ.";
@@ -97,4 +99,73 @@ public class InputValidationUtil {
 
         return null;
     }
+
+    public static String validateCreateRoom(int roomNumber, int floor, int roomTypeId,
+            RoomDAO roomDao) {
+
+        //Số phòng phải có 3-4 chữ số (format khách sạn: 101, 205, 1001...)
+        // Tầng + số phòng phải khớp: phòng 101 phải ở tầng 1
+        int expectedFloor = roomNumber / 100;
+        if (floor != expectedFloor) {
+            return "Số phòng " + roomNumber + " không khớp với tầng " + floor
+                    + " (phòng " + roomNumber + " thuộc tầng " + expectedFloor + ")";
+        }
+
+        // Số phòng không được trùng
+        try {
+            roomDao.getRoomByNumber(roomNumber);
+            return "Số phòng " + roomNumber + " đã tồn tại";
+        } catch (Exception e) {
+            // Phòng chưa tồn tại
+        }
+
+        //Số phòng trong 1 tầng không quá 100 (101-199)
+        int roomInFloor = roomNumber % 100;
+        if (roomInFloor > 99 || roomInFloor < 1) {
+            return "Số phòng trong tầng phải từ 01-99 (ví dụ: 101, 102... 199)";
+        }
+
+        return null;
+    }
+    
+    public static String validateEditRoom(int roomNumber, int newRoomNumber, int floor,
+            String oldStatus, String newStatus, int oldRoomTypeId, int newRoomTypeId,
+            RoomDAO roomDao) {
+
+        if ("Phòng có khách".equals(oldStatus)) {
+            return "Không thể thay đổi trạng thái phòng đang có khách";
+        }
+
+        if (!oldStatus.equals(newStatus)) {
+            if ("Phòng trống".equals(oldStatus)
+                    && !"Đang dọn dẹp".equals(newStatus)
+                    && !"Đang bảo trì".equals(newStatus)) {
+                return "Phòng trống chỉ có thể chuyển sang Đang dọn dẹp hoặc Đang bảo trì";
+            }
+
+            if ("Đang dọn dẹp".equals(oldStatus)
+                    && !"Phòng trống".equals(newStatus)
+                    && !"Đang bảo trì".equals(newStatus)) {
+                return "Phòng đang dọn dẹp chỉ có thể chuyển sang Phòng trống hoặc Đang bảo trì";
+            }
+
+            if ("Đang bảo trì".equals(oldStatus)
+                    && !"Phòng trống".equals(newStatus)
+                    && !"Đang dọn dẹp".equals(newStatus)) {
+                return "Phòng đang bảo trì chỉ có thể chuyển sang Phòng trống hoặc Đang dọn dẹp";
+            }
+        }
+
+        if (oldRoomTypeId != newRoomTypeId && !"Đang bảo trì".equals(oldStatus)) {
+            return "Chỉ được thay đổi hạng phòng khi phòng đang bảo trì";
+        }
+
+        if (newRoomNumber != roomNumber) {
+            return validateCreateRoom(newRoomNumber, floor, newRoomTypeId, roomDao);
+        }
+
+        
+        return null;
+    }
+
 }

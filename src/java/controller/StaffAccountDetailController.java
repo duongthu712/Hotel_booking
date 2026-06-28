@@ -28,12 +28,13 @@ public class StaffAccountDetailController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
+        
 
         try {
             int staffId = Integer.parseInt(request.getParameter("staffId"));
             StaffAccountDAO staffDao = new StaffAccountDAO();
 
-            StaffAccount selectedStaff = staffDao.getStaffAccById(staffId);
+            StaffAccount selectedStaff = staffDao.getStaffById(staffId);
 
             request.setAttribute("selectedStaff", selectedStaff);
             RequestDispatcher rd = request.getRequestDispatcher("/StaffAccountList");
