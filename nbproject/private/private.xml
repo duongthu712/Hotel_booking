@@ -3,8 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/web/view/assets/javascript/payment-verification.js</file>
-            <file>file:/E:/DOCUMENT%20IN%20FPT/Semester%205/SWP391/Project/Hotel_booking_project/web/view/receptionist/payment-verification.jsp</file>
+            <file>file:/F:/Hotel_booking/src/java/controller/CheckInController.java</file>
+            <file>file:/F:/Hotel_booking/web/view/receptionist/assign-room.jsp</file>
+            <file>file:/F:/Hotel_booking/src/java/controller/UnassignRoomController.java</file>
+            <file>file:/F:/Hotel_booking/src/java/dao/BookingDAO.java</file>
+            <file>file:/F:/Hotel_booking/web/view/receptionist/check-in.jsp</file>
+            <file>file:/F:/Hotel_booking/src/java/controller/AssignRoomController.java</file>
         </group>
     </open-files>
 </project-private>
