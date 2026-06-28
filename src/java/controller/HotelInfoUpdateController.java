@@ -81,6 +81,7 @@ public class HotelInfoUpdateController extends HttpServlet {
             HotelInfoDAO dao = new HotelInfoDAO();
             dao.updateHotelInfo(hotelInfo);
             session.setAttribute("successMessage", "Cập nhật thông tin khách sạn thành công.");
+            session.setAttribute("hotelInfo", hotelInfo);
         } catch (Exception e) {
             session.setAttribute("errorMessage", e.getMessage());
         }

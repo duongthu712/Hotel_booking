@@ -1,21 +1,24 @@
 document.addEventListener("DOMContentLoaded", function () {
     const detailModal = document.getElementById("detail-modal");
     const editModal = document.getElementById("edit-modal");
+    const createModal = document.getElementById("create-modal");
+    
     const btnCloseDetail = document.getElementById("btn-close-detail");
     const btnCloseEdit = document.getElementById("btn-close-edit");
+    const btnCloseCreate = document.getElementById("btn-close-create");
+    const btnCreate = document.getElementById("btn-create");
+    
     const editForm = document.getElementById("edit-form");
 
-      // Get status from body
     const isEditMode = document.body.getAttribute("data-edit-mode") === "true";
     const isDetailMode = document.body.getAttribute("data-detail-mode") === "true";
+    const isCreateMode = document.body.getAttribute("data-create-mode") === "true";
 
-    // Lấy params từ URL hiện tại
     const urlParams = new URLSearchParams(window.location.search);
     const page = urlParams.get('page') || '1';
     const roomTypeId = urlParams.get('roomTypeId') || '';
     const keyword = urlParams.get('keyword') || '';
 
-    // Build redirect URL giữ params
     function buildRoomListUrl() {
         let url = 'RoomList?page=' + page;
         if (roomTypeId) url += '&roomTypeId=' + encodeURIComponent(roomTypeId);
@@ -23,7 +26,6 @@ document.addEventListener("DOMContentLoaded", function () {
         return url;
     }
 
-    // Open and close modal
     function toggleModal(modal, show) {
         if (!modal) return;
         if (show) {
@@ -33,18 +35,26 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Open detail modal from server (first load)
     if (isDetailMode && detailModal) {
         toggleModal(detailModal, true);
     }
 
-    // Open edit modal from server (first load)
     if (isEditMode && editModal) {
         toggleModal(editModal, true);
         editForm.action = "RoomEdit";
     }
 
-    // Close detail modal - back to list with params
+    if (isCreateMode && createModal) {
+        toggleModal(createModal, true);
+    }
+
+    if (btnCreate) {
+        btnCreate.addEventListener("click", function () {
+            toggleModal(createModal, true);
+        });
+    }
+
+    // Tất cả nút X đều đóng modal và redirect về list
     if (btnCloseDetail) {
         btnCloseDetail.addEventListener("click", function () {
             toggleModal(detailModal, false);
@@ -52,13 +62,17 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Close edit modal - back to list with params
     if (btnCloseEdit) {
         btnCloseEdit.addEventListener("click", function () {
             toggleModal(editModal, false);
-            if (isEditMode) {
-                window.location.href = buildRoomListUrl();
-            }
+            window.location.href = buildRoomListUrl();
+        });
+    }
+
+    if (btnCloseCreate) {
+        btnCloseCreate.addEventListener("click", function () {
+            toggleModal(createModal, false);
+            window.location.href = buildRoomListUrl();
         });
     }
 });

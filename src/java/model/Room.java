@@ -7,8 +7,8 @@ package model;
  */
 public class Room {
 
-    private int roomId;       
-    private int roomNumber;   
+    private int roomId;
+    private int roomNumber;
     private int floor;
     private String status;
     private int roomTypeId;

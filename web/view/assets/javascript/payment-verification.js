@@ -1,6 +1,18 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    console.log("payment-verification.js NEW VERSION 10");
+    const alerts = document.querySelectorAll(".alert-message");
+
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.style.opacity = "0";
+            alert.style.transform = "translateY(-10px)";
+            alert.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+
+            setTimeout(() => {
+                alert.remove();
+            }, 300);
+        }, 3000);
+    });
 
     function toggleModal(modal, show) {
         if (!modal) {
@@ -28,8 +40,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const proofWrapper =
             document.getElementById("payment-proof-wrapper");
 
-    const proofNotes =
-            document.getElementById("proof-notes");
+    const proofUrlContainer =
+            document.getElementById("proof-url-container");
 
     const detailBookingCode =
             document.getElementById("detail-booking-code");
@@ -45,9 +57,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const detailStatus =
             document.getElementById("detail-status");
-
-    const detailVerifiedBy =
-            document.getElementById("detail-verified-by");
 
     const verifyNotes =
             document.getElementById("verify-notes");
@@ -68,19 +77,18 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("verification-form");
 
     window.openPaymentDetailModal = function (depositId) {
-        const paymentRow = document.querySelector(
-                `tr[data-deposit-id="${depositId}"]`
-                );
+        const paymentRow =
+                document.querySelector(`tr[data-deposit-id="${depositId}"]`);
 
         if (!paymentRow) {
             return;
         }
 
         const bookingCode =
-                paymentRow.getAttribute("data-booking-code") || "";
+                paymentRow.querySelector(".col-booking")?.innerText || "";
 
         const guestName =
-                paymentRow.getAttribute("data-guest-name") || "";
+                paymentRow.querySelector(".col-guest")?.innerText || "";
 
         const amount =
                 paymentRow.querySelector(".col-amount")?.innerText || "";
@@ -89,10 +97,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 paymentRow.querySelector(".col-date")?.innerText || "";
 
         const status =
-                paymentRow.getAttribute("data-status") || "";
-
-        const verifiedBy =
-                paymentRow.getAttribute("data-verified-by") || "-";
+                paymentRow.querySelector(".payment-status")?.innerText || "";
 
         const proofUrl =
                 paymentRow.getAttribute("data-proof-url") || "";
@@ -128,13 +133,8 @@ document.addEventListener("DOMContentLoaded", function () {
             detailSubmittedAt.innerText = submittedAt;
         }
 
-        if (detailVerifiedBy) {
-            detailVerifiedBy.innerText = verifiedBy;
-        }
-
         if (detailStatus) {
-            detailStatus.innerText =
-                    status === "Đã phê duyệt" ? "Đã duyệt" : status;
+            detailStatus.innerText = status;
 
             detailStatus.className =
                     statusClass === "pending"
@@ -155,21 +155,23 @@ document.addEventListener("DOMContentLoaded", function () {
                 proofWrapper.style.display = "block";
             }
         } else {
-            if (proofImg) {
-                proofImg.removeAttribute("src");
-            }
-
             if (proofWrapper) {
                 proofWrapper.style.display = "none";
             }
         }
 
-        if (proofNotes) {
-            proofNotes.innerText =
-                    paymentNotes && paymentNotes.trim() !== ""
-                    ? paymentNotes
-                    : "Chưa có mã giao dịch / mã tham chiếu.";
-        }
+        if (proofUrlContainer) {
+    proofUrlContainer.innerHTML = `
+        <strong>Mã giao dịch / Mã tham chiếu:</strong>
+        <p style="word-break: break-word; margin-top:8px;">
+            ${
+                paymentNotes && paymentNotes.trim() !== ""
+                ? paymentNotes
+                : "Chưa có mã giao dịch / mã tham chiếu."
+            }
+        </p>
+    `;
+}
 
         if (verifyDepositId) {
             verifyDepositId.value = depositId;
@@ -215,7 +217,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     if (btnCloseDetail) {
-        btnCloseDetail.addEventListener("click", function () {
+        btnCloseDetail.addEventListener("click", () => {
             toggleModal(paymentDetailModal, false);
 
             if (verifyNotes) {
@@ -247,8 +249,8 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    document.querySelectorAll(".hotel-popup").forEach(function (modal) {
-        modal.addEventListener("click", function (e) {
+    document.querySelectorAll(".hotel-popup").forEach(modal => {
+        modal.addEventListener("click", (e) => {
             if (e.target === modal) {
                 toggleModal(modal, false);
             }

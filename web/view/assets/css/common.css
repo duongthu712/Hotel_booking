@@ -352,19 +352,28 @@ border-radius: var(--radius-custom);
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    
+    overflow-y: auto;  
+    padding: 20px 0;
 }
 
 .service-popup.active, .amenity-popup.active, .room-modal.active, .staff-modal.show, .hotel-popup.show{
     display: flex;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 .popup-content, .modal-content {
+    position: relative;
     background: var(--bg-main);
     padding: 40px;
     border-radius: var(--radius-custom);
     width: 90%;
     max-width: 450px;
     border: 1px solid var(--border-color);
+    
+    margin-top: 50px; 
+    margin-bottom: 50px;
 }
 
 .modal-header, .popup-title {

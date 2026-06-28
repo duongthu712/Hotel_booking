@@ -13,8 +13,8 @@ import model.StaffAccount;
 
 /**
  * @author LinhLTHE200306
- * @version 1.1
- * @since 2026-06-13
+ * @version 1.2
+ * @since 2026-06-28
  */
 public class StaffAccountEditController extends HttpServlet {
 
@@ -34,7 +34,7 @@ public class StaffAccountEditController extends HttpServlet {
             int staffId = Integer.parseInt(request.getParameter("staffId"));
 
             StaffAccountDAO staffDao = new StaffAccountDAO();
-            StaffAccount editStaff = staffDao.getStaffAccById(staffId);
+            StaffAccount editStaff = staffDao.getStaffById(staffId);
 
             session.setAttribute("editStaff", editStaff);
 
@@ -112,7 +112,7 @@ public class StaffAccountEditController extends HttpServlet {
 
         try {
             StaffAccountDAO staffDao = new StaffAccountDAO();
-            StaffAccount existingStaff = staffDao.getStaffAccById(staffId);
+            StaffAccount existingStaff = staffDao.getStaffById(staffId);
 
             if (existingStaff == null) {
                 forwardWithError(request, response, staffId,
@@ -163,7 +163,7 @@ public class StaffAccountEditController extends HttpServlet {
 
         try {
             StaffAccountDAO staffDao = new StaffAccountDAO();
-            StaffAccount editStaff = staffDao.getStaffAccById(staffId);
+            StaffAccount editStaff = staffDao.getStaffById(staffId);
 
             if (editStaff != null) {
                 editStaff.setFullName(fullName);

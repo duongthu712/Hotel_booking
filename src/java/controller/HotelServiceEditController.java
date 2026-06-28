@@ -84,7 +84,7 @@ public class HotelServiceEditController extends HttpServlet {
             } catch (Exception e) {
             }
             boolean isActive = "true".equals(activeStr);
-            HotelService serviceToEditTemp = new HotelService(serviceId, serviceName, description, tempPrice, imageUrl, isActive);
+            HotelService serviceToEditTemp = new HotelService(serviceId, serviceName, 1, description, tempPrice, imageUrl, isActive);
 
             session.setAttribute("serviceToEdit", serviceToEditTemp);
 
@@ -97,7 +97,7 @@ public class HotelServiceEditController extends HttpServlet {
             BigDecimal unitPrice = new BigDecimal(unitPriceStr.trim());
             boolean isActive = "true".equals(activeStr);
 
-            HotelService updatedService = new HotelService(serviceId, serviceName, description, unitPrice, imageUrl, isActive);
+            HotelService updatedService = new HotelService(serviceId, serviceName, 1, description, unitPrice, imageUrl, isActive);
 
             HotelServiceDAO dao = new HotelServiceDAO();
             dao.updateHotelService(updatedService);
@@ -112,7 +112,7 @@ public class HotelServiceEditController extends HttpServlet {
                 tempPrice = new BigDecimal(unitPriceStr.trim());
             } catch (Exception ex) {
             }
-            HotelService serviceToEditTemp = new HotelService(serviceId, serviceName, description, tempPrice, imageUrl, "true".equals(activeStr));
+            HotelService serviceToEditTemp = new HotelService(serviceId, serviceName, 1, description, tempPrice, imageUrl, "true".equals(activeStr));
             session.setAttribute("serviceToEdit", serviceToEditTemp);
         }
 

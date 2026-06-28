@@ -1,5 +1,6 @@
 package controller;
 
+import dal.EmailUtil;
 import dao.BookingDAO;
 import dao.RoomTypeDAO;
 import jakarta.servlet.ServletException;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.Period;
 import java.util.List;
 import java.util.Random;
@@ -21,6 +23,8 @@ public class BookingFormController extends HttpServlet {
     private static final int CODE_LENGTH = 8;
     private static final String CODE_CHARACTERS
             = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final int HOLD_MINUTES = 15;
+    private static final LocalTime CHECK_IN_TIME = LocalTime.of(14, 0);
 
     @Override
     protected void doGet(HttpServletRequest request,
@@ -59,11 +63,12 @@ public class BookingFormController extends HttpServlet {
         RoomTypeDAO roomTypeDAO = new RoomTypeDAO();
         List<RoomType> roomTypes = roomTypeDAO.getAllRoomTypes();
         LocalDate today = LocalDate.now();
+        LocalDate earliestCheckIn = LocalTime.now().isBefore(CHECK_IN_TIME) ? today : today.plusDays(1);
 
         request.setAttribute("roomTypes", roomTypes);
-        request.setAttribute("today", today);
-        request.setAttribute("checkIn", today);
-        request.setAttribute("checkOut", today.plusDays(1));
+        request.setAttribute("today", earliestCheckIn);
+        request.setAttribute("checkIn", earliestCheckIn);
+        request.setAttribute("checkOut", earliestCheckIn.plusDays(1));
         request.setAttribute("selectedRoomTypeId", 0);
         request.setAttribute("numRooms", 1);
         request.setAttribute("numGuests", 1);
@@ -112,7 +117,12 @@ public class BookingFormController extends HttpServlet {
         if (error != null) {
             request.setAttribute("error", error);
             request.setAttribute("roomTypes", roomTypeDAO.getAllRoomTypes());
-            request.setAttribute("today", LocalDate.now());
+
+            LocalDate earliestCheckIn = LocalTime.now().isBefore(CHECK_IN_TIME)
+                    ? LocalDate.now()
+                    : LocalDate.now().plusDays(1);
+
+            request.setAttribute("today", earliestCheckIn);
             request.setAttribute("checkIn", checkInString);
             request.setAttribute("checkOut", checkOutString);
             request.setAttribute("selectedRoomTypeId", roomTypeId);
@@ -305,6 +315,20 @@ public class BookingFormController extends HttpServlet {
 
         booking.setBookingId(bookingId);
 
+        request.getSession().setAttribute("bookingEmail_" + booking.getBookingCode(), email);
+        request.getSession().setAttribute("bookingGuestName_" + booking.getBookingCode(), fullName);
+
+        String paymentUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+                + request.getContextPath() + "/booking-payment?bookingCode=" + booking.getBookingCode();
+
+        try {
+            EmailUtil.sendBookingCreated(email, fullName, phone, idNumber, dateOfBirth,
+                    booking.getBookingCode(), checkIn, checkOut, numRooms, numGuests,
+                    booking.getDepositAmount(), HOLD_MINUTES, paymentUrl);
+        } catch (Exception e) {
+            getServletContext().log("Không thể gửi email tạo booking " + booking.getBookingCode(), e);
+        }
+
         response.sendRedirect(request.getContextPath()
                 + "/booking-payment?bookingCode="
                 + booking.getBookingCode());
@@ -414,6 +438,8 @@ public class BookingFormController extends HttpServlet {
             return "Vui lòng chọn ngày nhận phòng và ngày trả phòng.";
         } else if (checkIn.isBefore(LocalDate.now())) {
             return "Ngày nhận phòng không được nhỏ hơn ngày hiện tại.";
+        } else if (checkIn.equals(LocalDate.now()) && !LocalTime.now().isBefore(CHECK_IN_TIME)) {
+            return "Đã quá 14:00. Bạn không thể đặt phòng nhận trong ngày hôm nay.";
         } else if (!checkOut.isAfter(checkIn)) {
             return "Ngày trả phòng phải sau ngày nhận phòng.";
         } else if (numRooms <= 0) {
