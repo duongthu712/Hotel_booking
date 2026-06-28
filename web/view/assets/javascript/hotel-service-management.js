@@ -35,12 +35,22 @@ document.addEventListener("DOMContentLoaded", function () {
                 form.action = "HotelServiceCreate";
                 if (!isCreateMode) {
                     form.reset();
-                    const inputs = form.querySelectorAll("input:not([type='hidden'])");
+
+                    const inputs = form.querySelectorAll(
+                            "input:not([type='hidden']):not([type='checkbox'])"
+                            );
+
                     inputs.forEach(input => input.value = "");
 
                     const textarea = form.querySelector("#description");
                     if (textarea)
                         textarea.value = "";
+
+                    const activeCheckbox = document.getElementById("active");
+                    if (activeCheckbox) {
+                        activeCheckbox.checked = true;
+                        activeCheckbox.value = "true";
+                    }
                 }
             }
             toggleModal(true);
