@@ -1,17 +1,23 @@
 package model;
 
+import java.time.LocalTime; 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Last update 16:50 27/06/2026
+ *
+ * @author LinhLTHE200306
+ */
 public class HotelInfo {
 
-   private int hotelId;
+    private int hotelId;
     private String hotelName;
     private String description;
-    private String checkinTime; 
-    private String checkoutTime;
+    private LocalTime checkinTime; // Chuyển từ String sang LocalTime
+    private LocalTime checkoutTime; // Chuyển từ String sang LocalTime
     private String address;
-    private String addressUrl; 
+    private String addressUrl;
     private String phone;
     private String email;
     private List<HotelImage> images;
@@ -32,7 +38,7 @@ public class HotelInfo {
     public HotelInfo() {
     }
 
-    public HotelInfo(int hotelId, String hotelName, String description, String checkinTime, String checkoutTime, String address, String addressUrl, String phone, String email) {
+    public HotelInfo(int hotelId, String hotelName, String description, LocalTime checkinTime, LocalTime checkoutTime, String address, String addressUrl, String phone, String email) {
         this.hotelId = hotelId;
         this.hotelName = hotelName;
         this.description = description;
@@ -42,6 +48,22 @@ public class HotelInfo {
         this.addressUrl = addressUrl;
         this.phone = phone;
         this.email = email;
+    }
+
+    public LocalTime getCheckinTime() {
+        return checkinTime;
+    }
+
+    public void setCheckinTime(LocalTime checkinTime) {
+        this.checkinTime = checkinTime;
+    }
+
+    public LocalTime getCheckoutTime() {
+        return checkoutTime;
+    }
+
+    public void setCheckoutTime(LocalTime checkoutTime) {
+        this.checkoutTime = checkoutTime;
     }
 
     public int getHotelId() {
@@ -66,22 +88,6 @@ public class HotelInfo {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getCheckinTime() {
-        return checkinTime;
-    }
-
-    public void setCheckinTime(String checkinTime) {
-        this.checkinTime = checkinTime;
-    }
-
-    public String getCheckoutTime() {
-        return checkoutTime;
-    }
-
-    public void setCheckoutTime(String checkoutTime) {
-        this.checkoutTime = checkoutTime;
     }
 
     public String getAddress() {
