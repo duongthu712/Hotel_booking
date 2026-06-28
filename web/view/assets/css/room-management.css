@@ -114,10 +114,30 @@ font-family: var(--font-logo);
     color: var(--text-muted);
     font-size: 0.9rem;
 }
-
-.btn-delete{
-    background: none;
+.btn-delete {
+    text-decoration: none;
     border: none;
+    color: var(--text-muted);
+    margin-right: 10px;
+    transition: color 0.3s;
+    cursor: pointer;
+    font-family: var(--font-logo);
+    padding: 0;
+    background: transparent;
+}
+
+
+.btn-action button {
+    text-decoration: none;
+    border: none;
+    font-size: 1em;
+    font-weight: 700;
+    color: var(--text-main);
+    cursor: pointer;
+    font-family: var(--font-logo);
+    padding: 0;
+    background: transparent;
+    margin-right: 10px; /* THÊM DÒNG NÀY */
 }
 
 .btn-filter {
@@ -128,7 +148,7 @@ font-family: var(--font-logo);
     text-transform: uppercase;
     text-decoration: none;
     color: var(--text-main);
-    border: 1px solid var(--border-color);
+    border: none;
     border-radius: var(--radius-custom);
     cursor: pointer;
     transition: all 0.3s;

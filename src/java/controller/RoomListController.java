@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +21,8 @@ import model.StaffAccount;
 
 /**
  * @author LinhLTHE200306
- * @version 2.0
- * @since 2026-06-10
+ * @version 3.0
+ * @since 2026-06-28
  */
 public class RoomListController extends HttpServlet {
 
@@ -48,18 +49,6 @@ public class RoomListController extends HttpServlet {
             roomTypeId = null;
         }
 
-        // Pagination
-        int page = 1;
-        try {
-            String pageParam = request.getParameter("page");
-            if (pageParam != null && !pageParam.isEmpty()) {
-                page = Integer.parseInt(pageParam);
-            }
-        } catch (NumberFormatException e) {
-            page = 1;
-        }
-        int recordsPerPage = 10;
-
         RoomDAO rDao = new RoomDAO();
         RoomTypeDAO rtDao = new RoomTypeDAO();
 
@@ -79,33 +68,8 @@ public class RoomListController extends HttpServlet {
                 floorMap.computeIfAbsent(floor, k -> new ArrayList<>()).add(room);
             }
 
-            int totalRecords = allRooms.size();
-            int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
-            if (page < 1) {
-                page = 1;
-            }
-            if (page > totalPages && totalPages > 0) {
-                page = totalPages;
-            }
-
-            int start = (page - 1) * recordsPerPage;
-            int end = Math.min(start + recordsPerPage, totalRecords);
-
-            List<Room> pagedRooms;
-            if (totalRecords > 0) {
-                pagedRooms = allRooms.subList(start, end);
-            } else {
-                pagedRooms = allRooms;
-            }
-
-            Map<Integer, List<Room>> pagedFloorMap = new TreeMap<>();
-            for (Room room : pagedRooms) {
-                int floor = room.getFloor();
-                pagedFloorMap.computeIfAbsent(floor, k -> new ArrayList<>()).add(room);
-            }
-
-            for (List<Room> rooms : pagedFloorMap.values()) {
-                rooms.sort((r1, r2) -> Integer.compare(r1.getRoomNumber(), r2.getRoomNumber()));
+            for (List<Room> rooms : floorMap.values()) {
+                rooms.sort(Comparator.comparingInt(Room::getRoomNumber));
             }
 
             // Detail modal
@@ -133,6 +97,7 @@ public class RoomListController extends HttpServlet {
                 session.removeAttribute("openCreateModal");
             }
 
+            // Giữ giá trị form khi lỗi
             request.setAttribute("keepRoomNumber", session.getAttribute("keepRoomNumber"));
             request.setAttribute("keepFloor", session.getAttribute("keepFloor"));
             request.setAttribute("keepRoomTypeId", session.getAttribute("keepRoomTypeId"));
@@ -140,14 +105,11 @@ public class RoomListController extends HttpServlet {
             session.removeAttribute("keepFloor");
             session.removeAttribute("keepRoomTypeId");
 
-            request.setAttribute("floorMap", pagedFloorMap);
-            request.setAttribute("roomList", pagedRooms);
+            request.setAttribute("floorMap", floorMap);
             request.setAttribute("roomTypeList", roomTypeList);
             request.setAttribute("roomTypeMap", roomTypeMap);
             request.setAttribute("selectedRoomTypeId", roomTypeId);
             request.setAttribute("keyword", keyword);
-            request.setAttribute("currentPage", page);
-            request.setAttribute("totalPages", totalPages);
 
             request.getRequestDispatcher("/view/manager/room-management.jsp").forward(request, response);
 

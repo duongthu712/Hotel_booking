@@ -8,8 +8,8 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="model.StaffAccount"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/common.css" type="text/css">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/room-management.css" type="text/css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/common.css?v=3" type="text/css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/room-management.css?v=3" type="text/css">
 <!DOCTYPE html>
 <html>
     <head>
@@ -87,14 +87,13 @@
                                         </c:choose>
                                     </div>
                                     <div class="room-action">
-                                        <a class="btn-edit" href="RoomDetail?roomNumber=${room.getRoomNumber()}&page=${currentPage}&roomTypeId=${selectedRoomTypeId}&keyword=${keyword}">Chi tiết</a>
-                                        <a class="btn-edit" href="RoomEdit?roomNumber=${room.getRoomNumber()}&page=${currentPage}&roomTypeId=${selectedRoomTypeId}&keyword=${keyword}">Sửa</a>
+                                        <a class="btn-edit" href="RoomDetail?roomNumber=${room.getRoomNumber()}&roomTypeId=${selectedRoomTypeId}&keyword=${keyword}">Chi tiết</a>
+                                        <a class="btn-edit" href="RoomEdit?roomNumber=${room.getRoomNumber()}&roomTypeId=${selectedRoomTypeId}&keyword=${keyword}">Sửa</a>
                                         <form action="RoomDelete" method="post" style="display: inline-block; margin: 0;">
                                             <input type="hidden" name="roomNumber" value="${room.getRoomNumber()}">
-                                            <input type="hidden" name="page" value="${currentPage}">
                                             <input type="hidden" name="roomTypeId" value="${selectedRoomTypeId}">
                                             <input type="hidden" name="keyword" value="${keyword}">
-                                            <button class="btn-delete" type="submit" onclick="return confirm('Bạn có chắc muốn xoá phòng ${room.getRoomNumber()}?')">Xoá</button>
+                                            <button type="submit" class="btn-delete" onclick="return confirm('Bạn có chắc muốn xoá phòng ${room.getRoomNumber()}?')">Xoá</button>
                                         </form>
                                     </div>
                                 </div>
@@ -103,23 +102,21 @@
                     </div>
                 </c:forEach>
                 
-                <c:if test="${empty roomList}">
+                <c:if test="${empty floorMap}">
                     <p class="empty-message">Không tìm thấy phòng.</p>
                 </c:if>
             </div>
 
-            <div class="pagination">
-                <c:forEach begin="1" end="${totalPages}" var="i">
-                    <a href="RoomList?page=${i}&roomTypeId=${selectedRoomTypeId}&keyword=${keyword}" class="${currentPage == i ? 'active' : ''}">${i}</a>
-                </c:forEach>
-            </div>
+            <%-- KHÔNG CÒN PHÂN TRANG --%>
+
         </main>
 
         <%-- DETAIL MODAL --%>
         <div class="room-modal" id="detail-modal">
-            <div class="popup-content">
-                <button type="button" class="btn-close" id="btn-close-detail" style="position: absolute; font-size: 35px; margin-top: 5px; top: 10px; right: 15px;">&times;</button>
-                
+            <div class="popup-content" style="position: relative;">
+                <div class="service-popup-action">
+                    <button type="button" class="btn-close" id="btn-close-detail" style="font-size: 35px; margin-top: -25px; right: 5px;">&times;</button>
+                </div>
                 <h2 class="service-popup-title">Chi tiết phòng ${selectedRoom.getRoomNumber()}</h2>
 
                 <c:if test="${selectedRoom != null}">
@@ -153,19 +150,19 @@
                 </c:if>
 
                 <div class="service-popup-action">
-                    <a class="btn-submit" href="RoomEdit?roomNumber=${selectedRoom.getRoomNumber()}&page=${currentPage}&roomTypeId=${selectedRoomTypeId}&keyword=${keyword}">Sửa</a>
+                    <a class="btn-submit" href="RoomEdit?roomNumber=${selectedRoom.getRoomNumber()}&roomTypeId=${selectedRoomTypeId}&keyword=${keyword}">Sửa</a>
                 </div>
             </div>
         </div>
 
         <%-- EDIT MODAL --%>
         <div class="room-modal" id="edit-modal">
-            <form action="RoomEdit" method="post" id="edit-form" class="popup-content">
-                <button type="button" class="btn-close" id="btn-close-edit" style="position: absolute; font-size: 35px; margin-top: 5px; top: 10px; right: 15px;">&times;</button>
-                
+            <form action="RoomEdit" method="post" id="edit-form" class="popup-content" style="position: relative;">
+                <div class="service-popup-action">
+                    <button type="button" class="btn-close" id="btn-close-edit" style="font-size: 35px; margin-top: -25px; right: 5px;">&times;</button>
+                </div>
                 <h2 class="service-popup-title" id="edit-modal-title">Chỉnh sửa phòng</h2>
 
-                <input type="hidden" name="page" value="${currentPage}">
                 <input type="hidden" name="filterRoomTypeId" value="${selectedRoomTypeId}">
                 <input type="hidden" name="keyword" value="${keyword}">
                 <input type="hidden" name="roomNumber" id="editRoomNumber" value="${editRoom.getRoomNumber()}">
@@ -226,12 +223,12 @@
 
         <%-- CREATE MODAL --%>
         <div class="room-modal ${not empty openCreateModal ? 'show' : ''}" id="create-modal" ${not empty openCreateModal ? 'style="display: flex;"' : ''}>
-            <form action="RoomCreate" method="POST" id="room-form" class="popup-content">
-                <button type="button" class="btn-close" id="btn-close-create" style="position: absolute; font-size: 35px; margin-top: 5px; top: 10px; right: 15px;">&times;</button>
-                
+            <form action="RoomCreate" method="POST" id="room-form" class="popup-content" style="position: relative;">
+                <div class="service-popup-action">
+                    <button type="button" class="btn-close" id="btn-close-create" style="font-size: 35px; margin-top: -25px; right: 5px;">&times;</button>
+                </div>
                 <h2 class="service-popup-title" id="modal-title">Thêm phòng mới</h2>
 
-                <input type="hidden" name="page" value="${currentPage}">
                 <input type="hidden" name="filterRoomTypeId" value="${selectedRoomTypeId}">
                 <input type="hidden" name="keyword" value="${keyword}">
 
