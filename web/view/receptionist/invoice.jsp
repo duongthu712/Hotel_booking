@@ -1,8 +1,8 @@
 <%-- 
     Document   : invoice
-    Created on : May 27, 2026, 10:46:49 PM
-    Author     : Minh Thu
-    Editor     : LinhLTHE200306
+    Created on : Jun 28, 2026
+    Author     : LinhLTHE200306
+    Luồng mới: Hiển thị dịch vụ/hư hỏng đã có từ DB + cho phép nhập thêm
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -24,7 +24,7 @@
 
         <main class="content-container">
             <div class="page-header">
-                <a href="${pageContext.request.contextPath}/Checkout?bookingId=${booking.bookingId}" class="btn-back">
+                <a href="${pageContext.request.contextPath}/Checkout" class="btn-back">
                     ← Quay lại
                 </a>
             </div>
@@ -113,10 +113,48 @@
                             </div>
                         </div>
 
+                        <!-- DỊCH VỤ ĐÃ SỬ DỤNG (hiển thị từ DB) -->
+                        <div class="card">
+                            <h3 class="section-title">DỊCH VỤ ĐÃ SỬ DỤNG</h3>
+                            <div class="table-container">
+                                <c:choose>
+                                    <c:when test="${not empty existingServices}">
+                                        <table class="data-table service-table">
+                                            <thead class="data-table-thead">
+                                                <tr>
+                                                    <th class="col-name">Dịch vụ</th>
+                                                    <th class="col-price">Đơn giá</th>
+                                                    <th class="col-qty">SL</th>
+                                                    <th class="col-total">Thành tiền</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="data-table-tbody">
+                                                <c:forEach var="svc" items="${existingServices}">
+                                                    <tr>
+                                                        <td class="col-name">${svc.serviceName}</td>
+                                                        <td class="col-price">
+                                                            <fmt:formatNumber value="${svc['unitPrice']}" type="number" pattern="#,###"/> đ
+                                                        </td>
+                                                        <td class="col-qty">${svc.quantityUsed}</td>
+                                                        <td class="col-total">
+                                                            <fmt:formatNumber value="${svc['totalPrice']}" type="number" pattern="#,###"/> đ
+                                                        </td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </tbody>
+                                        </table>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div class="empty-sub-message">Không có dịch vụ phát sinh thêm.</div>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+                        </div>
 
+                        <!-- NHẬP THÊM DỊCH VỤ -->
                         <div class="card">
                             <div class="card-header-with-search">
-                                <h3 class="section-title">DỊCH VỤ SỬ DỤNG</h3>
+                                <h3 class="section-title">THÊM DỊCH VỤ (NẾU CÓ)</h3>
                                 <div class="search-box">
                                     <input type="text" id="serviceSearch" placeholder="Tìm kiếm dịch vụ..." class="search-input-small">
                                 </div>
@@ -138,7 +176,7 @@
                                                     <div class="service-name">${svc.serviceName}</div>
                                                 </td>
                                                 <td class="col-price">
-                                                    <fmt:formatNumber value="${svc.unitPrice}" type="number" pattern="#,###"/> đ
+                                                    <fmt:formatNumber value="${svc['unitPrice']}" type="number" pattern="#,###"/> đ
                                                 </td>
                                                 <td class="col-qty">
                                                     <div class="quantity-control">
@@ -166,10 +204,48 @@
                             </div>
                         </div>
 
+                        <!-- TIỆN NGHI HƯ HỎNG ĐÃ GHI NHẬN (hiển thị từ DB) -->
+                        <div class="card">
+                            <h3 class="section-title">TIỆN NGHI BỊ HƯ HỎNG / MẤT ĐÃ GHI NHẬN</h3>
+                            <div class="table-container">
+                                <c:choose>
+                                    <c:when test="${not empty existingDamages}">
+                                        <table class="data-table amenity-table">
+                                            <thead class="data-table-thead">
+                                                <tr>
+                                                    <th class="col-name">Tiện nghi</th>
+                                                    <th class="col-price">Đơn giá</th>
+                                                    <th class="col-qty">SL hỏng</th>
+                                                    <th class="col-total">Thành tiền</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="data-table-tbody">
+                                                <c:forEach var="dmg" items="${existingDamages}">
+                                                    <tr>
+                                                        <td class="col-name">${dmg.amenityName}</td>
+                                                        <td class="col-price">
+                                                            <fmt:formatNumber value="${dmg.unitPrice}" type="number" pattern="#,###"/> đ
+                                                        </td>
+                                                        <td class="col-qty">${dmg.quantityDamaged}</td>
+                                                        <td class="col-total">
+                                                            <fmt:formatNumber value="${dmg.totalPrice}" type="number" pattern="#,###"/> đ
+                                                        </td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </tbody>
+                                        </table>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div class="empty-sub-message">Không có hư hỏng / mất mát nào.</div>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+                        </div>
 
+                        <!-- NHẬP THÊM HƯ HỎNG -->
                         <div class="card">
                             <div class="card-header-with-search">
-                                <h3 class="section-title">TIỆN NGHI BỊ HƯ HỎNG HOẶC MẤT</h3>
+                                <h3 class="section-title">THÊM TIỆN NGHI HƯ HỎNG (NẾU CÓ)</h3>
                                 <div class="search-box">
                                     <input type="text" id="amenitySearch" placeholder="Tìm kiếm tiện nghi..." class="search-input-small">
                                 </div>
@@ -186,26 +262,34 @@
                                     </thead>
                                     <tbody class="data-table-tbody">
                                         <c:forEach var="amen" items="${roomTypeAmenities}" varStatus="loop">
-                                            <tr class="amenity-row" data-name="${amen.amenityName.toLowerCase()}">
-                                                <td class="col-name">
-                                                    <div class="amenity-name">${amen.amenityName}</div>
-                                                </td>
-                                                <td class="col-price">
-                                                    <fmt:formatNumber value="${amen.unitPrice}" type="number" pattern="#,###"/> đ
-                                                </td>
-                                                <td class="col-qty">
-                                                    <div class="quantity-control">
-                                                        <button type="button" class="qty-btn qty-minus" onclick="changeQty('amenity', ${loop.index}, -1)">−</button>
-                                                        <input type="number" name="damageQuantity" id="amenityQty_${loop.index}" class="qty-input" value="0" min="0" max="${amen.quantity}" data-unit-price="${amen.unitPrice}" onchange="calculateAmenity(${loop.index})">
-                                                        <button type="button" class="qty-btn qty-plus" onclick="changeQty('amenity', ${loop.index}, 1)">+</button>
-                                                    </div>
-                                                    <input type="hidden" name="amenityId" value="${amen.amenityId}">
-                                                    <input type="hidden" name="damageUnitPrice" value="${amen.unitPrice}">
-                                                </td>
-                                                <td class="col-total">
-                                                    <span id="amenityTotal_${loop.index}" class="row-total">0 đ</span>
-                                                </td>
-                                            </tr>
+                                            <c:set var="alreadyDamaged" value="${damagedQtyMap[amen.amenityId] != null ? damagedQtyMap[amen.amenityId] : 0}"/>
+                                            <c:set var="maxAdditional" value="${amen.quantity - alreadyDamaged}"/>
+                                            <c:if test="${maxAdditional > 0}">
+                                                <tr class="amenity-row" data-name="${amen.amenityName.toLowerCase()}">
+                                                    <td class="col-name">
+                                                        <div class="amenity-name">${amen.amenityName}</div>
+                                                    </td>
+                                                    <td class="col-price">
+                                                        <fmt:formatNumber value="${amen.unitPrice}" type="number" pattern="#,###"/> đ
+                                                    </td>
+                                                    <td class="col-qty">
+                                                        <div class="quantity-control">
+                                                            <button type="button" class="qty-btn qty-minus" onclick="changeQty('amenity', ${loop.index}, -1)">−</button>
+                                                            <c:set var="alreadyDamaged" value="${damagedQtyMap[amen.amenityId] != null ? damagedQtyMap[amen.amenityId] : 0}"/>
+                                                            <c:set var="maxAdditional" value="${amen.quantity - alreadyDamaged}"/>
+                                                            <input type="number" name="damageQuantity" id="amenityQty_${loop.index}" class="qty-input" value="0" min="0" max="${maxAdditional > 0 ? maxAdditional : 0}"       
+                                                                   data-unit-price="${amen.unitPrice}"        
+                                                                   onchange="calculateAmenity(${loop.index})">
+                                                            <button type="button" class="qty-btn qty-plus" onclick="changeQty('amenity', ${loop.index}, 1)">+</button>
+                                                        </div>
+                                                        <input type="hidden" name="amenityId" value="${amen.amenityId}">
+                                                        <input type="hidden" name="damageUnitPrice" value="${amen.unitPrice}">
+                                                    </td>
+                                                    <td class="col-total">
+                                                        <span id="amenityTotal_${loop.index}" class="row-total">0 đ</span>
+                                                    </td>
+                                                </tr>
+                                            </c:if>
                                         </c:forEach>
                                     </tbody>
                                 </table>
@@ -226,19 +310,42 @@
                                 </div>
                                 <div class="summary-row">
                                     <span class="summary-label">Dịch vụ và sử dụng</span>
-                                    <span class="summary-value" id="summaryServices">0 đ</span>
+                                    <span class="summary-value" id="summaryServices">
+                                        <fmt:formatNumber value="${existingServicesTotal}" type="number" pattern="#,###"/> đ
+                                    </span>
                                 </div>
                                 <div class="summary-row">
                                     <span class="summary-label">Tiện nghi hư hỏng/mất</span>
-                                    <span class="summary-value" id="summaryDamages">0 đ</span>
+                                    <span class="summary-value" id="summaryDamages">
+                                        <fmt:formatNumber value="${existingDamagesTotal}" type="number" pattern="#,###"/> đ
+                                    </span>
                                 </div>
+
+                                <c:if test="${lateCharge > 0}">
+                                    <div class="summary-row">
+                                        <span class="summary-label">
+                                            Phụ thu trả phòng muộn
+                                            <c:choose>
+                                                <c:when test="${lateCharge >= booking.bookedPricePerNight.doubleValue() * booking.numRooms}">
+                                                    (sau 18:00 — 100%)
+                                                </c:when>
+                                                <c:otherwise>
+                                                    (trước 18:00 — 50%)
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </span>
+                                        <span class="summary-value" id="summaryLateCharge">
+                                            <fmt:formatNumber value="${lateCharge}" type="number" pattern="#,###"/> đ
+                                        </span>
+                                    </div>
+                                </c:if>
 
                                 <div class="summary-divider"></div>
 
                                 <div class="summary-row total-row">
                                     <span class="summary-label">Tổng tiền</span>
                                     <span class="summary-value total" id="summaryTotal">
-                                        <fmt:formatNumber value="${roomCharges}" type="number" pattern="#,###"/> đ
+                                        <fmt:formatNumber value="${roomCharges + existingServicesTotal + existingDamagesTotal}" type="number" pattern="#,###"/> đ
                                     </span>
                                 </div>
                                 <div class="summary-row discount-row">
@@ -253,7 +360,7 @@
                                 <div class="summary-row final-row">
                                     <span class="summary-label">SỐ TIỀN CẦN THANH TOÁN</span>
                                     <span class="summary-value final" id="summaryRemaining">
-                                        <fmt:formatNumber value="${roomCharges - (depositAmount != null ? depositAmount.doubleValue() : 0)}" type="number" pattern="#,###"/> đ
+                                        <fmt:formatNumber value="${roomCharges + existingServicesTotal + existingDamagesTotal - (depositAmount != null ? depositAmount.doubleValue() : 0)}" type="number" pattern="#,###"/> đ
                                     </span>
                                 </div>
                             </div>
@@ -298,9 +405,11 @@
                 </div>
             </form>
         </main>
-
+        <script>
+            var initServicesTotal = ${existingServicesTotal};
+            var initDamagesTotal = ${existingDamagesTotal};
+        </script>
         <script src="${pageContext.request.contextPath}/view/assets/javascript/alert.js"></script>
         <script src="${pageContext.request.contextPath}/view/assets/javascript/invoice.js"></script>
     </body>
 </html>
-

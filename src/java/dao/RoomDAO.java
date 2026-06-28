@@ -180,14 +180,12 @@ public class RoomDAO extends DBContext {
                         FROM GuestStays gs 
                         INNER JOIN BookingRooms br ON gs.booking_room_id = br.booking_room_id 
                         INNER JOIN Bookings b ON br.booking_id = b.booking_id 
-                        WHERE br.room_number = ? 
-                        AND b.status = N'Đã nhận phòng'           
-                        AND GETDATE() >= b.actual_checkin_time
-                          AND b.actual_checkout_time IS NULL
+                        WHERE br.room_id = ? 
+                        AND b.status = N'Đã nhận phòng'     
                         """;
 
         try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
-            stm.setInt(1, roomNumber);
+            stm.setInt(1, getRoomByNumber(roomNumber).getRoomId());
 
             try (ResultSet rs = stm.executeQuery()) {
                 while (rs.next()) {
