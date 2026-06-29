@@ -357,16 +357,24 @@ body {
     text-transform: uppercase;
 }
 
-.booking-input-grid {
+.booking-date-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 18px;
-    row-gap: 18px;
+    gap: 18px;
     width: 100%;
-    align-items: end;
+    margin-bottom: 18px;
 }
 
-.booking-input-grid > *,
+.booking-number-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    width: 100%;
+    margin-bottom: 18px;
+}
+
+.booking-date-grid > *,
+.booking-number-grid > *,
 .booking-field {
     min-width: 0;
 }
@@ -421,57 +429,44 @@ body {
     cursor: pointer;
 }
 
-.booking-quantity-field .quantity-box {
-    width: 100%;
-    max-width: 250px;
-}
+/* Number inputs */
 
-.quantity-box {
-    display: grid;
-    grid-template-columns: 48px minmax(70px, 1fr) 48px;
-    height: 50px;
-    overflow: hidden;
+.booking-number-input {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    height: 46px;
+    padding: 0 13px;
+    color: #073842;
     background-color: #fffdf9;
     border: 1px solid #d9cfc1;
     border-radius: 6px;
-}
-
-.quantity-box button,
-.quantity-box input {
-    min-width: 0;
-    height: 48px;
-    color: #073842;
-    background-color: transparent;
-    border: none;
-}
-
-.quantity-box button {
-    padding: 0;
-    font-size: 21px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: color 0.2s ease, background-color 0.2s ease;
-}
-
-.quantity-box button:first-child {
-    border-right: 1px solid #e5ddd2;
-}
-
-.quantity-box button:last-child {
-    border-left: 1px solid #e5ddd2;
-}
-
-.quantity-box button:hover {
-    color: #ffffff;
-    background-color: #c8a96b;
-}
-
-.quantity-box input {
-    width: 100%;
-    text-align: center;
+    outline: none;
     font-family: Arial, sans-serif;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease,
+        background-color 0.2s ease;
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+.booking-number-input:hover {
+    border-color: #c8a96b;
+    background-color: #ffffff;
+}
+
+.booking-number-input:focus {
+    border-color: #c8a96b;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(200, 169, 107, 0.13);
+}
+
+.booking-number-input::-webkit-inner-spin-button,
+.booking-number-input::-webkit-outer-spin-button {
+    margin: 0;
+    appearance: none;
+    -webkit-appearance: none;
 }
 
 .capacity-note {
@@ -952,9 +947,11 @@ body {
     .benefit-item:nth-child(2) {
         border-right: none;
     }
+}
 
-    .booking-quantity-field .quantity-box {
-        max-width: none;
+@media (max-width: 880px) {
+    .booking-number-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 
@@ -980,9 +977,10 @@ body {
         grid-template-columns: 1fr;
     }
 
-    .booking-input-grid {
+    .booking-date-grid,
+    .booking-number-grid {
         grid-template-columns: 1fr;
-        row-gap: 15px;
+        gap: 15px;
     }
 
     .booking-action-row {

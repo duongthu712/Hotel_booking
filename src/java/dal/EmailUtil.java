@@ -131,80 +131,171 @@ public class EmailUtil {
         
         Transport.send(message);
     }
-    
-    public static void sendBookingCreated(String toEmail, String guestName, String phone,
-            String idNumber, LocalDate dateOfBirth, String bookingCode,
-            LocalDate checkinDate, LocalDate checkoutDate, int numRooms,
-            int numGuests, BigDecimal depositAmount, int holdMinutes,
+
+    public static void sendBookingCreated(
+            String toEmail,
+            String guestName,
+            String phone,
+            String idNumber,
+            LocalDate dateOfBirth,
+            String bookingCode,
+            LocalDate checkinDate,
+            LocalDate checkoutDate,
+            int numRooms,
+            int numGuests,
+            int numChildren,
+            BigDecimal depositAmount,
+            int holdMinutes,
             String paymentUrl) throws Exception {
 
-        final String fromEmail = "phuonglinhthcsphuongdien@gmail.com";
-        final String appPassword = "pnzf biix zhmo zrxt";
+        final String fromEmail
+                = "phuonglinhthcsphuongdien@gmail.com";
+
+        final String appPassword
+                = "pnzf biix zhmo zrxt";
 
         Properties props = new Properties();
+
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "587");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
 
-        Session session = Session.getInstance(props, new Authenticator() {
+        Session session = Session.getInstance(
+                props,
+                new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(fromEmail, appPassword);
+                return new PasswordAuthentication(
+                        fromEmail,
+                        appPassword
+                );
             }
         });
 
         Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(fromEmail, "LaMer Hotel"));
-        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
 
-        String subject = "La Mer Hotel - Thông tin đặt phòng";
+        message.setFrom(
+                new InternetAddress(
+                        fromEmail,
+                        "LaMer Hotel"
+                )
+        );
 
-        String idNumberText = idNumber == null || idNumber.trim().isEmpty()
-                ? "Không cung cấp" : idNumber;
+        message.setRecipients(
+                Message.RecipientType.TO,
+                InternetAddress.parse(toEmail)
+        );
 
-        String dateOfBirthText = dateOfBirth == null
-                ? "Không cung cấp" : dateOfBirth.toString();
+        String subject
+                = "La Mer Hotel - Thông tin đặt phòng";
 
-        String htmlContent = "<div style='font-family: Arial, sans-serif; color: #073842;'>"
+        String idNumberText
+                = idNumber == null
+                || idNumber.trim().isEmpty()
+                ? "Không cung cấp"
+                : idNumber.trim();
+
+        String dateOfBirthText
+                = dateOfBirth == null
+                        ? "Không cung cấp"
+                        : dateOfBirth.toString();
+
+        int totalOccupants = numGuests + numChildren;
+
+        String htmlContent
+                = "<div style='font-family: Arial, sans-serif; "
+                + "color: #073842;'>"
                 + "<h2>La Mer Hotel - Thông tin đặt phòng</h2>"
-                + "<p>Xin chào <strong>" + guestName + "</strong>,</p>"
-                + "<p>Chúng tôi đã tiếp nhận thông tin đặt phòng của bạn.</p>"
-
+                + "<p>Xin chào <strong>"
+                + guestName
+                + "</strong>,</p>"
+                + "<p>"
+                + "Chúng tôi đã tiếp nhận thông tin đặt phòng của bạn."
+                + "</p>"
                 + "<h3>Thông tin khách hàng:</h3>"
                 + "<ul>"
-                + "<li>Họ và tên: <strong>" + guestName + "</strong></li>"
-                + "<li>Email: <strong>" + toEmail + "</strong></li>"
-                + "<li>Số điện thoại: <strong>" + phone + "</strong></li>"
-                + "<li>CCCD/Hộ chiếu: <strong>" + idNumberText + "</strong></li>"
-                + "<li>Ngày sinh: <strong>" + dateOfBirthText + "</strong></li>"
+                + "<li>Họ và tên: <strong>"
+                + guestName
+                + "</strong></li>"
+                + "<li>Email: <strong>"
+                + toEmail
+                + "</strong></li>"
+                + "<li>Số điện thoại: <strong>"
+                + phone
+                + "</strong></li>"
+                + "<li>CCCD/Hộ chiếu: <strong>"
+                + idNumberText
+                + "</strong></li>"
+                + "<li>Ngày sinh: <strong>"
+                + dateOfBirthText
+                + "</strong></li>"
                 + "</ul>"
-
                 + "<h3>Thông tin đặt phòng:</h3>"
                 + "<ul>"
-                + "<li>Mã đặt phòng: <strong>" + bookingCode + "</strong></li>"
-                + "<li>Ngày nhận phòng: <strong>" + checkinDate + "</strong></li>"
-                + "<li>Ngày trả phòng: <strong>" + checkoutDate + "</strong></li>"
-                + "<li>Số phòng: <strong>" + numRooms + "</strong></li>"
-                + "<li>Số khách: <strong>" + numGuests + "</strong></li>"
-                + "<li>Tiền đặt cọc: <strong>" + depositAmount + " VNĐ</strong></li>"
+                + "<li>Mã đặt phòng: <strong>"
+                + bookingCode
+                + "</strong></li>"
+                + "<li>Ngày nhận phòng: <strong>"
+                + checkinDate
+                + "</strong></li>"
+                + "<li>Ngày trả phòng: <strong>"
+                + checkoutDate
+                + "</strong></li>"
+                + "<li>Số phòng: <strong>"
+                + numRooms
+                + "</strong></li>"
+                + "<li>Người lớn: <strong>"
+                + numGuests
+                + "</strong></li>"
+                + "<li>Trẻ em: <strong>"
+                + numChildren
+                + "</strong></li>"
+                + "<li>Tổng số người: <strong>"
+                + totalOccupants
+                + "</strong></li>"
+                + "<li>Tiền đặt cọc: <strong>"
+                + depositAmount
+                + " VNĐ</strong></li>"
                 + "</ul>"
-
-                + "<p>Đơn đặt phòng được giữ trong <strong>" + holdMinutes + " phút</strong>.</p>"
-                + "<p>Vui lòng hoàn tất thanh toán trước khi thời gian giữ phòng kết thúc.</p>"
-
+                + "<p>"
+                + "Đơn đặt phòng được giữ trong <strong>"
+                + holdMinutes
+                + " phút</strong>."
+                + "</p>"
+                + "<p>"
+                + "Vui lòng hoàn tất thanh toán trước khi "
+                + "thời gian giữ phòng kết thúc."
+                + "</p>"
                 + "<p style='margin-top: 25px;'>"
-                + "<a href='" + paymentUrl + "' style='background-color: #073842; color: white; "
-                + "padding: 12px 20px; text-decoration: none; border-radius: 5px;'>"
+                + "<a href='"
+                + paymentUrl
+                + "' style='background-color: #073842; "
+                + "color: white; "
+                + "padding: 12px 20px; "
+                + "text-decoration: none; "
+                + "border-radius: 5px;'>"
                 + "Tiếp tục thanh toán"
                 + "</a>"
                 + "</p>"
-
-                + "<p>Bạn có thể mở lại email này để tiếp tục thanh toán mà không cần nhớ mã đặt phòng.</p>"
+                + "<p>"
+                + "Bạn có thể mở lại email này để tiếp tục thanh toán "
+                + "mà không cần nhớ mã đặt phòng."
+                + "</p>"
                 + "</div>";
 
-        message.setSubject(MimeUtility.encodeText(subject, "UTF-8", "B"));
-        message.setContent(htmlContent, "text/html; charset=UTF-8");
+        message.setSubject(
+                MimeUtility.encodeText(
+                        subject,
+                        "UTF-8",
+                        "B"
+                )
+        );
+
+        message.setContent(
+                htmlContent,
+                "text/html; charset=UTF-8"
+        );
 
         Transport.send(message);
     }

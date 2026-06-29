@@ -359,35 +359,11 @@
                                                  class="payment-upload-label">
 
                                               <div class="payment-upload-content">
-                                                  <strong>
-                                                      Chọn ảnh chụp chuyển khoản
-                                                  </strong>
-
-                                                  <span>
-                                                      Ảnh phải thể hiện giao dịch
-                                                      đã thành công
-                                                  </span>
-
                                                   <small>
                                                       Hỗ trợ định dạng JPG, JPEG, PNG
                                                   </small>
                                               </div>
                                           </label>
-
-                                          <div class="payment-file-preview"
-                                               id="paymentFilePreview">
-
-                                              <div class="payment-file-check">
-                                                  ✓
-                                              </div>
-
-                                              <span id="paymentFileName"></span>
-
-                                              <button type="button"
-                                                      id="clearPaymentImage">
-                                                  Xóa ảnh
-                                              </button>
-                                          </div>
                                       </div>
                                   </div>
 
@@ -467,8 +443,18 @@
                                 </p>
 
                                 <p>
-                                    Sức chứa:
-                                    ${roomType.capacity} khách/phòng
+                                    Người lớn:
+                                    tối đa ${roomType.numGuests}/phòng
+                                </p>
+
+                                <p>
+                                    Trẻ em:
+                                    tối đa ${roomType.numChildren}/phòng
+                                </p>
+
+                                <p>
+                                    Tổng sức chứa:
+                                    tối đa ${roomType.capacity} người/phòng
                                 </p>
 
                                 <p>
@@ -501,8 +487,18 @@
                         </div>
 
                         <div class="summary-row">
-                            <span>Số khách:</span>
-                            <strong>${booking.numGuests} khách</strong>
+                            <span>Người lớn:</span>
+                            <strong>${booking.numGuests} người</strong>
+                        </div>
+
+                        <div class="summary-row">
+                            <span>Trẻ em:</span>
+                            <strong>${booking.numChildren} trẻ em</strong>
+                        </div>
+
+                        <div class="summary-row">
+                            <span>Tổng số người:</span>
+                            <strong>${booking.numGuests + booking.numChildren} người</strong>
                         </div>
 
                         <div class="summary-divider"></div>

@@ -72,6 +72,7 @@ public class BookingFormController extends HttpServlet {
         request.setAttribute("selectedRoomTypeId", 0);
         request.setAttribute("numRooms", 1);
         request.setAttribute("numGuests", 1);
+        request.setAttribute("numChildren", 0);
 
         request.getRequestDispatcher("/view/user/quick-booking.jsp")
                 .forward(request, response);
@@ -92,6 +93,7 @@ public class BookingFormController extends HttpServlet {
         int roomTypeId = parseInt(request.getParameter("roomTypeId"));
         int numRooms = parseInt(request.getParameter("numRooms"));
         int numGuests = parseInt(request.getParameter("numGuests"));
+        int numChildren = parseInt(request.getParameter("numChildren"));
 
         LocalDate checkIn = parseDate(checkInString);
         LocalDate checkOut = parseDate(checkOutString);
@@ -112,7 +114,7 @@ public class BookingFormController extends HttpServlet {
 
         String error = validateRoomSelection(
                 roomType, checkIn, checkOut,
-                numRooms, numGuests, availableRooms);
+                numRooms, numGuests, numChildren, availableRooms);
 
         if (error != null) {
             request.setAttribute("error", error);
@@ -128,6 +130,7 @@ public class BookingFormController extends HttpServlet {
             request.setAttribute("selectedRoomTypeId", roomTypeId);
             request.setAttribute("numRooms", numRooms > 0 ? numRooms : 1);
             request.setAttribute("numGuests", numGuests > 0 ? numGuests : 1);
+            request.setAttribute("numChildren", Math.max(numChildren, 0));
 
             request.getRequestDispatcher("/view/user/quick-booking.jsp")
                     .forward(request, response);
@@ -139,7 +142,8 @@ public class BookingFormController extends HttpServlet {
                 + "&checkIn=" + checkIn
                 + "&checkOut=" + checkOut
                 + "&numRooms=" + numRooms
-                + "&numGuests=" + numGuests;
+                + "&numGuests=" + numGuests
+                + "&numChildren=" + numChildren;
 
         response.sendRedirect(url);
     }
@@ -165,9 +169,14 @@ public class BookingFormController extends HttpServlet {
 
         int numRooms = parseInt(numRoomsString);
         int numGuests = parseInt(request.getParameter("numGuests"));
+        int numChildren = parseInt(request.getParameter("numChildren"));
 
         if (numGuests <= 0) {
             numGuests = 1;
+        }
+
+        if (numChildren < 0) {
+            numChildren = 0;
         }
 
         LocalDate checkIn = parseDate(checkInString);
@@ -188,10 +197,10 @@ public class BookingFormController extends HttpServlet {
 
         String error = validateRoomSelection(
                 roomType, checkIn, checkOut,
-                numRooms, numGuests, availableRooms);
+                numRooms, numGuests, numChildren, availableRooms);
 
         setBookingFormData(request, roomType, checkIn, checkOut,
-                numRooms, numGuests, availableRooms);
+                numRooms, numGuests, numChildren, availableRooms);
 
         request.setAttribute("error", error);
 
@@ -212,6 +221,7 @@ public class BookingFormController extends HttpServlet {
         int roomTypeId = parseInt(request.getParameter("roomTypeId"));
         int numRooms = parseInt(request.getParameter("numRooms"));
         int numGuests = parseInt(request.getParameter("numGuests"));
+        int numChildren = parseInt(request.getParameter("numChildren"));
 
         LocalDate checkIn = parseDate(request.getParameter("checkIn"));
         LocalDate checkOut = parseDate(request.getParameter("checkOut"));
@@ -241,11 +251,11 @@ public class BookingFormController extends HttpServlet {
         if (error == null) {
             error = validateRoomSelection(
                     roomType, checkIn, checkOut,
-                    numRooms, numGuests, availableRooms);
+                    numRooms, numGuests, numChildren, availableRooms);
         }
 
         setBookingFormData(request, roomType, checkIn, checkOut,
-                numRooms, numGuests, availableRooms);
+                numRooms, numGuests, numChildren, availableRooms);
 
         request.setAttribute("fullName", fullName);
         request.setAttribute("email", email);
@@ -294,6 +304,7 @@ public class BookingFormController extends HttpServlet {
                 BigDecimal.valueOf(pricePerNight));
         booking.setNumRooms(numRooms);
         booking.setNumGuests(numGuests);
+        booking.setNumChildren(numChildren);
         booking.setCheckinDate(checkIn);
         booking.setCheckoutDate(checkOut);
         booking.setSource("Đặt phòng trực tuyến");
@@ -322,9 +333,20 @@ public class BookingFormController extends HttpServlet {
                 + request.getContextPath() + "/booking-payment?bookingCode=" + booking.getBookingCode();
 
         try {
-            EmailUtil.sendBookingCreated(email, fullName, phone, idNumber, dateOfBirth,
-                    booking.getBookingCode(), checkIn, checkOut, numRooms, numGuests,
-                    booking.getDepositAmount(), HOLD_MINUTES, paymentUrl);
+            EmailUtil.sendBookingCreated(email,
+                    fullName,
+                    phone,
+                    idNumber,
+                    dateOfBirth,
+                    booking.getBookingCode(),
+                    checkIn,
+                    checkOut,
+                    numRooms,
+                    numGuests,
+                    numChildren,
+                    booking.getDepositAmount(),
+                    HOLD_MINUTES,
+                    paymentUrl);
         } catch (Exception e) {
             getServletContext().log("Không thể gửi email tạo booking " + booking.getBookingCode(), e);
         }
@@ -336,7 +358,8 @@ public class BookingFormController extends HttpServlet {
 
     private void setBookingFormData(HttpServletRequest request,
             RoomType roomType, LocalDate checkIn, LocalDate checkOut,
-            int numRooms, int numGuests, int availableRooms) {
+            int numRooms, int numGuests, int numChildren,
+            int availableRooms) {
 
         long numberOfNights
                 = checkOut.toEpochDay() - checkIn.toEpochDay();
@@ -354,6 +377,7 @@ public class BookingFormController extends HttpServlet {
         request.setAttribute("checkOut", checkOut);
         request.setAttribute("numRooms", numRooms);
         request.setAttribute("numGuests", numGuests);
+        request.setAttribute("numChildren", numChildren);
         request.setAttribute("numberOfNights", numberOfNights);
         request.setAttribute("availableRooms", availableRooms);
         request.setAttribute(
@@ -430,35 +454,80 @@ public class BookingFormController extends HttpServlet {
     private String validateRoomSelection(
             RoomType roomType, LocalDate checkIn,
             LocalDate checkOut, int numRooms,
-            int numGuests, int availableRooms) {
+            int numGuests, int numChildren,
+            int availableRooms) {
 
         if (roomType == null) {
             return "Vui lòng chọn hạng phòng.";
-        } else if (checkIn == null || checkOut == null) {
-            return "Vui lòng chọn ngày nhận phòng và ngày trả phòng.";
-        } else if (checkIn.isBefore(LocalDate.now())) {
-            return "Ngày nhận phòng không được nhỏ hơn ngày hiện tại.";
-        } else if (checkIn.equals(LocalDate.now()) && !LocalTime.now().isBefore(CHECK_IN_TIME)) {
-            return "Đã quá 14:00. Bạn không thể đặt phòng nhận trong ngày hôm nay.";
-        } else if (!checkOut.isAfter(checkIn)) {
-            return "Ngày trả phòng phải sau ngày nhận phòng.";
-        } else if (numRooms <= 0) {
-            return "Số lượng phòng phải lớn hơn 0.";
-        } else if (availableRooms <= 0) {
-            return "Hạng phòng này hiện đã hết phòng.";
-        } else if (numRooms > availableRooms) {
-            return "Hiện chỉ còn "
-                    + availableRooms + " phòng khả dụng.";
-        } else if (numGuests <= 0) {
-            return "Số lượng khách phải lớn hơn 0.";
         }
 
-        int maximumGuests = roomType.getCapacity() * numRooms;
+        if (checkIn == null || checkOut == null) {
+            return "Vui lòng chọn ngày nhận phòng và ngày trả phòng.";
+        }
 
-        if (numGuests > maximumGuests) {
-            return "Số khách vượt quá sức chứa tối đa. "
+        if (checkIn.isBefore(LocalDate.now())) {
+            return "Ngày nhận phòng không được nhỏ hơn ngày hiện tại.";
+        }
+
+        if (checkIn.equals(LocalDate.now())
+                && !LocalTime.now().isBefore(CHECK_IN_TIME)) {
+            return "Đã quá 14:00. Bạn không thể đặt phòng nhận trong ngày hôm nay.";
+        }
+
+        if (!checkOut.isAfter(checkIn)) {
+            return "Ngày trả phòng phải sau ngày nhận phòng.";
+        }
+
+        if (numRooms <= 0) {
+            return "Số lượng phòng phải lớn hơn 0.";
+        }
+
+        if (availableRooms <= 0) {
+            return "Hạng phòng này hiện đã hết phòng.";
+        }
+
+        if (numRooms > availableRooms) {
+            return "Hiện chỉ còn "
+                    + availableRooms + " phòng khả dụng.";
+        }
+
+        if (numGuests <= 0) {
+            return "Số người lớn phải lớn hơn 0.";
+        }
+
+        if (numChildren < 0) {
+            return "Số trẻ em không được nhỏ hơn 0.";
+        }
+
+        int adultsPerRoom = roomType.getNumGuests() > 0
+                ? roomType.getNumGuests()
+                : roomType.getCapacity();
+
+        int childrenPerRoom = Math.max(roomType.getNumChildren(), 0);
+        int capacityPerRoom = Math.max(roomType.getCapacity(), 1);
+
+        int maximumAdults = adultsPerRoom * numRooms;
+        int maximumChildren = childrenPerRoom * numRooms;
+        int maximumOccupants = capacityPerRoom * numRooms;
+
+        if (numGuests > maximumAdults) {
+            return numRooms + " phòng chỉ được tối đa "
+                    + maximumAdults + " người lớn.";
+        }
+
+        if (numChildren > maximumChildren) {
+            return numRooms + " phòng chỉ được tối đa "
+                    + maximumChildren + " trẻ em.";
+        }
+
+        if (numGuests + numChildren > maximumOccupants) {
+            return "Tổng số người lớn và trẻ em vượt quá sức chứa. "
                     + numRooms + " phòng chỉ được tối đa "
-                    + maximumGuests + " khách.";
+                    + maximumOccupants + " người.";
+        }
+
+        if (numGuests < numRooms) {
+            return "Mỗi phòng phải có ít nhất một người lớn.";
         }
 
         return null;
