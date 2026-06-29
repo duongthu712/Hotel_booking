@@ -1,5 +1,6 @@
 package controller;
 
+import dal.EmailUtil;
 import dao.BookingDAO;
 import dao.RoomTypeDAO;
 import jakarta.servlet.ServletException;
@@ -124,6 +125,25 @@ public class BookingPaymentController extends HttpServlet {
                         + "Vui lòng thử lại."
                 );
                 return;
+            }
+
+            jakarta.servlet.http.HttpSession session = request.getSession(false);
+
+            if (session != null) {
+                Object emailObject = session.getAttribute("bookingEmail_" + booking.getBookingCode());
+                Object guestNameObject = session.getAttribute("bookingGuestName_" + booking.getBookingCode());
+
+                if (emailObject != null && guestNameObject != null) {
+                    try {
+                        EmailUtil.sendPaymentSubmitted(emailObject.toString(), guestNameObject.toString(),
+                                booking.getBookingCode(), transactionReference);
+
+                        session.removeAttribute("bookingEmail_" + booking.getBookingCode());
+                        session.removeAttribute("bookingGuestName_" + booking.getBookingCode());
+                    } catch (Exception e) {
+                        getServletContext().log("Không thể gửi email thanh toán " + booking.getBookingCode(), e);
+                    }
+                }
             }
 
             response.sendRedirect(

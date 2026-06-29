@@ -134,6 +134,7 @@ public class BookingDAO extends DBContext {
 
     private Booking mapBooking(ResultSet rs) throws SQLException {
         Booking booking = new Booking();
+
         booking.setBookingId(rs.getInt("booking_id"));
         booking.setBookingCode(rs.getString("booking_code"));
         booking.setGuestId(rs.getInt("guest_id"));
@@ -143,15 +144,16 @@ public class BookingDAO extends DBContext {
 
         booking.setRoomTypeId(rs.getInt("room_type_id"));
         booking.setNumRooms(rs.getInt("num_rooms"));
+        booking.setNumGuests(rs.getInt("num_guests"));
+        booking.setNumChildren(rs.getInt("num_children"));
         booking.setBookedPricePerNight(rs.getBigDecimal("booked_price_per_night"));
 
-        java.sql.Date checkinDate = rs.getDate("checkin_date");
+        Date checkinDate = rs.getDate("checkin_date");
         booking.setCheckinDate(checkinDate != null ? checkinDate.toLocalDate() : null);
 
-        java.sql.Date checkoutDate = rs.getDate("checkout_date");
+        Date checkoutDate = rs.getDate("checkout_date");
         booking.setCheckoutDate(checkoutDate != null ? checkoutDate.toLocalDate() : null);
 
-        booking.setNumGuests(rs.getInt("num_guests"));
         booking.setStatus(rs.getString("status"));
         booking.setPaymentStatus(rs.getString("payment_status"));
         booking.setDepositAmount(rs.getBigDecimal("deposit_amount"));
@@ -166,10 +168,14 @@ public class BookingDAO extends DBContext {
         booking.setCancellationReason(rs.getString("cancellation_reason"));
 
         Timestamp actualCheckin = rs.getTimestamp("actual_checkin_time");
-        booking.setActualCheckinTime(actualCheckin != null ? actualCheckin.toLocalDateTime() : null);
+        booking.setActualCheckinTime(
+                actualCheckin != null ? actualCheckin.toLocalDateTime() : null
+        );
 
         Timestamp actualCheckout = rs.getTimestamp("actual_checkout_time");
-        booking.setActualCheckoutTime(actualCheckout != null ? actualCheckout.toLocalDateTime() : null);
+        booking.setActualCheckoutTime(
+                actualCheckout != null ? actualCheckout.toLocalDateTime() : null
+        );
 
         Timestamp createdAt = rs.getTimestamp("created_at");
         booking.setCreateAt(createdAt != null ? createdAt.toLocalDateTime() : null);
@@ -541,41 +547,66 @@ public class BookingDAO extends DBContext {
 
     // Tạo booking mới và bắt đầu giữ phòng 15 phút
     public int createBooking(Booking booking) {
-        try {
-            String sql = """
-                         INSERT INTO Bookings
-                         (booking_code, guest_id, staff_id, room_type_id,
-                          booked_price_per_night, num_rooms, num_guests,
-                          checkin_date, checkout_date, [source], [status],
-                          deposit_amount, payment_status)
-                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                         """;
-            stm = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            stm.setString(1, booking.getBookingCode());
-            stm.setInt(2, booking.getGuestId());
+        String sql = """
+                 INSERT INTO Bookings
+                 (
+                     booking_code,
+                     guest_id,
+                     staff_id,
+                     room_type_id,
+                     booked_price_per_night,
+                     num_rooms,
+                     num_guests,
+                     num_children,
+                     checkin_date,
+                     checkout_date,
+                     [source],
+                     [status],
+                     deposit_amount,
+                     payment_status
+                 )
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 """;
+
+        try (PreparedStatement ps = connection.prepareStatement(
+                sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            ps.setString(1, booking.getBookingCode());
+            ps.setInt(2, booking.getGuestId());
 
             if (booking.getStaffId() == null) {
-                stm.setNull(3, Types.INTEGER);
+                ps.setNull(3, Types.INTEGER);
             } else {
-                stm.setInt(3, booking.getStaffId());
+                ps.setInt(3, booking.getStaffId());
             }
-            stm.setInt(4, booking.getRoomTypeId());
-            stm.setBigDecimal(5, booking.getBookedPricePerNight());
-            stm.setInt(6, booking.getNumRooms());
-            stm.setInt(7, booking.getNumGuests());
-            stm.setDate(8, Date.valueOf(booking.getCheckinDate()));
-            stm.setDate(9, Date.valueOf(booking.getCheckoutDate()));
-            stm.setString(10, booking.getSource());
-            stm.setString(11, booking.getStatus());
-            stm.setBigDecimal(12, booking.getDepositAmount());
-            stm.setString(13, booking.getPaymentStatus());
-            stm.executeUpdate();
-            rs = stm.getGeneratedKeys();
-            if (rs.next()) {
-                return rs.getInt(1);
+
+            ps.setInt(4, booking.getRoomTypeId());
+            ps.setBigDecimal(5, booking.getBookedPricePerNight());
+            ps.setInt(6, booking.getNumRooms());
+            ps.setInt(7, booking.getNumGuests());
+            ps.setInt(8, booking.getNumChildren());
+            ps.setDate(9, Date.valueOf(booking.getCheckinDate()));
+            ps.setDate(10, Date.valueOf(booking.getCheckoutDate()));
+            ps.setNString(11, booking.getSource());
+            ps.setNString(12, booking.getStatus());
+            ps.setBigDecimal(13, booking.getDepositAmount());
+            ps.setNString(14, booking.getPaymentStatus());
+
+            int affectedRows = ps.executeUpdate();
+
+            if (affectedRows == 0) {
+                return 0;
             }
-        } catch (Exception e) {
+
+            try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return generatedKeys.getInt(1);
+                }
+            }
+
+        } catch (SQLException e) {
             System.out.println("createBooking: " + e.getMessage());
+            e.printStackTrace();
         }
 
         return 0;
@@ -584,63 +615,84 @@ public class BookingDAO extends DBContext {
     // Lấy booking theo mã booking
     public Booking getBookingByCode(String bookingCode) {
         cancelExpiredBookings();
-        try {
-            String sql = """
-                         SELECT *
-                         FROM Bookings
-                         WHERE booking_code = ?
-                         """;
 
-            stm = connection.prepareStatement(sql);
-            stm.setString(1, bookingCode);
-            rs = stm.executeQuery();
-            if (rs.next()) {
-                Booking booking = new Booking();
+        String sql = """
+                 SELECT *
+                 FROM Bookings
+                 WHERE booking_code = ?
+                 """;
 
-                booking.setBookingId(rs.getInt("booking_id"));
-                booking.setBookingCode(rs.getString("booking_code"));
-                booking.setGuestId(rs.getInt("guest_id"));
-                if (rs.getObject("staff_id") == null) {
-                    booking.setStaffId(null);
-                } else {
-                    booking.setStaffId(rs.getInt("staff_id"));
-                }
-                booking.setRoomTypeId(rs.getInt("room_type_id"));
-                booking.setBookedPricePerNight(rs.getBigDecimal("booked_price_per_night"));
-                booking.setNumRooms(rs.getInt("num_rooms"));
-                booking.setNumGuests(rs.getInt("num_guests"));
-                booking.setCheckinDate(rs.getDate("checkin_date").toLocalDate());
-                booking.setCheckoutDate(rs.getDate("checkout_date").toLocalDate());
-                booking.setSource(rs.getString("source"));
-                booking.setStatus(rs.getString("status"));
-                booking.setPaymentStatus(rs.getString("payment_status"));
-                booking.setDepositAmount(rs.getBigDecimal("deposit_amount"));
-                if (rs.getTimestamp("created_at") != null) {
-                    booking.setCreateAt(rs.getTimestamp("created_at").toLocalDateTime());
-                }
-                if (rs.getTimestamp("confirmed_at") != null) {
-                    booking.setConfirmedAt(rs.getTimestamp("confirmed_at").toLocalDateTime());
-                }
-                if (rs.getTimestamp("cancelled_at") != null) {
-                    booking.setCancelledAt(rs.getTimestamp("cancelled_at").toLocalDateTime());
-                }
-                booking.setCancellationReason(rs.getString("cancellation_reason"));
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, bookingCode);
 
-                if (rs.getTimestamp("actual_checkin_time") != null) {
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Booking booking = new Booking();
+
+                    booking.setBookingId(rs.getInt("booking_id"));
+                    booking.setBookingCode(rs.getString("booking_code"));
+                    booking.setGuestId(rs.getInt("guest_id"));
+
+                    int staffId = rs.getInt("staff_id");
+                    booking.setStaffId(rs.wasNull() ? null : staffId);
+
+                    booking.setRoomTypeId(rs.getInt("room_type_id"));
+                    booking.setBookedPricePerNight(rs.getBigDecimal("booked_price_per_night"));
+                    booking.setNumRooms(rs.getInt("num_rooms"));
+                    booking.setNumGuests(rs.getInt("num_guests"));
+                    booking.setNumChildren(rs.getInt("num_children"));
+
+                    Date checkinDate = rs.getDate("checkin_date");
+                    booking.setCheckinDate(
+                            checkinDate != null ? checkinDate.toLocalDate() : null
+                    );
+
+                    Date checkoutDate = rs.getDate("checkout_date");
+                    booking.setCheckoutDate(
+                            checkoutDate != null ? checkoutDate.toLocalDate() : null
+                    );
+
+                    booking.setSource(rs.getString("source"));
+                    booking.setStatus(rs.getString("status"));
+                    booking.setPaymentStatus(rs.getString("payment_status"));
+                    booking.setDepositAmount(rs.getBigDecimal("deposit_amount"));
+
+                    Timestamp createdAt = rs.getTimestamp("created_at");
+                    booking.setCreateAt(
+                            createdAt != null ? createdAt.toLocalDateTime() : null
+                    );
+
+                    Timestamp confirmedAt = rs.getTimestamp("confirmed_at");
+                    booking.setConfirmedAt(
+                            confirmedAt != null ? confirmedAt.toLocalDateTime() : null
+                    );
+
+                    Timestamp cancelledAt = rs.getTimestamp("cancelled_at");
+                    booking.setCancelledAt(
+                            cancelledAt != null ? cancelledAt.toLocalDateTime() : null
+                    );
+
+                    booking.setCancellationReason(rs.getString("cancellation_reason"));
+
+                    Timestamp actualCheckin = rs.getTimestamp("actual_checkin_time");
                     booking.setActualCheckinTime(
-                            rs.getTimestamp("actual_checkin_time").toLocalDateTime()
+                            actualCheckin != null ? actualCheckin.toLocalDateTime() : null
                     );
-                }
-                if (rs.getTimestamp("actual_checkout_time") != null) {
+
+                    Timestamp actualCheckout = rs.getTimestamp("actual_checkout_time");
                     booking.setActualCheckoutTime(
-                            rs.getTimestamp("actual_checkout_time").toLocalDateTime()
+                            actualCheckout != null ? actualCheckout.toLocalDateTime() : null
                     );
+
+                    return booking;
                 }
-                return booking;
             }
-        } catch (Exception e) {
+
+        } catch (SQLException e) {
             System.out.println("getBookingByCode: " + e.getMessage());
+            e.printStackTrace();
         }
+
         return null;
     }
 
