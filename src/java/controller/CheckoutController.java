@@ -1,36 +1,29 @@
 package controller;
 
 import dao.CheckoutDAO;
-import dao.HotelInfoDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import model.Booking;
 import model.StaffAccount;
 
-/**
- * @author LinhLTHE200306
- * @version 1.0
- * @since 2026-06-21
- */
 public class CheckoutController extends HttpServlet {
 
-    private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy'T'HH:mm:ss");
-    private static final DateTimeFormatter DISPLAY_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-    private static final DateTimeFormatter TIME_24H = DateTimeFormatter.ofPattern("HH:mm:ss");
-    private static final DateTimeFormatter  dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -43,107 +36,27 @@ public class CheckoutController extends HttpServlet {
         }
 
         String keyword = request.getParameter("keyword");
-        String selectedBookingId = request.getParameter("bookingId");
-
-        String actualCheckoutStr = request.getParameter("actualCheckoutTime");
-        LocalDateTime actualCheckoutDateTime;
-
-        try {
-            actualCheckoutDateTime = (actualCheckoutStr != null && !actualCheckoutStr.isEmpty())
-                    ? LocalDateTime.parse(actualCheckoutStr)
-                    : LocalDateTime.now();
-        } catch (Exception e) {
-            actualCheckoutDateTime = LocalDateTime.now();
-        }
-
-        request.setAttribute("currentDateTimeDisplay", actualCheckoutDateTime.format(DISPLAY_FORMATTER));
-        request.setAttribute("currentDateTimeISO", actualCheckoutDateTime.format(ISO_FORMATTER));
-
-        int page = 1;
-        try {
-            String pageParam = request.getParameter("page");
-            if (pageParam != null) {
-                page = Integer.parseInt(pageParam);
-            }
-        } catch (NumberFormatException e) {
-            page = 1;
-        }
-
-        int recordsPerPage = 10;
 
         try {
             CheckoutDAO dao = new CheckoutDAO();
-            HotelInfoDAO hdao = new HotelInfoDAO();
-            List<Booking> allBookings = new ArrayList<>();
+            List<Map<String, Object>> roomList = dao.getRoomsForCheckout(keyword);
 
-            if (selectedBookingId != null && !selectedBookingId.isEmpty()) {
-                int bookingId = Integer.parseInt(selectedBookingId);
-                Booking booking = dao.getBookingById(bookingId);
-
-                if (booking != null) {
-                    allBookings.add(booking);
-                    request.setAttribute("guest", dao.getGuestByBookingId(bookingId));
-                    request.setAttribute("roomType", dao.getRoomTypeByBookingId(bookingId));
-                    request.setAttribute("roomImageUrl", dao.getRoomTypeImgByTypeId(dao.getRoomTypeByBookingId(bookingId).getRoomTypeId()));
-                    request.setAttribute("bookingRooms", dao.getBookingRoomsByBookingId(bookingId));
-                    request.setAttribute("guestStays", dao.getGuestStaysByBookingId(bookingId));
-                    request.setAttribute("hotelInfo", hdao.getHotelInfoById(1));
-
-                    // Tính toán check-in time
-                    request.setAttribute("formattedCheckinTime", (booking.getActualCheckinTime() != null)
-                            ? booking.getActualCheckinTime().format(TIME_24H) : "14:00:00");
-
-                    // Tính số đêm và tiền
-                    long nights = Math.max(1, ChronoUnit.DAYS.between(booking.getCheckinDate(), actualCheckoutDateTime.toLocalDate()));
-                    double pricePerNight = booking.getBookedPricePerNight() != null ? booking.getBookedPricePerNight().doubleValue() : 0;
-                    double roomCharges = nights * pricePerNight * booking.getNumRooms();
-
-                    request.setAttribute("selectedBooking", booking);
-                    request.setAttribute("nights", nights);
-                    request.setAttribute("roomCharges", roomCharges);
-
-                    request.setAttribute("checkinDateDisplay", booking.getCheckinDate().format(dateFormatter));
-                    request.setAttribute("checkoutDateDisplay", booking.getCheckoutDate().format(dateFormatter));
-                }
-            } else if (keyword != null && !keyword.trim().isEmpty()) {
-                allBookings = dao.searchActiveBookings(keyword.trim());
-            } else {
-                allBookings = dao.searchActiveBookingsByCheckoutDate(LocalDate.now());
+            Map<Integer, List<Map<String, Object>>> groupedByBooking = new LinkedHashMap<>();
+            for (Map<String, Object> room : roomList) {
+                int bookingId = (Integer) room.get("bookingId");
+                groupedByBooking.computeIfAbsent(bookingId, k -> new ArrayList<>()).add(room);
             }
 
-            int totalRecords = allBookings.size();
-            int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
-            page = Math.max(1, Math.min(page, totalPages > 0 ? totalPages : 1));
-
-            List<Booking> pagedList = (totalRecords > 0) ? allBookings.subList((page - 1) * recordsPerPage, Math.min(page * recordsPerPage, totalRecords)) : new ArrayList<>();
-
-            Map<Integer, String> checkinDateMap = new HashMap<>();
-            Map<Integer, String> checkoutDateMap = new HashMap<>();
-           
-
-            for (Booking b : pagedList) {
-                if (b.getCheckinDate() != null) {
-                    checkinDateMap.put(b.getBookingId(), b.getCheckinDate().format(dateFormatter));
-                }
-                if (b.getCheckoutDate() != null) {
-                    checkoutDateMap.put(b.getBookingId(), b.getCheckoutDate().format(dateFormatter));
-                }
-            }
-
-            request.setAttribute("checkinDateMap", checkinDateMap);
-            request.setAttribute("checkoutDateMap", checkoutDateMap);
-
-            request.setAttribute("guestMap", dao.getGuestsByBookings(pagedList));
-            request.setAttribute("bookingList", pagedList);
-            request.setAttribute("currentPage", page);
-            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("roomList", roomList);
+            request.setAttribute("groupedByBooking", groupedByBooking);
             request.setAttribute("keyword", keyword);
+            request.setAttribute("today", LocalDate.now().format(DATE_FORMATTER));
 
             request.getRequestDispatcher("/view/receptionist/check-out.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", e.getMessage());
+            session.setAttribute("errorMessage", "Lỗi hệ thống: " + e.getMessage());
             request.getRequestDispatcher("/view/receptionist/check-out.jsp").forward(request, response);
         }
     }
@@ -152,6 +65,161 @@ public class CheckoutController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        doGet(request, response);
+        request.setCharacterEncoding("UTF-8");
+        HttpSession session = request.getSession();
+        StaffAccount staff = (StaffAccount) session.getAttribute("staff");
+
+        if (staff == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        String[] selectedRoomIds = request.getParameterValues("selectedRooms");
+        if (selectedRoomIds == null || selectedRoomIds.length == 0) {
+            session.setAttribute("errorMessage", "Vui lòng chọn ít nhất một phòng để checkout.");
+            response.sendRedirect(request.getContextPath() + "/Checkout");
+            return;
+        }
+
+        CheckoutDAO dao = new CheckoutDAO();
+        List<String> errorMessages = new ArrayList<>();
+        List<Integer> successBookingIds = new ArrayList<>();
+        Map<Integer, List<Integer>> bookingRoomIdsMap = new LinkedHashMap<>();
+
+        try {
+            List<Integer> roomIds = new ArrayList<>();
+            for (String rid : selectedRoomIds) {
+                roomIds.add(Integer.parseInt(rid));
+            }
+
+            List<Map<String, Object>> selectedRoomDetails = dao.getRoomDetailsByRoomIds(roomIds);
+
+            Map<Integer, List<Integer>> bookingRoomNumbersMap = new LinkedHashMap<>();
+            for (Map<String, Object> roomDetail : selectedRoomDetails) {
+                int bookingId = (Integer) roomDetail.get("bookingId");
+                int roomId = (Integer) roomDetail.get("roomId");
+                int roomNumber = (Integer) roomDetail.get("roomNumber");
+                bookingRoomIdsMap.computeIfAbsent(bookingId, k -> new ArrayList<>()).add(roomId);
+                bookingRoomNumbersMap.computeIfAbsent(bookingId, k -> new ArrayList<>()).add(roomNumber);
+            }
+
+            for (Map.Entry<Integer, List<Integer>> entry : bookingRoomIdsMap.entrySet()) {
+                int bookingId = entry.getKey();
+                List<Integer> bookingRoomIds = entry.getValue();
+                List<Integer> bookingRoomNumbers = bookingRoomNumbersMap.get(bookingId);
+
+                try {
+                    processSingleBookingCheckout(dao, bookingId, bookingRoomIds, bookingRoomNumbers, staff.getStaffId());
+                    successBookingIds.add(bookingId);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    String bookingCode = dao.getBookingCodeById(bookingId);
+                    errorMessages.add("Lỗi checkout đơn " + bookingCode + ": " + ex.getMessage());
+                }
+            }
+
+            if (successBookingIds.isEmpty()) {
+                session.setAttribute("errorMessage", String.join("; ", errorMessages));
+                response.sendRedirect(request.getContextPath() + "/Checkout");
+                return;
+            }
+
+            if (!errorMessages.isEmpty()) {
+                session.setAttribute("errorMessage", String.join("; ", errorMessages));
+            }
+
+            if (successBookingIds.size() == 1) {
+                int bookingId = successBookingIds.get(0);
+                session.setAttribute("checkoutRoomCount_" + bookingId,
+                        bookingRoomIdsMap.get(bookingId).size());
+                response.sendRedirect(request.getContextPath() + "/InvoiceCreate?bookingId=" + bookingId);
+            } else {
+                session.setAttribute("successMessage",
+                        "Đã tạo " + successBookingIds.size() + " hóa đơn thành công.");
+                response.sendRedirect(request.getContextPath() + "/BillingList");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.setAttribute("errorMessage", "Lỗi hệ thống: " + e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/Checkout");
+        }
+    }
+
+    private void processSingleBookingCheckout(CheckoutDAO dao, int bookingId,
+            List<Integer> roomIds, List<Integer> roomNumbers, int staffId) throws Exception {
+
+        Booking booking = dao.getBookingById(bookingId);
+
+        LocalDateTime actualCheckout = LocalDateTime.now();
+        LocalDateTime expectedCheckout = booking.getCheckoutDate().atTime(12, 0);
+
+        // Số đêm thực tế
+        long nights = Math.max(1, ChronoUnit.DAYS.between(
+                booking.getCheckinDate(), actualCheckout.toLocalDate()));
+
+        // Tiền phòng base
+        BigDecimal pricePerNight = booking.getBookedPricePerNight() != null
+                ? booking.getBookedPricePerNight() : BigDecimal.ZERO;
+        BigDecimal roomChargesBase = pricePerNight
+                .multiply(BigDecimal.valueOf(nights))
+                .multiply(BigDecimal.valueOf(roomIds.size()));
+
+        // Phụ thu trả phòng muộn
+        double lateChargePerRoom = dao.lateCheckoutSurcharge(
+                expectedCheckout, actualCheckout, pricePerNight.doubleValue());
+        BigDecimal lateCharge = BigDecimal.valueOf(lateChargePerRoom * roomIds.size());
+        BigDecimal roomCharges = roomChargesBase.add(lateCharge);
+
+        // Dịch vụ và hư hỏng của các phòng đang checkout
+        BigDecimal consumableCharges = dao.sumBookingServicesByRooms(bookingId, roomIds);
+        BigDecimal amenityDamages = dao.sumRoomAmenityDamagesByRooms(bookingId, roomIds);
+
+        // Tính tiền cọc cho lần checkout này
+        BigDecimal totalDeposit = booking.getDepositAmount() != null
+                ? booking.getDepositAmount() : BigDecimal.ZERO;
+        BigDecimal depositAlreadyUsed = dao.sumDepositDeductedByBookingId(bookingId);
+        BigDecimal depositRemaining = totalDeposit.subtract(depositAlreadyUsed);
+
+        int remainingRooms = dao.countRemainingRooms(bookingId);
+        boolean isLastCheckout = remainingRooms == roomIds.size();
+
+        BigDecimal depositDeducted;
+        if (isLastCheckout) {
+            // Lần checkout cuối: trừ hết phần cọc còn lại
+            depositDeducted = depositRemaining;
+        } else {
+            // Chia đều theo số phòng checkout lần này
+            int totalRooms = booking.getNumRooms();
+            if (totalRooms > 0) {
+                depositDeducted = totalDeposit
+                        .divide(BigDecimal.valueOf(totalRooms), 0, java.math.RoundingMode.FLOOR)
+                        .multiply(BigDecimal.valueOf(roomIds.size()));
+                // Không trừ quá phần còn lại
+                if (depositDeducted.compareTo(depositRemaining) > 0) {
+                    depositDeducted = depositRemaining;
+                }
+            } else {
+                depositDeducted = BigDecimal.ZERO;
+            }
+        }
+
+        BigDecimal totalAmount = roomCharges.add(consumableCharges).add(amenityDamages);
+        BigDecimal remainingAmount = totalAmount.subtract(depositDeducted).max(BigDecimal.ZERO);
+
+        dao.createOrUpdateInvoice(bookingId, roomCharges, consumableCharges, amenityDamages,
+                depositDeducted, totalAmount, remainingAmount, staffId);
+    }
+
+    private String formatRoomNumbers(List<Integer> roomNumbers) {
+        Collections.sort(roomNumbers);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < roomNumbers.size(); i++) {
+            if (i > 0) {
+                sb.append(", ");
+            }
+            sb.append(roomNumbers.get(i));
+        }
+        return sb.toString();
     }
 }

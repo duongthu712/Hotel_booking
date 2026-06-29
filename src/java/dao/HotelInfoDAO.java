@@ -67,9 +67,8 @@ public class HotelInfoDAO extends DBContext {
                         rs.getInt("hotel_id"),
                         rs.getNString("hotel_name"),
                         rs.getNString("description"),
-                        // Sử dụng LocalTime.class để map trực tiếp từ SQL TIME
-                        rs.getObject("checkin_time", LocalTime.class),
-                        rs.getObject("checkout_time", LocalTime.class),
+                        rs.getTime("checkin") != null ? rs.getTime("checkin").toLocalTime() : LocalTime.of(14, 0),
+                        rs.getTime("checkout") != null ? rs.getTime("checkout").toLocalTime() : LocalTime.of(12, 0),
                         rs.getNString("address"),
                         rs.getString("address_url"),
                         rs.getString("phone"),
@@ -164,10 +163,10 @@ public class HotelInfoDAO extends DBContext {
     //LinhLTHE200306
     public HotelInfo getHotelInfoById(int hotelId) throws Exception {
         String strSQL = """
-                        select * 
-                        from HotelInfo 
-                        where hotel_id = ?
-                        """;
+                    select * 
+                    from HotelInfo 
+                    where hotel_id = ?
+                    """;
 
         try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
             stm.setInt(1, hotelId);
@@ -179,15 +178,14 @@ public class HotelInfoDAO extends DBContext {
                     hotel.setHotelName(rs.getString("hotel_name"));
                     hotel.setDescription(rs.getString("description"));
 
-                    java.sql.Time checkinTime = rs.getTime("checkin_time");
-                    java.sql.Time checkoutTime = rs.getTime("checkout_time");
-                    // Sử dụng getObject với LocalTime.class
-                    java.time.LocalTime checkin = rs.getObject("checkin_time", java.time.LocalTime.class);
-                    java.time.LocalTime checkout = rs.getObject("checkout_time", java.time.LocalTime.class);
-
-                    // Gán giá trị, nếu null thì gán giá trị mặc định
-                    hotel.setCheckinTime(checkin != null ? checkin : java.time.LocalTime.of(14, 0));
-                    hotel.setCheckoutTime(checkout != null ? checkout : java.time.LocalTime.of(12, 0));
+                    java.sql.Time checkinSql = rs.getTime("checkin_time");
+                    java.sql.Time checkoutSql = rs.getTime("checkout_time");
+                    hotel.setCheckinTime(checkinSql != null
+                            ? checkinSql.toLocalTime()
+                            : java.time.LocalTime.of(14, 0));
+                    hotel.setCheckoutTime(checkoutSql != null
+                            ? checkoutSql.toLocalTime()
+                            : java.time.LocalTime.of(12, 0));
 
                     hotel.setAddress(rs.getString("address"));
                     hotel.setAddressUrl(rs.getString("address_url"));
