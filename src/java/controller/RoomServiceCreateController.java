@@ -59,7 +59,8 @@ public class RoomServiceCreateController extends HttpServlet {
 
             RoomServiceDAO dao = new RoomServiceDAO();
             dao.createRoomService(newService);
-            
+            System.out.println("activeStr = " + activeStr);
+System.out.println("isActive = " + isActive);
             session.setAttribute("successMessage", "Thêm dịch vụ \"" + serviceName.trim() + "\" thành công.");
             
         } catch (Exception e) {
@@ -70,6 +71,9 @@ public class RoomServiceCreateController extends HttpServlet {
             session.setAttribute("keepDescription", description);
             session.setAttribute("keepUnitPrice", unitPriceStr);
             session.setAttribute("keepActive", activeStr);
+            request.getParameterMap().forEach((k, v) ->
+    System.out.println(k + " = " + java.util.Arrays.toString(v))
+);
         }
 
         response.sendRedirect(buildRedirectUrl(request, page, keyword));

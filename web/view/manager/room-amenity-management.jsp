@@ -125,9 +125,9 @@
 
                 <div class="form-group">
                     <label class="input-label">Tên tiện nghi*</label>
-                    <input class="service-popup-input-field" type="text" name="serviceName" id="serviceName" 
+                    <input class="service-popup-input-field" type="text" name="amenityName" id="amenityName" 
                            placeholder="Nhập tên..." 
-                           value="${not empty amenityToEdit ? amenityToEdit.getAmenityName() : keepServiceName}" required>
+                           value="${not empty amenityToEdit ? amenityToEdit.getAmenityName() : keepAmenityName}" required>
                 </div>
 
                 <div class="form-group">

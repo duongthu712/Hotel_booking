@@ -182,7 +182,8 @@ public class InvoiceCreateController extends HttpServlet {
                     if (qty > 0) {
                         BigDecimal unitPrice = new BigDecimal(unitPrices[i]);
                         int isFree = Integer.parseInt(isFrees[i]);
-                        int chargeQty = Math.max(0, qty - isFree);
+                        int numRooms = booking.getNumRooms();
+                        int chargeQty = Math.max(0, qty - (isFree * numRooms));
                         BigDecimal totalPrice = unitPrice.multiply(new BigDecimal(chargeQty));
 
                         BookingService bs = new BookingService();
