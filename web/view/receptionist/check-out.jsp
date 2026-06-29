@@ -4,6 +4,12 @@
     Author     : Minh Thu
     Editor     : LinhLTHE200306
 --%>
+<%-- 
+    Document   : check-out
+    Created on : Jun 28, 2026
+    Author     : LinhLTHE200306
+    Luồng mới: Checkbox table, multi-booking checkout
+--%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -24,6 +30,7 @@
 
         <main class="content-container">
 
+            <!-- Alert messages -->
             <c:if test="${not empty sessionScope.successMessage}">
                 <div class="alert-message alert-success">
                     ${sessionScope.successMessage}
@@ -37,226 +44,90 @@
                 </div>
                 <c:remove var="errorMessage" scope="session"/>
             </c:if>
+
+
+            <!-- Search -->
             <div class="search-container">
                 <form action="Checkout" method="GET" class="search-form">
                     <div class="search-input-wrapper">
                         <input type="text" name="keyword" class="search-input" 
-                               placeholder="Nhập mã booking hoặc tên khách" value="${keyword}">
+                               placeholder="Tìm theo tên khách hoặc số phòng..." value="${keyword}">
                     </div>
                     <button type="submit" class="search-btn">Tìm kiếm</button>
+                    <c:if test="${not empty keyword}">
+                        <a href="Checkout" class="btn-clear">Xóa lọc</a>
+                    </c:if>
                 </form>
             </div>
 
-            <c:if test="${empty selectedBooking}">
-                <div class="booking-list-section">
+            <!-- Checkout Form -->
+            <form id="checkoutForm" action="Checkout" method="POST">
+                <div class="checkout-table-section">
                     <c:choose>
-                        <c:when test="${not empty bookingList}">
-                            <table class="data-table">
+                        <c:when test="${not empty roomList}">
+                            <table class="data-table checkout-table" id="checkoutTable">
                                 <thead class="data-table-thead">
                                     <tr>
-                                        <th class="col-stt">STT</th>
-                                        <th class="col-booking">Mã đặt phòng</th>
-                                        <th class="col-guest">Tên khách</th>
+                                        <th class="col-checkbox">
+                                            <input type="checkbox" id="selectAll" title="Chọn tất cả">
+                                        </th>
                                         <th class="col-room">Phòng</th>
-                                        <th class="col-checkin">Nhận phòng</th>
-                                        <th class="col-checkout">Trả phòng</th>
-                                        <th class="col-action">Hành động</th>
+                                        <th class="col-guest">Tên khách</th>
+                                        <th class="col-checkout">Check-out dự kiến</th>
+                                        <th class="col-booking">Mã đặt phòng</th>
                                     </tr>
                                 </thead>
                                 <tbody class="data-table-tbody">
-                                    <c:forEach var="booking" items="${bookingList}" varStatus="loop">
-                                        <tr>
-                                            <td class="col-stt">${(currentPage - 1) * 10 + loop.index + 1}</td>
-                                            <td class="col-booking">${booking.getBookingCode()}</td>
-                                            <td class="col-guest">${guestMap[booking.getBookingId()].getFullName()}</td>
-                                            <td class="col-room">${booking.getNumRooms()} phòng</td>
-                                            <td class="col-checkin">${checkinDateMap[booking.bookingId]}</td>
-                                            <td class="col-checkout">${checkoutDateMap[booking.bookingId]}</td>
-                                            <td class="col-action">
-                                                <a href="Checkout?bookingId=${booking.getBookingId()}" class="btn-checkout">Check-out</a>
+                                    <c:forEach var="room" items="${roomList}" varStatus="loop">
+                                        <tr class="room-row" 
+                                            data-booking-id="${room.bookingId}"
+                                            data-room-id="${room.roomId}">
+                                            <td class="col-checkbox">
+                                                <input type="checkbox" name="selectedRooms" 
+                                                       value="${room.roomId}" 
+                                                       class="room-checkbox"
+                                                       data-booking-id="${room.bookingId}">
+                                            </td>
+                                            <td class="col-room">
+                                                <span class="room-number">Phòng ${room.roomNumber}</span>
+                                            </td>
+                                            <td class="col-guest">${room.guestName}</td>
+                                            <td class="col-checkout">
+                                                ${room.checkoutDate}
+                                            </td>
+                                            <td class="col-booking">
+                                                <span class="booking-code">${room.bookingCode}</span>
                                             </td>
                                         </tr>
                                     </c:forEach>
                                 </tbody>
                             </table>
 
-                            <div class="pagination">
-                                <c:forEach begin="1" end="${totalPages}" var="i">
-                                    <a href="Checkout?page=${i}&keyword=${keyword}" 
-                                       class="${currentPage == i ? 'active' : ''}">${i}</a>
-                                </c:forEach>
+                            <div class="checkout-actions-bar">
+                                <button type="submit" id="btnCheckout" class="btn-checkout-primary" disabled>
+                                    Checkout các phòng đã chọn (<span id="selectedCount">0</span>)
+                                </button>
                             </div>
                         </c:when>
                         <c:otherwise>
-                            <div class="empty-message">Không có đơn đặt phòng.</div>
+                            <div class="empty-message">
+                                <c:choose>
+                                    <c:when test="${not empty keyword}">
+                                        Không tìm thấy phòng nào phù hợp với từ khóa "<strong>${keyword}</strong>".
+                                    </c:when>
+                                    <c:otherwise>
+                                        Không có phòng nào cần checkout hôm nay.
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
                         </c:otherwise>
                     </c:choose>
                 </div>
-            </c:if>
-
-            <c:if test="${not empty selectedBooking}">
-                <div class="checkout-detail">
-
-                    <div class="detail-section">
-                        <h3 class="section-title">THÔNG TIN BOOKING</h3>
-
-                        <div class="booking-info-grid">
-                            <div class="room-image">
-                                <img src="${roomImageUrl}" alt="Room Image">
-                            </div>
-
-                            <div class="booking-details">
-                                <div class="booking-header">
-                                    <span class="booking-code">${selectedBooking.getBookingCode()}</span>
-                                    <span class="booking-status status-active">${selectedBooking.getStatus()}</span>
-                                </div>
-
-                                <div class="info-grid">
-                                    <div class="info-col">
-                                        <div class="info-row">
-                                            <span class="info-label">Hạng phòng: </span>
-                                            <span class="info-value">${roomType.getTypeName()}</span>
-                                        </div>
-
-                                        <div class="info-row">
-                                            <span class="info-label">Giá phòng/đêm:</span>
-                                            <span class="info-value">
-                                                <fmt:formatNumber value="${selectedBooking.getBookedPricePerNight()}" type="number" pattern="#,###"/> đ</span>
-                                        </div>
-
-                                        <div class="info-row">
-                                            <span class="info-label">Số đêm:</span>
-                                            <span class="info-value">${nights} đêm</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="info-col">
-                                        <div class="info-row">
-                                            <span class="info-label">Check-in:</span>
-                                            <span class="info-value">${checkinDateDisplay} ${formattedCheckinTime}</span>
-                                        </div>
-                                        <div class="info-row">
-                                            <span class="info-label">Check-out dự kiến:</span>
-                                            <span class="info-value">${checkoutDateDisplay} ${hotelInfo.getCheckoutTime()}</span>
-                                        </div>
-
-                                        <div class="info-row">
-                                            <span class="info-label">Check-out thực tế:</span>
-                                            <span class="info-value">
-                                                <input type="text" class="time-input" value="${currentDateTimeDisplay}" readonly>
-                                                <input type="hidden" name="actualCheckoutTime" value="${currentDateTimeISO}">
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="detail-section">
-
-                        <h3 class="section-title">THÔNG TIN KHÁCH HÀNG</h3>
-                        <c:if test="${not empty guest}">
-                            <div class="guest-info-grid">
-                                <div class="info-col">
-                                    <div class="info-row">
-                                        <span class="info-label">Họ và tên</span>
-                                        <span class="info-value">${guest.getFullName()}</span>
-                                    </div>
-
-                                    <div class="info-row">
-                                        <span class="info-label">Điện thoại</span>
-                                        <span class="info-value">${guest.getPhone()}</span>
-                                    </div>
-                                </div>
-
-                                <div class="info-col">
-                                    <div class="info-row">
-                                        <span class="info-label">Quốc tịch</span>
-                                        <span class="info-value">${guest.getNationality()}</span>
-                                    </div>
-
-                                    <div class="info-row">
-                                        <span class="info-label">Số CMND/Hộ chiếu</span>
-                                        <span class="info-value">${guest.getIdNumber()}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </c:if>
-                        <c:if test="${empty guest}">
-                            <div class="info-row">
-                                <span class="info-label">Ghi chú</span>
-                                <span class="info-value">Booking walk-in</span>
-                            </div>
-                        </c:if>
-
-                    </div>
-
-                    <div class="detail-section">
-                        <h3 class="section-title">THÔNG TIN LƯU TRÚ</h3>
-
-                        <table class="data-table stay-table">
-                            <thead>
-                                <tr>
-                                    <th>Phòng</th>
-                                    <th>Họ & tên</th>
-                                    <th>SĐT</th>
-                                    <th>CCCD/Hộ chiếu</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                <c:forEach var="stay" items="${guestStays}">
-                                    <tr>
-                                        <td>
-                                            <c:forEach var="br" items="${bookingRooms}">
-                                                <c:if test="${br.getBookingRoomId() == stay.getBookingRoomId()}">
-                                                    ${br.getRoomNumber()}
-                                                </c:if>
-                                            </c:forEach>
-                                        </td>
-                                        <td>${stay.getFullName()}</td>
-                                        <td>${stay.getPhone()}</td>
-                                        <td>${stay.getIdNumber()}</td>
-                                    </tr>
-                                </c:forEach>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="payment-summary">
-                        <h3 class="section-title">TÓM TẮT THANH TOÁN</h3>
-
-                        <div class="payment-row">
-                            <span class="payment-label">Tiền phòng (${nights} đêm)</span>
-                            <span class="payment-value"><fmt:formatNumber value="${roomCharges}" type="number" pattern="#,###"/>đ</span>
-                        </div>
-
-                        <div class="payment-row">
-                            <span class="payment-label">Tiền cọc</span>
-                            <span class="payment-value discount">-<fmt:formatNumber value="${selectedBooking.getDepositAmount()}" type="number" pattern="#,###"/>đ</span>
-                        </div>
-
-                        <div class="payment-row total-row">
-                            <span class="payment-label">TỔNG TIỀN</span>
-                            <span class="payment-value total">
-                                <fmt:formatNumber value="${roomCharges - (selectedBooking.depositAmount != null ? selectedBooking.depositAmount.doubleValue() : 0)}" type="number" pattern="#,###"/>đ
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="checkout-actions">
-                        <a href="${pageContext.request.contextPath}/InvoiceCreate?bookingId=${selectedBooking.bookingId}" 
-                           class="btn-checkout-primary">
-                            CHECK-OUT (TẠO HÓA ĐƠN)
-                        </a>
-                        <a href="Checkout" class="btn-cancel-checkout">HỦY TRẢ PHÒNG</a>
-                    </div>
-
-                </div>
-            </c:if>
+            </form>
 
         </main>
+
+                    
         <script src="<%=request.getContextPath()%>/view/assets/javascript/alert.js"></script>
         <script src="${pageContext.request.contextPath}/view/assets/javascript/checkout.js"></script>
     </body>
