@@ -80,7 +80,8 @@ public class RoomTypeCreateServlet extends HttpServlet {
         String typeName = request.getParameter("typeName");
         String description = request.getParameter("description");
         String capacityStr = request.getParameter("capacity");
-        int capacity = (capacityStr != null && !capacityStr.isEmpty()) ? Integer.parseInt(capacityStr) : 1;
+        int numGuests = Integer.parseInt(request.getParameter("num_guests"));
+        int numChildren = Integer.parseInt(request.getParameter("num_children"));
         String bedType = request.getParameter("bedType");
         String bedCountStr = request.getParameter("bedCount");
         int bedCount = (bedCountStr != null && !bedCountStr.isEmpty()) ? Integer.parseInt(bedCountStr) : 1;
@@ -91,13 +92,19 @@ public class RoomTypeCreateServlet extends HttpServlet {
         boolean isActive = request.getParameter("isActive") != null;
 
         // Tạo hạng phòng mới với những thông tin cơ bản
-        RoomType rt = new RoomType(0, typeName, description, capacity, bedType, bedCount, areaSqm, basePrice, isActive);
+        RoomType rt = new RoomType(0, typeName, description, numGuests, numChildren, bedType, bedCount, areaSqm, basePrice, isActive);
 
         // Check trùng tên
         if (!hasError && roomTypeDAO.isRoomTypeNameExist(typeName)) {
             hasError = true;
             errorMessage = "Tên hạng phòng \"" + typeName + "\" đã tồn tại!";
             request.setAttribute("status", "duplicate");
+        }
+        // Ràng buộc dưới 50 người
+        if ((numGuests + numChildren) >= 50) {
+            hasError = true;
+            errorMessage = "Tổng số khách phải dưới 50 người!";
+            request.setAttribute("status", "error");
         }
 
         // Check giường nằm trong khoảng từ 1-20

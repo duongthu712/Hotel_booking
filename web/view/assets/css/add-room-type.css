@@ -242,3 +242,13 @@ body {
 .btn-submit:hover {
     background-color: #112d47;
 }
+.required-star {
+    color: #ff0000 !important;
+    font-weight: bold !important;
+    margin-left: 4px !important;
+}
+.required-star {
+    color: #dc3545 !important;
+    font-weight: bold;
+    margin-left: 4px;
+}

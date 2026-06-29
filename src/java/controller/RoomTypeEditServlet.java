@@ -92,14 +92,15 @@ public class RoomTypeEditServlet extends HttpServlet {
         int roomTypeId = Integer.parseInt(request.getParameter("roomTypeId"));
         String typeName = request.getParameter("typeName");
         String description = request.getParameter("description");
-        int capacity = Integer.parseInt(request.getParameter("capacity"));
+        int numGuests = Integer.parseInt(request.getParameter("num_guests"));
+        int numChildren = Integer.parseInt(request.getParameter("num_children"));
         String bedType = request.getParameter("bedType");
         int bedCount = Integer.parseInt(request.getParameter("bedCount"));
         BigDecimal areaSqm = new BigDecimal(request.getParameter("areaSqm"));
         BigDecimal basePrice = new BigDecimal(request.getParameter("basePrice"));
         boolean isActive = request.getParameter("isActive") != null;
 
-        RoomType rt = new RoomType(roomTypeId, typeName, description, capacity, bedType, bedCount, areaSqm, basePrice, isActive);
+        RoomType rt = new RoomType(roomTypeId, typeName, description, numGuests, numChildren, bedType, bedCount, areaSqm, basePrice, isActive);
 
         // 2. Validation 
         boolean hasError = false;
@@ -111,6 +112,13 @@ public class RoomTypeEditServlet extends HttpServlet {
             errorMessage = "Tên hạng phòng \"" + typeName + "\" đã tồn tại!";
             request.setAttribute("status", "duplicate");
         }
+         // Ràng buộc dưới 50 người
+        if ((numGuests + numChildren) >= 50) {
+            hasError = true;
+            errorMessage = "Tổng số khách phải dưới 50 người!";
+            request.setAttribute("status", "error");
+        }
+
         // Check constraints
         if (bedCount < 1 || bedCount > 20) {
             hasError = true;

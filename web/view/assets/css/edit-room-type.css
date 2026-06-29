@@ -1,259 +1,249 @@
 
-/* --- Tổng thể & Khung chứa --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Cormorant Garamond', 'Lora', serif;
+}
+
 body {
-    background-color: #f8f9fa;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #333;
+    background-color: #F9F5EB !important; /* Giữ màu nền kem hoàng gia đồng bộ */
+    color: #1a446c;
 }
 
+/* Khung bọc hộp thoại form phẳng hoàn toàn, bung rộng theo trục Grid */
 .form-box {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 30px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    margin-bottom: 40px;
-    border: 1px solid #edf2f7;
+    background-color: transparent; 
+    border: none;                  
+    
+    padding: 40px 40px;            
+    
+    width: 100%;
+    box-sizing: border-box; /* Đảm bảo padding không làm phình to tràn màn hình */
 }
 
-/* --- Tiêu đề phân khu --- */
-.border-bottom-luxury {
-    border-bottom: 2px solid #e2e8f0;
-}
-
+/* Tiêu đề lớn của trang */
 .form-header h2 {
-    color: #0f4c5c; /* Tone màu xanh Teal sang trọng */
-    font-weight: 700;
-    font-size: 24px;
-}
-
-.form-header p {
-    color: #718096;
-    font-size: 14px;
-    margin-bottom: 0;
-}
-
-.block-title {
-    font-size: 16px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
     font-weight: 600;
-    color: #0f4c5c;
+    color: #1a446c;
+    letter-spacing: 0.5px;
+}
+.form-header p {
+    font-family: 'Lora', serif;
+    font-size: 14px;
+    color: #5c7f9e;
+    margin-top: 4px;
+}
+
+/* Đường gạch liền màu vàng kim phân chia khối dữ liệu 1, 2, 3, 4 */
+.block-title {
+    font-family: 'Cormorant Garamond', 'Lora', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a446c;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-top: 25px;
+    margin-top: 30px;
     margin-bottom: 15px;
-    padding-bottom: 5px;
-    border-bottom: 1px dashed #cbd5e1;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #bfa15f; /* Giữ gạch vàng sang rõ nét */
 }
 
-/* --- Ô nhập liệu (Input Fields) --- */
+/* Nhãn chữ đứng đầu mỗi ô nhập liệu */
 .field-label {
-    font-weight: 600;
+    font-family: 'Lora', serif;
     font-size: 14px;
-    color: #4a5568;
+    font-weight: 600;
+    color: #1a446c;
     margin-bottom: 6px;
     display: block;
 }
 
+/* Định dạng các ô Input văn bản, số và ô TextArea mô tả */
 .input-field, .textarea-field {
     width: 100%;
     padding: 10px 14px;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
+    font-family: 'Lora', serif;
     font-size: 14px;
-    color: #2d3748;
-    background-color: #fff;
-    transition: all 0.2s ease-in-out;
-}
-
-.input-field:focus, .textarea-field:focus {
-    border-color: #0f4c5c;
-    box-shadow: 0 0 0 3px rgba(15, 76, 92, 0.15);
+    color: #1a446c;
+    background-color: #fbf9f3;
+    border: 1px solid #ebd9b4;
+    border-radius: 4px;
     outline: none;
+    box-sizing: border-box;
+    height: 43px;
 }
-
 .textarea-field {
-    resize: vertical;
+    height: auto;
+}
+.input-field:focus, .textarea-field:focus {
+    border-color: #1a446c;
+    background-color: #ffffff;
 }
 
-/* --- Khu vực xử lý Album Ảnh động --- */
-.img-group {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    position: relative;
-}
-
-.input-grow {
-    flex-grow: 1;
-}
-
-.badge-main {
-    background-color: #e2e8f0;
-    color: #475569;
+/* Dòng chữ ghi chú nhỏ bên dưới ô nhập liệu */
+.text-hint {
     font-size: 12px;
-    font-weight: 600;
-    padding: 10px 12px;
-    border-radius: 6px;
-    border: 1px solid #cbd5e1;
-    white-space: nowrap;
+    color: #5c7f9e;
+    font-style: italic;
+    display: block;
+    margin-top: 4px;
 }
 
-/* --- Thiết kế Bảng dịch vụ & Tiện nghi --- */
+/* === 2. BẢNG THIẾT LẬP DỊCH VỤ MẶC ĐỊNH === */
 .service-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
-    background: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid #e2e8f0;
+    margin-top: 15px;
 }
-
-.service-table th {
-    background-color: #0f4c5c;
-    color: #ffffff;
-    font-weight: 600;
+.service-table thead th {
+    color: #1a446c;
+    font-family: 'Lora', serif;
     font-size: 14px;
-    padding: 12px 16px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-weight: 700;
+    padding: 16px 12px;
+    border-bottom: 1px solid #ebd9b4;
+    background-color: rgba(26, 68, 108, 0.03); /* Đồng bộ độ mờ nền của bảng danh sách */
 }
-
-.service-table td {
-    padding: 12px 16px;
-    border-bottom: 1px solid #edf2f7;
-    color: #2d3748;
-    font-size: 14px;
+.service-table tbody td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #ebd9b4;
+    font-family: 'Lora', serif;
+    font-size: 14.5px;
+    color: #1a446c;
     vertical-align: middle;
 }
 
-.service-table tr:hover {
-    background-color: #f8fafc;
-}
-
-/* Ô nhập số lượng trong bảng */
+/* Ô nhập số lượng cài đặt dịch vụ trong bảng */
 .qty-input {
-    width: 80px;
-    padding: 6px 10px;
-    border: 1px solid #cbd5e1;
+    width: 70px;
+    padding: 5px 8px;
+    border: 1px solid #ebd9b4;
     border-radius: 4px;
+    font-family: 'Lora', serif;
+    font-size: 13.5px;
+    color: #1a446c;
     text-align: center;
-    font-size: 14px;
+    background-color: #ffffff;
+    outline: none;
+}
+.qty-input:focus {
+    border-color: #1a446c;
 }
 
-.qty-input:disabled {
-    background-color: #f1f5f9;
-    color: #94a3b8;
-    border-color: #e2e8f0;
-    cursor: not-allowed;
-}
-
-/* Checkbox kiểu Custom mượt mà */
+/* Khối nhãn bọc Checkbox chọn dịch vụ */
 .check-box-wrapper {
     display: flex;
     align-items: center;
     cursor: pointer;
-    user-select: none;
-    gap: 10px;
+    font-family: 'Lora', serif;
 }
-
-.check-box-wrapper input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+.check-box-wrapper input {
+    margin-right: 8px;
+    width: 16px;
+    height: 16px;
     cursor: pointer;
-    accent-color: #0f4c5c; /* Đổi màu xanh đồng bộ cho checkbox */
 }
 
-/* Khối trạng thái kích hoạt cuối trang */
+/* === 3. KHỐI TRẠNG THÁI KINH DOANH LÙI SÂU === */
 .status-block {
-    background-color: #f0fdf4;
-    border: 1px solid #bbf7d0;
-    padding: 15px;
-    border-radius: 8px;
-    margin-top: 30px;
-    margin-bottom: 30px;
+    margin-top: 50px !important;    
+    margin-bottom: 35px !important; 
 }
 
-.status-block .check-box-wrapper {
-    color: #166534;
+/* === 4. CẤU TRÚC KHỐI ALBUM ẢNH ĐỘNG CÂN BẰNG === */
+.img-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
 }
-
-/* --- Hệ thống các Nút bấm (Buttons) --- */
-.btn-add {
-    background-color: #fff;
-    color: #0f4c5c;
-    border: 1px dashed #0f4c5c;
-    padding: 8px 16px;
-    font-size: 14px;
+.input-grow {
+    flex: 1;
+}
+.badge-main {
+    color: #1a446c;
+    font-size: 13.5px;
     font-weight: 600;
-    border-radius: 6px;
+    white-space: nowrap;
+    height: 43px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-delete {
+    background-color: #fbf9f3;
+    color: #bfa15f;
+    border: 1px solid #ebd9b4;
+    margin: 5px ;
+    padding: 0px 20px;
+    border-radius: 4px;
+    font-family: 'Lora', serif;
+    font-size: 13.5px;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+    height: 43px; 
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-delete:hover {
+    background-color: #bfa15f;
+    color: #ffffff;
+    border-color: #bfa15f;
+}
+.btn-add {
+    font-family: 'Lora', serif;
+    color: #1a446c;
+    border: 1px solid #bfa15f;
+    background: transparent;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
     margin-top: 5px;
 }
-
 .btn-add:hover {
-    background-color: rgba(15, 76, 92, 0.05);
-    border-style: solid;
+    background-color: rgba(26, 68, 108, 0.05);
 }
 
-.btn-delete {
-    background-color: #fee2e2;
-    color: #dc2626;
-    border: 1px solid #fca5a5;
-    padding: 10px 16px;
-    font-size: 14px;
-    font-weight: 600;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-delete:hover {
-    background-color: #fca5a5;
-    color: #991b1b;
-}
-
-/* Thanh hành động cuối cùng */
+/* === 5. KHU VỰC ĐIỀU HƯỚNG NÚT BẤM ĐÁY FORM === */
 .action-box {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top: 2px solid #e2e8f0;
-    padding-top: 20px;
-    margin-top: 20px;
+    border-top: 1px dashed #ebd9b4;
+    padding-top: 25px;
 }
-
 .btn-link-back {
-    color: #4a5568;
-    text-decoration: none;
-    font-weight: 600;
+    font-family: 'Lora', serif;
     font-size: 14px;
-    transition: color 0.2s;
+    color: #1a446c;
+    text-decoration: none;
 }
-
 .btn-link-back:hover {
-    color: #1a202c;
+    text-decoration: underline;
 }
-
 .btn-submit {
-    background-color: #0f4c5c;
+    font-family: 'Lora', serif;
+    font-size: 14px;
+    font-weight: 500;
+    background-color: #1a446c;
     color: #ffffff;
     border: none;
     padding: 12px 28px;
-    font-size: 15px;
-    font-weight: 600;
-    border-radius: 6px;
+    border-radius: 4px;
     cursor: pointer;
-    box-shadow: 0 4px 6px rgba(15, 76, 92, 0.15);
-    transition: all 0.2s;
 }
-
 .btn-submit:hover {
-    background-color: #0b3945;
-    box-shadow: 0 4px 12px rgba(15, 76, 92, 0.25);
-    transform: translateY(-1px);
+    background-color: #112d47;
 }
-
-.btn-submit:active {
-    transform: translateY(0);
+.required-star {
+    color: #dc3545 !important;
+    font-weight: bold;
+    margin-left: 4px;
 }
