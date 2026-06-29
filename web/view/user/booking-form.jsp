@@ -89,6 +89,10 @@
                        name="numGuests"
                        value="${numGuests}">
 
+                <input type="hidden"
+                       name="numChildren"
+                       value="${numChildren}">
+
                 <div class="booking-layout">
 
                     <div class="booking-left">
@@ -188,7 +192,7 @@
 
                                 <div>
                                     <h2>THÔNG TIN ĐẶT PHÒNG</h2>
-                                    <p>Kiểm tra lại ngày lưu trú, số phòng và số khách</p>
+                                    <p>Kiểm tra lại ngày lưu trú, số phòng, người lớn và trẻ em</p>
                                 </div>
                             </div>
 
@@ -222,25 +226,12 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Số lượng phòng</label>
+                                    <label for="displayNumRooms">Số lượng phòng</label>
 
-                                    <div class="quantity-control">
-
-                                        <button type="button" disabled>
-                                            −
-                                        </button>
-
-                                        <input type="number"
-                                               id="displayNumRooms"
-                                               min="1"
-                                               value="${numRooms}"
-                                               disabled>
-
-                                        <button type="button" disabled>
-                                            +
-                                        </button>
-
-                                    </div>
+                                    <input type="number"
+                                           id="displayNumRooms"
+                                           value="${numRooms}"
+                                           readonly>
 
                                     <small>
                                         Hiện còn ${availableRooms} phòng khả dụng.
@@ -248,26 +239,30 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="displayNumGuests">Số khách</label>
+                                    <label for="displayNumGuests">Người lớn</label>
 
-                                    <select id="displayNumGuests" disabled>
+                                    <input type="number"
+                                           id="displayNumGuests"
+                                           value="${numGuests}"
+                                           readonly>
 
-                                        <c:forEach begin="1"
-                                                   end="${roomType.capacity * numRooms}"
-                                                   var="guestNumber">
+                                    <small>
+                                        Tối đa ${roomType.numGuests * numRooms}
+                                        người lớn cho ${numRooms} phòng.
+                                    </small>
+                                </div>
 
-                                            <option value="${guestNumber}"
-                                                    ${guestNumber == numGuests ? 'selected' : ''}>
-                                                ${guestNumber} khách
-                                            </option>
+                                <div class="form-group">
+                                    <label for="displayNumChildren">Trẻ em</label>
 
-                                        </c:forEach>
+                                    <input type="number"
+                                           id="displayNumChildren"
+                                           value="${numChildren}"
+                                           readonly>
 
-                                    </select>
-
-                                    <small id="capacityMessage">
-                                        Tối đa ${roomType.capacity * numRooms}
-                                        khách cho ${numRooms} phòng.
+                                    <small>
+                                        Tối đa ${roomType.numChildren * numRooms}
+                                        trẻ em cho ${numRooms} phòng.
                                     </small>
                                 </div>
 
@@ -316,8 +311,18 @@
                                 </p>
 
                                 <p>
-                                    Sức chứa:
-                                    ${roomType.capacity} khách/phòng
+                                    Người lớn:
+                                    tối đa ${roomType.numGuests}/phòng
+                                </p>
+
+                                <p>
+                                    Trẻ em:
+                                    tối đa ${roomType.numChildren}/phòng
+                                </p>
+
+                                <p>
+                                    Tổng sức chứa:
+                                    tối đa ${roomType.capacity} người/phòng
                                 </p>
 
                                 <p>
@@ -352,8 +357,18 @@
                         </div>
 
                         <div class="summary-row">
-                            <span>Số khách</span>
-                            <strong>${numGuests} khách</strong>
+                            <span>Người lớn</span>
+                            <strong>${numGuests} người</strong>
+                        </div>
+
+                        <div class="summary-row">
+                            <span>Trẻ em</span>
+                            <strong>${numChildren} trẻ em</strong>
+                        </div>
+
+                        <div class="summary-row">
+                            <span>Tổng số người</span>
+                            <strong>${numGuests + numChildren} người</strong>
                         </div>
 
                         <div class="summary-divider"></div>

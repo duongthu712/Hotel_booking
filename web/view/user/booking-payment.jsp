@@ -149,6 +149,40 @@
                             chuyển khoản.
                         </div>
 
+                        <div class="payment-required-warning">
+                            <div class="payment-required-warning-title">
+                                ⚠ BẮT BUỘC SAU KHI CHUYỂN KHOẢN
+                            </div>
+
+                            <div class="payment-required-warning-content">
+                                <p>
+                                    Để khách sạn kiểm tra khoản đặt cọc,
+                                    bạn phải cung cấp đầy đủ:
+                                </p>
+
+                                <ol>
+                                    <li>
+                                        <strong>
+                                            Ảnh chụp màn hình giao dịch
+                                            chuyển khoản thành công.
+                                        </strong>
+                                    </li>
+
+                                    <li>
+                                        <strong>
+                                            Mã giao dịch hoặc mã tham chiếu
+                                        </strong>
+                                        hiển thị trên biên lai chuyển khoản.
+                                    </li>
+                                </ol>
+                            </div>
+
+                            <div class="payment-required-warning-danger">
+                                Thiếu một trong hai thông tin trên,
+                                bạn sẽ không thể gửi thông tin giao dịch.
+                            </div>
+                        </div>
+
                         <div class="bank-card">
 
                             <div class="bank-information">
@@ -310,7 +344,7 @@
                                   <div class="transaction-proof-field">
 
                                       <label>
-                                          Ảnh minh chứng chuyển khoản
+                                          Ảnh chụp màn hình chuyển khoản thành công
                                           <span>*</span>
                                       </label>
 
@@ -321,13 +355,16 @@
                                                  class="payment-file-input"
                                                  accept="image/png, image/jpeg, image/jpg">
 
-                                          <label for="paymentImage" class="payment-upload-label">
+                                          <label for="paymentImage"
+                                                 class="payment-upload-label">
+
                                               <div class="payment-upload-content">
-                                                  <small>Hỗ trợ định dạng JPG, JPEG, PNG</small>
+                                                  <small>
+                                                      Hỗ trợ định dạng JPG, JPEG, PNG
+                                                  </small>
                                               </div>
                                           </label>
                                       </div>
-
                                   </div>
 
                                   <div class="transaction-proof-field">
@@ -343,7 +380,7 @@
                                              class="transaction-proof-input"
                                              maxlength="100"
                                              value="${fn:escapeXml(param.transactionReference)}"
-                                             placeholder="Ví dụ: FT26123456789"
+                                             placeholder="Nhập chính xác mã giao dịch hoặc mã tham chiếu trên biên lai"
                                              autocomplete="off"
                                              required>
 
@@ -406,8 +443,18 @@
                                 </p>
 
                                 <p>
-                                    Sức chứa:
-                                    ${roomType.capacity} khách/phòng
+                                    Người lớn:
+                                    tối đa ${roomType.numGuests}/phòng
+                                </p>
+
+                                <p>
+                                    Trẻ em:
+                                    tối đa ${roomType.numChildren}/phòng
+                                </p>
+
+                                <p>
+                                    Tổng sức chứa:
+                                    tối đa ${roomType.capacity} người/phòng
                                 </p>
 
                                 <p>
@@ -440,8 +487,18 @@
                         </div>
 
                         <div class="summary-row">
-                            <span>Số khách:</span>
-                            <strong>${booking.numGuests} khách</strong>
+                            <span>Người lớn:</span>
+                            <strong>${booking.numGuests} người</strong>
+                        </div>
+
+                        <div class="summary-row">
+                            <span>Trẻ em:</span>
+                            <strong>${booking.numChildren} trẻ em</strong>
+                        </div>
+
+                        <div class="summary-row">
+                            <span>Tổng số người:</span>
+                            <strong>${booking.numGuests + booking.numChildren} người</strong>
                         </div>
 
                         <div class="summary-divider"></div>
@@ -567,13 +624,20 @@
             const paymentForm =
                     document.getElementById("paymentForm");
 
-            const paymentFilePreview = document.getElementById("paymentFilePreview");
+            const paymentImage =
+                    document.getElementById("paymentImage");
 
-            const paymentFileName = document.getElementById("paymentFileName");
+            const paymentFilePreview =
+                    document.getElementById("paymentFilePreview");
 
-            const clearPaymentImage = document.getElementById("clearPaymentImage");
+            const paymentFileName =
+                    document.getElementById("paymentFileName");
 
-            const paymentProofUrl = document.getElementById("payment-proof-url");
+            const clearPaymentImage =
+                    document.getElementById("clearPaymentImage");
+
+            const paymentProofUrl =
+                    document.getElementById("payment-proof-url");
 
             const transactionReference =
                     document.getElementById("transactionReference");
@@ -739,22 +803,22 @@
                     }
                 });
             }
-            
+
             if (paymentImage) {
-    paymentImage.addEventListener("change", function () {
-        if (paymentImage.files.length > 0) {
-            const fileName = paymentImage.files[0].name;
+                paymentImage.addEventListener("change", function () {
+                    if (paymentImage.files.length > 0) {
+                        const fileName = paymentImage.files[0].name;
 
-            if (paymentFileName) {
-                paymentFileName.textContent = fileName;
-            }
+                        if (paymentFileName) {
+                            paymentFileName.textContent = fileName;
+                        }
 
-            if (paymentFilePreview) {
-                paymentFilePreview.style.display = "flex";
+                        if (paymentFilePreview) {
+                            paymentFilePreview.style.display = "flex";
+                        }
+                    }
+                });
             }
-        }
-    });
-}
 
             if (clearPaymentImage) {
                 clearPaymentImage.addEventListener("click", function () {
@@ -775,59 +839,53 @@
             }
 
             if (paymentForm) {
-                paymentForm.addEventListener(
-                        "submit",
-                        function (event) {
+                paymentForm.addEventListener("submit", function (event) {
+                    if (!paymentImage || paymentImage.files.length === 0) {
+                        event.preventDefault();
 
-                            if (!paymentImage
-                                    || paymentImage.files.length === 0) {
+                        showPageMessage(
+                                "Vui lòng tải ảnh chụp màn hình giao dịch chuyển khoản thành công.",
+                                true
+                                );
 
-                                event.preventDefault();
-
-                                showPageMessage(
-                                        "Vui lòng tải ảnh minh chứng chuyển khoản.",
-                                        true
-                                        );
-
-                                if (paymentImage) {
-                                    paymentImage.focus();
-                                }
-
-                                return;
-                            }
-
-                            const referenceValue =
-                                    transactionReference.value.trim();
-
-                            if (referenceValue === "") {
-                                event.preventDefault();
-
-                                showPageMessage(
-                                        "Vui lòng nhập mã giao dịch "
-                                        + "hoặc mã tham chiếu.",
-                                        true
-                                        );
-
-                                transactionReference.focus();
-                                return;
-                            }
-
-                            if (referenceValue.length < 4) {
-                                event.preventDefault();
-
-                                showPageMessage(
-                                        "Mã giao dịch hoặc mã tham chiếu "
-                                        + "không hợp lệ.",
-                                        true
-                                        );
-
-                                transactionReference.focus();
-                                return;
-                            }
-
-                            transactionReference.value = referenceValue;
+                        if (paymentImage) {
+                            paymentImage.focus();
                         }
-                );
+
+                        return;
+                    }
+
+                    const referenceValue =
+                            transactionReference.value.trim();
+
+                    if (referenceValue === "") {
+                        event.preventDefault();
+
+                        showPageMessage(
+                                "Vui lòng nhập chính xác mã giao dịch "
+                                + "hoặc mã tham chiếu trên biên lai.",
+                                true
+                                );
+
+                        transactionReference.focus();
+                        return;
+                    }
+
+                    if (referenceValue.length < 4) {
+                        event.preventDefault();
+
+                        showPageMessage(
+                                "Mã giao dịch hoặc mã tham chiếu "
+                                + "không hợp lệ.",
+                                true
+                                );
+
+                        transactionReference.focus();
+                        return;
+                    }
+
+                    transactionReference.value = referenceValue;
+                });
             }
         </script>
 

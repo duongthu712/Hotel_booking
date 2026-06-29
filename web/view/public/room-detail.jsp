@@ -89,15 +89,21 @@
 
     Integer numRoomsObj = (Integer) request.getAttribute("numRooms");
     Integer numGuestsObj = (Integer) request.getAttribute("numGuests");
+    Integer numChildrenObj = (Integer) request.getAttribute("numChildren");
     Integer availableRoomsObj = (Integer) request.getAttribute("availableRooms");
     Integer maxGuestsByRoomsObj = (Integer) request.getAttribute("maxGuestsByRooms");
+    Integer maxAdultsByRoomsObj = (Integer) request.getAttribute("maxAdultsByRooms");
+    Integer maxChildrenByRoomsObj = (Integer) request.getAttribute("maxChildrenByRooms");
     Long nightsObj = (Long) request.getAttribute("nights");
     Boolean hasValidDateObj = (Boolean) request.getAttribute("hasValidDate");
 
     int numRooms = numRoomsObj == null ? 1 : numRoomsObj;
     int numGuests = numGuestsObj == null ? 1 : numGuestsObj;
+    int numChildren = numChildrenObj == null ? 0 : numChildrenObj;
     int availableRooms = availableRoomsObj == null ? -1 : availableRoomsObj;
     int maxGuestsByRooms = maxGuestsByRoomsObj == null ? 1 : maxGuestsByRoomsObj;
+    int maxAdultsByRooms = maxAdultsByRoomsObj == null ? 1 : maxAdultsByRoomsObj;
+    int maxChildrenByRooms = maxChildrenByRoomsObj == null ? 0 : maxChildrenByRoomsObj;
     long nights = nightsObj == null ? 0 : nightsObj;
     boolean hasValidDate = hasValidDateObj != null && hasValidDateObj;
 
@@ -111,10 +117,24 @@
 
     String basePrice = "0";
     int capacityPerRoom = 1;
+    int adultsPerRoom = 1;
+    int childrenPerRoom = 0;
+
     if (room != null) {
-        capacityPerRoom = room.getCapacity();
-        if (room.getBasePrice() != null) basePrice = room.getBasePrice().toPlainString();
+        capacityPerRoom = Math.max(room.getCapacity(), 1);
+        adultsPerRoom = room.getNumGuests() > 0 ? room.getNumGuests() : capacityPerRoom;
+        childrenPerRoom = Math.max(room.getNumChildren(), 0);
+
+        if (room.getBasePrice() != null) {
+            basePrice = room.getBasePrice().toPlainString();
+        }
     }
+
+    boolean canBook = hasValidDate
+            && availableRooms > 0
+            && dateError.isEmpty()
+            && guestRoomError.isEmpty()
+            && numRooms <= availableRooms;
 %>
 
 <!DOCTYPE html>
@@ -125,7 +145,7 @@
         <title><%= html(pageTitle) %></title>
         <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/navbar.css">
         <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/footer.css">
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/room-detail.css?v=65">
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/room-detail.css?v=70">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     </head>
     <body>
@@ -199,7 +219,10 @@
                         <div class="room-spec-row">
                             <div class="room-spec-card">
                                 <i class="fa-solid fa-users"></i>
-                                <div><span>Sức chứa</span><strong><%= room.getCapacity() %> khách / phòng</strong></div>
+                                <div>
+                                    <span>Sức chứa</span>
+                                    <strong><%= room.getNumGuests() %> người lớn, <%= room.getNumChildren() %> trẻ em</strong>
+                                </div>
                             </div>
 
                             <div class="room-spec-card">
@@ -218,52 +241,80 @@
                         <input type="hidden" name="roomTypeId" value="<%= room.getRoomTypeId() %>">
                         <h2>Kiểm tra phòng & đặt phòng</h2>
 
-                        <div class="booking-input-grid">
+                        <div class="booking-date-grid">
                             <div class="booking-field booking-date-field">
                                 <label for="checkInInput">Nhận phòng</label>
                                 <div class="field-with-icon">
-                                    <input type="date" id="checkInInput" name="checkIn" value="<%= html(checkIn) %>" min="<%= html(today) %>">
+                                    <input type="date"
+                                           id="checkInInput"
+                                           name="checkIn"
+                                           value="<%= html(checkIn) %>"
+                                           min="<%= html(today) %>">
                                 </div>
                             </div>
 
                             <div class="booking-field booking-date-field">
                                 <label for="checkOutInput">Trả phòng</label>
                                 <div class="field-with-icon">
-                                    <input type="date" id="checkOutInput" name="checkOut" value="<%= html(checkOut) %>" min="<%= html(today) %>">
+                                    <input type="date"
+                                           id="checkOutInput"
+                                           name="checkOut"
+                                           value="<%= html(checkOut) %>"
+                                           min="<%= html(today) %>">
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="booking-number-grid">
+                            <div class="booking-field booking-quantity-field">
+                                <label for="numGuests">Người lớn</label>
+                                <input type="number"
+                                       class="booking-number-input"
+                                       id="numGuests"
+                                       name="numGuests"
+                                       value="<%= numGuests %>"
+                                       min="1"
+                                       step="1"
+                                       inputmode="numeric">
                             </div>
 
                             <div class="booking-field booking-quantity-field">
-                                <label>Số khách lưu trú</label>
-                                <div class="quantity-box">
-                                    <button type="button" onclick="changeGuests(-1)" aria-label="Giảm số khách">−</button>
-                                    <input type="text" id="numGuests" name="numGuests" value="<%= numGuests %>" readonly>
-                                    <button type="button" onclick="changeGuests(1)" aria-label="Tăng số khách">+</button>
-                                </div>
+                                <label for="numChildren">Trẻ em</label>
+                                <input type="number"
+                                       class="booking-number-input"
+                                       id="numChildren"
+                                       name="numChildren"
+                                       value="<%= numChildren %>"
+                                       min="0"
+                                       step="1"
+                                       inputmode="numeric">
                             </div>
 
                             <div class="booking-field booking-quantity-field">
-                                <label>Số lượng phòng</label>
-                                <div class="quantity-box">
-                                    <button type="button" onclick="changeQuantity(-1)" aria-label="Giảm số phòng">−</button>
-                                    <input type="text" id="roomQuantity" name="numRooms" value="<%= numRooms %>" readonly>
-                                    <button type="button" onclick="changeQuantity(1)" aria-label="Tăng số phòng">+</button>
-                                </div>
+                                <label for="roomQuantity">Số lượng phòng</label>
+                                <input type="number"
+                                       class="booking-number-input"
+                                       id="roomQuantity"
+                                       name="numRooms"
+                                       value="<%= numRooms %>"
+                                       min="1"
+                                       step="1"
+                                       inputmode="numeric">
                             </div>
                         </div>
 
                         <div class="capacity-note" id="capacityNote">
-                            Tối đa <strong id="maxGuestText"><%= maxGuestsByRooms %></strong> khách cho
-                            <strong id="roomCountText"><%= numRooms %></strong> phòng đã chọn.
+                            Với <strong id="roomCountText"><%= numRooms %></strong> phòng:
+                            tối đa <strong id="maxAdultText"><%= maxAdultsByRooms %></strong> người lớn,
+                            <strong id="maxChildText"><%= maxChildrenByRooms %></strong> trẻ em,
+                            tổng cộng <strong id="maxGuestText"><%= maxGuestsByRooms %></strong> người.
                         </div>
-
-                        <div class="client-message" id="clientMessage" role="alert" aria-live="polite"></div>
 
                         <% if (!guestRoomError.isEmpty()) { %>
                         <div class="availability-box error server-message">
                             <i class="fa-solid fa-circle-exclamation"></i>
                             <span><%= html(guestRoomError) %></span>
-                            <em>Đã điều chỉnh</em>
+                            <em>Chưa hợp lệ</em>
                         </div>
                         <% } else if (!guestRoomWarning.isEmpty()) { %>
                         <div class="availability-box warning server-message">
@@ -311,10 +362,11 @@
                             </button>
 
                             <button type="submit"
+                                    id="bookButton"
                                     formaction="<%= request.getContextPath() %>/booking-form"
                                     class="room-booking-btn"
                                     data-action="book"
-                                    <%= (!hasValidDate || availableRooms <= 0 || !dateError.isEmpty() || numRooms > availableRooms) ? "disabled" : "" %>>
+                                    <%= canBook ? "" : "disabled" %>>
                                 <i class="fa-solid fa-calendar-check"></i>
                                 Đặt phòng ngay
                             </button>
@@ -328,7 +380,9 @@
                     <h3><i class="fa-solid fa-circle-info"></i>Thông tin phòng</h3>
                     <ul>
                         <li><i class="fa-solid fa-check"></i><span><%= html(formatBedInfo(room.getBedCount(), room.getBedType())) %></span></li>
-                        <li><i class="fa-solid fa-check"></i><span>Phòng phù hợp tối đa <%= room.getCapacity() %> khách</span></li>
+                        <li><i class="fa-solid fa-check"></i><span>Tối đa <%= room.getNumGuests() %> người lớn mỗi phòng</span></li>
+                        <li><i class="fa-solid fa-check"></i><span>Tối đa <%= room.getNumChildren() %> trẻ em mỗi phòng</span></li>
+                        <li><i class="fa-solid fa-check"></i><span>Tổng sức chứa tối đa <%= room.getCapacity() %> người mỗi phòng</span></li>
                         <li><i class="fa-solid fa-check"></i><span>Diện tích phòng <%= room.getAreaSqm() %> m²</span></li>
                         <li><i class="fa-solid fa-check"></i><span>Dọn phòng hằng ngày</span></li>
                         <li><i class="fa-solid fa-check"></i><span>Không gian nghỉ dưỡng hiện đại</span></li>
@@ -461,14 +515,15 @@
 
             const basePrice = Number("<%= basePrice %>");
             const nights = Number("<%= nights %>");
-            const availableRooms = Number("<%= availableRooms %>");
             const hasValidDate = <%= hasValidDate ? "true" : "false" %>;
             const capacityPerRoom = Number("<%= capacityPerRoom %>");
+            const adultsPerRoom = Number("<%= adultsPerRoom %>");
+            const childrenPerRoom = Number("<%= childrenPerRoom %>");
 
             function updateSliderPosition() {
                 const track = document.getElementById("imageSliderTrack");
-                if (!track)
-                    return;
+                if (!track) return;
+
                 track.style.transform = "translateX(-" + (currentImageIndex * 100) + "%)";
                 updateActiveThumbnail();
                 updateImageCount();
@@ -476,28 +531,29 @@
             }
 
             function moveImage(step) {
-                if (!imageList || imageList.length <= 1 || isSliding)
-                    return;
+                if (!imageList || imageList.length <= 1 || isSliding) return;
+
                 isSliding = true;
                 currentImageIndex += step;
-                if (currentImageIndex < 0)
-                    currentImageIndex = imageList.length - 1;
-                if (currentImageIndex >= imageList.length)
-                    currentImageIndex = 0;
+
+                if (currentImageIndex < 0) currentImageIndex = imageList.length - 1;
+                if (currentImageIndex >= imageList.length) currentImageIndex = 0;
+
                 updateSliderPosition();
+
                 window.setTimeout(function () {
                     isSliding = false;
                 }, 520);
             }
 
             function goToImage(index) {
-                if (!imageList || imageList.length === 0 || isSliding)
-                    return;
-                if (index < 0 || index >= imageList.length || index === currentImageIndex)
-                    return;
+                if (!imageList || imageList.length === 0 || isSliding) return;
+                if (index < 0 || index >= imageList.length || index === currentImageIndex) return;
+
                 isSliding = true;
                 currentImageIndex = index;
                 updateSliderPosition();
+
                 window.setTimeout(function () {
                     isSliding = false;
                 }, 520);
@@ -507,53 +563,67 @@
                 document.querySelectorAll(".room-thumbnail").forEach(function (thumbnail) {
                     thumbnail.classList.remove("active-thumb");
                 });
-                const activeThumbnail = document.querySelector(".room-thumbnail[data-index='" + currentImageIndex + "']");
-                if (activeThumbnail)
-                    activeThumbnail.classList.add("active-thumb");
+
+                const activeThumbnail = document.querySelector(
+                        ".room-thumbnail[data-index='" + currentImageIndex + "']"
+                );
+
+                if (activeThumbnail) activeThumbnail.classList.add("active-thumb");
             }
 
             function updateImageCount() {
                 const counter = document.getElementById("currentImageNumber");
-                if (counter)
-                    counter.textContent = String(currentImageIndex + 1);
+                if (counter) counter.textContent = String(currentImageIndex + 1);
             }
 
             function scrollThumbnailIntoView() {
-                const activeThumbnail = document.querySelector(".room-thumbnail[data-index='" + currentImageIndex + "']");
+                const activeThumbnail = document.querySelector(
+                        ".room-thumbnail[data-index='" + currentImageIndex + "']"
+                );
+
                 if (activeThumbnail) {
-                    activeThumbnail.scrollIntoView({behavior: "smooth", block: "nearest", inline: "center"});
+                    activeThumbnail.scrollIntoView({
+                        behavior: "smooth",
+                        block: "nearest",
+                        inline: "center"
+                    });
                 }
             }
 
-            function escapeHtml(value) {
-                const element = document.createElement("div");
-                element.textContent = value;
-                return element.innerHTML;
+            function readInteger(inputId, defaultValue) {
+                const input = document.getElementById(inputId);
+                if (!input) return defaultValue;
+
+                const value = Number.parseInt(input.value, 10);
+                return Number.isNaN(value) ? defaultValue : value;
             }
 
-            function clearClientMessage() {
-                const messageBox = document.getElementById("clientMessage");
-                if (!messageBox)
-                    return;
-                messageBox.className = "client-message";
-                messageBox.innerHTML = "";
+            function updateCapacityText() {
+                const rooms = Math.max(readInteger("roomQuantity", 1), 1);
+
+                const roomCountText = document.getElementById("roomCountText");
+                const maxAdultText = document.getElementById("maxAdultText");
+                const maxChildText = document.getElementById("maxChildText");
+                const maxGuestText = document.getElementById("maxGuestText");
+
+                if (roomCountText) roomCountText.textContent = String(rooms);
+                if (maxAdultText) maxAdultText.textContent = String(rooms * adultsPerRoom);
+                if (maxChildText) maxChildText.textContent = String(rooms * childrenPerRoom);
+                if (maxGuestText) maxGuestText.textContent = String(rooms * capacityPerRoom);
             }
 
-            function showClientMessage(type, message) {
-                const messageBox = document.getElementById("clientMessage");
-                if (!messageBox)
+            function updateTotalPrice() {
+                const totalPriceElement = document.getElementById("totalPrice");
+                if (!totalPriceElement) return;
+
+                if (!hasValidDate) {
+                    totalPriceElement.textContent = "--";
                     return;
+                }
 
-                let iconClass = "fa-circle-info";
-                if (type === "error")
-                    iconClass = "fa-circle-exclamation";
-                else if (type === "warning")
-                    iconClass = "fa-triangle-exclamation";
-                else if (type === "success")
-                    iconClass = "fa-circle-check";
-
-                messageBox.className = "client-message show " + type;
-                messageBox.innerHTML = "<i class=\"fa-solid " + iconClass + "\"></i><span>" + escapeHtml(message) + "</span>";
+                const rooms = Math.max(readInteger("roomQuantity", 1), 1);
+                const total = basePrice * rooms * nights;
+                totalPriceElement.textContent = total.toLocaleString("vi-VN") + " VND";
             }
 
             function hideServerMessages() {
@@ -562,209 +632,31 @@
                 });
             }
 
-            function isPageReload() {
-                const navigationEntries = window.performance.getEntriesByType("navigation");
-                if (navigationEntries.length > 0)
-                    return navigationEntries[0].type === "reload";
-                return window.performance.navigation && window.performance.navigation.type === 1;
-            }
-
-            function hideAllMessagesOnReload() {
-                if (!isPageReload())
-                    return;
-                clearClientMessage();
-                hideServerMessages();
-            }
-
-            function getRoomQuantity() {
-                const input = document.getElementById("roomQuantity");
-                const value = Number.parseInt(input.value, 10);
-                return Number.isNaN(value) ? 1 : value;
-            }
-
-            function getGuestQuantity() {
-                const input = document.getElementById("numGuests");
-                const value = Number.parseInt(input.value, 10);
-                return Number.isNaN(value) ? 1 : value;
-            }
-
-            function updateCapacityText() {
-                const rooms = getRoomQuantity();
-                const maxGuests = rooms * capacityPerRoom;
-                const maxGuestText = document.getElementById("maxGuestText");
-                const roomCountText = document.getElementById("roomCountText");
-                if (maxGuestText)
-                    maxGuestText.textContent = String(maxGuests);
-                if (roomCountText)
-                    roomCountText.textContent = String(rooms);
-            }
-
-            function normalizeGuestQuantity(showMessage) {
-                const guestInput = document.getElementById("numGuests");
-                const rooms = getRoomQuantity();
-                let guests = getGuestQuantity();
-                const maxGuests = rooms * capacityPerRoom;
-
-                if (guests < 1)
-                    guests = 1;
-                if (guests > maxGuests) {
-                    guests = maxGuests;
-                    if (showMessage) {
-                        showClientMessage("error", "Số khách tối đa cho " + rooms + " phòng là " + maxGuests + " khách. Hệ thống đã điều chỉnh lại.");
-                    }
-                }
-                guestInput.value = String(guests);
-            }
-
-            function changeGuests(value) {
-                clearClientMessage();
+            function markFormChanged() {
                 hideServerMessages();
 
-                const guestInput = document.getElementById("numGuests");
-                let guests = getGuestQuantity() + value;
+                const bookButton = document.getElementById("bookButton");
+                if (bookButton) bookButton.disabled = true;
 
-                if (guests < 1) {
-                    guests = 1;
-                    showClientMessage("warning", "Số khách tối thiểu là 1.");
-                }
-
-                guestInput.value = String(guests);
-                normalizeGuestQuantity(true);
-
-                if (getGuestQuantity() < getRoomQuantity()) {
-                    showClientMessage("warning", "Số khách đang nhỏ hơn số phòng. Bạn vẫn có thể tiếp tục nếu đang đặt hộ người khác.");
-                }
-            }
-
-            function changeQuantity(value) {
-                clearClientMessage();
-                hideServerMessages();
-
-                const roomInput = document.getElementById("roomQuantity");
-                let quantity = getRoomQuantity() + value;
-
-                if (quantity < 1) {
-                    quantity = 1;
-                    showClientMessage("warning", "Số lượng phòng tối thiểu là 1.");
-                }
-
-                if (hasValidDate && availableRooms >= 0 && quantity > availableRooms) {
-                    if (availableRooms > 0) {
-                        quantity = availableRooms;
-                        showClientMessage("error", "Chỉ còn " + availableRooms + " phòng khả dụng trong thời gian đã chọn.");
-                    } else {
-                        quantity = 1;
-                        showClientMessage("error", "Hạng phòng này không còn phòng trong thời gian đã chọn.");
-                    }
-                }
-
-                roomInput.value = String(quantity);
                 updateCapacityText();
-                normalizeGuestQuantity(true);
                 updateTotalPrice();
-
-                if (getGuestQuantity() < quantity) {
-                    showClientMessage("warning", "Số khách đang nhỏ hơn số phòng. Bạn vẫn có thể tiếp tục nếu đang đặt hộ người khác.");
-                }
-            }
-
-            function updateTotalPrice() {
-                const totalPriceElement = document.getElementById("totalPrice");
-                if (!totalPriceElement)
-                    return;
-                if (!hasValidDate) {
-                    totalPriceElement.textContent = "--";
-                    return;
-                }
-                const total = basePrice * getRoomQuantity() * nights;
-                totalPriceElement.textContent = total.toLocaleString("vi-VN") + " VND";
-            }
-
-            function validateDates() {
-                const checkInInput = document.getElementById("checkInInput");
-                const checkOutInput = document.getElementById("checkOutInput");
-                const checkInValue = checkInInput.value;
-                const checkOutValue = checkOutInput.value;
-
-                if (!checkInValue || !checkOutValue) {
-                    showClientMessage("error", "Vui lòng chọn đầy đủ ngày nhận phòng và ngày trả phòng.");
-                    return false;
-                }
-
-                const currentDate = new Date();
-                currentDate.setHours(0, 0, 0, 0);
-                const checkInDate = new Date(checkInValue + "T00:00:00");
-                const checkOutDate = new Date(checkOutValue + "T00:00:00");
-
-                if (checkInDate < currentDate) {
-                    showClientMessage("error", "Ngày nhận phòng không được nhỏ hơn ngày hiện tại.");
-                    return false;
-                }
-
-                if (checkOutDate <= checkInDate) {
-                    showClientMessage("error", "Ngày trả phòng phải sau ngày nhận phòng.");
-                    return false;
-                }
-
-                return true;
-            }
-
-            function validateGuestsAndRooms() {
-                const guests = getGuestQuantity();
-                const rooms = getRoomQuantity();
-                const maxGuests = rooms * capacityPerRoom;
-
-                if (guests > maxGuests) {
-                    showClientMessage("error", "Số khách không được vượt quá " + maxGuests + " khách cho " + rooms + " phòng đã chọn.");
-                    return false;
-                }
-
-                if (guests < rooms) {
-                    showClientMessage("warning", "Số khách đang nhỏ hơn số phòng. Hệ thống vẫn cho phép tiếp tục vì bạn có thể đang đặt hộ người khác.");
-                }
-
-                return true;
             }
 
             document.addEventListener("DOMContentLoaded", function () {
-                clearClientMessage();
-                hideAllMessagesOnReload();
+                const formInputs = [
+                    document.getElementById("checkInInput"),
+                    document.getElementById("checkOutInput"),
+                    document.getElementById("numGuests"),
+                    document.getElementById("numChildren"),
+                    document.getElementById("roomQuantity")
+                ];
 
-                const bookingPanel = document.getElementById("bookingPanel");
-                const checkInInput = document.getElementById("checkInInput");
-                const checkOutInput = document.getElementById("checkOutInput");
+                formInputs.forEach(function (input) {
+                    if (!input) return;
 
-                if (checkInInput) {
-                    checkInInput.addEventListener("input", function () {
-                        clearClientMessage();
-                        hideServerMessages();
-                    });
-                }
-
-                if (checkOutInput) {
-                    checkOutInput.addEventListener("input", function () {
-                        clearClientMessage();
-                        hideServerMessages();
-                    });
-                }
-
-                if (bookingPanel) {
-                    bookingPanel.addEventListener("submit", function (event) {
-                        clearClientMessage();
-                        hideServerMessages();
-
-                        if (!validateDates()) {
-                            event.preventDefault();
-                            return;
-                        }
-
-                        normalizeGuestQuantity(false);
-
-                        if (!validateGuestsAndRooms()) {
-                            event.preventDefault();
-                        }
-                    });
-                }
+                    input.addEventListener("input", markFormChanged);
+                    input.addEventListener("change", markFormChanged);
+                });
 
                 updateCapacityText();
                 updateTotalPrice();
