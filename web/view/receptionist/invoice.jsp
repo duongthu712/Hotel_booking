@@ -351,7 +351,7 @@
                                 <div class="summary-row discount-row">
                                     <span class="summary-label">Trừ tiền cọc</span>
                                     <span class="summary-value discount" id="summaryDeposit">
-                                        -<fmt:formatNumber value="${depositAmount != null ? depositAmount : 0}" type="number" pattern="#,###"/> đ
+                                        -<fmt:formatNumber value="${depositAmount}" type="number" pattern="#,###"/> đ
                                     </span>
                                 </div>
 
@@ -370,7 +370,7 @@
                                 <div class="deposit-row">
                                     <span class="deposit-label">Số tiền đã cọc</span>
                                     <span class="deposit-value">
-                                        <fmt:formatNumber value="${depositAmount != null ? depositAmount : 0}" type="number" pattern="#,###"/> đ
+                                        <fmt:formatNumber value="${totalDeposit}" type="number" pattern="#,###"/> đ
                                     </span>
                                 </div>
                                 <div class="deposit-row">
@@ -385,6 +385,14 @@
                                     <span class="deposit-label">Trạng thái</span>
                                     <span class="deposit-status confirmed">Đã nhận</span>
                                 </div>
+                                <c:if test="${!isLastCheckout}">
+                                    <div class="deposit-row">
+                                        <span class="deposit-label">Khấu trừ lần này</span>
+                                        <span class="deposit-value">
+                                            <fmt:formatNumber value="${depositAmount}" type="number" pattern="#,###"/> đ
+                                        </span>
+                                    </div>
+                                </c:if>
                             </div>
 
                             <div class="payment-method">

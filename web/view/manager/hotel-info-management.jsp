@@ -100,10 +100,11 @@
                  id="info-edit-modal"
                  ${not empty infoEditMode ? 'style="display: flex;"' : ''}>
                 <form action="HotelInfoUpdate" method="POST" id="info-edit-form" class="popup-content info-popup-content">
-                    <h2 class="popup-title">Chỉnh sửa thông tin khách sạn</h2>
                     <div class="popup-action">
                         <button type="button" class="btn-close" id="btn-close-info-edit" style="font-size: 35px; margin-top: -25px; right: 5px;">&times;</button>
                     </div>
+                    <h2 class="popup-title">Chỉnh sửa thông tin khách sạn</h2>
+
 
                     <c:if test="${not empty infoErrorMessage}">
                         <div class="alert-message alert-error">

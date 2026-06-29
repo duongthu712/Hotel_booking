@@ -693,6 +693,43 @@ public class CheckoutDAO extends DBContext {
         }
     }
 
+    public List<Integer> getCheckedOutRoomIdsByBookingId(int bookingId) throws Exception {
+        List<Integer> list = new ArrayList<>();
+        String sql = """
+        select room_id from BookingRooms
+        where booking_id = ? and checkout_status = N'Chưa checkout'
+        """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, bookingId);
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    list.add(rs.getInt("room_id"));
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể lấy danh sách phòng.");
+        }
+        return list;
+    }
+
+    public int countRemainingRooms(int bookingId) throws Exception {
+        String sql = """
+        select count(*) from BookingRooms
+        where booking_id = ? and checkout_status = N'Chưa checkout'
+        """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, bookingId);
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể đếm phòng còn lại.");
+        }
+        return 0;
+    }
+
     public void completeInvoicePayment(int invoiceId, int bookingId, String paymentMethod,
             int staffId, List<RoomAmenityDamage> damages) throws Exception {
         connection.setAutoCommit(false);
@@ -795,6 +832,23 @@ public class CheckoutDAO extends DBContext {
             throw new Exception("Lỗi hệ thống: Không thể cập nhật trạng thái phòng.");
         }
     }
+
+    public BigDecimal sumDepositDeductedByBookingId(int bookingId) throws Exception {
+    String sql = """
+        select isnull(sum(deposit_deducted), 0) as total
+        from Invoices
+        where booking_id = ? and payment_status = N'Đã thanh toán'
+        """;
+    try (PreparedStatement stm = connection.prepareStatement(sql)) {
+        stm.setInt(1, bookingId);
+        try (ResultSet rs = stm.executeQuery()) {
+            if (rs.next()) return rs.getBigDecimal("total");
+        }
+    } catch (SQLException e) {
+        throw new Exception("Lỗi hệ thống: Không thể tính tiền cọc đã trừ.");
+    }
+    return BigDecimal.ZERO;
+}
 
     private Invoice mapInvoice(ResultSet rs) throws SQLException {
         Invoice inv = new Invoice();

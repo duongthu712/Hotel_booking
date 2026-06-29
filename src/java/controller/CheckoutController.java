@@ -14,12 +14,10 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import model.Booking;
-import model.Invoice;
 import model.StaffAccount;
 
 public class CheckoutController extends HttpServlet {
@@ -41,7 +39,6 @@ public class CheckoutController extends HttpServlet {
 
         try {
             CheckoutDAO dao = new CheckoutDAO();
-
             List<Map<String, Object>> roomList = dao.getRoomsForCheckout(keyword);
 
             Map<Integer, List<Map<String, Object>>> groupedByBooking = new LinkedHashMap<>();
@@ -87,6 +84,7 @@ public class CheckoutController extends HttpServlet {
         CheckoutDAO dao = new CheckoutDAO();
         List<String> errorMessages = new ArrayList<>();
         List<Integer> successBookingIds = new ArrayList<>();
+        Map<Integer, List<Integer>> bookingRoomIdsMap = new LinkedHashMap<>();
 
         try {
             List<Integer> roomIds = new ArrayList<>();
@@ -96,14 +94,11 @@ public class CheckoutController extends HttpServlet {
 
             List<Map<String, Object>> selectedRoomDetails = dao.getRoomDetailsByRoomIds(roomIds);
 
-            Map<Integer, List<Integer>> bookingRoomIdsMap = new LinkedHashMap<>();
             Map<Integer, List<Integer>> bookingRoomNumbersMap = new LinkedHashMap<>();
-
             for (Map<String, Object> roomDetail : selectedRoomDetails) {
                 int bookingId = (Integer) roomDetail.get("bookingId");
                 int roomId = (Integer) roomDetail.get("roomId");
                 int roomNumber = (Integer) roomDetail.get("roomNumber");
-
                 bookingRoomIdsMap.computeIfAbsent(bookingId, k -> new ArrayList<>()).add(roomId);
                 bookingRoomNumbersMap.computeIfAbsent(bookingId, k -> new ArrayList<>()).add(roomNumber);
             }
@@ -134,9 +129,13 @@ public class CheckoutController extends HttpServlet {
             }
 
             if (successBookingIds.size() == 1) {
-                response.sendRedirect(request.getContextPath() + "/InvoiceCreate?bookingId=" + successBookingIds.get(0));
+                int bookingId = successBookingIds.get(0);
+                session.setAttribute("checkoutRoomCount_" + bookingId,
+                        bookingRoomIdsMap.get(bookingId).size());
+                response.sendRedirect(request.getContextPath() + "/InvoiceCreate?bookingId=" + bookingId);
             } else {
-                session.setAttribute("successMessage", "Đã tạo " + successBookingIds.size() + " hóa đơn thành công.");
+                session.setAttribute("successMessage",
+                        "Đã tạo " + successBookingIds.size() + " hóa đơn thành công.");
                 response.sendRedirect(request.getContextPath() + "/BillingList");
             }
 
@@ -155,30 +154,59 @@ public class CheckoutController extends HttpServlet {
         LocalDateTime actualCheckout = LocalDateTime.now();
         LocalDateTime expectedCheckout = booking.getCheckoutDate().atTime(12, 0);
 
+        // Số đêm thực tế
         long nights = Math.max(1, ChronoUnit.DAYS.between(
                 booking.getCheckinDate(), actualCheckout.toLocalDate()));
 
+        // Tiền phòng base
         BigDecimal pricePerNight = booking.getBookedPricePerNight() != null
                 ? booking.getBookedPricePerNight() : BigDecimal.ZERO;
-
         BigDecimal roomChargesBase = pricePerNight
                 .multiply(BigDecimal.valueOf(nights))
                 .multiply(BigDecimal.valueOf(roomIds.size()));
 
+        // Phụ thu trả phòng muộn
         double lateChargePerRoom = dao.lateCheckoutSurcharge(
                 expectedCheckout, actualCheckout, pricePerNight.doubleValue());
         BigDecimal lateCharge = BigDecimal.valueOf(lateChargePerRoom * roomIds.size());
         BigDecimal roomCharges = roomChargesBase.add(lateCharge);
 
+        // Dịch vụ và hư hỏng của các phòng đang checkout
         BigDecimal consumableCharges = dao.sumBookingServicesByRooms(bookingId, roomIds);
         BigDecimal amenityDamages = dao.sumRoomAmenityDamagesByRooms(bookingId, roomIds);
 
-        BigDecimal depositDeducted = booking.getDepositAmount() != null
+        // Tính tiền cọc cho lần checkout này
+        BigDecimal totalDeposit = booking.getDepositAmount() != null
                 ? booking.getDepositAmount() : BigDecimal.ZERO;
+        BigDecimal depositAlreadyUsed = dao.sumDepositDeductedByBookingId(bookingId);
+        BigDecimal depositRemaining = totalDeposit.subtract(depositAlreadyUsed);
+
+        int remainingRooms = dao.countRemainingRooms(bookingId);
+        boolean isLastCheckout = remainingRooms == roomIds.size();
+
+        BigDecimal depositDeducted;
+        if (isLastCheckout) {
+            // Lần checkout cuối: trừ hết phần cọc còn lại
+            depositDeducted = depositRemaining;
+        } else {
+            // Chia đều theo số phòng checkout lần này
+            int totalRooms = booking.getNumRooms();
+            if (totalRooms > 0) {
+                depositDeducted = totalDeposit
+                        .divide(BigDecimal.valueOf(totalRooms), 0, java.math.RoundingMode.FLOOR)
+                        .multiply(BigDecimal.valueOf(roomIds.size()));
+                // Không trừ quá phần còn lại
+                if (depositDeducted.compareTo(depositRemaining) > 0) {
+                    depositDeducted = depositRemaining;
+                }
+            } else {
+                depositDeducted = BigDecimal.ZERO;
+            }
+        }
+
         BigDecimal totalAmount = roomCharges.add(consumableCharges).add(amenityDamages);
         BigDecimal remainingAmount = totalAmount.subtract(depositDeducted).max(BigDecimal.ZERO);
 
-        // Chỉ tạo invoice, CHƯA update trạng thái gì cả
         dao.createOrUpdateInvoice(bookingId, roomCharges, consumableCharges, amenityDamages,
                 depositDeducted, totalAmount, remainingAmount, staffId);
     }
@@ -194,5 +222,4 @@ public class CheckoutController extends HttpServlet {
         }
         return sb.toString();
     }
-
 }
