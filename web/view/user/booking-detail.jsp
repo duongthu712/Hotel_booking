@@ -208,7 +208,17 @@
 
                                         <span>
                                             <b>♙</b>
-                                            ${booking.numGuests} khách
+                                            ${booking.numGuests} người lớn
+                                        </span>
+
+                                        <span>
+                                            <b>♙</b>
+                                            ${booking.numChildren} trẻ em
+                                        </span>
+
+                                        <span>
+                                            <b>♙</b>
+                                            ${booking.numGuests + booking.numChildren} người
                                         </span>
 
                                         <span>
@@ -220,6 +230,21 @@
                                             <b>▤</b>
                                             ${roomType.bedCount} x
                                             <c:out value="${roomType.bedType}"/>
+                                        </span>
+
+                                        <span>
+                                            <b>▣</b>
+                                            Tối đa ${roomType.numGuests} người lớn/phòng
+                                        </span>
+
+                                        <span>
+                                            <b>▣</b>
+                                            Tối đa ${roomType.numChildren} trẻ em/phòng
+                                        </span>
+
+                                        <span>
+                                            <b>▣</b>
+                                            Tổng sức chứa ${roomType.capacity} người/phòng
                                         </span>
                                     </div>
                                 </div>

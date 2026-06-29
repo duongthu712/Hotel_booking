@@ -1,8 +1,24 @@
 document.addEventListener("DOMContentLoaded", function () {
 
+    const alerts = document.querySelectorAll(".alert-message");
+
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.style.opacity = "0";
+            alert.style.transform = "translateY(-10px)";
+            alert.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+
+            setTimeout(() => {
+                alert.remove();
+            }, 300);
+        }, 3000);
+    });
+
     function toggleModal(modal, show) {
-        if (!modal)
+        if (!modal) {
             return;
+        }
+
         if (show) {
             modal.classList.add("show");
             modal.style.display = "flex";
@@ -12,40 +28,91 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    const paymentDetailModal = document.getElementById("payment-detail-modal");
-    const btnCloseDetail = document.getElementById("btn-close-detail");
-    const proofImg = document.getElementById("proof-img");
-    const proofWrapper = document.getElementById("payment-proof-wrapper");
-    const proofUrlContainer = document.getElementById("proof-url-container");
-    const detailBookingCode = document.getElementById("detail-booking-code");
-    const detailGuestName = document.getElementById("detail-guest-name");
-    const detailAmount = document.getElementById("detail-amount");
-    const detailSubmittedAt = document.getElementById("detail-submitted-at");
-    const detailStatus = document.getElementById("detail-status");
-    const verifyNotes = document.getElementById("verify-notes");
-    const verifyDepositId = document.getElementById("verify-deposit-id");
-    const rejectDepositId = document.getElementById("reject-deposit-id");
-    const verifyNotesHidden = document.getElementById("verify-notes-hidden");
-    const rejectNotes = document.getElementById("reject-notes");
-    const verificationForm = document.getElementById("verification-form");
+    const paymentDetailModal =
+            document.getElementById("payment-detail-modal");
+
+    const btnCloseDetail =
+            document.getElementById("btn-close-detail");
+
+    const proofImg =
+            document.getElementById("proof-img");
+
+    const proofWrapper =
+            document.getElementById("payment-proof-wrapper");
+
+    const proofUrlContainer =
+            document.getElementById("proof-url-container");
+
+    const detailBookingCode =
+            document.getElementById("detail-booking-code");
+
+    const detailGuestName =
+            document.getElementById("detail-guest-name");
+
+    const detailAmount =
+            document.getElementById("detail-amount");
+
+    const detailSubmittedAt =
+            document.getElementById("detail-submitted-at");
+
+    const detailStatus =
+            document.getElementById("detail-status");
+
+    const verifyNotes =
+            document.getElementById("verify-notes");
+
+    const verifyDepositId =
+            document.getElementById("verify-deposit-id");
+
+    const rejectDepositId =
+            document.getElementById("reject-deposit-id");
+
+    const verifyNotesHidden =
+            document.getElementById("verify-notes-hidden");
+
+    const rejectNotes =
+            document.getElementById("reject-notes");
+
+    const verificationForm =
+            document.getElementById("verification-form");
 
     window.openPaymentDetailModal = function (depositId) {
-        const paymentRow = document.querySelector(`tr[data-deposit-id="${depositId}"]`);
+        const paymentRow =
+                document.querySelector(`tr[data-deposit-id="${depositId}"]`);
 
         if (!paymentRow) {
             return;
         }
 
-        const bookingCode = paymentRow.querySelector(".col-booking")?.innerText || "";
-        const guestName = paymentRow.querySelector(".col-guest")?.innerText || "";
-        const amount = paymentRow.querySelector(".col-amount")?.innerText || "";
-        const submittedAt = paymentRow.querySelector(".col-date")?.innerText || "";
-        const status = paymentRow.querySelector(".payment-status")?.innerText || "";
-        const proofUrl = paymentRow.getAttribute("data-proof-url") || "";
-        const paymentNotes = paymentRow.getAttribute("data-notes") || "";
-        const paymentStatus = paymentRow.querySelector(".payment-status");
-        const statusClass = paymentStatus?.classList.contains("status-pending")
-                ? "pending" : (paymentStatus?.classList.contains("status-approved")
+        const bookingCode =
+                paymentRow.querySelector(".col-booking")?.innerText || "";
+
+        const guestName =
+                paymentRow.querySelector(".col-guest")?.innerText || "";
+
+        const amount =
+                paymentRow.querySelector(".col-amount")?.innerText || "";
+
+        const submittedAt =
+                paymentRow.querySelector(".col-date")?.innerText || "";
+
+        const status =
+                paymentRow.querySelector(".payment-status")?.innerText || "";
+
+        const proofUrl =
+                paymentRow.getAttribute("data-proof-url") || "";
+
+        const paymentNotes =
+                paymentRow.getAttribute("data-notes") || "";
+
+        const paymentStatus =
+                paymentRow.querySelector(".payment-status");
+
+        const statusClass =
+                paymentStatus?.classList.contains("status-pending")
+                ? "pending"
+                : (
+                        paymentStatus?.classList.contains("status-approved")
                         ? "approved"
                         : "rejected"
                         );
@@ -69,10 +136,14 @@ document.addEventListener("DOMContentLoaded", function () {
         if (detailStatus) {
             detailStatus.innerText = status;
 
-            detailStatus.className = statusClass === "pending" ? "status-pending" : (statusClass === "approved"
-                    ? "status-approved"
-                    : "status-rejected"
-                    );
+            detailStatus.className =
+                    statusClass === "pending"
+                    ? "status-pending"
+                    : (
+                            statusClass === "approved"
+                            ? "status-approved"
+                            : "status-rejected"
+                            );
         }
 
         if (proofUrl) {
@@ -90,19 +161,17 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         if (proofUrlContainer) {
-            proofUrlContainer.innerHTML = `
-                          <div class="proof-info-block" style="margin-top: 16px;">
-                    <strong>Mã giao dịch / Mã tham chiếu:</strong>
-                    <p style="word-break: break-word; margin-top: 8px;">
-                        ${
-                    paymentNotes && paymentNotes.trim() !== ""
-                    ? paymentNotes
-                    : "Chưa có mã giao dịch / mã tham chiếu."
-                    }
-                    </p>
-                </div>
-            `;
-        }
+    proofUrlContainer.innerHTML = `
+        <strong>Mã giao dịch / Mã tham chiếu:</strong>
+        <p style="word-break: break-word; margin-top:8px;">
+            ${
+                paymentNotes && paymentNotes.trim() !== ""
+                ? paymentNotes
+                : "Chưa có mã giao dịch / mã tham chiếu."
+            }
+        </p>
+    `;
+}
 
         if (verifyDepositId) {
             verifyDepositId.value = depositId;
@@ -112,9 +181,11 @@ document.addEventListener("DOMContentLoaded", function () {
             rejectDepositId.value = depositId;
         }
 
-        const btnReject = document.querySelector(".btn-reject");
+        const btnReject =
+                document.querySelector(".btn-reject");
 
-        const btnSubmit = document.querySelector(".popup-action .btn-submit");
+        const btnSubmit =
+                document.querySelector(".popup-action .btn-submit");
 
         if (statusClass !== "pending") {
             if (verificationForm) {
@@ -180,8 +251,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.querySelectorAll(".hotel-popup").forEach(modal => {
         modal.addEventListener("click", (e) => {
-            if (e.target === modal)
+            if (e.target === modal) {
                 toggleModal(modal, false);
+            }
         });
     });
 });

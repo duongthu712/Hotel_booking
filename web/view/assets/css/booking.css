@@ -2153,4 +2153,144 @@ a.progress-item.completed:active .progress-name {
     .payment-upload-box .file-name-display {
         display: none;
     }
+    
+    /* Cảnh báo bắt buộc khi thanh toán */
+    .payment-required-warning {
+        margin: 24px 0;
+        padding: 22px 24px;
+        border: 3px solid #c62828;
+        border-radius: 10px;
+        background-color: #fff3f3;
+        color: #7f0000;
+    }
+
+    .payment-required-warning-title {
+        margin-bottom: 14px;
+        color: #c62828;
+        font-size: 22px;
+        font-weight: 800;
+        text-align: center;
+    }
+
+    .payment-required-warning-content {
+        font-size: 17px;
+        line-height: 1.7;
+    }
+
+    .payment-required-warning-content p {
+        margin: 0 0 10px;
+    }
+
+    .payment-required-warning-content ol {
+        margin: 0;
+        padding-left: 24px;
+    }
+
+    .payment-required-warning-content li {
+        margin-bottom: 8px;
+    }
+
+    .payment-required-warning-danger {
+        margin-top: 16px;
+        padding: 12px;
+        border-radius: 6px;
+        background-color: #ffcdd2;
+        color: #b71c1c;
+        font-size: 16px;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    /* Khu vực tải ảnh minh chứng - áp dụng cho mọi màn hình */
+    .payment-upload-box {
+        width: 100%;
+    }
+
+    .payment-file-input {
+        display: none;
+    }
+
+    .payment-upload-label {
+        min-height: 120px;
+        border: 2px dashed #d4dce3;
+        border-radius: 14px;
+        background: #fbf7ee;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 22px 24px;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .payment-upload-label:hover {
+        border-color: #c39747;
+        background: #fffaf1;
+    }
+
+    .payment-upload-content {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .payment-upload-content strong {
+        color: #0b2638;
+        font-size: 18px;
+    }
+
+    .payment-upload-content span {
+        color: #657178;
+        font-size: 15px;
+    }
+
+    .payment-upload-content small {
+        color: #8a96a0;
+        font-size: 14px;
+    }
+
+    .payment-file-preview {
+        display: none;
+        align-items: center;
+        gap: 12px;
+        margin-top: 12px;
+        padding: 14px 16px;
+        border: 1px solid #cfe8d4;
+        border-radius: 10px;
+        background: #f4fbf6;
+        color: #1f6f3d;
+    }
+
+    .payment-file-check {
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: #2f9e44;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+    }
+
+    #paymentFileName {
+        flex: 1;
+        font-size: 15px;
+        font-weight: 600;
+        word-break: break-all;
+    }
+
+    #clearPaymentImage {
+        padding: 4px 8px;
+        border: none;
+        background: transparent;
+        color: #c39747;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    #clearPaymentImage:hover {
+        text-decoration: underline;
+    }
 }

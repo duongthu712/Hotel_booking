@@ -104,7 +104,9 @@
                             </h3>
 
                             <p>Giường: ${roomType.bedCount} x ${roomType.bedType}</p>
-                            <p>Sức chứa: ${roomType.capacity} khách/phòng</p>
+                            <p>Người lớn: tối đa ${roomType.numGuests}/phòng</p>
+                            <p>Trẻ em: tối đa ${roomType.numChildren}/phòng</p>
+                            <p>Tổng sức chứa: tối đa ${roomType.capacity} người/phòng</p>
                             <p>Diện tích: ${roomType.areaSqm} m²</p>
                         </div>
                     </div>
@@ -133,8 +135,18 @@
                         </div>
 
                         <div class="success-detail-item">
-                            <span>Số khách</span>
-                            <strong>${booking.numGuests} khách</strong>
+                            <span>Người lớn</span>
+                            <strong>${booking.numGuests} người</strong>
+                        </div>
+
+                        <div class="success-detail-item">
+                            <span>Trẻ em</span>
+                            <strong>${booking.numChildren} trẻ em</strong>
+                        </div>
+
+                        <div class="success-detail-item">
+                            <span>Tổng số người</span>
+                            <strong>${booking.numGuests + booking.numChildren} người</strong>
                         </div>
 
                         <div class="success-detail-item">
