@@ -1,0 +1,250 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #F9F5EB;
+    color: #102A43;
+    font-family: 'Cormorant Garamond', 'Lora', serif;
+}
+
+.feedback-submit-top {
+    background: #2c3e46;
+}
+
+.feedback-submit-page {
+    max-width: 1050px;
+    margin: 0 auto;
+    padding: 90px 40px 110px;
+}
+
+.feedback-submit-card {
+    background: #ffffff;
+    border: 1px solid #e8ddc8;
+    border-radius: 16px;
+    padding: 48px 58px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.04);
+}
+
+.feedback-submit-card h1 {
+    text-align: center;
+    font-size: 46px;
+    color: #102A43;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+}
+
+.feedback-submit-card h1::after {
+    content: '';
+    display: block;
+    width: 56px;
+    height: 2px;
+    background: #C8A96B;
+    margin: 18px auto 0;
+}
+
+.subtitle {
+    text-align: center;
+    color: #5f6b73;
+    font-size: 19px;
+    margin-bottom: 38px;
+}
+
+.error-box {
+    max-width: 760px;
+    margin: 0 auto 28px;
+    background: #fff3f3;
+    color: #9b1c1c;
+    border: 1px solid #e6b8b8;
+    border-radius: 8px;
+    padding: 16px 20px;
+    text-align: center;
+    font-size: 18px;
+}
+
+.lookup-form {
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.lookup-form .form-group {
+    margin-bottom: 24px;
+}
+
+.lookup-form label {
+    display: block;
+    font-size: 22px;
+    font-weight: 600;
+    color: #102A43;
+    margin-bottom: 10px;
+}
+
+.lookup-form input {
+    width: 100%;
+    height: 58px;
+    border: 1px solid #d8c8a7;
+    border-radius: 8px;
+    padding: 0 18px;
+    font-size: 18px;
+    font-family: 'Cormorant Garamond', 'Lora', serif;
+    color: #333;
+    background: #fff;
+    outline: none;
+}
+
+.lookup-form input:focus {
+    border-color: #C8A96B;
+    box-shadow: 0 0 0 3px rgba(200, 169, 107, 0.18);
+}
+
+.lookup-form button,
+.feedback-form button {
+    display: block;
+    width: 100%;
+    max-width: 520px;
+    height: 62px;
+    margin: 28px auto 0;
+    background: #102A43;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.lookup-form button:hover,
+.feedback-form button:hover {
+    background: #C8A96B;
+}
+
+.guest-box {
+    max-width: 760px;
+    margin: 0 auto 32px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 22px;
+    background: #fbf8f0;
+    border: 1px solid #eadfca;
+    border-radius: 12px;
+}
+
+.guest-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #102A43;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.guest-box span {
+    display: block;
+    color: #6f777b;
+    font-size: 16px;
+}
+
+.guest-box strong {
+    display: block;
+    font-size: 26px;
+    color: #102A43;
+}
+
+.guest-box small {
+    display: block;
+    color: #7a7a7a;
+    font-size: 15px;
+    margin-top: 4px;
+}
+
+.feedback-form {
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.feedback-form label {
+    display: block;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 14px;
+}
+
+.star-select {
+    direction: rtl;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 32px;
+}
+
+.star-select input {
+    display: none;
+}
+
+.star-select label {
+    font-size: 44px;
+    color: #d9d1c2;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.star-select label:hover,
+.star-select label:hover ~ label,
+.star-select input:checked ~ label {
+    color: #C8A96B;
+}
+
+textarea {
+    width: 100%;
+    min-height: 170px;
+    resize: vertical;
+    border: 1px solid #d8c8a7;
+    border-radius: 10px;
+    padding: 18px;
+    font-size: 18px;
+    line-height: 1.6;
+    font-family: 'Cormorant Garamond', 'Lora', serif;
+    outline: none;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+textarea:focus {
+    border-color: #C8A96B;
+    box-shadow: 0 0 0 3px rgba(200, 169, 107, 0.18);
+}
+
+@media (max-width: 768px) {
+    .feedback-submit-page {
+        padding: 60px 20px 80px;
+    }
+
+    .feedback-submit-card {
+        padding: 34px 24px;
+    }
+
+    .feedback-submit-card h1 {
+        font-size: 34px;
+    }
+
+    .subtitle {
+        font-size: 17px;
+    }
+
+    .star-select label {
+        font-size: 38px;
+    }
+
+    .guest-box {
+        align-items: flex-start;
+    }
+}
