@@ -73,7 +73,7 @@
                                             <th>Tiền phòng</th>
                                             <th>Dịch vụ</th>
                                             <th>Hư hỏng</th>
-                                            <th>Tiền cọc</th>
+                                            <th>Đã thu</th>
                                             <th>Tổng tiền</th>
                                             <th>Trạng thái</th>
                                             <th>Thao tác</th>
@@ -93,7 +93,7 @@
                                                     <fmt:formatNumber value="${inv.amenityDamages}" type="number" pattern="#,###"/>
                                                 </td>
                                                 <td class="text-right">
-                                                    <fmt:formatNumber value="${inv.depositDeducted}" type="number" pattern="#,###"/>
+                                                    <fmt:formatNumber value="${inv.totalPaid}" type="number" pattern="#,###"/>
                                                 </td>
                                                 <td class="text-right">
                                                     <fmt:formatNumber value="${inv.totalAmount}" type="number" pattern="#,###"/>
@@ -156,35 +156,37 @@
                         </div>
 
                         <div class="detail-section">
-                            <div class="detail-row">
-                                <span>Mã đặt phòng</span>
-                                <span>${selectedInvoice.bookingCode}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span>Trạng thái booking</span>
-                                <span class="booking-status ${selectedInvoice.bookingStatus == 'Đã trả phòng' ? 'status-checked-out' : (selectedInvoice.bookingStatus == 'Đã hủy' ? 'status-cancelled' : (selectedInvoice.bookingStatus == 'Đã nhận phòng' ? 'status-active' : 'status-confirmed'))}">
-                                    ${selectedInvoice.bookingStatus}
-                                </span>
-                            </div>
-                            <div class="detail-row">
-                                <span>Trạng thái</span>
-                                <span ${selectedInvoice.invoice.paymentStatus == 'Đã thanh toán' ? 'status-paid' : 'status-unpaid'}">
-                                    ${selectedInvoice.invoice.paymentStatus}
-                                </span>
-                            </div>
-                            <div class="detail-row">
-                                <span>Phương thức thanh toán</span>
-                                <span>${not empty selectedInvoice.invoice.paymentMethod ? selectedInvoice.invoice.paymentMethod : '-'}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span>Thanh toán lúc</span>
-                                <span>${not empty selectedInvoice.paidAtFormatted ? selectedInvoice.paidAtFormatted : '-'}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span>Tạo bởi</span>
-                                <span>${not empty selectedInvoice.staffName ? selectedInvoice.staffName : '-'}</span>
-                            </div>
+                            <h3 class="detail-section-title">Lịch sử thanh toán</h3>
+                            <c:forEach var="p" items="${selectedInvoice.payments}">
+                                <div class="detail-row">
+                                    <span>${p.note}</span>
+                                    <span><fmt:formatNumber value="${p.amount}" type="number" pattern="#,###"/> đ</span>
+                                </div>
+                            </c:forEach>
+                            <c:if test="${empty selectedInvoice.payments}">
+                                <div class="empty-sub-message">Chưa có khoản thanh toán nào.</div>
+                            </c:if>
                         </div>
+
+                        <c:if test="${selectedInvoice.invoice.remainingAmount > 0}">
+                            <div class="detail-section">
+                                <h3 class="detail-section-title">Thu tiền</h3>
+                                <form action="BillingList" method="POST">
+                                    <input type="hidden" name="action" value="collectPayment">
+                                    <input type="hidden" name="invoiceId" value="${selectedInvoice.invoice.invoiceId}">
+                                    <input type="hidden" name="bookingId" value="${selectedInvoice.invoice.bookingId}">
+                                    <input type="number" name="amount" placeholder="Số tiền thu"
+                                           max="${selectedInvoice.invoice.remainingAmount}" min="0"
+                                           class="filter-input" style="margin-bottom:8px;width:100%">
+                                    <select name="paymentMethod" class="filter-select" style="margin-bottom:8px;width:100%">
+                                        <option value="Tiền mặt">Tiền mặt</option>
+                                        <option value="Thẻ ngân hàng">Thẻ ngân hàng</option>
+                                        <option value="Chuyển khoản">Chuyển khoản</option>
+                                    </select>
+                                    <button type="submit" class="btn-panel-primary" style="width:100%">Thu tiền</button>
+                                </form>
+                            </div>
+                        </c:if>
 
                         <div class="detail-section">
                             <h3 class="detail-section-title">Chi tiết chi phí</h3>
@@ -200,12 +202,7 @@
                                 <span>Thiệt hại</span>
                                 <span><fmt:formatNumber value="${selectedInvoice.invoice.amenityDamages}" type="number" pattern="#,###"/> đ</span>
                             </div>
-                            <div class="detail-row">
-                                <span>Trừ tiền đặt cọc</span>
-                                <span class="text-danger">
-                                    -<fmt:formatNumber value="${selectedInvoice.invoice.depositDeducted}" type="number" pattern="#,###"/> đ
-                                </span>
-                            </div>
+                            
                             <div class="detail-row detail-total">
                                 <span>Tổng tiền</span>
                                 <span><fmt:formatNumber value="${selectedInvoice.invoice.totalAmount}" type="number" pattern="#,###"/> đ</span>

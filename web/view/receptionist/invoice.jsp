@@ -1,8 +1,8 @@
 <%-- 
     Document   : invoice
-    Created on : Jun 28, 2026
-    Author     : LinhLTHE200306
-    Luồng mới: Hiển thị dịch vụ/hư hỏng đã có từ DB + cho phép nhập thêm
+    Created on : May 27, 2026, 10:46:49 PM
+    Author     : Minh Thu
+    Editor     : LinhLTHE200306
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -13,7 +13,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Tạo hóa đơn</title>
+        <title>Hóa đơn</title>
         <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/common.css" type="text/css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/invoice.css" type="text/css">
     </head>
@@ -31,7 +31,6 @@
 
             <form id="invoiceForm" action="InvoiceCreate" method="POST" class="invoice-form">
                 <input type="hidden" name="bookingId" value="${booking.bookingId}">
-                <input type="hidden" name="roomCharges" id="hiddenRoomCharges" value="${roomCharges}">
 
                 <div class="invoice-grid">
                     <div class="invoice-left">
@@ -43,15 +42,12 @@
                             </h3>
                             <div class="booking-info-grid">
                                 <div class="booking-details">
-
                                     <div class="info-grid-3col">
                                         <div class="info-col">
                                             <div class="info-row">
-                                                <span class="info-label">Phòng</span>
+                                                <span class="info-label">Phòng đang checkout</span>
                                                 <span class="info-value">
-                                                    <c:forEach var="br" items="${bookingRooms}" varStatus="loop">${br.roomNumber}
-                                                        <c:if test="${!loop.last}">, 
-                                                        </c:if></c:forEach>
+                                                    <c:forEach var="br" items="${checkoutRooms}">${br.roomNumber}</c:forEach>
                                                     </span>
                                                 </div>
                                                 <div class="info-row">
@@ -68,6 +64,10 @@
                                                 <span class="info-label">Số đêm</span>
                                                 <span class="info-value">${nights} đêm</span>
                                             </div>
+                                            <div class="info-row">
+                                                <span class="info-label">Số phòng checkout</span>
+                                                <span class="info-value">${checkoutRoomCount} phòng</span>
+                                            </div>
                                         </div>
                                         <div class="info-col">
                                             <div class="info-row">
@@ -81,7 +81,7 @@
                                             <div class="info-row">
                                                 <span class="info-label">Check-out thực tế</span>
                                                 <span class="info-value">
-                                                    <input type="text" id="actual-checkout-time" class="time-input" value="${actualCheckoutTime}" readonly>
+                                                    <input type="text" class="time-input" value="${actualCheckoutTime}" readonly>
                                                 </span>
                                             </div>
                                         </div>
@@ -94,12 +94,8 @@
                                                 <span class="info-label">Đặt bởi</span>
                                                 <span class="info-value">
                                                     <c:choose>
-                                                        <c:when test="${not empty guest}">
-                                                            ${guest.fullName}
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            Lễ tân
-                                                        </c:otherwise>
+                                                        <c:when test="${not empty guest}">${guest.fullName}</c:when>
+                                                        <c:otherwise>Lễ tân</c:otherwise>
                                                     </c:choose>
                                                 </span>
                                             </div>
@@ -113,7 +109,7 @@
                             </div>
                         </div>
 
-                        <!-- DỊCH VỤ ĐÃ SỬ DỤNG (hiển thị từ DB) -->
+                        <!-- DỊCH VỤ ĐÃ SỬ DỤNG -->
                         <div class="card">
                             <h3 class="section-title">DỊCH VỤ ĐÃ SỬ DỤNG</h3>
                             <div class="table-container">
@@ -204,7 +200,7 @@
                             </div>
                         </div>
 
-                        <!-- TIỆN NGHI HƯ HỎNG ĐÃ GHI NHẬN (hiển thị từ DB) -->
+                        <!-- HƯ HỎNG ĐÃ GHI NHẬN -->
                         <div class="card">
                             <h3 class="section-title">TIỆN NGHI BỊ HƯ HỎNG / MẤT ĐÃ GHI NHẬN</h3>
                             <div class="table-container">
@@ -275,9 +271,7 @@
                                                     <td class="col-qty">
                                                         <div class="quantity-control">
                                                             <button type="button" class="qty-btn qty-minus" onclick="changeQty('amenity', ${loop.index}, -1)">−</button>
-                                                            <c:set var="alreadyDamaged" value="${damagedQtyMap[amen.amenityId] != null ? damagedQtyMap[amen.amenityId] : 0}"/>
-                                                            <c:set var="maxAdditional" value="${amen.quantity - alreadyDamaged}"/>
-                                                            <input type="number" name="damageQuantity" id="amenityQty_${loop.index}" class="qty-input" value="0" min="0" max="${maxAdditional > 0 ? maxAdditional : 0}"       
+                                                            <input type="number" name="damageQuantity" id="amenityQty_${loop.index}" class="qty-input" value="0" min="0" max="${maxAdditional}"       
                                                                    data-unit-price="${amen.unitPrice}"        
                                                                    onchange="calculateAmenity(${loop.index})">
                                                             <button type="button" class="qty-btn qty-plus" onclick="changeQty('amenity', ${loop.index}, 1)">+</button>
@@ -299,38 +293,54 @@
 
                     <div class="invoice-right">
                         <div class="card summary-card">
-                            <h3 class="section-title">HÓA ĐƠN</h3>
+                            <h3 class="section-title">HÓA ĐƠN - PHÒNG 
+                                <c:forEach var="br" items="${checkoutRooms}">${br.roomNumber}</c:forEach>
+                                </h3>
 
-                            <div class="summary-rows">
-                                <div class="summary-row">
-                                    <span class="summary-label">Tiền phòng (${nights} đêm)</span>
+                                <div class="summary-rows">
+                                    <div class="summary-row">
+                                        <span class="summary-label">Tiền phòng (1 phòng × ${nights} đêm)</span>
                                     <span class="summary-value" id="summaryRoomCharges">
-                                        <fmt:formatNumber value="${roomCharges}" type="number" pattern="#,###"/> đ
+                                        <fmt:formatNumber value="${pureRoomCharges}" type="number" pattern="#,###"/> đ
                                     </span>
                                 </div>
+
+                                <%-- Tính tổng service/damage của phòng này --%>
+                                <c:set var="thisRoomServicesTotal" value="0"/>
+                                <c:forEach var="svc" items="${existingServices}">
+                                    <c:set var="thisRoomServicesTotal" value="${thisRoomServicesTotal + svc.totalPrice}"/>
+                                </c:forEach>
+
+                                <c:set var="thisRoomDamagesTotal" value="0"/>
+                                <c:forEach var="dmg" items="${existingDamages}">
+                                    <c:set var="thisRoomDamagesTotal" value="${thisRoomDamagesTotal + dmg.totalPrice}"/>
+                                </c:forEach>
+
                                 <div class="summary-row">
                                     <span class="summary-label">Dịch vụ và sử dụng</span>
                                     <span class="summary-value" id="summaryServices">
-                                        <fmt:formatNumber value="${existingServicesTotal}" type="number" pattern="#,###"/> đ
+                                        <fmt:formatNumber value="${thisRoomServicesTotal}" type="number" pattern="#,###"/> đ
                                     </span>
                                 </div>
                                 <div class="summary-row">
                                     <span class="summary-label">Tiện nghi hư hỏng/mất</span>
                                     <span class="summary-value" id="summaryDamages">
-                                        <fmt:formatNumber value="${existingDamagesTotal}" type="number" pattern="#,###"/> đ
+                                        <fmt:formatNumber value="${thisRoomDamagesTotal}" type="number" pattern="#,###"/> đ
                                     </span>
                                 </div>
+
+                                <div class="summary-divider"></div>
 
                                 <c:if test="${lateCharge > 0}">
                                     <div class="summary-row">
                                         <span class="summary-label">
                                             Phụ thu trả phòng muộn
                                             <c:choose>
-                                                <c:when test="${lateCharge >= booking.bookedPricePerNight.doubleValue() * booking.numRooms}">
-                                                    (sau 18:00 — 100%)
+                                                <c:when test="${lateCharge.doubleValue() >= booking.bookedPricePerNight.doubleValue()}">
+                                                    (sau 18:00)
                                                 </c:when>
                                                 <c:otherwise>
-                                                    (trước 18:00 — 50%)
+                                                    (trước 18:00)
                                                 </c:otherwise>
                                             </c:choose>
                                         </span>
@@ -340,37 +350,62 @@
                                     </div>
                                 </c:if>
 
-                                <div class="summary-divider"></div>
+                                <div class="summary-row">
+                                    <span class="summary-label">Tiền cọc (1 phòng)</span>
+                                    <span class="summary-value" id="summaryDeposit" style="color: var(--success-color);">
+                                        -<fmt:formatNumber value="${depositThisRoom}" type="number" pattern="#,###"/> đ
+                                    </span>
+                                </div>
+
+                                <c:set var="thisRoomGrandTotal" value="${thisRoomTotalCharge + thisRoomServicesTotal + thisRoomDamagesTotal}"/>
 
                                 <div class="summary-row total-row">
-                                    <span class="summary-label">Tổng tiền</span>
+                                    <span class="summary-label">Tổng tiền phòng này</span>
                                     <span class="summary-value total" id="summaryTotal">
-                                        <fmt:formatNumber value="${roomCharges + existingServicesTotal + existingDamagesTotal}" type="number" pattern="#,###"/> đ
-                                    </span>
-                                </div>
-                                <div class="summary-row discount-row">
-                                    <span class="summary-label">Trừ tiền cọc</span>
-                                    <span class="summary-value discount" id="summaryDeposit">
-                                        -<fmt:formatNumber value="${depositAmount}" type="number" pattern="#,###"/> đ
+                                        <fmt:formatNumber value="${thisRoomGrandTotal}" type="number" pattern="#,###"/> đ
                                     </span>
                                 </div>
 
                                 <div class="summary-divider"></div>
 
+                                <c:set var="remainingForThisRoom" value="${thisRoomGrandTotal - depositThisRoom}"/>
+                                <c:if test="${remainingForThisRoom < 0}">
+                                    <c:set var="remainingForThisRoom" value="0"/>
+                                </c:if>
+
                                 <div class="summary-row final-row">
-                                    <span class="summary-label">SỐ TIỀN CẦN THANH TOÁN</span>
-                                    <span class="summary-value final" id="summaryRemaining">
-                                        <fmt:formatNumber value="${roomCharges + existingServicesTotal + existingDamagesTotal - (depositAmount != null ? depositAmount.doubleValue() : 0)}" type="number" pattern="#,###"/> đ
+                                    <span class="summary-label">CÒN PHẢI THANH TOÁN <br/>(phòng này)</span>
+                                    <span class="summary-value final" id="summaryRemaining" 
+                                          data-remaining="${remainingForThisRoom}">
+                                        <fmt:formatNumber value="${remainingForThisRoom}" type="number" pattern="#,###"/> đ
                                     </span>
                                 </div>
                             </div>
 
+                            <!-- Thông tin tổng booking -->
+                            <div class="deposit-info" style="margin-top: 16px; border-top: 2px dashed #ddd; padding-top: 12px;">
+                                <h4 class="sub-title" style="color: var(--text-secondary);">TỔNG BOOKING</h4>
+                                <div class="deposit-row">
+                                    <span class="deposit-label">Tổng tiền toàn booking</span>
+                                    <span class="deposit-value" style="font-size: 13px;">
+                                        <fmt:formatNumber value="${totalBookingAmount}" type="number" pattern="#,###"/> đ
+                                    </span>
+                                </div>
+                                <div class="deposit-row">
+                                    <span class="deposit-label">Còn nợ toàn booking</span>
+                                    <span class="deposit-value" style="color: var(--danger-color); font-size: 13px;">
+                                        <fmt:formatNumber value="${totalBookingRemaining}" type="number" pattern="#,###"/> đ
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- THÔNG TIN CỌC -->
                             <div class="deposit-info">
                                 <h4 class="sub-title">THÔNG TIN CỌC</h4>
                                 <div class="deposit-row">
-                                    <span class="deposit-label">Số tiền đã cọc</span>
+                                    <span class="deposit-label">Số tiền đã cọc (toàn booking)</span>
                                     <span class="deposit-value">
-                                        <fmt:formatNumber value="${totalDeposit}" type="number" pattern="#,###"/> đ
+                                        <fmt:formatNumber value="${booking.depositAmount}" type="number" pattern="#,###"/> đ
                                     </span>
                                 </div>
                                 <div class="deposit-row">
@@ -385,38 +420,52 @@
                                     <span class="deposit-label">Trạng thái</span>
                                     <span class="deposit-status confirmed">Đã nhận</span>
                                 </div>
-                                <c:if test="${!isLastCheckout}">
+                            </div>
+
+                            <!-- LỊCH SỬ THANH TOÁN -->
+                            <div class="deposit-info">
+                                <h4 class="sub-title">LỊCH SỬ THANH TOÁN</h4>
+                                <c:forEach var="p" items="${payments}">
                                     <div class="deposit-row">
-                                        <span class="deposit-label">Khấu trừ lần này</span>
+                                        <span class="deposit-label">
+                                            ${p.note}
+                                            <small style="color:var(--text-secondary)">-${p.paymentMethod}</small>
+                                        </span>
                                         <span class="deposit-value">
-                                            <fmt:formatNumber value="${depositAmount}" type="number" pattern="#,###"/> đ
+                                            <fmt:formatNumber value="${p.amount}" type="number" pattern="#,###"/> đ
                                         </span>
                                     </div>
+                                </c:forEach>
+                                <c:if test="${empty payments}">
+                                    <div class="empty-sub-message">Chưa có khoản thanh toán nào.</div>
                                 </c:if>
                             </div>
 
-                            <div class="payment-method">
-                                <h4 class="sub-title">PHƯƠNG THỨC THANH TOÁN</h4>
-                                <select name="paymentMethod" class="payment-select" required>
-                                    <option value="">Chọn phương thức thanh toán</option>
-                                    <option value="Tiền mặt">Tiền mặt</option>
-                                    <option value="Thẻ ngân hàng">Thẻ ngân hàng</option>
-                                    <option value="Chuyển khoản" selected>Chuyển khoản</option>
-                                </select>
-                            </div>
+                            <!-- THU TIỀN THÊM (nếu còn nợ) -->
+                            <c:if test="${remainingForThisRoom > 0}">
+                                <div class="payment-method">
+                                    <h4 class="sub-title">THU TIỀN TẠI QUẦY (phòng này)</h4>
+                                    <input type="number" name="collectAmount" id="collectAmount"
+                                           class="qty-input" style="width:100%;margin-bottom:8px"
+                                           placeholder="Nhập số tiền thanh toán lần này"
+                                           min="0" max="${remainingForThisRoom}">
+                                    <select name="paymentMethod" class="payment-select">
+                                        <option value="">-- Chọn phương thức --</option>
+                                        <option value="Tiền mặt">Tiền mặt</option>
+                                        <option value="Thẻ ngân hàng">Thẻ ngân hàng</option>
+                                        <option value="Chuyển khoản">Chuyển khoản</option>
+                                    </select>
+                                </div>
+                            </c:if>
 
                             <div class="invoice-actions">
-                                <button type="submit" class="btn-checkout-primary">XÁC NHẬN THANH TOÁN</button>
+                                <button type="submit" class="btn-checkout-primary">CẬP NHẬT HÓA ĐƠN</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </form>
         </main>
-        <script>
-            var initServicesTotal = ${existingServicesTotal};
-            var initDamagesTotal = ${existingDamagesTotal};
-        </script>
         <script src="${pageContext.request.contextPath}/view/assets/javascript/alert.js"></script>
         <script src="${pageContext.request.contextPath}/view/assets/javascript/invoice.js"></script>
     </body>
