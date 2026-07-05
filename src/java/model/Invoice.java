@@ -1,10 +1,9 @@
 package model;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 /**
- * Last update 17:10 27/06/2026
+ * Last update 8:30 30/06/2026
  *
  * @author LinhLTHE200306
  */
@@ -15,34 +14,29 @@ public class Invoice {
     private BigDecimal roomCharges;
     private BigDecimal consumableCharges;
     private BigDecimal amenityDamages;
-    private BigDecimal depositDeducted;
+    
     private BigDecimal totalAmount;
     private BigDecimal remainingAmount;
     private String paymentStatus;
-    private String paymentMethod;
-    private LocalDateTime paidAt;
+    
     private Integer createdBy; // Cập nhật sang Integer để hỗ trợ giá trị NULL
 
     public Invoice() {
     }
 
-    public Invoice(int invoiceId, int bookingId, BigDecimal roomCharges, BigDecimal consumableCharges,
-            BigDecimal amenityDamages, BigDecimal depositDeducted, BigDecimal totalAmount,
-            BigDecimal remainingAmount, String paymentStatus, String paymentMethod,
-            LocalDateTime paidAt, Integer createdBy) {
+    public Invoice(int invoiceId, int bookingId, BigDecimal roomCharges, BigDecimal consumableCharges, BigDecimal amenityDamages, BigDecimal totalAmount, BigDecimal remainingAmount, String paymentStatus, Integer createdBy) {
         this.invoiceId = invoiceId;
         this.bookingId = bookingId;
         this.roomCharges = roomCharges;
         this.consumableCharges = consumableCharges;
         this.amenityDamages = amenityDamages;
-        this.depositDeducted = depositDeducted;
         this.totalAmount = totalAmount;
         this.remainingAmount = remainingAmount;
         this.paymentStatus = paymentStatus;
-        this.paymentMethod = paymentMethod;
-        this.paidAt = paidAt;
         this.createdBy = createdBy;
     }
+
+    
 
     public Integer getCreatedBy() {
         return createdBy;
@@ -93,13 +87,6 @@ public class Invoice {
         this.amenityDamages = amenityDamages;
     }
 
-    public BigDecimal getDepositDeducted() {
-        return depositDeducted;
-    }
-
-    public void setDepositDeducted(BigDecimal depositDeducted) {
-        this.depositDeducted = depositDeducted;
-    }
 
     public BigDecimal getTotalAmount() {
         return totalAmount;
@@ -125,19 +112,4 @@ public class Invoice {
         this.paymentStatus = paymentStatus;
     }
 
-    public String getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(String paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
-
-    public LocalDateTime getPaidAt() {
-        return paidAt;
-    }
-
-    public void setPaidAt(LocalDateTime paidAt) {
-        this.paidAt = paidAt;
-    }
 }

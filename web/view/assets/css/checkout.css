@@ -3,8 +3,17 @@
     Author     : LinhLTHE200306
 */
 
-.col-action {
+/* Căn giữa TẤT CẢ th và td trong checkout-table */
+.checkout-table th,
+.checkout-table td {
     text-align: center;
+    vertical-align: middle;
+}
+
+/* Cột tên khách CĂN TRÁI (ghi đè lại) */
+.checkout-table .col-guest,
+.checkout-table td.col-guest {
+    text-align: left;
 }
 
 .btn-checkout {
@@ -37,7 +46,7 @@
     background: #fff;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-custom);
-      margin: 0;
+    margin: 0;
     padding: 20px;
 }
 
@@ -120,10 +129,6 @@
     padding: 5px 12px;
     border-radius: 20px;
     font-size: 0.85rem;
-}
-
-.data-table-thead th{
-    text-align: left !important;
 }
 
 .info-grid {
@@ -293,4 +298,5 @@
     .guest-info-grid {
         grid-template-columns: 1fr;
     }
+
 }

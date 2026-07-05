@@ -2,6 +2,7 @@ package controller;
 
 import dao.CheckoutDAO;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -15,9 +16,10 @@ import model.StaffAccount;
 
 /**
  * @author LinhLTHE200306
- * @version 1.0
- * @since 2026-06-22
+ * @version 3.0
+ * @since 2026-06-30
  */
+
 public class BillingListController extends HttpServlet {
 
     private static final int RECORDS_PER_PAGE = 10;
@@ -49,56 +51,38 @@ public class BillingListController extends HttpServlet {
             LocalDate fromDate = null;
             LocalDate toDate = null;
             try {
-                if (fromDateStr != null && !fromDateStr.isEmpty()) {
-                    fromDate = LocalDate.parse(fromDateStr);
-                }
-            } catch (Exception ignored) {
-            }
+                if (fromDateStr != null && !fromDateStr.isEmpty()) fromDate = LocalDate.parse(fromDateStr);
+            } catch (Exception ignored) {}
             try {
-                if (toDateStr != null && !toDateStr.isEmpty()) {
-                    toDate = LocalDate.parse(toDateStr);
-                }
-            } catch (Exception ignored) {
-            }
+                if (toDateStr != null && !toDateStr.isEmpty()) toDate = LocalDate.parse(toDateStr);
+            } catch (Exception ignored) {}
 
             int page = 1;
             try {
                 String pageParam = request.getParameter("page");
-                if (pageParam != null && !pageParam.isEmpty()) {
-                    page = Integer.parseInt(pageParam);
-                }
-            } catch (NumberFormatException ignored) {
-            }
+                if (pageParam != null && !pageParam.isEmpty()) page = Integer.parseInt(pageParam);
+            } catch (NumberFormatException ignored) {}
 
             List<Map<String, Object>> allInvoices = dao.searchInvoices(keyword, fromDate, toDate, status);
-            if (allInvoices == null) {
-                allInvoices = new ArrayList<>();
-            }
+            if (allInvoices == null) allInvoices = new ArrayList<>();
 
             int totalRecords = allInvoices.size();
-            int totalPages = totalRecords == 0 ? 1
-                    : (int) Math.ceil((double) totalRecords / RECORDS_PER_PAGE);
+            int totalPages = totalRecords == 0 ? 1 : (int) Math.ceil((double) totalRecords / RECORDS_PER_PAGE);
 
-            if (page < 1) {
-                page = 1;
-            }
-            if (page > totalPages) {
-                page = totalPages;
-            }
+            if (page < 1) page = 1;
+            if (page > totalPages) page = totalPages;
 
             int start = (page - 1) * RECORDS_PER_PAGE;
             int end = Math.min(start + RECORDS_PER_PAGE, totalRecords);
             List<Map<String, Object>> invoiceList = totalRecords > 0
-                    ? allInvoices.subList(start, end)
-                    : new ArrayList<>();
+                    ? allInvoices.subList(start, end) : new ArrayList<>();
 
             Map<String, Object> selectedInvoice = null;
             String invoiceIdStr = request.getParameter("invoiceId");
             if (invoiceIdStr != null && !invoiceIdStr.isEmpty()) {
                 try {
                     selectedInvoice = dao.getInvoiceDetailById(Integer.parseInt(invoiceIdStr));
-                } catch (NumberFormatException ignored) {
-                }
+                } catch (NumberFormatException ignored) {}
             }
 
             request.setAttribute("invoiceList", invoiceList);
@@ -124,6 +108,37 @@ public class BillingListController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        StaffAccount staff = (StaffAccount) session.getAttribute("staff");
+        if (staff == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        // Xử lý "Thu tiền" cho hóa đơn còn nợ
+        String action = request.getParameter("action");
+        if ("collectPayment".equals(action)) {
+            try {
+                int invoiceId = Integer.parseInt(request.getParameter("invoiceId"));
+                int bookingId = Integer.parseInt(request.getParameter("bookingId"));
+                BigDecimal amount = new BigDecimal(request.getParameter("amount"));
+                String paymentMethod = request.getParameter("paymentMethod");
+
+                CheckoutDAO dao = new CheckoutDAO();
+                dao.addInvoicePayment(invoiceId, bookingId, amount, paymentMethod,
+                        "Thanh toán tại quầy", staff.getStaffId());
+
+                session.setAttribute("successMessage", "Thu tiền thành công!");
+                response.sendRedirect(request.getContextPath() + "/BillingList?invoiceId=" + invoiceId);
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+                session.setAttribute("errorMessage", "Lỗi thu tiền: " + e.getMessage());
+                response.sendRedirect(request.getContextPath() + "/BillingList");
+                return;
+            }
+        }
+
         doGet(request, response);
     }
 
