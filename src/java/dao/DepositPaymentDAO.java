@@ -133,13 +133,18 @@ public class DepositPaymentDAO extends DBContext {
     }
 
     public void verifyPayment(int depositId, int staffId, String notes) throws Exception {
-    DepositPayment payment = getPaymentById(depositId);
-    if (payment == null) throw new Exception("Khoản thanh toán không tồn tại.");
-    if (!"Chờ xử lý".equals(payment.getVerificationStatus())) throw new Exception("Khoản thanh toán này đã được xử lý trước đó.");
+        DepositPayment payment = getPaymentById(depositId);
+        if (payment == null) {
+            throw new Exception("Khoản thanh toán không tồn tại.");
+        }
+        if (!"Chờ xử lý".equals(payment.getVerificationStatus())) {
+            throw new Exception("Khoản thanh toán này đã được xử lý trước đó.");
+        }
 
-    connection.setAutoCommit(false);
-    try {
-        String updatePaymentSQL = """
+        connection.setAutoCommit(false);
+        try {
+            // 1. Update DepositPayments
+            String updatePaymentSQL = """
                 update DepositPayments
                 set verification_status = N'Đã phê duyệt',
                 verified_at = GETDATE(),
@@ -147,79 +152,115 @@ public class DepositPaymentDAO extends DBContext {
                 verified_by = ?
                 where deposit_id = ?
                 """;
-        try (PreparedStatement stm = connection.prepareStatement(updatePaymentSQL)) {
-            stm.setString(1, notes);
-            stm.setInt(2, staffId);
-            stm.setInt(3, depositId);
-            stm.executeUpdate();
-        }
+            try (PreparedStatement stm = connection.prepareStatement(updatePaymentSQL)) {
+                stm.setString(1, notes);
+                stm.setInt(2, staffId);
+                stm.setInt(3, depositId);
+                stm.executeUpdate();
+            }
 
-        String updateBookingSQL = """
+            // 2. Update Bookings
+            String updateBookingSQL = """
                 update Bookings
                 set status = N'Đã xác nhận',
                 payment_status = N'Đã đặt cọc',
                 confirmed_at = GETDATE()
                 where booking_id = ?
                 """;
-        try (PreparedStatement stm = connection.prepareStatement(updateBookingSQL)) {
-            stm.setInt(1, payment.getBookingId());
-            stm.executeUpdate();
-        }
+            try (PreparedStatement stm = connection.prepareStatement(updateBookingSQL)) {
+                stm.setInt(1, payment.getBookingId());
+                stm.executeUpdate();
+            }
 
-        // Lấy thông tin booking để tính tiền phòng
-        String bookingSQL = """
-                select booked_price_per_night, num_rooms, checkin_date, checkout_date, deposit_amount
+            // 3. Lấy thông tin booking để tính tiền phòng
+            String bookingSQL = """
+                select booked_price_per_night, num_rooms, checkin_date, checkout_date
                 from Bookings where booking_id = ?
                 """;
-        java.math.BigDecimal pricePerNight;
-        int numRooms;
-        java.time.LocalDate checkinDate;
-        java.time.LocalDate checkoutDate;
-        java.math.BigDecimal depositAmount;
+            java.math.BigDecimal pricePerNight;
+            int numRooms;
+            java.time.LocalDate checkinDate;
+            java.time.LocalDate checkoutDate;
 
-        try (PreparedStatement stm = connection.prepareStatement(bookingSQL)) {
-            stm.setInt(1, payment.getBookingId());
-            try (ResultSet rs = stm.executeQuery()) {
-                if (!rs.next()) throw new Exception("Không tìm thấy booking.");
-                pricePerNight = rs.getBigDecimal("booked_price_per_night");
-                numRooms      = rs.getInt("num_rooms");
-                checkinDate   = rs.getDate("checkin_date").toLocalDate();
-                checkoutDate  = rs.getDate("checkout_date").toLocalDate();
-                depositAmount = rs.getBigDecimal("deposit_amount");
+            try (PreparedStatement stm = connection.prepareStatement(bookingSQL)) {
+                stm.setInt(1, payment.getBookingId());
+                try (ResultSet rs = stm.executeQuery()) {
+                    if (!rs.next()) {
+                        throw new Exception("Không tìm thấy booking.");
+                    }
+                    pricePerNight = rs.getBigDecimal("booked_price_per_night");
+                    numRooms = rs.getInt("num_rooms");
+                    checkinDate = rs.getDate("checkin_date").toLocalDate();
+                    checkoutDate = rs.getDate("checkout_date").toLocalDate();
+                }
             }
-        }
 
-        long nights = java.time.temporal.ChronoUnit.DAYS.between(checkinDate, checkoutDate);
-        java.math.BigDecimal roomCharges = pricePerNight
-                .multiply(java.math.BigDecimal.valueOf(nights))
-                .multiply(java.math.BigDecimal.valueOf(numRooms));
-        java.math.BigDecimal deposit = depositAmount != null ? depositAmount : java.math.BigDecimal.ZERO;
-        java.math.BigDecimal remaining = roomCharges.subtract(deposit).max(java.math.BigDecimal.ZERO);
+            long nights = java.time.temporal.ChronoUnit.DAYS.between(checkinDate, checkoutDate);
+            java.math.BigDecimal roomCharges = pricePerNight
+                    .multiply(java.math.BigDecimal.valueOf(nights))
+                    .multiply(java.math.BigDecimal.valueOf(numRooms));
 
-        String invoiceSQL = """
+            // 4. Insert Invoices
+            // remaining_amount tạm = total_amount, sẽ recalculate lại sau khi có InvoicePayments
+            String invoiceSQL = """
                 insert into Invoices (booking_id, room_charges, consumable_charges,
-                    amenity_damages, deposit_deducted, total_amount, remaining_amount,
-                    payment_status, payment_method, created_by)
-                values (?, ?, 0, 0, ?, ?, ?, N'Chưa thanh toán', N'Chuyển khoản', ?)
+                    amenity_damages, total_amount, remaining_amount,
+                    payment_status, created_by)
+                values (?, ?, 0, 0, ?, ?, N'Chưa thanh toán', ?)
                 """;
-        try (PreparedStatement stm = connection.prepareStatement(invoiceSQL)) {
-            stm.setInt(1, payment.getBookingId());
-            stm.setBigDecimal(2, roomCharges);
-            stm.setBigDecimal(3, deposit);
-            stm.setBigDecimal(4, roomCharges);
-            stm.setBigDecimal(5, remaining);
-            stm.setInt(6, staffId);
-            stm.executeUpdate();
-        }
+            int invoiceId;
+            try (PreparedStatement stm = connection.prepareStatement(invoiceSQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                stm.setInt(1, payment.getBookingId());
+                stm.setBigDecimal(2, roomCharges);
+                stm.setBigDecimal(3, roomCharges);
+                stm.setBigDecimal(4, roomCharges);
+                stm.setInt(5, staffId);
+                stm.executeUpdate();
 
-        connection.commit();
-    } catch (SQLException e) {
-        connection.rollback();
-        throw new Exception("Lỗi hệ thống: Không thể xác nhận thanh toán. " + e.getMessage());
-    } finally {
-        connection.setAutoCommit(true);
+                try (ResultSet keys = stm.getGeneratedKeys()) {
+                    if (keys.next()) {
+                        invoiceId = keys.getInt(1);
+                    } else {
+                        throw new Exception("Không lấy được invoice_id vừa tạo.");
+                    }
+                }
+            }
+
+            // 5. Insert InvoicePayments cho khoản cọc
+            String paymentSQL = """
+                insert into InvoicePayments (invoice_id, amount, payment_method, collected_by, note)
+                values (?, ?, N'Chuyển khoản', ?, N'Tiền đặt cọc')
+                """;
+            try (PreparedStatement stm = connection.prepareStatement(paymentSQL)) {
+                stm.setInt(1, invoiceId);
+                stm.setBigDecimal(2, payment.getAmount());
+                stm.setInt(3, staffId);
+                stm.executeUpdate();
+            }
+
+            // 6. Recalculate remaining_amount = total_amount - tổng đã thu
+            String updateRemainingSQL = """
+                update Invoices
+                set remaining_amount = total_amount - (
+                    select isnull(sum(amount), 0) from InvoicePayments where invoice_id = ?
+                )
+                where invoice_id = ?
+                """;
+            try (PreparedStatement stm = connection.prepareStatement(updateRemainingSQL)) {
+                stm.setInt(1, invoiceId);
+                stm.setInt(2, invoiceId);
+                stm.executeUpdate();
+            }
+
+            connection.commit();
+        } catch (SQLException e) {
+            connection.rollback();
+            throw new Exception("Lỗi hệ thống: Không thể xác nhận thanh toán. " + e.getMessage());
+        } finally {
+            connection.setAutoCommit(true);
+        }
     }
-}
+
     public void rejectPayment(int depositId, int staffId, String notes) throws Exception {
         DepositPayment payment = getPaymentById(depositId);
         if (payment == null) {

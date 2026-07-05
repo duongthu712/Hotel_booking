@@ -7,19 +7,19 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import model.Booking;
 import model.StaffAccount;
 
+/**
+ * @author LinhLTHE200306
+ * @version 3.0
+ * @since 2026-06-30
+ */
 public class CheckoutController extends HttpServlet {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -41,14 +41,19 @@ public class CheckoutController extends HttpServlet {
             CheckoutDAO dao = new CheckoutDAO();
             List<Map<String, Object>> roomList = dao.getRoomsForCheckout(keyword);
 
-            Map<Integer, List<Map<String, Object>>> groupedByBooking = new LinkedHashMap<>();
+            // Format date cho từng room
             for (Map<String, Object> room : roomList) {
-                int bookingId = (Integer) room.get("bookingId");
-                groupedByBooking.computeIfAbsent(bookingId, k -> new ArrayList<>()).add(room);
+                Object checkinDate = room.get("checkinDate");
+                if (checkinDate instanceof LocalDate) {
+                    room.put("checkinDate", ((LocalDate) checkinDate).format(DATE_FORMATTER));
+                }
+                Object checkoutDate = room.get("checkoutDate");
+                if (checkoutDate instanceof LocalDate) {
+                    room.put("checkoutDate", ((LocalDate) checkoutDate).format(DATE_FORMATTER));
+                }
             }
 
             request.setAttribute("roomList", roomList);
-            request.setAttribute("groupedByBooking", groupedByBooking);
             request.setAttribute("keyword", keyword);
             request.setAttribute("today", LocalDate.now().format(DATE_FORMATTER));
 
@@ -56,7 +61,7 @@ public class CheckoutController extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            session.setAttribute("errorMessage", "Lỗi hệ thống: " + e.getMessage());
+            session.setAttribute("errorMessage", e.getMessage());
             request.getRequestDispatcher("/view/receptionist/check-out.jsp").forward(request, response);
         }
     }
@@ -74,152 +79,48 @@ public class CheckoutController extends HttpServlet {
             return;
         }
 
-        String[] selectedRoomIds = request.getParameterValues("selectedRooms");
-        if (selectedRoomIds == null || selectedRoomIds.length == 0) {
-            session.setAttribute("errorMessage", "Vui lòng chọn ít nhất một phòng để checkout.");
+        // Nhận 1 roomId duy nhất từ form
+        String selectedRoomId = request.getParameter("selectedRoom");
+        if (selectedRoomId == null || selectedRoomId.isEmpty()) {
+            session.setAttribute("errorMessage", "Vui lòng chọn một phòng để checkout.");
             response.sendRedirect(request.getContextPath() + "/Checkout");
             return;
         }
 
         CheckoutDAO dao = new CheckoutDAO();
-        List<String> errorMessages = new ArrayList<>();
-        List<Integer> successBookingIds = new ArrayList<>();
-        Map<Integer, List<Integer>> bookingRoomIdsMap = new LinkedHashMap<>();
 
         try {
-            List<Integer> roomIds = new ArrayList<>();
-            for (String rid : selectedRoomIds) {
-                roomIds.add(Integer.parseInt(rid));
-            }
+            int roomId = Integer.parseInt(selectedRoomId);
 
-            List<Map<String, Object>> selectedRoomDetails = dao.getRoomDetailsByRoomIds(roomIds);
-
-            Map<Integer, List<Integer>> bookingRoomNumbersMap = new LinkedHashMap<>();
-            for (Map<String, Object> roomDetail : selectedRoomDetails) {
-                int bookingId = (Integer) roomDetail.get("bookingId");
-                int roomId = (Integer) roomDetail.get("roomId");
-                int roomNumber = (Integer) roomDetail.get("roomNumber");
-                bookingRoomIdsMap.computeIfAbsent(bookingId, k -> new ArrayList<>()).add(roomId);
-                bookingRoomNumbersMap.computeIfAbsent(bookingId, k -> new ArrayList<>()).add(roomNumber);
-            }
-
-            for (Map.Entry<Integer, List<Integer>> entry : bookingRoomIdsMap.entrySet()) {
-                int bookingId = entry.getKey();
-                List<Integer> bookingRoomIds = entry.getValue();
-                List<Integer> bookingRoomNumbers = bookingRoomNumbersMap.get(bookingId);
-
-                try {
-                    processSingleBookingCheckout(dao, bookingId, bookingRoomIds, bookingRoomNumbers, staff.getStaffId());
-                    successBookingIds.add(bookingId);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    String bookingCode = dao.getBookingCodeById(bookingId);
-                    errorMessages.add("Lỗi checkout đơn " + bookingCode + ": " + ex.getMessage());
-                }
-            }
-
-            if (successBookingIds.isEmpty()) {
-                session.setAttribute("errorMessage", String.join("; ", errorMessages));
+            // Lấy thông tin phòng để biết bookingId
+            List<Map<String, Object>> roomDetails = dao.getRoomDetailsByRoomIds(
+                    java.util.Collections.singletonList(roomId));
+            if (roomDetails.isEmpty()) {
+                session.setAttribute("errorMessage", "Không tìm thấy thông tin phòng.");
                 response.sendRedirect(request.getContextPath() + "/Checkout");
                 return;
             }
 
-            if (!errorMessages.isEmpty()) {
-                session.setAttribute("errorMessage", String.join("; ", errorMessages));
-            }
+            int bookingId = (Integer) roomDetails.get(0).get("bookingId");
 
-            if (successBookingIds.size() == 1) {
-                int bookingId = successBookingIds.get(0);
-                session.setAttribute("checkoutRoomCount_" + bookingId,
-                        bookingRoomIdsMap.get(bookingId).size());
+            // Lưu roomId đang checkout vào session
+            session.setAttribute("checkoutRoomId_" + bookingId, roomId);
+
+            try {
+                dao.processCheckout(bookingId, java.util.Collections.singletonList(roomId), staff.getStaffId());
+                session.setAttribute("checkoutRoomCount_" + bookingId, 1);
                 response.sendRedirect(request.getContextPath() + "/InvoiceCreate?bookingId=" + bookingId);
-            } else {
-                session.setAttribute("successMessage",
-                        "Đã tạo " + successBookingIds.size() + " hóa đơn thành công.");
-                response.sendRedirect(request.getContextPath() + "/BillingList");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                String bookingCode = dao.getBookingCodeById(bookingId);
+                session.setAttribute("errorMessage", "Lỗi checkout đơn " + bookingCode + ": " + ex.getMessage());
+                response.sendRedirect(request.getContextPath() + "/Checkout");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            session.setAttribute("errorMessage", "Lỗi hệ thống: " + e.getMessage());
+            session.setAttribute("errorMessage", e.getMessage());
             response.sendRedirect(request.getContextPath() + "/Checkout");
         }
-    }
-
-    private void processSingleBookingCheckout(CheckoutDAO dao, int bookingId,
-            List<Integer> roomIds, List<Integer> roomNumbers, int staffId) throws Exception {
-
-        Booking booking = dao.getBookingById(bookingId);
-
-        LocalDateTime actualCheckout = LocalDateTime.now();
-        LocalDateTime expectedCheckout = booking.getCheckoutDate().atTime(12, 0);
-
-        // Số đêm thực tế
-        long nights = Math.max(1, ChronoUnit.DAYS.between(
-                booking.getCheckinDate(), actualCheckout.toLocalDate()));
-
-        // Tiền phòng base
-        BigDecimal pricePerNight = booking.getBookedPricePerNight() != null
-                ? booking.getBookedPricePerNight() : BigDecimal.ZERO;
-        BigDecimal roomChargesBase = pricePerNight
-                .multiply(BigDecimal.valueOf(nights))
-                .multiply(BigDecimal.valueOf(roomIds.size()));
-
-        // Phụ thu trả phòng muộn
-        double lateChargePerRoom = dao.lateCheckoutSurcharge(
-                expectedCheckout, actualCheckout, pricePerNight.doubleValue());
-        BigDecimal lateCharge = BigDecimal.valueOf(lateChargePerRoom * roomIds.size());
-        BigDecimal roomCharges = roomChargesBase.add(lateCharge);
-
-        // Dịch vụ và hư hỏng của các phòng đang checkout
-        BigDecimal consumableCharges = dao.sumBookingServicesByRooms(bookingId, roomIds);
-        BigDecimal amenityDamages = dao.sumRoomAmenityDamagesByRooms(bookingId, roomIds);
-
-        // Tính tiền cọc cho lần checkout này
-        BigDecimal totalDeposit = booking.getDepositAmount() != null
-                ? booking.getDepositAmount() : BigDecimal.ZERO;
-        BigDecimal depositAlreadyUsed = dao.sumDepositDeductedByBookingId(bookingId);
-        BigDecimal depositRemaining = totalDeposit.subtract(depositAlreadyUsed);
-
-        int remainingRooms = dao.countRemainingRooms(bookingId);
-        boolean isLastCheckout = remainingRooms == roomIds.size();
-
-        BigDecimal depositDeducted;
-        if (isLastCheckout) {
-            // Lần checkout cuối: trừ hết phần cọc còn lại
-            depositDeducted = depositRemaining;
-        } else {
-            // Chia đều theo số phòng checkout lần này
-            int totalRooms = booking.getNumRooms();
-            if (totalRooms > 0) {
-                depositDeducted = totalDeposit
-                        .divide(BigDecimal.valueOf(totalRooms), 0, java.math.RoundingMode.FLOOR)
-                        .multiply(BigDecimal.valueOf(roomIds.size()));
-                // Không trừ quá phần còn lại
-                if (depositDeducted.compareTo(depositRemaining) > 0) {
-                    depositDeducted = depositRemaining;
-                }
-            } else {
-                depositDeducted = BigDecimal.ZERO;
-            }
-        }
-
-        BigDecimal totalAmount = roomCharges.add(consumableCharges).add(amenityDamages);
-        BigDecimal remainingAmount = totalAmount.subtract(depositDeducted).max(BigDecimal.ZERO);
-
-        dao.createOrUpdateInvoice(bookingId, roomCharges, consumableCharges, amenityDamages,
-                depositDeducted, totalAmount, remainingAmount, staffId);
-    }
-
-    private String formatRoomNumbers(List<Integer> roomNumbers) {
-        Collections.sort(roomNumbers);
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < roomNumbers.size(); i++) {
-            if (i > 0) {
-                sb.append(", ");
-            }
-            sb.append(roomNumbers.get(i));
-        }
-        return sb.toString();
     }
 }
