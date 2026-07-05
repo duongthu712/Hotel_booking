@@ -38,35 +38,41 @@
                             <div class="block-title">1. Thông tin cơ bản</div>
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
-                                    <label class="field-label">Tên hạng phòng</label>
+                                    <label class="field-label">Tên hạng phòng <span class="required-star" >*</span> </label>  
                                     <input type="text" name="typeName" class="input-field" value="${not empty roomType ? roomType.typeName : param.typeName}" required />
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="field-label">Giá cơ bản (VNĐ / Đêm)</label>
+                                    <label class="field-label">Giá cơ bản (VNĐ / Đêm) <span class="required-star" >*</span> </label>  
                                     <input type="number" name="basePrice" class="input-field" min="0" value="${not empty roomType ? (roomType.basePrice == 0 ? '' : roomType.basePrice) : param.basePrice}" required />
                                 </div>
                                 <div class="col-12">
-                                    <label class="field-label">Mô tả chi tiết hạng phòng</label>
-                                    <textarea name="description" class="textarea-field" rows="3" required>${not empty roomType ? roomType.description : param.description}</textarea>
+                                    <label class="field-label">Mô tả chi tiết hạng phòng</label>  
+                                    <textarea name="description" class="textarea-field" rows="3" >${not empty roomType ? roomType.description : param.description}</textarea>
                                 </div>
                             </div>
 
                             <div class="block-title">2. Thông số cấu hình & Tiện nghi</div>
                             <div class="row g-3 mb-4">
                                 <div class="col-md-3">
-                                    <label class="field-label">Sức chứa tối đa (Khách)</label>
-                                    <input type="number" name="capacity" class="input-field" min="1" value="${not empty roomType ? roomType.capacity : param.capacity}" required />
+                                    <label class="field-label">Số người lớn <span class="required-star" >*</span></label> 
+                                    <input type="number" name="num_guests" id="num_guests" class="input-field" min="1" 
+                                           value="${not empty roomType ? roomType.numGuests :  param.numGuests }" required />
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="field-label">Diện tích phòng (m²)</label>
+                                    <label class="field-label">Số trẻ em <span class="required-star" >*</span></label> 
+                                    <input type="number" name="num_children" id="num_children" class="input-field" min="0" 
+                                           value="${not empty roomType ? roomType.numChildren :  param.numChildren }" required />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="field-label">Diện tích phòng (m²) <span class="required-star" >*</span></label> 
                                     <input type="number" step="any" name="areaSqm" class="input-field" min="1" value="${not empty roomType ? (roomType.areaSqm == 0 ? '' : roomType.areaSqm) : param.areaSqm}" required />
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="field-label">Kiểu giường</label>
+                                    <label class="field-label">Kiểu giường <span class="required-star" >*</span></label> 
                                     <input type="text" name="bedType" class="input-field" value="${not empty roomType ? roomType.bedType : param.bedType}" required />
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="field-label">Số lượng giường</label>
+                                    <label class="field-label">Số lượng giường <span class="required-star" >*</span> </label> 
                                     <input type="number" name="bedCount" class="input-field" min="1" value="${not empty roomType ? roomType.bedCount : param.bedCount}" required />
                                 </div>
                             </div>
@@ -76,15 +82,73 @@
                                 <label class="field-label">Đường dẫn ảnh đại diện chính và các góc chụp phụ (URL)</label>
 
                                 <div id="imageFieldsContainer">
-                                    <div class="img-group mb-2">
-                                        <span class="badge-main">Ảnh chính</span>
-                                        <input type="text" name="imageUrls" class="input-field input-grow" placeholder="Nhập đường dẫn ảnh chính..." value="${not empty roomType.imageUrl ? roomType.imageUrl[0] : param.imageUrls}" required />
+                                    <%-- Khối Ảnh Chính --%>
+                                    <div class="img-group mb-3">
+                                        <span class="badge-main">Ảnh chính *</span>
+
+                                        <input type="file"
+                                               id="mainImageFile"
+                                               class="main-image-file"
+                                               accept="image/*">
+
+                                        <span id="mainImageName" style="margin-left:10px;color:#666"></span>
+
+                                        <div id="previewContainer" class="mt-2">
+                                            <img id="mainPreview"
+                                                 src="${roomType.imageUrl[0]}"
+                                                 style="display:${not empty roomType.imageUrl[0] ? 'block' : 'none'};
+                                                 width:260px;
+                                                 border-radius:8px;
+                                                 border:1px solid #ddd;">
+                                        </div>
+
+                                        <input type="text"
+                                               id="mainImageUrl"
+                                               name="imageUrls"
+                                               class="input-field mt-2"
+                                               value="${roomType.imageUrl[0]}"
+                                               placeholder="Nhập đường dẫn ảnh chính (URL)..." 
+                                               readonly
+                                               required>
                                     </div>
+
+                                    <%-- Khối Ảnh Phụ --%>
                                     <c:forEach items="${roomType.imageUrl}" var="imgUrl" varStatus="st">
                                         <c:if test="${!st.first && not empty imgUrl}">
-                                            <div class="img-group mb-2">
-                                                <input type="text" name="imageUrls" class="input-field input-grow" placeholder="Nhập đường dẫn ảnh phụ..." value="${imgUrl}"/>
-                                                <button type="button" class="btn-delete" onclick="this.parentElement.remove();">Xóa</button>
+                                            <div class="img-group mb-3">
+
+                                                <input type="file"
+                                                       class="sub-image-file"
+                                                       accept="image/*">
+
+                                                <span class="file-name"
+                                                      style="margin-left:10px;color:#666"></span>
+
+                                                <div style="margin-top:10px">
+                                                    <img class="preview-image"
+                                                         src="${imgUrl}"
+                                                         style="display:block;
+                                                         width:260px;
+                                                         border-radius:8px;
+                                                         border:1px solid #ddd;">
+                                                </div>
+
+                                                <div style="margin-top:10px">
+                                                    <label>Link ảnh</label>
+
+                                                    <input type="text"
+                                                           name="imageUrls"
+                                                           class="image-url-hidden input-field"
+                                                           
+                                                           value="${imgUrl}"
+                                                           readonly>
+                                                </div>
+
+                                                <button type="button"
+                                                        class="btn-delete">
+                                                    Xóa
+                                                </button>
+
                                             </div>
                                         </c:if>
                                     </c:forEach>
@@ -110,7 +174,7 @@
                                             <c:set var="isServed" value="false" />
                                             <c:set var="savedQty" value="1" />
                                             <c:set var="savedFree" value="0" />
-                                            
+
                                             <c:forEach items="${roomType.roomTypeServices}" var="rts">
                                                 <c:if test="${rts.serviceId == s.serviceId}">
                                                     <c:set var="isServed" value="true" />
@@ -156,7 +220,7 @@
                                         <c:forEach items="${availableAmenities}" var="a">
                                             <c:set var="hasAmenity" value="false" />
                                             <c:set var="savedAmenityQty" value="1" />
-                                            
+
                                             <c:forEach items="${roomType.roomAmenities}" var="ra">
                                                 <c:if test="${ra.amenityId == a.amenityId}">
                                                     <c:set var="hasAmenity" value="true" />
@@ -211,15 +275,15 @@
 
         <c:if test="${not empty errorMessage}">
             <script>
-                document.addEventListener("DOMContentLoaded", function() {
-                    Swal.fire({
-                        title: 'Dữ liệu không hợp lệ!',
-                        text: '${errorMessage}',
-                        icon: 'error',
-                        confirmButtonColor: '#0f4c5c',
-                        confirmButtonText: 'Tôi đã hiểu'
-                    });
-                });
+                                                                   document.addEventListener("DOMContentLoaded", function () {
+                                                                       Swal.fire({
+                                                                           title: 'Dữ liệu không hợp lệ!',
+                                                                           text: '${errorMessage}',
+                                                                           icon: 'error',
+                                                                           confirmButtonColor: '#0f4c5c',
+                                                                           confirmButtonText: 'Tôi đã hiểu'
+                                                                       });
+                                                                   });
             </script>
         </c:if>
     </body>

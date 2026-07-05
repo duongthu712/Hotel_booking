@@ -1,3 +1,4 @@
+
 package controller;
 
 import com.lowagie.text.Document;
@@ -186,3 +187,4 @@ public class InvoicePDFController extends HttpServlet {
         return CURRENCY_FORMAT.format(amount) + " d";
     }
 }
+

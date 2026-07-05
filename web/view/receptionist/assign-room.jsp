@@ -23,6 +23,7 @@
                 <c:remove var="notificationType" scope="session"/>
             </c:if>
 
+            <!-- THANH TÌM KIẾM BỘ LỌC ĐÃ ĐƯỢC CHUẨN HÓA THEO CLASS ĐỒNG BỘ MÀU XANH NAVY -->
             <form action="${pageContext.request.contextPath}/assign-room" method="GET" class="filter-form-wrapper">
                 <c:if test="${not empty targetBookingId}">
                     <input type="hidden" name="bookingId" value="${targetBookingId}" />
@@ -64,19 +65,41 @@
                         <div class="card-header-flex">
                             <c:choose>
                                 <c:when test="${not empty targetBookingId}">
-                                    <div>
-                                        <h3>Chọn Phòng Hạng: ${targetBooking.roomTypeName} (Đơn #${targetBookingId})</h3>
-                                        <div class="booking-info-group">
-                                            <span class="badge-info-navy">Đặt: ${targetBooking.numRooms} phòng</span>
-                                            <span class="badge-info-navy">Đã gán: ${assignedRoomsCount != null ? assignedRoomsCount : 0} phòng</span>
-                                            <c:choose>
-                                                <c:when test="${(targetBooking.numRooms - (assignedRoomsCount != null ? assignedRoomsCount : 0)) > 0}">
-                                                    <span class="badge-info-navy">Còn lại: ${targetBooking.numRooms - (assignedRoomsCount != null ? assignedRoomsCount : 0)} phòng</span>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <span class="badge-success-green">Đã đủ phòng</span>
-                                                </c:otherwise>
-                                            </c:choose>
+                                    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                                        <div>
+                                            <!-- ĐỒNG BỘ HIỂN THỊ BIẾN PHÂN TÁCH TỪ BACKEND GỒM HẠNG CŨ VÀ HẠNG MỚI -->
+                                            <h3 style="margin: 0;">Gán Phòng Cho Đơn #${targetBookingId}</h3>
+                                            <div style="margin-top: 4px; font-size: 14.5px; color: #334155; display: flex; flex-direction: column; gap: 2px;">
+                                                <span>• Hạng phòng cũ (Gốc): <strong style="color: #1a446c;">${originalRoomTypeName}</strong></span>
+                                                <c:if test="${isOverriddenType}">
+                                                    <span>• Hạng phòng mới đang gán: <strong style="color: #bfa15f;">${newRoomTypeName}</strong></span>
+                                                </c:if>
+                                            </div>
+                                            
+                                            <div class="booking-info-group" style="margin-top: 8px;">
+                                                <span class="badge-info-navy">Đặt: ${targetBooking.numRooms} phòng</span>
+                                                <span class="badge-info-navy">Đã gán: ${assignedRoomsCount != null ? assignedRoomsCount : 0} phòng</span>
+                                                <c:choose>
+                                                    <c:when test="${(targetBooking.numRooms - (assignedRoomsCount != null ? assignedRoomsCount : 0)) > 0}">
+                                                        <span class="badge-info-navy">Còn lại: ${targetBooking.numRooms - (assignedRoomsCount != null ? assignedRoomsCount : 0)} phòng</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="badge-success-green">Đã đủ phòng</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                        </div>
+
+                                        <!-- HỘP CHỌN ĐỔI HẠNG LINH HOẠT KHI PHÒNG HỎNG -->
+                                        <div style="background-color: #f0f4f8; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px; display: flex; align-items: center; gap: 8px;">
+                                            <span style="font-size: 13px; font-weight: 600; color: #475569;">Phòng hỏng / Đổi hạng:</span>
+                                            <select onchange="switchAssignRoomType('${targetBookingId}', this.value)" style="padding: 4px 8px; border: 1px solid #94a3b8; border-radius: 4px; font-size: 13px; font-weight: 600; color: #1e293b; background-color: #ffffff; cursor: pointer; outline: none;">
+                                                <c:forEach items="${allRoomTypes}" var="type">
+                                                    <option value="${type.roomTypeId}" ${currentDisplayTypeId == type.roomTypeId ? 'selected' : ''}>
+                                                        ${type.roomTypeName}
+                                                    </option>
+                                                </c:forEach>
+                                            </select>
                                         </div>
                                     </div>
                                     <a href="${pageContext.request.contextPath}/checkin" class="btn-close-view">Hủy luồng</a>
@@ -95,13 +118,14 @@
                                 <div class="room-card ${room.status eq 'Phòng trống' ? 'status-available' : 
                                                         room.status eq 'Phòng có khách' ? 'status-occupied' : 
                                                         room.status eq 'Đang dọn dẹp' ? 'status-dirty' : 'status-maintenance'}"
+                                     data-view-id="${room.roomId}"
                                      data-view-number="${room.roomNumber}"
                                      data-view-type="${room.roomTypeName} (Tầng ${room.floor})"
                                      data-view-status="${room.status}"
                                      data-view-code="${not empty room.currentBookingCode ? room.currentBookingCode : '--'}"
                                      data-view-guests="${not empty room.guestFullName ? room.guestFullName : '--'}"
                                      data-view-phone="${not empty room.guestPhone ? room.guestPhone : '--'}"
-                                     data-view-id="${not empty room.guestIdNumber ? room.guestIdNumber : '--'}">
+                                     data-view-guest-id="${not empty room.guestIdNumber ? room.guestIdNumber : '--'}">
 
                                     <div class="room-number">Phòng ${room.roomNumber}</div>
                                     <div class="room-type">${room.roomTypeName} (Tầng ${room.floor})</div>
@@ -119,8 +143,8 @@
                                             <c:if test="${not empty targetBookingId}">
                                                 <div class="select-wrapper">
                                                     <label class="select-label">
-                                                        <input type="radio" name="selectedRoomNumber" value="${room.roomNumber}" 
-                                                               form="assignRoomMainForm" data-capacity="${room.capacity}" class="select-radio" required />
+                                                        <input type="radio" name="selectedRoomId" value="${room.roomId}" 
+                                                               form="assignRoomMainForm" data-room-number="${room.roomNumber}" data-capacity="${room.capacity}" class="select-radio" required />
                                                         Chọn phòng này
                                                     </label>
                                                 </div>
@@ -176,7 +200,6 @@
                                     </tr>
                                 </table>
 
-                                <%--Nếu có đơn--%> 
                                 <div id="viewGuestsTableContainer" style="display: none;">
                                     <h5 class="guest-list-title">DANH SÁCH KHÁCH LƯU TRÚ</h5>
                                     <table class="table-guests-list">
@@ -194,7 +217,7 @@
                                 <c:if test="${not empty targetBookingId}">
                                     <form action="${pageContext.request.contextPath}/unassign-room" method="POST" id="unassignRoomForm">
                                         <input type="hidden" name="bookingId" value="${targetBookingId}" />
-                                        <input type="hidden" name="roomNumber" id="unassignRoomNumber" value="" />
+                                        <input type="hidden" name="roomId" id="unassignRoomId" value="" />
                                         <button type="button" onclick="confirmUnassign()" class="btn-unassign">
                                             HỦY GÁN PHÒNG NÀY
                                         </button>
@@ -212,38 +235,49 @@
                                 <div id="assignRoomFormContainer">
                                     <div class="guest-count-wrapper">
                                         <label class="guest-count-label">
-                                            Số lượng khách ở phòng này * <div id="capacityDisplay" class="capacity-alert-text" data-max="${targetBooking.capacity}">
-                                                Sức chứa tối đa của phòng này: ${targetBooking.capacity} người
+                                            Số lượng khách ở phòng này * <div id="capacityDisplay" class="capacity-alert-text" 
+                                                                              data-max-adults="${targetBooking.maxAdults}" 
+                                                                              data-max-children="${targetBooking.maxChildren}">
+                                                Sức chứa tối đa/phòng: ${targetBooking.maxAdults} Người lớn & ${targetBooking.maxChildren} Trẻ em
                                             </div>
                                         </label>
-                                        <input type="number" id="currentRoomGuests" name="currentRoomGuests" 
-                                               min="1" max="${targetBooking.capacity}" value="1" 
-                                               class="guest-count-input" />
-                                    </div>
-
-                                    <hr class="guest-card-divider">
-
-                                    <div class="guest-fields-scroll">
-                                        <div id="guestFieldsContainer">
-                                            <div class="select-room-placeholder" id="placeholderFormText">
-                                                Chọn một phòng trống từ sơ đồ để bắt đầu nhập hồ sơ lưu trú.
+                                        <div class="form-field-row">
+                                            <div class="field-col">
+                                                <label class="field-label">Số người lớn</label>
+                                                <input type="number" id="currentRoomAdults" name="currentRoomAdults" 
+                                                       min="1" max="${targetBooking.maxAdults}" value="1" class="guest-count-input" />
+                                            </div>
+                                            <div class="field-col">
+                                                <label class="field-label">Số trẻ em</label>
+                                                <input type="number" id="currentRoomChildren" name="currentRoomChildren" 
+                                                       min="0" max="${targetBooking.maxChildren}" value="0" class="guest-count-input" />
                                             </div>
                                         </div>
                                     </div>
+                                </div>
 
-                                    <div class="action-bar-submit-only">
-                                        <button type="submit" class="btn-success btn-submit-full btn-filter-search">
-                                            XÁC NHẬN GÁN PHÒNG
-                                        </button>
+                                <hr class="guest-card-divider">
+
+                                <div class="guest-fields-scroll">
+                                    <div id="guestFieldsContainer">
+                                        <div class="select-room-placeholder" id="placeholderFormText">
+                                            Chọn một phòng trống từ sơ đồ để bắt đầu nhập hồ sơ lưu trú.
+                                        </div>
                                     </div>
+                                </div>
+
+                                <div class="action-bar-submit-only" id="submitAssignBtnWrapper" style="display: none;">
+                                    <button type="submit" class="btn-success btn-submit-full btn-filter-search">
+                                        XÁC NHẬN GÁN PHÒNG
+                                    </button>
                                 </div>
                             </form>
                         </c:if>
 
                     </div>
                 </div>
-
             </div>
+
         </div>
 
         <script src="${pageContext.request.contextPath}/view/assets/javascript/assign-room.js?v=<%=System.currentTimeMillis()%>"></script>

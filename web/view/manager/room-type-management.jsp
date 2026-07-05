@@ -2,7 +2,6 @@
     Document   : room-type-management
     Created on : Jun 11, 2026, 2:15:52 PM
     Author     : Minh Thu
-    Updated by : Vu Pham (Đồng bộ Fancybox màu kem hoàng gia)
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -99,7 +98,11 @@
 
                                                     <td class="col-config">
                                                         <div class="room-config-info">
-                                                            <div><i class="fa-solid fa-users me-1"></i> ${item.capacity} khách</div>
+                                                            <%-- Hiển thị người lớn/trẻ em thay vì chỉ hiển thị tổng --%>
+                                                            <div>
+                                                                <i class="fa-solid fa-users me-1"></i> 
+                                                                <small>Người lớn: ${item.numGuests} | Trẻ em: ${item.numChildren}</small>
+                                                            </div>
                                                             <div><i class="fa-solid fa-bed me-1"></i> ${item.bedCount} x ${item.bedType}</div>
                                                             <div class="area-text text-muted"><i class="fa-solid fa-ruler-combined me-1"></i> ${item.areaSqm} m²</div>
                                                         </div>
@@ -156,8 +159,22 @@
                                                     </td>
                                                     <td class="col-actions">
                                                         <div class="btn-group-actions">
-                                                            <a href="${pageContext.request.contextPath}/roomtypeedit?id=${item.roomTypeId}" class="btn-action-edit">Sửa</a>
-                                                            <a href="${pageContext.request.contextPath}/roomtypedelete?id=${item.roomTypeId}" class="btn-action-delete" onclick="return confirm('Bạn có chắc chắn muốn xóa (ẩn) loại phòng này không?')">Xóa</a>
+                                                            <c:choose>
+                                                                <c:when test="${item.isActive()}">
+                                                                    <span class="btn-action-disabled">Sửa</span>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <a href="${pageContext.request.contextPath}/roomtypeedit?id=${item.roomTypeId}" class="btn-action-edit">Sửa</a>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                            <c:choose>
+                                                                <c:when test="${item.isActive()}">
+                                                                    <a href="${pageContext.request.contextPath}/roomtypedelete?id=${item.roomTypeId}" class="btn-delete">Xóa</a>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <span class="btn-action-disabled">Xóa</span>
+                                                                </c:otherwise>
+                                                            </c:choose>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -181,10 +198,10 @@
 
         <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
         <script>
-                                                                Fancybox.bind("[data-fancybox]", {
-                                                                    Thumbs: {autoStart: true},
-                                                                    Toolbar: {display: {left: ["infobar"], right: ["zoom", "close"]}}
-                                                                });
+            Fancybox.bind("[data-fancybox]", {
+                Thumbs: {autoStart: true},
+                Toolbar: {display: {left: ["infobar"], right: ["zoom", "close"]}}
+            });
         </script>
 
         <script src="${pageContext.request.contextPath}/view/assets/javascript/room-type-notification.js?v=<%= System.currentTimeMillis() %>"></script>

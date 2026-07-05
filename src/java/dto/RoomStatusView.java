@@ -2,16 +2,14 @@ package dto;
 
 public class RoomStatusView {
 
-    // 1. Thông tin cơ bản của phòng (Từ bảng Rooms)
+    private int roomId;
     private int roomNumber;
     private int floor;
-    private String status; // 'Phòng trống', 'Phòng có khách', 'Đang dọn dẹp', 'Đang bảo trì'
+    private String status;
 
-    // 2. Thông tin hạng phòng (Từ bảng RoomTypes)
     private int roomTypeId;
     private String roomTypeName;
 
-    // 3. Thông tin bổ trợ đơn đặt phòng hiện tại (Nếu phòng đang có khách ở - status = N'Phòng có khách')
     private Integer currentBookingId;
     private String currentBookingCode;
     private String guestFullName;
@@ -19,19 +17,17 @@ public class RoomStatusView {
     private String guestPhone;      
     private String guestIdNumber;   
 
-    public int getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
-    }
+    // Thêm mới định mức người lớn và trẻ em
+    private int maxAdults;
+    private int maxChildren;
 
     public RoomStatusView() {
     }
 
-    public RoomStatusView(int roomNumber, int floor, String status, int roomTypeId, String roomTypeName,
-            Integer currentBookingId, String currentBookingCode, String guestFullName) {
+    public RoomStatusView(int roomId, int roomNumber, int floor, String status, int roomTypeId, String roomTypeName,
+            Integer currentBookingId, String currentBookingCode, String guestFullName, int capacity, 
+            String guestPhone, String guestIdNumber, int maxAdults, int maxChildren) {
+        this.roomId = roomId;
         this.roomNumber = roomNumber;
         this.floor = floor;
         this.status = status;
@@ -40,6 +36,35 @@ public class RoomStatusView {
         this.currentBookingId = currentBookingId;
         this.currentBookingCode = currentBookingCode;
         this.guestFullName = guestFullName;
+        this.capacity = capacity;
+        this.guestPhone = guestPhone;
+        this.guestIdNumber = guestIdNumber;
+        this.maxAdults = maxAdults;
+        this.maxChildren = maxChildren;
+    }
+
+    public int getMaxAdults() {
+        return maxAdults;
+    }
+
+    public void setMaxAdults(int maxAdults) {
+        this.maxAdults = maxAdults;
+    }
+
+    public int getMaxChildren() {
+        return maxChildren;
+    }
+
+    public void setMaxChildren(int maxChildren) {
+        this.maxChildren = maxChildren;
+    }
+
+    public int getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(int roomId) {
+        this.roomId = roomId;
     }
 
     public int getRoomNumber() {
@@ -106,6 +131,14 @@ public class RoomStatusView {
         this.guestFullName = guestFullName;
     }
 
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
     public String getGuestPhone() {
         return guestPhone;
     }
@@ -121,5 +154,4 @@ public class RoomStatusView {
     public void setGuestIdNumber(String guestIdNumber) {
         this.guestIdNumber = guestIdNumber;
     }
-    
 }

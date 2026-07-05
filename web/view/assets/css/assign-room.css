@@ -128,6 +128,7 @@
 .booking-info-group {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 8px;
     font-size: 14px;
     margin-top: 4px;
@@ -166,7 +167,7 @@
     margin-top: 15px;
 }
 
-/* KHỐI PHÒNG CHUNG: Thêm hiệu ứng hover đẩy trồi cho TẤT CẢ các phòng */
+/* KHỐI PHÒNG CHUNG */
 .room-card {
     border: 1px solid #e2e8f0;
     border-radius: 6px;
@@ -277,10 +278,66 @@
     letter-spacing: 0.3px;
 }
 
-.guest-count-wrapper { margin-bottom: 15px; }
-.guest-count-label { display: block; font-family: 'Lora', serif; font-size: 13.5px; font-weight: 600; margin-bottom: 6px; color: #1a446c; }
-.capacity-alert-text { font-size: 12.5px; font-weight: normal; color: #f57f17; margin-top: 2px; }
-.guest-count-input { width: 100%; padding: 8px 12px; border: 1px solid #ebd9b4; border-radius: 4px; font-size: 14px; font-weight: bold; color: #1a446c; box-sizing: border-box; }
+.guest-count-wrapper { 
+    margin-bottom: 15px; 
+}
+
+.guest-count-label { 
+    display: block; 
+    font-family: 'Lora', serif; 
+    font-size: 13.5px; 
+    font-weight: 600; 
+    margin-bottom: 6px; 
+    color: #1a446c; 
+}
+
+.capacity-alert-text { 
+    font-size: 12.5px; 
+    font-weight: normal; 
+    color: #f57f17; 
+    margin-top: 3px; 
+    line-height: 1.4;
+}
+
+/* TỔ HỢP CSS MỚI CHO HÀNG NHẬP SỐ KHÁCH (ADULTS & CHILDREN) */
+.guest-count-wrapper .form-field-row {
+    display: flex;
+    gap: 15px;          
+    margin-top: 12px;   
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.guest-count-wrapper .field-col {
+    flex: 1;
+    min-width: 0;       
+}
+
+.guest-count-wrapper .field-label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #64748b;     
+    margin-bottom: 6px;
+}
+
+.guest-count-wrapper .guest-count-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ebd9b4;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #1a446c;
+    background-color: #ffffff;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.guest-count-wrapper .guest-count-input:focus {
+    border-color: #1a446c;
+}
 
 .guest-card-divider { border: none; border-top: 1px dashed #ebd9b4; margin-bottom: 15px; }
 .guest-fields-scroll { max-height: 420px; overflow-y: auto; padding-right: 5px; margin-bottom: 15px; }
@@ -315,41 +372,39 @@
 
 .action-bar-submit-only { border: none; padding: 5px 0 0 0; margin: 0; }
 .btn-submit-full { width: 100%; padding: 12px; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; }
-/* ==========================================================================
-   FORM & NÚT HỦY GÁN PHÒNG (UNASSIGN)
-   ========================================================================== */
 
-/* Container form hủy gán phòng (Ẩn mặc định, JS sẽ gọi hiện lên) */
+/* ==========================================================================
+   5. FORM & NÚT HỦY GÁN PHÒNG (UNASSIGN)
+   ========================================================================== */
 #unassignRoomForm {
     display: none;
     margin-top: 20px;
     padding-top: 15px;
-    border-top: 1px dashed #cbd5e1; /* Thêm đường viền gạch đứt để ngăn cách với thông tin ở trên */
+    border-top: 1px solid #ebd9b4; 
 }
 
-/* Style cho nút Hủy Gán màu đỏ (Cảnh báo) */
 .btn-unassign {
     width: 100%;
     padding: 12px 16px;
-    background-color: #1a446c; /* Màu đỏ mận (Danger) */
+    background-color: #1a446c; 
     color: #ffffff;
     border: none;
     border-radius: 4px;
     font-size: 14px;
     font-weight: 700;
-    font-family: 'Lora', serif; /* Đồng bộ font chữ với hệ thống */
+    font-family: 'Lora', serif; 
     cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-    box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2); /* Đổ bóng nhẹ */
+    text-transform: uppercase; 
+    letter-spacing: 0.5px;
+    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 4px rgba(26, 68, 108, 0.15); 
 }
 
-/* Hiệu ứng khi di chuột vào nút */
 .btn-unassign:hover {
-   background-color: #133250; /* Đỏ sậm hơn khi hover */
-    box-shadow: 0 4px 6px rgba(26, 68, 108, 0.3);
+    background-color: #123250; 
+    box-shadow: 0 4px 12px rgba(26, 68, 108, 0.25);
 }
 
-/* Hiệu ứng khi click (nhấn nút xuống) */
 .btn-unassign:active {
     transform: translateY(1px);
 }

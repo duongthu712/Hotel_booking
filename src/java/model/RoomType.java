@@ -49,14 +49,18 @@ public class RoomType {
         this.roomTypeAmenitys = roomTypeAmenitys;
     }
 
+    // Thêm Constructor này vào class RoomType
     public RoomType(int roomTypeId, String typeName, String description,
-            int capacity, String bedType, int bedCount, BigDecimal areaSqm,
-            BigDecimal basePrice, boolean active) {
-        this();
+            int numGuests, int numChildren, String bedType,
+            int bedCount, BigDecimal areaSqm, BigDecimal basePrice, boolean active) {
+        this(); // Gọi constructor mặc định để khởi tạo các List
         this.roomTypeId = roomTypeId;
         this.typeName = typeName;
         this.description = description;
-        this.capacity = capacity;
+        this.numGuests = numGuests;
+        this.numChildren = numChildren;
+        // Tự động tính capacity dựa trên 2 trường mới
+        this.capacity = numGuests + numChildren;
         this.bedType = bedType;
         this.bedCount = bedCount;
         this.areaSqm = areaSqm;
@@ -147,19 +151,11 @@ public class RoomType {
         return numGuests;
     }
 
-    public void setNumGuests(int numGuests) {
-        this.numGuests = numGuests;
-    }
 
     public int getNumChildren() {
         return numChildren;
     }
 
-    public void setNumChildren(int numChildren) {
-        this.numChildren = numChildren;
-    }
-
-    
     public BigDecimal getAreaSqm() {
         return areaSqm;
     }
@@ -223,5 +219,15 @@ public class RoomType {
     public void setAvailableRooms(int availableRooms) {
         this.availableRooms = availableRooms;
     }
-    
+
+    public void setNumGuests(int numGuests) {
+        this.numGuests = numGuests;
+        this.capacity = this.numGuests + this.numChildren; // Tự động cập nhật tổng
+    }
+
+    public void setNumChildren(int numChildren) {
+        this.numChildren = numChildren;
+        this.capacity = this.numGuests + this.numChildren; // Tự động cập nhật tổng
+    }
+
 }

@@ -24,7 +24,6 @@
         <jsp:include page="/view/common/navbar.jsp"/>
 
         <div class="room-list-page">
-
             <!-- Search bar -->
             <div class="search-bar" style="margin: 0 0 40px 0; width: 100%;">
                 <form action="${ctx}/search" method="GET"
@@ -153,7 +152,8 @@
                                     <div class="room-amenities-container">
                                         <div class="room-core-specs">
                                             <span class="badge-core-capacity">
-                                                Sức chứa: ${room.capacity} khách
+                                                <i class="fa-solid fa-users me-1"></i>
+                                                Người lớn: ${room.numGuests} | Trẻ em: ${room.numChildren}
                                             </span>
 
                                             <span class="badge-core-info">

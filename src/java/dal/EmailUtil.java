@@ -354,4 +354,75 @@ public class EmailUtil {
 
             Transport.send(message);
         }
+    
+    public static void sendWalkInBookingConfirmed(String toEmail, String guestName, String phone, String idNumber,
+            LocalDate dateOfBirth, String bookingCode, LocalDate checkinDate, LocalDate checkoutDate,
+            int numRooms, int numGuests, int numChildren, BigDecimal depositAmount, boolean isStayNow) throws Exception {
+
+        final String fromEmail = "phuonglinhthcsphuongdien@gmail.com";
+        final String appPassword = "pnzf biix zhmo zrxt";
+
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+
+        Session session = Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(fromEmail, appPassword);
+            }
+        });
+
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(fromEmail, "LaMer Hotel"));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
+
+        String subject = "La Mer Hotel - Xác nhận lập đơn đặt phòng tại quầy";
+
+        String idNumberText = idNumber == null || idNumber.trim().isEmpty() ? "Không cung cấp" : idNumber.trim();
+        String dateOfBirthText = dateOfBirth == null ? "Không cung cấp" : dateOfBirth.toString();
+        int totalOccupants = numGuests + numChildren;
+
+        // Xử lý chuỗi thông báo tiền cọc dựa theo luồng ở luôn hoặc đặt tương lai
+        String depositText;
+        if (isStayNow) {
+            depositText = "<strong style='color: #2e7d32;'>0 VNĐ (Không thu cọc - Thanh toán 100% khi Checkout)</strong>";
+        } else {
+            depositText = "<strong style='color: #2e7d32;'>" + depositAmount + " VNĐ (Đã xác nhận thanh toán thành công tại quầy)</strong>";
+        }
+
+        String htmlContent
+                = "<div style='font-family: Arial, sans-serif; color: #073842;'>"
+                + "<h2>La Mer Hotel - Thông tin đặt phòng tại quầy</h2>"
+                + "<p>Xin chào <strong>" + guestName + "</strong>,</p>"
+                + "<p>Chúng tôi xin thông báo đơn đặt phòng trực tiếp của bạn tại quầy lễ tân đã được lập thành công và xác nhận trên hệ thống.</p>"
+                + "<h3>Thông tin khách hàng:</h3>"
+                + "<ul>"
+                + "<li>Họ và tên: <strong>" + guestName + "</strong></li>"
+                + "<li>Email: <strong>" + toEmail + "</strong></li>"
+                + "<li>Số điện thoại: <strong>" + phone + "</strong></li>"
+                + "<li>CCCD/Hộ chiếu: <strong>" + idNumberText + "</strong></li>"
+                + "<li>Ngày sinh: <strong>" + dateOfBirthText + "</strong></li>"
+                + "</ul>"
+                + "<h3>Thông tin đơn đặt phòng:</h3>"
+                + "<ul>"
+                + "<li>Mã đặt phòng: <strong style='font-size: 16px; color: #1a446c;'>" + bookingCode + "</strong></li>"
+                + "<li>Ngày nhận phòng: <strong>" + checkinDate + "</strong></li>"
+                + "<li>Ngày trả phòng: <strong>" + checkoutDate + "</strong></li>"
+                + "<li>Số lượng phòng: <strong>" + numRooms + " phòng</strong></li>"
+                + "<li>Người lớn: <strong>" + numGuests + "</strong></li>"
+                + "<li>Trẻ em: <strong>" + numChildren + "</strong></li>"
+                + "<li>Tổng số người: <strong>" + totalOccupants + " người</strong></li>"
+                + "<li>Tiền đặt cọc: " + depositText + "</li>"
+                + "</ul>"
+                + "<p style='margin-top: 20px;'>Đơn hàng của bạn đã được lưu trữ an toàn. Bạn có thể sử dụng Mã đặt phòng trên để tra cứu thông tin bất cứ lúc nào.</p>"
+                + "<p>La Mer Hotel rất hân hạnh được phục vụ bạn!</p>"
+                + "</div>";
+
+        message.setSubject(MimeUtility.encodeText(subject, "UTF-8", "B"));
+        message.setContent(htmlContent, "text/html; charset=UTF-8");
+        Transport.send(message);
+    }
 }
