@@ -619,7 +619,7 @@ public class RoomTypeDAO extends DBContext {
     // 1. Hàm lấy danh sách khách đang ở
     public List<dto.RoomStayInfo> getStayingGuestsByRoomType(int roomTypeId) {
         List<dto.RoomStayInfo> list = new ArrayList<>();
-        String sql = "SELECT r.room_number, gs.full_name, gs.phone, b.checkout_date "
+        String sql = "SELECT r.room_id, r.room_number, gs.full_name, gs.phone, b.checkout_date "
                 + "FROM BookingRooms br "
                 + "JOIN Rooms r ON br.room_id = r.room_id "
                 + "JOIN Bookings b ON br.booking_id = b.booking_id "
@@ -631,6 +631,7 @@ public class RoomTypeDAO extends DBContext {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     list.add(new dto.RoomStayInfo(
+                            rs.getInt("room_id"),
                             rs.getString("room_number"),
                             rs.getString("full_name"),
                             rs.getString("phone"),
@@ -985,71 +986,5 @@ public RoomType getRoomDetailById(int roomTypeId) {
         return Math.max(availableRooms, 0);
     }
 
-    // Trả về danh sách Hạng phòng kèm Giá tiền, SỐ LƯỢNG PHÒNG TRỐNG và MÔ TẢ
-    public List<RoomType> searchAvailableRoomTypesForWalkIn(String checkIn, String checkOut) {
-        List<RoomType> list = new ArrayList<>();
-
-        // 1. Thêm rt.description vào câu SELECT
-        String sql = "SELECT rt.room_type_id, rt.type_name, rt.base_price, rt.capacity, rt.description, "
-                + "img.image_url AS firstImageUrl, "
-                + "avail.available_rooms "
-                + "FROM RoomTypes rt "
-                + "OUTER APPLY ( "
-                + "    SELECT TOP 1 rti.image_url FROM RoomTypeImages rti "
-                + "    WHERE rti.room_type_id = rt.room_type_id ORDER BY rti.image_id ASC "
-                + ") img "
-                + "CROSS APPLY ( "
-                + "    SELECT ( "
-                + "        (SELECT COUNT(*) FROM Rooms r WHERE r.room_type_id = rt.room_type_id AND r.[status] != N'Đang bảo trì') "
-                + "        - "
-                + "        ISNULL(( "
-                + "            SELECT SUM(b.num_rooms) FROM Bookings b "
-                + "            WHERE b.room_type_id = rt.room_type_id "
-                + "            AND b.[status] != N'Đã hủy' "
-                + "            AND NOT (b.checkout_date <= ? OR b.checkin_date >= ?) "
-                + "            AND ( "
-                + "                b.[status] != N'Chờ xử lý' "
-                + "                OR ISNULL(b.[source], '') != N'Đặt phòng trực tuyến' "
-                + "                OR DATEADD(MINUTE, ?, b.created_at) > GETDATE() "
-                + "                OR EXISTS (SELECT 1 FROM DepositPayments dp WHERE dp.booking_id = b.booking_id) "
-                + "            ) "
-                + "        ), 0) "
-                + "    ) AS available_rooms "
-                + ") avail "
-                + "WHERE rt.is_active = 1 AND avail.available_rooms > 0 "
-                + "ORDER BY rt.base_price ASC";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, checkOut);
-            ps.setString(2, checkIn);
-            ps.setInt(3, HOLD_MINUTES);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    RoomType rt = new RoomType();
-                    rt.setRoomTypeId(rs.getInt("room_type_id"));
-                    rt.setTypeName(rs.getString("type_name"));
-                    rt.setBasePrice(rs.getBigDecimal("base_price"));
-                    rt.setCapacity(rs.getInt("capacity"));
-
-                    // 2. Gán giá trị description lấy từ database
-                    rt.setDescription(rs.getString("description"));
-
-                    rt.setAvailableRooms(rs.getInt("available_rooms"));
-
-                    String firstImage = rs.getString("firstImageUrl");
-                    if (firstImage != null && !firstImage.trim().isEmpty()) {
-                        rt.addImage(firstImage, "");
-                    }
-
-                    list.add(rt);
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("Lỗi searchAvailableRoomTypesForWalkIn: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return list;
-    }
-
+  
 }

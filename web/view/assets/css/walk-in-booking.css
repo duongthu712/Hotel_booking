@@ -1,93 +1,636 @@
-/* 1. RESET BODY */
-body {
+/* ==========================================================================
+   1. RESET, PHÔNG CHỮ & NỀN CHỦ ĐẠO (ĐỒNG BỘ 100% PHÔNG CHỮ LORA)
+   ========================================================================== */
+* {
     margin: 0;
     padding: 0;
-    background-color: #F9F5EB;
-}
-
-/* 2. CONTAINER: Ép nội dung căn giữa */
-.walkin-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column; /* Chuyển thành column để Card Search và Bảng nằm trên dưới */
-    align-items: center;    /* Căn giữa toàn bộ nội dung */
-    padding: 30px 20px;
     box-sizing: border-box;
 }
 
-/* 3. CARD SEARCH */
-.walkin-search-card {
-    background-color: #F9F5EB;
-    padding: 25px;
-    border: 1px solid #ebd9b4;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(187, 161, 95, 0.15);
+body {
+    background-color: #F9F5EB !important; 
+    color: #1a446c;
+    font-family: 'Lora', serif !important; /* Ép phông chủ đạo cho toàn bộ trang */
+}
+
+/* Khung chứa chính rộng rãi */
+.walkin-container {
+    padding: 20px 50px; 
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: fit-content;
-    min-width: 600px;
-    margin-bottom: 40px; /* Tạo khoảng cách với bảng bên dưới */
 }
 
-/* 4. TITLE & SECTION TITLE */
-.walkin-title, .section-title {
+.walkin-title {
+    font-family: 'Lora', serif !important;
+    font-size: 24px;
+    font-weight: 600;
     color: #1a446c;
-    font-family: 'Lora', serif;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     text-align: center;
+    margin-bottom: 20px;
 }
 
-.section-title { margin: 30px 0 20px 0; font-size: 20px; }
-
-/* 5. FORM SEARCH */
-.walkin-search-form { display: flex; flex-direction: row; align-items: flex-end; gap: 20px; justify-content: center; }
-.walkin-search-field { display: flex; flex-direction: row; align-items: center; gap: 10px; white-space: nowrap; }
-.walkin-search-field label { font-family: 'Lora', serif; font-size: 16px; font-weight: 600; color: #1a446c; }
-.walkin-search-field input { width: 180px; padding: 8px 10px; border: 1px solid #ebd9b4; border-radius: 4px; font-family: 'Lora', serif; outline: none; }
-
-/* 6. TABLE STYLES (ĐÃ TỐI ƯU ĐỂ KHÔNG VỠ) */
-.walkin-result-table {
-    width: 100%;
-    max-width: 1000px; /* Giới hạn độ rộng tối đa */
-    border-collapse: collapse;
-    background: #fff;
+/* ==========================================================================
+   2. KHUNG TÌM KIẾM (SEARCH CARD)
+   ========================================================================== */
+.walkin-search-card {
+    background-color: transparent;
     border: 1px solid #ebd9b4;
-    table-layout: fixed; /* Cố định cột để tránh tràn */
+    padding: 24px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(26, 68, 108, 0.03);
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.walkin-result-table th { background: #1a446c; color: #ebd9b4; padding: 15px; text-align: left; }
-.walkin-result-table td { padding: 12px; border-bottom: 1px solid #ebd9b4; word-wrap: break-word; }
+.walkin-search-card .walkin-title {
+    font-family: 'Lora', serif !important;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a446c;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 20px;
+}
 
-/* Định nghĩa độ rộng cột để cân đối */
-.col-type { width: 20%; }
-.col-desc { width: 35%; }
-.col-amenity { width: 25%; }
-.col-price { width: 20%; }
+.walkin-search-form {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 16px;
+    width: 100%;
+    justify-content: center;
+}
 
-/* 7. CÁC THÀNH PHẦN KHÁC */
-.walkin-search-btn {
-    padding: 8px 25px;
-    background-color: #1a446c;
-    color: white;
-    border: none;
+.walkin-search-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
+.walkin-search-field label {
+    display: block;
+    font-family: 'Lora', serif !important;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #1a446c;
+}
+
+/* Các Input, Select đồng bộ chiều cao và phông chữ */
+.walkin-search-field input[type="date"],
+.walkin-search-field select,
+.walkin-search-field input[type="number"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ebd9b4;
     border-radius: 4px;
+    font-family: 'Lora', serif !important;
+    font-size: 14px;
+    color: #1a446c;
+    background-color: #ffffff;
+    outline: none;
+    height: 39px;
+    transition: all 0.2s ease;
+}
+
+.walkin-search-field select {
+    cursor: pointer;
+}
+
+.walkin-search-field input[type="date"]:focus,
+.walkin-search-field select:focus,
+.walkin-search-field input[type="number"]:focus {
+    border-color: #1a446c;
+    box-shadow: 0 0 0 3px rgba(26, 68, 108, 0.05);
+}
+
+/* ==========================================================================
+   3. HÀNH ĐỘNG & NÚT BẤM (BUTTONS)
+   ========================================================================== */
+.walkin-search-btn {
+    font-family: 'Lora', serif !important;
+    background-color: #1a446c;
+    color: #ffffff;
+    border: none;
+    padding: 0 28px;
+    border-radius: 4px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    font-family: 'Lora', serif;
+    height: 39px;
+    align-self: flex-end;
+    transition: background-color 0.2s ease;
 }
 
-.amenity-badge {
-    background-color: #f1ebd8;
-    color: #1a446c;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 11px;
+.walkin-search-btn:hover {
+    background-color: #112d47;
+}
+
+.walkin-action-btn {
+    font-family: 'Lora', serif !important;
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    text-decoration: none;
+    color: #ffffff !important;
+    background-color: #1a446c !important;
+    padding: 8px 14px;
+    border-radius: 4px;
     display: inline-block;
-    margin: 2px;
-    border: 1px solid #ebd9b4;
+    transition: background-color 0.2s ease;
+    text-align: center;
+    white-space: nowrap;
+    border: none !important;
+    cursor: pointer;
 }
 
-.status-empty { color: #d63c3c; font-weight: bold; }
-.status-available { color: #28a745; font-weight: bold; }
+.walkin-action-btn:hover {
+    background-color: #112d47 !important;
+}
+
+/* ==========================================================================
+   4. BẢNG KẾT QUẢ DANH SÁCH PHÒNG
+   ========================================================================== */
+.walkin-result-table {
+    width: 100%;
+    max-width: 1200px;
+    border-collapse: collapse;
+    background-color: transparent;
+    border: 1px solid #ebd9b4;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(26, 68, 108, 0.05);
+    table-layout: fixed;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.walkin-result-table thead th {
+    background-color: #1a446c;
+    color: #ebd9b4;
+    font-family: 'Lora', serif !important;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 14px 16px;
+    border-bottom: 2px solid #ebd9b4;
+    text-align: left;
+}
+
+.walkin-result-table tbody td {
+    padding: 16px;
+    border-bottom: 1px solid #ebd9b4;
+    font-family: 'Lora', serif !important;
+    font-size: 14px;
+    color: #1a446c;
+    vertical-align: middle;
+    background-color: transparent;
+}
+
+.walkin-result-table tbody tr:hover {
+    background-color: rgba(26, 68, 108, 0.04);
+}
+
+.walkin-result-table tr:last-child td {
+    border-bottom: none;
+}
+
+.room-type-name, .room-price {
+    font-weight: 600;
+    color: #1a446c;
+}
+
+.room-price {
+    font-weight: 700;
+}
+
+.room-capacity-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.capacity-badge {
+    background-color: #f8fafc;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12.5px;
+    font-weight: 500;
+    font-family: 'Lora', serif !important;
+}
+
+.status-empty {
+    font-family: 'Lora', serif !important;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    background-color: #fee2e2;
+    color: #c92a2a;
+    border: 1px solid #fca5a5;
+}
+
+.status-available {
+    font-family: 'Lora', serif !important;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    background-color: #e8f5e9;  
+    color: #2e7d32;  
+    border: 1px solid #c8e6c9;  
+}
+
+/* ==========================================================================
+   5. LAYOUT PHẦN ĐẶT PHÒNG TẠI QUẦY & HOÁ ĐƠN TỔNG HỢP
+   ========================================================================== */
+.booking-progress {
+    width: 100%;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
+}
+
+.booking-progress .progress-name {
+    font-family: 'Lora', serif !important;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a446c;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #ebd9b4;
+    padding-bottom: 8px;
+}
+
+.booking-layout {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 1200px;
+    margin-bottom: 40px;
+}
+
+.booking-left {
+    flex: 7;
+}
+
+.booking-section {
+    background: transparent !important; 
+    padding: 24px;
+    border-radius: 8px;
+    border: 1px solid #ebd9b4;
+    box-shadow: 0 4px 15px rgba(26, 68, 108, 0.02);
+    margin-bottom: 25px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+}
+
+.form-group label {
+    font-family: 'Lora', serif !important;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #1a446c;
+}
+
+.form-group label span {
+    color: #c92a2a;
+}
+
+.form-group input[type="text"],
+.form-group input[type="tel"],
+.form-group input[type="email"],
+.form-group input[type="date"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ebd9b4;
+    border-radius: 4px;
+    font-family: 'Lora', serif !important;
+    font-size: 14px;
+    color: #1a446c;
+    background-color: #ffffff;
+    outline: none;
+    height: 40px;
+    transition: all 0.2s ease;
+}
+
+.form-group input:focus {
+    border-color: #1a446c;
+    box-shadow: 0 0 0 3px rgba(26, 68, 108, 0.04);
+}
+
+.form-group small {
+    font-family: 'Lora', serif !important;
+    font-size: 11.5px;
+    color: #718096;
+    margin-top: 2px;
+}
+
+.summary-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ebd9b4;
+    padding-bottom: 10px;
+}
+
+.summary-title .progress-number {
+    background-color: #1a446c;
+    color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Lora', serif !important;
+    font-weight: bold;
+}
+
+.summary-title h2 {
+    font-family: 'Lora', serif !important;
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    color: #1a446c !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ==========================================================================
+   6. HÓA ĐƠN TÓM TẮT (ASIDE SUMMARY CARD)
+   ========================================================================== */
+.booking-summary {
+    flex: 3;
+    background: transparent !important; 
+    padding: 24px;
+    border-radius: 8px;
+    border: 1px solid #ebd9b4;
+    box-shadow: 0 4px 20px rgba(26, 68, 108, 0.04);
+    position: sticky;
+    top: 20px;
+}
+
+.booking-summary .summary-title h2 {
+    margin-left: 0 !important;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #1a446c;
+    font-family: 'Lora', serif !important;
+}
+
+.summary-divider {
+    border-top: 1px dashed #ebd9b4;
+    margin: 15px 0;
+    width: 100%;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 5px;
+    font-family: 'Lora', serif !important;
+}
+
+#cashPaymentGuide {
+    background: rgba(235, 217, 180, 0.15); 
+    padding: 15px;
+    border-left: 4px solid #ebd9b4;
+    border-radius: 4px;
+    font-family: 'Lora', serif !important;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: #1a446c;
+}
+
+#qrPaymentGateway {
+    text-align: center;
+    background: transparent;
+    padding: 20px;
+    border: 1px dashed #ebd9b4;
+    border-radius: 8px;
+}
+
+#qrPaymentGateway p {
+    font-family: 'Lora', serif !important;
+    font-size: 14px;
+    color: #1a446c;
+    margin-bottom: 8px;
+}
+
+#vietQrCode {
+    max-width: 230px;
+    border: 1px solid #ebd9b4;
+    padding: 10px;
+    background: #ffffff;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+/* ==========================================================================
+   7. KHỐI THÔNG BÁO LUỒNG Ở LUÔN & THÔNG BÁO LỖI INLINE
+   ========================================================================== */
+#stayNowNotice {
+    background-color: rgba(46, 125, 50, 0.06); 
+    color: #2e7d32;
+    padding: 12px;
+    border-radius: 4px;
+    font-family: 'Lora', serif !important;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 15px;
+    border: 1px solid rgba(46, 125, 50, 0.2);
+    line-height: 1.4;
+}
+
+.form-error-inline {
+    color: #c92a2a; 
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 4px;
+    display: none;
+    font-family: 'Lora', serif !important;
+}
+
+.input-error-border {
+    border-color: #c92a2a !important;
+    background-color: #fdf3f3 !important; 
+}
+
+/* ==========================================================================
+   8. SỬA ĐỒNG BỘ PHÔNG CHỮ CHO LỰA CHỌN PHƯƠNG THỨC THANH TOÁN (MỚI CẬP NHẬT)
+   ========================================================================== */
+.payment-method-label {
+    font-family: 'Lora', serif !important; /* Ép đồng bộ phông chữ Lora */
+    font-size: 14.5px !important;
+    font-weight: 600 !important; 
+    color: #1a446c !important;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px; 
+    transition: color 0.2s ease;
+}
+
+.payment-method-label input[type="radio"] {
+    cursor: pointer;
+    accent-color: #1a446c; 
+    width: 16px;
+    height: 16px;
+}
+
+.payment-method-label:hover {
+    color: #112d47 !important;
+}
+/* ==========================================================================
+   10. KHỐI THÔNG BÁO THÀNH CÔNG ĐƠN TƯƠNG LAI (SUCCESS BANNER)
+   ========================================================================== */
+.walkin-success-banner {
+    width: 100%;
+    max-width: 1100px;
+    background-color: rgba(46, 125, 50, 0.06); /* Xanh lá nhạt dịu mắt chuẩn Lamer */
+    color: #2e7d32;
+    padding: 15px 20px;
+    border-radius: 8px;
+    border: 1px solid rgba(46, 125, 50, 0.2);
+    font-family: 'Lora', serif !important;
+    font-size: 14.5px;
+    margin-bottom: 20px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.03);
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* ==========================================================================
+   11. GIAO DIỆN POP-UP THÔNG BÁO (MODAL POPUP)
+   ========================================================================== */
+.walkin-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(26, 68, 108, 0.4); /* Nền tối mờ nhẹ theo tông xanh đại dương */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeInBg 0.3s ease forwards;
+}
+
+.walkin-popup-content {
+    background-color: #F9F5EB; /* Nền kem chuẩn La Mer Hotel */
+    border: 1px solid #ebd9b4;
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 450px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(26, 68, 108, 0.15);
+    font-family: 'Lora', serif !important;
+    animation: scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.walkin-popup-content h3 {
+    color: #1a446c;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.walkin-popup-content p {
+    color: #4a5568;
+    font-size: 14.5px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.popup-code-box {
+    background-color: rgba(235, 217, 180, 0.25);
+    border: 1px dashed #ebd9b4;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.popup-code-box span {
+    font-size: 14px;
+    color: #4a5568;
+}
+
+.popup-code-box strong {
+    font-size: 18px;
+    color: #1a446c;
+    letter-spacing: 1px;
+}
+
+.popup-close-btn {
+    background-color: #1a446c;
+    color: #ffffff;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 4px;
+    font-family: 'Lora', serif !important;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: 100%;
+}
+
+.popup-close-btn:hover {
+    background-color: #112d47;
+}
+
+/* Hiệu ứng chuyển động mượt mà */
+@keyframes fadeInBg {
+    from { background-color: rgba(26, 68, 108, 0); }
+    to { background-color: rgba(26, 68, 108, 0.4); }
+}
+
+@keyframes scaleUp {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}

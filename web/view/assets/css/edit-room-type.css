@@ -1,4 +1,4 @@
-/* === 1. ĐỊNH DẠNG CƠ BẢN (GIỮ NGUYÊN) === */
+/* === 1. ĐỊNH DẠNG CƠ BẢN === */
 * {
     margin: 0;
     padding: 0;
@@ -74,7 +74,7 @@ body {
     background-color: #ffffff;
 }
 
-/* === 2. BẢNG DỊCH VỤ & TIỆN NGHI (GIỮ NGUYÊN) === */
+/* === 2. BẢNG DỊCH VỤ === */
 .service-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
 .service-table thead th {
     color: #1a446c;
@@ -102,10 +102,8 @@ body {
     text-align: center;
     background-color: #ffffff;
 }
-.check-box-wrapper { display: flex; align-items: center; cursor: pointer; font-family: 'Lora', serif; }
-.check-box-wrapper input { margin-right: 8px; width: 16px; height: 16px; cursor: pointer; }
 
-/* === 3. KHỐI ẢNH (ĐỒNG BỘ VỚI TRANG ADD) === */
+/* === 3. KHỐI ẢNH (TỐI ƯU HÓA LAYOUT) === */
 #imageFieldsContainer {
     display: flex;
     flex-direction: column;
@@ -114,13 +112,13 @@ body {
 }
 
 .img-group {
-    background-color: #fdfaf6;
+    background-color: #F9F5EB !important;
     border: 1px solid #e1dcd5;
     border-radius: 12px;
     padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px; /* Giảm gap chung để kiểm soát khoảng cách từng phần tử tốt hơn */
 }
 
 .input-section {
@@ -135,6 +133,7 @@ body {
     font-weight: 600;
 }
 
+/* Nút Xóa: Nhỏ gọn, cách xa Choose File */
 .btn-delete {
     background-color: #0f4c5c;
     color: white;
@@ -145,9 +144,14 @@ body {
     font-size: 12px;
     font-weight: 500;
     align-self: flex-start;
-    margin-top: 15px;
+    margin-top: 15px; /* Tăng margin-top để nút xóa không bị dính vào ảnh */
 }
 .btn-delete:hover { background-color: #0a3a47; }
+
+/* Tạo khoảng cách cho input file */
+input[type="file"] {
+    margin-bottom: 5px;
+}
 
 .btn-add {
     font-family: 'Lora', serif;
@@ -167,8 +171,8 @@ body {
     border-radius: 8px;
     border: 1px solid #ddd;
     display: block;
-    margin-top: 15px;
-    margin-bottom: 10px;
+    margin-top: 15px;      /* Tăng khoảng cách từ ảnh lên khung input/link bên trên */
+    margin-bottom: 10px;   /* Tạo khoảng cách phía dưới ảnh */
 }
 
 /* === 4. KHỐI ĐIỀU HƯỚNG === */
@@ -179,7 +183,7 @@ body {
     border-top: 1px dashed #ebd9b4;
     padding-top: 25px;
     margin-top: 30px;
-     text-decoration: none;
+    text-decoration: none;
 }
 .btn-submit {
     background-color: #1a446c;
@@ -189,7 +193,7 @@ body {
     cursor: pointer;
     border: none;
 }
-.required-star { color: #dc3545 !important; font-weight: bold; margin-left: 4px; }
+.required-star { color: #dc3545 !important; font-weight: bold; }
 .status-block { margin-top: 40px !important; }
 /* Nút Quay lại - Đã chuyển đổi thành phong cách Button */
 .btn-link-back {

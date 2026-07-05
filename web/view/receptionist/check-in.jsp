@@ -36,6 +36,13 @@
                 </div>
             </div>
 
+            <!-- Khối thông báo thành công khi cập nhật lịch hẹn -->
+            <c:if test="${param.successTime eq 'true'}">
+                <div class="alert alert-success" style="text-align: center; margin-bottom: 15px; padding: 10px; background-color: #d1fae5; color: #065f46; border-radius: 6px; font-weight: 500; font-family: 'Lora', serif; font-size: 14px;">
+                    Cập nhật giờ hẹn đến và gia hạn giữ phòng thành công!
+                </div>
+            </c:if>
+
             <div class="search-card">
                 <h3>Tìm Kiếm Đơn Đặt Phòng</h3>
                 <form action="${pageContext.request.contextPath}/checkin" method="GET">
@@ -56,27 +63,83 @@
                         <p><strong>Khách đặt trực tuyến:</strong> ${booking.guestFullName}</p>
                         <p><strong>Hạng phòng đã đặt:</strong> ${booking.roomTypeName}</p>
                         <p><strong>Số lượng phòng thuê:</strong> ${booking.numRooms} phòng</p>
-                        <p><strong>Sức chứa tối đa:</strong> ${booking.capacity} khách/phòng</p>
+                        <p><strong>Sức chứa tối đa:</strong> ${booking.maxAdults} người lớn & ${booking.maxChildren} trẻ em /phòng</p>
                         <p><strong>Trạng thái cọc:</strong> ${booking.paymentStatus}</p>
                         <p><strong>Trạng thái đơn:</strong> 
                             <span class="${booking.status eq 'Đã nhận phòng' ? 'badge-success' : (booking.status eq 'Đã hủy' ? 'badge-danger' : 'badge-warning')}">${booking.status}</span>
                         </p>
                         <c:if test="${booking.status eq 'Đã nhận phòng' and not empty booking.actualCheckInTime}">
                             <p><strong>Thời gian nhận phòng:</strong> <span class="text-success-highlight">${fn:substring(booking.actualCheckInTime, 0, 19)}</span></p>
-                            </c:if>
+                        </c:if>
+                        
+                        <!-- Hiển thị lịch hẹn hiện tại nếu có cuộc gọi note trước -->
+                        <c:if test="${not empty booking.expectedCheckInTime}">
+                            <p><strong>Lịch hẹn gọi điện:</strong> <span style="font-weight: 600;">Khách báo đến lúc ${fn:substring(booking.expectedCheckInTime, 0, 5)}</span></p>
+                            <p><strong>Ghi chú cuộc gọi:</strong> <span class="text-muted" style="font-style: italic; color: #4b5563;">"${booking.callNote}"</span></p>
+                        </c:if>
+
+                        <div class="room-progress-block">
+                            <span class="progress-title">Tiến độ gán phòng:</span> 
+                            <span class="progress-status-text">
+                                Đã gán <span class="badge-assigned">${booking.assignedRoomsCount} / ${booking.numRooms} phòng</span>
+                                <c:if test="${booking.assignedRoomsCount > 0}">
+                                    (Gồm phòng: <strong class="assigned-room-list">${booking.assignedRoomList}</strong>)
+                                </c:if>
+
+                                <c:choose>
+                                    <c:when test="${booking.numRooms - booking.assignedRoomsCount > 0}">
+                                        <span class="status-missing">➔ Còn thiếu: ${booking.numRooms - booking.assignedRoomsCount} phòng</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="status-full">➔ Đã đủ phòng!</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </span>
+                        </div>
                     </div>
 
+                    <c:if test="${booking.status eq 'Đã xác nhận'}">
+                        <div class="special-request-card">
+                            <div class="request-card-header">
+                                <span class="request-title-text">Ghi nhận cuộc gọi hẹn giờ của Khách</span>
+                            </div>
+                            <form action="${pageContext.request.contextPath}/checkin" method="POST" style="margin-top: 15px;">
+                                <input type="hidden" name="bookingId" value="${booking.bookingId}" />
+                                <input type="hidden" name="bookingCode" value="${booking.bookingCode}" />
+                                
+                                <div style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap; width: 100%;">
+                                    <div style="flex: 1; min-width: 150px;">
+                                        <label style="display: block; font-family: 'Lora', serif; font-size: 13.5px; font-weight: 600; margin-bottom: 6px; color: #1a446c;">Giờ hẹn đến *</label>
+                                        <input type="time" name="expectedTime" required style="width: 100%; padding: 10px 14px; border: 1px solid #ebd9b4; border-radius: 4px; font-family: 'Lora', serif; font-size: 14px; color: #1a446c; outline: none; background-color: #ffffff;" 
+                                               value="${not empty booking.expectedCheckInTime ? fn:substring(booking.expectedCheckInTime, 0, 5) : ''}"/>
+                                    </div>
+                                    <div style="flex: 3; min-width: 250px;">
+                                        <label style="display: block; font-family: 'Lora', serif; font-size: 13.5px; font-weight: 600; margin-bottom: 6px; color: #1a446c;">Nội dung ghi chú cuộc gọi *</label>
+                                        <input type="text" name="note" placeholder="Nhập nhanh lý do..." required 
+                                               style="width: 100%; padding: 10px 14px; border: 1px solid #ebd9b4; border-radius: 4px; font-family: 'Lora', serif; font-size: 14px; color: #1a446c; outline: none; background-color: #ffffff;"
+                                               value="${not empty booking.callNote ? booking.callNote : ''}"/>
+                                    </div>
+                                    <div style="flex: 1; min-width: 150px; text-align: right;">
+                                        <button type="submit" name="action" value="updateExpectedTime" class="btn-success" style="width: 100%; height: 41px; padding: 0 15px;">
+                                            Đánh dấu lịch hẹn
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </c:if>
+
                     <c:if test="${not empty booking.requestType}">
-                        <div class="switch-block" style="background-color: rgba(26, 68, 108, 0.05); border: 1px solid rgba(26, 68, 108, 0.2); margin-top: 0; margin-bottom: 20px; display: block;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                                <span style="font-family: 'Lora', serif; font-size: 14px; font-weight: 700; color: #1a446c; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <div class="special-request-card">
+                            <div class="request-card-header">
+                                <span class="request-title-text">
                                     Yêu Cầu Đặc Biệt Từ Khách Hàng:
                                 </span>
                                 <span class="${booking.requestStatus eq 'Chờ xử lý' ? 'badge-warning' : 'badge-success'}">
                                     ${booking.requestStatus}
                                 </span>
                             </div>
-                            <p style="font-family: 'Lora', serif; font-size: 14px; color: #4f6f8f; margin: 0; line-height: 1.5;">
+                            <p class="request-content-text">
                                 <strong>Loại dịch vụ:</strong> ${booking.requestType}<br>
                                 <strong>Chi tiết:</strong> ${booking.requestDetails}
                             </p>
@@ -89,27 +152,40 @@
                         <input type="hidden" name="bookingId" value="${booking.bookingId}" />
                         <input type="hidden" name="bookingCode" value="${booking.bookingCode}" />
                         <input type="hidden" name="currentGuestId" value="${booking.guestId}" />
-                        <input type="hidden" name="maxCapacity" value="${booking.capacity}" />
                         <input type="hidden" name="numRooms" value="${booking.numRooms}" />
+                        <input type="hidden" name="maxAdults" value="${booking.maxAdults}" />
+                        <input type="hidden" name="maxChildren" value="${booking.maxChildren}" />
 
-                        <label><b>Số khách thực tế *</b></label>
-                        <input type="number" name="numGuests" min="1" required placeholder="Nhập số người lưu trú..." value="${not empty param.numGuests ? param.numGuests : booking.numGuests}" />
+                        <div class="guest-input-container" style="margin-bottom: 20px;">
+                            <label><b>Số khách thực tế *</b></label>
 
-                        <div class="switch-block <c:if test="${booking.status eq 'Đã nhận phòng' or booking.status eq 'Đã hủy'}">hide-element</c:if>">
-                                <input type="checkbox" name="isDifferentGuest" id="isDifferentGuest" value="true">
-                                <label for="isDifferentGuest"><b>Khách làm thủ tục nhận phòng là người khác (Người đặt hộ)</b></label>
+                            <div class="guest-input-group">
+                                <label for="numAdults">Người lớn:</label>
+                                <input type="number" id="numAdults" name="numAdults" min="1" required placeholder="Số người lớn..." 
+                                       value="${not empty param.numAdults ? param.numAdults : (booking.numGuests != null ? booking.numGuests : 1)}" />
                             </div>
 
-                            <h5>Hồ Sơ Khách Đại Diện Lưu Trú</h5>
+                            <div class="guest-input-group">
+                                <label for="numChildren">Trẻ em:</label>
+                                <input type="number" id="numChildren" name="numChildren" min="0" required placeholder="Số trẻ em..." 
+                                       value="${not empty param.numChildren ? param.numChildren : 0}" />
+                            </div>
+                        </div>
 
-                            <label>Họ và tên *</label>
-                            <input type="text" name="idFullName" value="${booking.guestFullName}" required />
+                        <div class="switch-block <c:if test="${booking.status eq 'Đã nhận phòng' or booking.status eq 'Đã hủy'}">hide-element</c:if>">
+                            <input type="checkbox" name="isDifferentGuest" id="isDifferentGuest" value="true">
+                            <label for="isDifferentGuest"><b>Khách làm thủ tục nhận phòng là người khác (Người đặt hộ)</b></label>
+                        </div>
+
+                        <h5>Hồ Sơ Khách Đại Diện Lưu Trú</h5>
+
+                        <label>Họ và tên *</label>
+                        <input type="text" name="idFullName" value="${booking.guestFullName}" required />
 
                         <label>Số điện thoại</label>
                         <input type="text" name="idPhone" value="${booking.guestPhone}" />
 
-                        <label>Email</label>
-                        <input type="email" name="idEmail" value="${booking.guestEmail}" />
+                        <input type="hidden" name="idEmail" value="" />
 
                         <label>Số CCCD / Hộ chiếu *</label>
                         <input type="text" name="idNumber" required placeholder="Nhập số giấy tờ tùy thân..." value="${booking.idNumber}" />
@@ -128,15 +204,23 @@
 
                         <div class="form-footer footer-buttons-flex">
                             <c:choose>
-                                <c:when test="${booking.status eq 'Đã nhận phòng'}">
-                                    <button type="submit" name="action" value="checkin" class="btn-success">Cập Nhật Thông Tin Lưu Trú</button>
-                                </c:when>
                                 <c:when test="${booking.status eq 'Đã hủy'}">
                                     <button type="button" class="btn-success btn-disabled" disabled>Đơn Đã Bị Hủy</button>
                                 </c:when>
                                 <c:otherwise>
-                                    <button type="submit" name="action" value="checkin" class="btn-success">Xác Nhận Check-In</button>
-                                    <button type="submit" name="action" value="cancel" class="btn-success btn-danger-flat" onclick="return confirm('Bạn có chắc chắn muốn hủy đơn đặt phòng này do khách không đến (No-Show)?');">Hủy Đơn (No-Show)</button>
+                                    <button type="submit" name="action" value="checkin" class="btn-success">
+                                        Lưu Hồ Sơ Lưu Trú
+                                    </button>
+
+                                    <c:if test="${booking.assignedRoomsCount < booking.numRooms}">
+                                        <button type="submit" name="action" value="assign" class="btn-success" >
+                                            Tiến Hành Gán Phòng Tiếp Theo
+                                        </button>
+                                    </c:if>
+
+                                    <c:if test="${booking.status eq 'Đã xác nhận'}">
+                                        <button type="submit" name="action" value="cancel" class="btn-success btn-danger-flat" onclick="return confirm('Bạn có chắc chắn muốn hủy đơn đặt phòng này do khách không đến (No-Show)?');">Hủy Đơn</button>
+                                    </c:if>
                                 </c:otherwise>
                             </c:choose>
                         </div>
@@ -152,6 +236,7 @@
                         <tr>
                             <th>Mã Đặt Phòng</th>
                             <th>Khách Hàng</th>
+                            <th>Số Điện Thoại</th>
                             <th>Hạng Phòng</th>
                             <th>Trạng Thái</th>
                             <th>Giờ Hẹn Đến</th>
@@ -164,19 +249,31 @@
                             <tr>
                                 <td>${b.bookingCode}</td>
                                 <td>
-                                    <span class="td-name">${b.guestFullName}</span>
+                                    <span class="td-name" style="display: block; font-weight: 600;">${b.guestFullName}</span>
 
                                     <c:if test="${b.requestType eq 'Nhận phòng muộn' and b.status eq 'Đã xác nhận' and b.requestStatus eq 'Đã phê duyệt'}">
-                                        <span class="badge-success" style="background-color: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; margin-left: 6px; font-size: 11px; padding: 2px 6px; text-transform: none; font-weight: 500; border-radius: 4px;">
+                                        <span class="badge-success" style="background-color: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; font-size: 11px; padding: 2px 6px; text-transform: none; font-weight: 500; border-radius: 4px; display: inline-block; margin-top: 4px;">
                                             Nhận phòng muộn
                                         </span>
                                     </c:if>
 
                                     <c:if test="${b.requestType eq 'Nhận phòng sớm' and b.status eq 'Đã xác nhận' and b.requestStatus eq 'Đã phê duyệt'}">
-                                        <span class="badge-success" style="background-color: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; margin-left: 6px; font-size: 11px; padding: 2px 6px; text-transform: none; font-weight: 500; border-radius: 4px;">
+                                        <span class="badge-success" style="background-color: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; font-size: 11px; padding: 2px 6px; text-transform: none; font-weight: 500; border-radius: 4px; display: inline-block; margin-top: 4px;">
                                             Nhận phòng sớm
                                         </span>
                                     </c:if>
+                                    
+                                    <!-- Hiển thị tag trạng thái đã gọi điện đặt lịch (Sử dụng badge-warning của hệ thống) -->
+                                    <c:if test="${not empty b.expectedCheckInTime and b.status eq 'Đã xác nhận'}">
+                                        <span class="badge-warning" style="font-size: 11px; padding: 2px 6px; text-transform: none; font-weight: 500; border-radius: 4px; display: inline-block; margin-top: 4px;" title="Ghi chú cuộc gọi: ${b.callNote}">
+                                            Đã hẹn giờ đến
+                                        </span>
+                                    </c:if>
+                                </td>
+                                <td>
+                                    <span class="td-phone" style="font-size: 14px; color: #475569; font-weight: 500;">
+                                        ${b.guestPhone}
+                                    </span>
                                 </td>
                                 <td><span class="room-badge">${b.roomTypeName}</span></td>
                                 <td>
@@ -193,11 +290,13 @@
                                     </c:choose>
                                 </td>
 
-                                <%-- CỘT 1: GIỜ HẸN ĐẾN ĐỘNG --%>
                                 <td class="time-col-text">
                                     <c:choose>
+                                        <c:when test="${not empty b.expectedCheckInTime}">
+                                            <span style="font-weight: 700;" title="Ghi chú cuộc gọi: ${b.callNote}">${fn:substring(b.expectedCheckInTime, 0, 5)}</span>
+                                        </c:when>
                                         <c:when test="${(b.requestType eq 'Nhận phòng muộn' or b.requestType eq 'Nhận phòng sớm') and b.requestStatus eq 'Đã phê duyệt' and not empty b.requestedCheckIn}">
-                                            <span style="color: #0369a1; font-weight: 600;">${fn:substring(b.requestedCheckIn, 11, 16)}</span>
+                                            <span>${fn:substring(b.requestedCheckIn, 11, 16)}</span>
                                         </c:when>
                                         <c:otherwise>
                                             <span class="text-muted-dash">—</span>
@@ -205,7 +304,6 @@
                                     </c:choose>
                                 </td>
 
-                                <%-- CỘT 2: GIỜ VÀO THỰC TẾ --%>
                                 <td class="time-col-text">
                                     <c:choose>
                                         <c:when test="${b.status eq 'Đã nhận phòng' and not empty b.actualCheckInTime}">
@@ -227,8 +325,6 @@
                                         </a>
 
                                         <c:if test="${b.status eq 'Đã xác nhận'}">
-
-
                                             <form action="${pageContext.request.contextPath}/checkin" method="POST" class="form-inline-table">
                                                 <input type="hidden" name="bookingId" value="${b.bookingId}" />
                                                 <input type="hidden" name="bookingCode" value="${b.bookingCode}" />
@@ -241,7 +337,7 @@
                         </c:forEach>
                         <c:if test="${empty listToday}">
                             <tr>
-                                <td colspan="7" class="td-empty">Hôm nay chưa có đơn đặt phòng nào đến.</td>
+                                <td colspan="8" class="td-empty">Hôm nay chưa có đơn đặt phòng nào đến.</td>
                             </tr>
                         </c:if>
                     </tbody>

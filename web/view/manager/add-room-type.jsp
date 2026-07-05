@@ -84,40 +84,76 @@
                                 <div id="imageFieldsContainer">
                                     <%-- Khối Ảnh Chính --%>
                                     <div class="img-group mb-3">
-                                        <span class="badge-main">Ảnh chính <span class="required-star">*</span></span>
-                                        <div class="mt-2">
-                                            <input type="file" id="mainImageFile" accept="image/*">
-                                            <div id="previewContainer" class="mt-2">
-                                                <img id="mainPreview" src="#" alt="Xem trước" 
-                                                     style="display:none; width: 260px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 10px;">
-                                            </div>
-                                            <input type="text" name="imageUrls" id="mainImageUrl" class="input-field mt-2" 
-                                                   placeholder="Nhập đường dẫn ảnh chính (URL)..." 
-                                                   value="${roomType.imageUrl[0]}" required>
+                                        <span class="badge-main">Ảnh chính *</span>
+
+                                        <input type="file"
+                                               id="mainImageFile"
+                                               class="main-image-file"
+                                               accept="image/*">
+
+                                        <span id="mainImageName" style="margin-left:10px;color:#666"></span>
+
+                                        <div id="previewContainer" class="mt-2">
+                                            <img id="mainPreview"
+                                                 src="${roomType.imageUrl[0]}"
+                                                 style="display:${not empty roomType.imageUrl[0] ? 'block' : 'none'};
+                                                 width:260px;
+                                                 border-radius:8px;
+                                                 border:1px solid #ddd;">
                                         </div>
+
+                                        <input type="text"
+                                               id="mainImageUrl"
+                                               name="imageUrls"
+                                               class="input-field mt-2"
+                                               value="${roomType.imageUrl[0]}"
+                                               placeholder="Nhập đường dẫn ảnh chính (URL)..." 
+                                               readonly
+                                               required>
                                     </div>
 
                                     <%-- Khối Ảnh Phụ --%>
                                     <c:forEach items="${roomType.imageUrl}" var="imgUrl" varStatus="st">
                                         <c:if test="${!st.first && not empty imgUrl}">
-                                            <div class="img-group mb-2">
-                                                <div style="flex-grow: 1;">
-                                                    <input type="file" class="sub-image-file mb-2" accept="image/*">
-                                                    <div class="mt-1 mb-2">
-                                                        <img class="preview-image" src="${imgUrl}" 
-                                                             style="width: 180px; border-radius: 8px; border: 1px solid #ddd; display: block;">
-                                                    </div>
-                                                    <%-- Bọc ô input và nút xóa vào một div để chúng thẳng hàng --%>
-                                                    <div class="input-section" style="display: flex; gap: 10px; align-items: center;">
-                                                        <input type="text" name="imageUrls" class="image-url-hidden input-field" 
-                                                               placeholder="Nhập đường dẫn ảnh phụ (URL)..." value="${imgUrl}">
-                                                        <button type="button" class="btn-delete" onclick="this.parentElement.parentElement.parentElement.remove();">Xóa</button>
-                                                    </div>
+                                            <div class="img-group mb-3">
+
+                                                <input type="file"
+                                                       class="sub-image-file"
+                                                       accept="image/*">
+
+                                                <span class="file-name"
+                                                      style="margin-left:10px;color:#666"></span>
+
+                                                <div style="margin-top:10px">
+                                                    <img class="preview-image"
+                                                         src="${imgUrl}"
+                                                         style="display:block;
+                                                         width:260px;
+                                                         border-radius:8px;
+                                                         border:1px solid #ddd;">
                                                 </div>
+
+                                                <div style="margin-top:10px">
+                                                    <label>Link ảnh</label>
+
+                                                    <input type="text"
+                                                           name="imageUrls"
+                                                           class="image-url-hidden input-field"
+                                                           
+                                                           value="${imgUrl}"
+                                                           readonly>
+                                                </div>
+
+                                                <button type="button"
+                                                        class="btn-delete">
+                                                    Xóa
+                                                </button>
+
                                             </div>
                                         </c:if>
                                     </c:forEach>
                                 </div>
+
                                 <button type="button" id="btnAddNewImageField" class="btn-add">
                                     <i class="fa-solid fa-plus me-1"></i> Thêm ảnh phụ
                                 </button>

@@ -284,28 +284,25 @@ public class RoomDAO extends DBContext {
 
     //Thư
     // Gán phòng
-    public boolean processRoomAssignment(int bookingId, int roomNumber, String[] fullNames, String[] phones, String[] idNumbers, int totalRequiredRooms) throws SQLException {
-        String updateRoomSql = "UPDATE Rooms SET [status] = N'Phòng có khách' WHERE room_number = ?";
-        String insertBookingRoomSql = "INSERT INTO BookingRooms (booking_id, room_number, assigned_at) VALUES (?, ?, GETDATE())";
+   // Gán phòng linh hoạt 
+    public boolean processRoomAssignment(int bookingId, int roomId, String[] fullNames, String[] phones, String[] idNumbers, int totalRequiredRooms) throws SQLException {
+        String updateRoomSql = "UPDATE Rooms SET [status] = N'Phòng có khách' WHERE room_id = ?";
+        String insertBookingRoomSql = "INSERT INTO BookingRooms (booking_id, room_id, assigned_at) VALUES (?, ?, GETDATE())";
         String insertGuestStaySql = "INSERT INTO GuestStays (booking_room_id, full_name, phone, id_number) VALUES (?, ?, ?, ?)";
-
-        // Chỉ cập nhật đơn đặt thành 'Đã nhận phòng' khi đã gán đủ số lượng phòng
         String updateBookingSql = "UPDATE Bookings SET [status] = N'Đã nhận phòng', actual_checkin_time = GETDATE() WHERE booking_id = ?";
 
         try {
             connection.setAutoCommit(false);
 
-            // 1. Đổi trạng thái phòng vật lý được chọn sang 'Phòng có khách'
             try (PreparedStatement psRoom = connection.prepareStatement(updateRoomSql)) {
-                psRoom.setInt(1, roomNumber);
+                psRoom.setInt(1, roomId);
                 psRoom.executeUpdate();
             }
 
-            // 2. Tạo bản ghi liên kết phòng và hứng lấy ID tự tăng (booking_room_id)
             int generatedBookingRoomId = -1;
             try (PreparedStatement psBookingRoom = connection.prepareStatement(insertBookingRoomSql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
                 psBookingRoom.setInt(1, bookingId);
-                psBookingRoom.setInt(2, roomNumber);
+                psBookingRoom.setInt(2, roomId);
                 psBookingRoom.executeUpdate();
                 try (ResultSet rsKeys = psBookingRoom.getGeneratedKeys()) {
                     if (rsKeys.next()) {
@@ -314,16 +311,18 @@ public class RoomDAO extends DBContext {
                 }
             }
 
-            // 3. Lặp qua mảng danh sách khách thực tế gửi từ Form lên để đẩy vào bảng GuestStays
             if (generatedBookingRoomId != -1 && fullNames != null && fullNames.length > 0) {
                 try (PreparedStatement psGuestStay = connection.prepareStatement(insertGuestStaySql)) {
                     for (int i = 0; i < fullNames.length; i++) {
-                        if (fullNames[i] == null || fullNames[i].trim().isEmpty()) {
-                            continue;
+                        
+                        // Nếu tên bị bỏ trống, mặc định ép gán thành dấu "-" để database lưu và render đủ số dòng STT
+                        String actualName = "-";
+                        if (fullNames[i] != null && !fullNames[i].trim().isEmpty()) {
+                            actualName = fullNames[i].trim();
                         }
 
                         psGuestStay.setInt(1, generatedBookingRoomId);
-                        psGuestStay.setNString(2, fullNames[i].trim());
+                        psGuestStay.setNString(2, actualName);
 
                         if (phones != null && i < phones.length && phones[i] != null && !phones[i].trim().isEmpty()) {
                             psGuestStay.setString(3, phones[i].trim());
@@ -344,8 +343,6 @@ public class RoomDAO extends DBContext {
                 throw new SQLException("Không thể tạo liên kết phòng tại BookingRooms.");
             }
 
-            // 4. KIỂM TRA ĐIỀU KIỆN CHỐT ĐƠN TỔNG
-            // Lấy số lượng phòng thực tế ĐÃ GÁN ĐƯỢC TỪ TRƯỚC TỚI NAY (bao gồm cả phòng vừa insert xong ở trên)
             int currentlyAssignedCount = 0;
             String checkCountSql = "SELECT COUNT(*) FROM BookingRooms WHERE booking_id = ?";
             try (PreparedStatement psCheck = connection.prepareStatement(checkCountSql)) {
@@ -357,7 +354,6 @@ public class RoomDAO extends DBContext {
                 }
             }
 
-            // Nếu số phòng đã gán bằng đúng tổng số phòng khách đặt thực tế -> Chốt đơn thành 'Đã nhận phòng'
             if (currentlyAssignedCount >= totalRequiredRooms) {
                 try (PreparedStatement psBooking = connection.prepareStatement(updateBookingSql)) {
                     psBooking.setInt(1, bookingId);
@@ -379,13 +375,13 @@ public class RoomDAO extends DBContext {
             }
         }
     }
-
     // 2. Lấy thông tin chi tiết đơn hàng để hiển thị lên Form Check-in
     public BookingCheckInView getBookingForCheckInById(int bookingId) {
-        String sql = "SELECT b.booking_id, b.booking_code, b.num_rooms, b.num_guests, b.payment_status, b.deposit_amount, "
+        String sql = "SELECT b.booking_id, b.booking_code, b.num_rooms, b.num_guests, b.num_children, b.payment_status, b.deposit_amount, "
                 + "b.[status], b.actual_checkin_time, "
                 + "g.guest_id, g.full_name, g.phone, g.email, g.id_number, g.date_of_birth, g.nationality, "
                 + "rt.room_type_id, rt.type_name, rt.capacity, "
+                + "rt.num_guests AS rt_num_guests, rt.num_children AS rt_num_children, " // Lấy sức chứa gốc của đúng 1 phòng
                 + "r.request_type, r.request_details, r.status AS request_status, "
                 + "CONVERT(VARCHAR(19), r.requested_checkin, 120) AS requested_checkin "
                 + "FROM Bookings b "
@@ -402,7 +398,11 @@ public class RoomDAO extends DBContext {
                     b.setBookingId(rs.getInt("booking_id"));
                     b.setBookingCode(rs.getString("booking_code"));
                     b.setNumRooms(rs.getInt("num_rooms"));
-                    b.setNumGuests(rs.getInt("num_guests"));
+                    
+                    // Thông tin số lượng khách thực tế của cả đơn hàng
+                    b.setNumGuests(rs.getInt("num_guests"));       // Tổng số người lớn đặt đơn
+                    b.setNumChildren(rs.getInt("num_children"));   // Tổng số trẻ em đặt đơn
+                    
                     b.setPaymentStatus(rs.getString("payment_status"));
                     b.setDepositAmount(rs.getBigDecimal("deposit_amount"));
                     b.setStatus(rs.getString("status"));
@@ -414,11 +414,14 @@ public class RoomDAO extends DBContext {
                     b.setIdNumber(rs.getString("id_number"));
                     b.setDateOfBirth(rs.getDate("date_of_birth"));
                     b.setNationality(rs.getString("nationality"));
-
                     b.setRoomTypeId(rs.getInt("room_type_id"));
-
                     b.setRoomTypeName(rs.getString("type_name"));
                     b.setCapacity(rs.getInt("capacity"));
+                    
+                    // Sức chứa tiêu chuẩn của duy nhất 1 phòng phục vụ logic so sánh nhân chuỗi ở UI/JS
+                    b.setMaxAdults(rs.getInt("rt_num_guests"));
+                    b.setMaxChildren(rs.getInt("rt_num_children"));
+                    
                     b.setRequestType(rs.getString("request_type"));
                     b.setRequestDetails(rs.getString("request_details"));
                     b.setRequestStatus(rs.getString("request_status"));
@@ -436,14 +439,14 @@ public class RoomDAO extends DBContext {
     public List<RoomStatusView> getAllRoomStatusViews(int targetRoomTypeId, String filterRoomTypeName, String filterFloor) {
         List<RoomStatusView> list = new ArrayList<>();
 
-        String sql = "SELECT r.room_number, r.floor, r.room_type_id, rt.type_name, rt.capacity, r.[status], "
+        String sql = "SELECT r.room_id, r.room_number, r.floor, r.room_type_id, rt.type_name, rt.capacity, r.[status], "
                 + "MAX(b.booking_code) AS booking_code, "
                 + "STRING_AGG(CAST(g.full_name AS NVARCHAR(MAX)), ', ') AS guest_name, "
                 + "STRING_AGG(CAST(ISNULL(g.phone, N'Không có') AS NVARCHAR(MAX)), ', ') AS guest_phone, "
                 + "STRING_AGG(CAST(ISNULL(g.id_number, N'Không có') AS NVARCHAR(MAX)), ', ') AS guest_id_number "
                 + "FROM Rooms r "
                 + "INNER JOIN RoomTypes rt ON r.room_type_id = rt.room_type_id "
-                + "LEFT JOIN BookingRooms br ON r.room_number = br.room_number "
+                + "LEFT JOIN BookingRooms br ON r.room_id = br.room_id "
                 + "LEFT JOIN Bookings b ON br.booking_id = b.booking_id AND b.[status] IN (N'Đã xác nhận', N'Đã nhận phòng') "
                 + "LEFT JOIN GuestStays g ON br.booking_room_id = g.booking_room_id "
                 + "WHERE 1=1 ";
@@ -458,7 +461,7 @@ public class RoomDAO extends DBContext {
             sql += " AND r.floor = ? ";
         }
 
-        sql += " GROUP BY r.room_number, r.floor, r.room_type_id, rt.type_name, rt.capacity, r.[status] "
+        sql += " GROUP BY r.room_id, r.room_number, r.floor, r.room_type_id, rt.type_name, rt.capacity, r.[status] "
                 + " ORDER BY r.room_number ASC";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -477,6 +480,7 @@ public class RoomDAO extends DBContext {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     RoomStatusView room = new RoomStatusView();
+                    room.setRoomId(rs.getInt("room_id"));
                     room.setRoomNumber(rs.getInt("room_number"));
                     room.setFloor(rs.getInt("floor"));
                     room.setRoomTypeId(rs.getInt("room_type_id"));
@@ -525,11 +529,11 @@ public class RoomDAO extends DBContext {
     }
 
     // Lấy lại phòng đã gán
-    public boolean unassignRoom(int bookingId, int roomNumber) throws SQLException {
-        String getBookingRoomIdSql = "SELECT booking_room_id FROM BookingRooms WHERE booking_id = ? AND room_number = ?";
+  public boolean unassignRoom(int bookingId, int roomId) throws SQLException {
+        String getBookingRoomIdSql = "SELECT booking_room_id FROM BookingRooms WHERE booking_id = ? AND room_id = ?";
         String deleteGuestStaysSql = "DELETE FROM GuestStays WHERE booking_room_id = ?";
         String deleteBookingRoomSql = "DELETE FROM BookingRooms WHERE booking_room_id = ?";
-        String updateRoomSql = "UPDATE Rooms SET [status] = N'Phòng trống' WHERE room_number = ?";
+        String updateRoomSql = "UPDATE Rooms SET [status] = N'Phòng trống' WHERE room_id = ?";
         String rollbackBookingStatusSql = "UPDATE Bookings SET [status] = N'Đã xác nhận', actual_checkin_time = NULL WHERE booking_id = ? AND [status] = N'Đã nhận phòng'";
 
         int targetBookingRoomId = -1;
@@ -537,10 +541,9 @@ public class RoomDAO extends DBContext {
         try {
             connection.setAutoCommit(false);
 
-            // Lấy booking_room_id
             try (PreparedStatement psGet = connection.prepareStatement(getBookingRoomIdSql)) {
                 psGet.setInt(1, bookingId);
-                psGet.setInt(2, roomNumber);
+                psGet.setInt(2, roomId);
                 try (ResultSet rs = psGet.executeQuery()) {
                     if (rs.next()) {
                         targetBookingRoomId = rs.getInt("booking_room_id");
@@ -549,25 +552,21 @@ public class RoomDAO extends DBContext {
             }
 
             if (targetBookingRoomId != -1) {
-                // Xóa dữ liệu khách lưu trú của phòng đã gán
                 try (PreparedStatement psDelGuest = connection.prepareStatement(deleteGuestStaysSql)) {
                     psDelGuest.setInt(1, targetBookingRoomId);
                     psDelGuest.executeUpdate();
                 }
 
-                // Xóa liên kết giữa đơn đặt và phòng
                 try (PreparedStatement psDelRoom = connection.prepareStatement(deleteBookingRoomSql)) {
                     psDelRoom.setInt(1, targetBookingRoomId);
                     psDelRoom.executeUpdate();
                 }
 
-                // Đặt lại trạng thái phòng thành phòng trống
                 try (PreparedStatement psUpdRoom = connection.prepareStatement(updateRoomSql)) {
-                    psUpdRoom.setInt(1, roomNumber);
+                    psUpdRoom.setInt(1, roomId);
                     psUpdRoom.executeUpdate();
                 }
 
-                // Lùi trạng thái đơn đặt nếu trước đó đã được đánh dấu là nhận đủ phòng
                 try (PreparedStatement psUpdBooking = connection.prepareStatement(rollbackBookingStatusSql)) {
                     psUpdBooking.setInt(1, bookingId);
                     psUpdBooking.executeUpdate();
@@ -588,5 +587,41 @@ public class RoomDAO extends DBContext {
             }
         }
     }
-
+    // BỔ SUNG: Lấy danh sách toàn bộ hạng phòng để phục vụ đổi hạng khi phòng hỏng
+    public List<dto.RoomStatusView> getAllActiveRoomTypesForDropdown() {
+        List<dto.RoomStatusView> list = new ArrayList<>();
+        // Chỉ cần lấy id và tên hạng phòng từ bảng RoomTypes
+        String sql = "SELECT room_type_id, type_name FROM RoomTypes WHERE is_active = 1 ORDER BY type_name ASC";
+        
+        try (PreparedStatement ps = connection.prepareStatement(sql); 
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                dto.RoomStatusView type = new dto.RoomStatusView();
+                type.setRoomTypeId(rs.getInt("room_type_id"));
+                type.setRoomTypeName(rs.getNString("type_name"));
+                list.add(type);
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi tại getAllActiveRoomTypesForDropdown: " + e.getMessage());
+        }
+        return list;
+    }
+    // BỔ SUNG: Cập nhật lại sức chứa hiển thị (maxAdults/maxChildren) khi lễ tân chọn hạng phòng khác hạng gốc
+    public void overrideBookingCapacityWithType(dto.BookingCheckInView booking, int overriddenRoomTypeId) {
+        String sql = "SELECT num_guests, num_children, type_name FROM RoomTypes WHERE room_type_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, overriddenRoomTypeId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    // Ép lại thông tin sức chứa của hạng phòng mới để hiển thị & JS kiểm tra không bị lệch
+                    booking.setMaxAdults(rs.getInt("num_guests"));
+                    booking.setMaxChildren(rs.getInt("num_children"));
+                    booking.setRoomTypeName(rs.getNString("type_name"));
+                    booking.setRoomTypeId(overriddenRoomTypeId);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi tại overrideBookingCapacityWithType: " + e.getMessage());
+        }
+    }
 }

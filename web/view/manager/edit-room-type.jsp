@@ -82,46 +82,53 @@
                                 <div class="block-title">3. Bộ sưu tập hình ảnh không gian phòng</div>
                                 <div class="mb-4">
                                     <label class="field-label">Đường dẫn ảnh đại diện chính và các góc chụp phụ (URL)</label>
+
                                     <div id="imageFieldsContainer">
-                                        <%-- Ảnh chính --%>
+                                        <%-- Khối Ảnh Chính --%>
                                         <div class="img-group mb-3">
                                             <span class="badge-main">Ảnh chính <span class="required-star">*</span></span>
-                                            <div class="mt-2">
-                                                <input type="file" class="main-image-file" accept="image/*">
-                                                <div class="previewContainer mt-2">
-                                                    <img class="mainPreview" src="${roomType.imageUrl[0]}" 
+                                            <div class="input-section mt-2">
+                                                <%-- Class main-image-file khớp với JS --%>
+                                                <input type="file" id="mainImageFile" class="main-image-file" accept="image/*">
+                                                <div id="previewContainer" class="mt-2">
+                                                    <img id="mainPreview" src="${roomType.imageUrl[0]}" alt="Xem trước" 
                                                          style="display:block; width: 260px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 10px;">
                                                 </div>
-                                                <input type="text" name="imageUrls" class="input-field mt-2" 
+                                                <%-- Class input-field và ID mainImageUrl khớp với JS --%>
+                                                <input type="text" name="imageUrls" id="mainImageUrl" class="input-field mt-2" 
                                                        placeholder="Nhập đường dẫn ảnh chính (URL)..." 
                                                        value="${roomType.imageUrl[0]}" required>
                                             </div>
                                         </div>
 
-                                        <%-- Ảnh phụ (Duyệt qua các ảnh còn lại) --%>
+                                        <%-- Khối Ảnh Phụ --%>
                                         <c:forEach items="${roomType.imageUrl}" var="imgUrl" varStatus="st">
                                             <c:if test="${!st.first && not empty imgUrl}">
                                                 <div class="img-group mb-2">
                                                     <div class="input-section">
+                                                        <%-- Class sub-image-file khớp với JS --%>
                                                         <input type="file" class="sub-image-file mb-2" accept="image/*">
                                                         <div class="mt-1 mb-2">
-                                                            <img class="preview-image" src="${imgUrl}" style="width: 180px; border-radius: 8px; border: 1px solid #ddd; display: block;">
+                                                            <%-- Class preview-image khớp với JS --%>
+                                                            <img class="preview-image" src="${imgUrl}" 
+                                                                 style="width: 180px; border-radius: 8px; border: 1px solid #ddd; display: block;">
                                                         </div>
                                                         <div style="display: flex; gap: 10px; align-items: center;">
-                                                            <input type="text" name="imageUrls" class="input-field" 
+                                                            <%-- Class image-url-hidden khớp với JS --%>
+                                                            <input type="text" name="imageUrls" class="image-url-hidden input-field" 
                                                                    placeholder="Nhập đường dẫn ảnh phụ (URL)..." value="${imgUrl}">
-                                                            <button type="button" class="btn-delete" onclick="this.parentElement.parentElement.parentElement.remove();">Xóa</button>
+                                                            <button type="button" class="btn-delete">Xóa</button>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </c:if>
                                         </c:forEach>
                                     </div>
+
                                     <button type="button" id="btnAddNewImageField" class="btn-add">
                                         <i class="fa-solid fa-plus me-1"></i> Thêm ảnh phụ
                                     </button>
                                 </div>
-
                                 <div class="block-title">4. Thiết lập dịch vụ mặc định kèm theo phòng</div>
                                 <div class="table-responsive mb-4">
                                     <table class="service-table">

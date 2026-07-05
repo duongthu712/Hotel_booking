@@ -20,12 +20,12 @@ public class UnassignRoomController extends HttpServlet {
         try {
             // Lấy 2 tham số quan trọng từ nút [Hủy Gán] gửi lên
             int bookingId = Integer.parseInt(request.getParameter("bookingId"));
-            int roomNumber = Integer.parseInt(request.getParameter("roomNumber"));
+            int roomId = Integer.parseInt(request.getParameter("roomId"));
 
             RoomDAO roomDAO = new RoomDAO();
             
             // Gọi hàm hủy gán phòng dưới DAO
-            boolean isSuccess = roomDAO.unassignRoom(bookingId, roomNumber);
+            boolean isSuccess = roomDAO.unassignRoom(bookingId, roomId);
 
             if (isSuccess) {
                 request.getSession().setAttribute("notification", "success");

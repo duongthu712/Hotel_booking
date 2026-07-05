@@ -3,21 +3,25 @@ package dto;
 import java.math.BigDecimal;
 import java.sql.Date;
 
+// List đơn check in ngày hôm nay
 public class BookingCheckInView {
 
     private int bookingId;
     private String bookingCode;
     private int numRooms;
-    private int numGuests;
+    private int numGuests;       // Số người lớn thực tế của đoàn khách từ đơn đặt
+    private int numChildren;
     private String paymentStatus;
     private BigDecimal depositAmount;
     private int guestId;
     private String guestFullName;
     private String guestPhone;
     private String guestEmail;
-    private int roomTypeId; // THÊM MỚI BIẾN NÀY ĐỂ LƯU ID HẠNG PHÒNG
+    private int roomTypeId; 
     private String roomTypeName;
     private int capacity;
+    private int maxAdults;    
+    private int maxChildren;  
     private String status;
     private String idNumber;
     private Date dateOfBirth;
@@ -27,8 +31,68 @@ public class BookingCheckInView {
     private String requestDetails;
     private String requestStatus;
     private String requestedCheckIn;
+    private int assignedRoomsCount;    // Số phòng đã được gán thực tế trong DB
+    private String assignedRoomList;   // Chuỗi danh sách số phòng dạng "101, 102"
+    private String expectedCheckInTime; // Giờ khách hẹn đến (Dạng HH:mm:ss)
+    private String autoCancelDeadline;  // Hạn chót tự động hủy phòng nếu khách ko đến
+    private String callNote;            // Ghi chú cuộc gọi của lễ tân (Lấy từ cancellation_reason)
 
     public BookingCheckInView() {
+    }
+    public String getExpectedCheckInTime() {
+        return expectedCheckInTime;
+    }
+
+    public void setExpectedCheckInTime(String expectedCheckInTime) {
+        this.expectedCheckInTime = expectedCheckInTime;
+    }
+
+    public String getAutoCancelDeadline() {
+        return autoCancelDeadline;
+    }
+
+    public void setAutoCancelDeadline(String autoCancelDeadline) {
+        this.autoCancelDeadline = autoCancelDeadline;
+    }
+
+    public String getCallNote() {
+        return callNote;
+    }
+
+    public void setCallNote(String callNote) {
+        this.callNote = callNote;
+    }
+
+    public int getAssignedRoomsCount() {
+        return assignedRoomsCount;
+    }
+
+    public void setAssignedRoomsCount(int assignedRoomsCount) {
+        this.assignedRoomsCount = assignedRoomsCount;
+    }
+
+    public String getAssignedRoomList() {
+        return assignedRoomList;
+    }
+
+    public void setAssignedRoomList(String assignedRoomList) {
+        this.assignedRoomList = assignedRoomList;
+    }
+
+    public int getMaxAdults() {
+        return maxAdults;
+    }
+
+    public void setMaxAdults(int maxAdults) {
+        this.maxAdults = maxAdults;
+    }
+
+    public int getMaxChildren() {
+        return maxChildren;
+    }
+
+    public void setMaxChildren(int maxChildren) {
+        this.maxChildren = maxChildren;
     }
 
     public int getRoomTypeId() {
@@ -69,6 +133,14 @@ public class BookingCheckInView {
 
     public void setNumGuests(int numGuests) {
         this.numGuests = numGuests;
+    }
+
+    public int getNumChildren() {
+        return numChildren;
+    }
+
+    public void setNumChildren(int numChildren) {
+        this.numChildren = numChildren;
     }
 
     public String getPaymentStatus() {
