@@ -12,9 +12,15 @@ import java.util.List;
 import model.Booking;
 import java.sql.Types;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Statement;
 import java.sql.Date;
+import java.util.HashMap;
+import java.util.Map;
 import model.Guest;
+import java.sql.ResultSetMetaData;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 public class BookingDAO extends DBContext {
 
@@ -779,29 +785,31 @@ public class BookingDAO extends DBContext {
 
     // Hủy booking online quá 15 phút nhưng chưa gửi minh chứng
     public int cancelExpiredBookings() {
-        try {
-            String sql = """
-                     UPDATE b
-                     SET b.[status] = N'Đã hủy',
-                         b.cancelled_at = GETDATE(),
-                         b.cancellation_reason = N'Quá thời hạn thanh toán 15 phút'
-                     FROM Bookings b
-                     WHERE b.[status] = N'Chờ xử lý'
-                       AND b.payment_status = N'Chưa thanh toán'
-                       AND b.[source] = N'Đặt phòng trực tuyến'
-                       AND DATEADD(MINUTE, 15, b.created_at) <= GETDATE()
-                       AND NOT EXISTS (
-                           SELECT 1
-                           FROM DepositPayments dp
-                           WHERE dp.booking_id = b.booking_id
-                       )
-                     """;
+        String sql = """
+             UPDATE b
+             SET b.[status] = N'Đã hủy',
+                 b.cancelled_at = ISNULL(b.cancelled_at, GETDATE()),
+                 b.cancellation_reason = N'Quá thời hạn thanh toán 15 phút',
+                 b.staff_id = NULL
+             FROM Bookings b
+             WHERE b.[status] = N'Chờ xử lý'
+               AND b.payment_status = N'Chưa thanh toán'
+               AND b.[source] = N'Đặt phòng trực tuyến'
+               AND b.created_at IS NOT NULL
+               AND DATEADD(MINUTE, 15, b.created_at) <= GETDATE()
+               AND NOT EXISTS (
+                   SELECT 1
+                   FROM DepositPayments dp
+                   WHERE dp.booking_id = b.booking_id
+               )
+             """;
 
-            stm = connection.prepareStatement(sql);
-            return stm.executeUpdate();
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            return ps.executeUpdate();
 
         } catch (Exception e) {
-            System.out.println("cancelExpiredBookings: " + e.getMessage());
+            System.out.println("cancelExpiredBookings error: " + e.getMessage());
+            e.printStackTrace();
         }
 
         return 0;
@@ -1150,5 +1158,1135 @@ public class BookingDAO extends DBContext {
             }
         }
         return false;
+    }
+    
+    //booking list - GiangTTT
+    public List<Map<String, Object>> getBookingList(
+            String keyword,
+            String status,
+            String paymentStatus,
+            String source,
+            Integer roomTypeId,
+            Integer staffId,
+            String roomNumber,
+            String dateFilter,
+            String sort,
+            int page,
+            int pageSize) {
+
+        List<Map<String, Object>> list = new ArrayList<>();
+        cancelExpiredBookings();
+
+        if (page < 1) {
+            page = 1;
+        }
+
+        if (pageSize <= 0) {
+            pageSize = 10;
+        }
+
+        StringBuilder sql = new StringBuilder();
+
+        sql.append(" SELECT ");
+        sql.append("     b.booking_id AS bookingId, ");
+        sql.append("     b.booking_code AS bookingCode, ");
+        sql.append("     ISNULL(g.full_name, N'Khách vãng lai') AS guestName, ");
+        sql.append("     ISNULL(g.email, '') AS guestEmail, ");
+        sql.append("     ISNULL(g.phone, '') AS guestPhone, ");
+        sql.append("     rt.type_name AS roomTypeName, ");
+        sql.append("     b.num_rooms AS numRooms, ");
+        sql.append("     ISNULL(rd.roomNumbers, N'Chưa gán') AS roomNumbers, ");
+        sql.append("     ISNULL(rd.assignedRoomCount, 0) AS assignedRoomCount, ");
+        sql.append("     CONVERT(VARCHAR(10), b.checkin_date, 103) AS checkinDateText, ");
+        sql.append("     CONVERT(VARCHAR(10), b.checkout_date, 103) AS checkoutDateText, ");
+        sql.append("     b.[source] AS source, ");
+        sql.append("     b.[status] AS bookingStatus, ");
+        sql.append("     b.payment_status AS paymentStatus, ");
+        sql.append("     ISNULL(rq.pendingRequestCount, 0) AS pendingRequestCount, ");
+        sql.append("     ISNULL(rq.approvedRequestCount, 0) AS approvedRequestCount, ");
+        sql.append("     lr.request_type AS latestRequestType, ");
+        sql.append("     lr.[status] AS latestRequestStatus, ");
+        sql.append("     ISNULL(s.full_name, N'Chưa có') AS staffName, ");
+
+        sql.append("     CASE ");
+        sql.append("         WHEN b.[status] IN (N'Chờ xử lý', N'Đã xác nhận') ");
+        sql.append("              AND ISNULL(rd.assignedRoomCount, 0) = 0 ");
+        sql.append("         THEN 1 ELSE 0 ");
+        sql.append("     END AS canCancel, ");
+
+        sql.append("     CASE ");
+        sql.append("         WHEN b.[status] = N'Đã xác nhận' ");
+        sql.append("         THEN 1 ELSE 0 ");
+        sql.append("     END AS canCheckin, ");
+
+        sql.append("     CASE ");
+        sql.append("         WHEN b.[status] = N'Đã nhận phòng' ");
+        sql.append("         THEN 1 ELSE 0 ");
+        sql.append("     END AS canCheckout, ");
+
+        sql.append("     CASE ");
+        sql.append("         WHEN ISNULL(rq.pendingRequestCount, 0) > 0 ");
+        sql.append("         THEN 1 ELSE 0 ");
+        sql.append("     END AS canProcessRequest ");
+
+        sql.append(" FROM Bookings b ");
+        sql.append(" LEFT JOIN Guests g ON b.guest_id = g.guest_id ");
+        sql.append(" INNER JOIN RoomTypes rt ON b.room_type_id = rt.room_type_id ");
+        sql.append(" LEFT JOIN StaffAccounts s ON b.staff_id = s.staff_id ");
+
+        sql.append(" OUTER APPLY ( ");
+        sql.append("     SELECT ");
+        sql.append("         STUFF(( ");
+        sql.append("             SELECT N', ' + CAST(r2.room_number AS NVARCHAR(20)) ");
+        sql.append("             FROM BookingRooms br2 ");
+        sql.append("             INNER JOIN Rooms r2 ON br2.room_id = r2.room_id ");
+        sql.append("             WHERE br2.booking_id = b.booking_id ");
+        sql.append("             ORDER BY r2.room_number ");
+        sql.append("             FOR XML PATH(''), TYPE ");
+        sql.append("         ).value('.', 'NVARCHAR(MAX)'), 1, 2, N'') AS roomNumbers, ");
+        sql.append("         ( ");
+        sql.append("             SELECT COUNT(*) ");
+        sql.append("             FROM BookingRooms br3 ");
+        sql.append("             WHERE br3.booking_id = b.booking_id ");
+        sql.append("         ) AS assignedRoomCount ");
+        sql.append(" ) rd ");
+
+        sql.append(" OUTER APPLY ( ");
+        sql.append("     SELECT ");
+        sql.append("         SUM(CASE WHEN gr.[status] = N'Chờ xử lý' THEN 1 ELSE 0 END) AS pendingRequestCount, ");
+        sql.append("         SUM(CASE WHEN gr.[status] = N'Đã phê duyệt' THEN 1 ELSE 0 END) AS approvedRequestCount ");
+        sql.append("     FROM GuestRequests gr ");
+        sql.append("     WHERE gr.booking_id = b.booking_id ");
+        sql.append(" ) rq ");
+
+        sql.append(" OUTER APPLY ( ");
+        sql.append("     SELECT TOP 1 ");
+        sql.append("         gr.request_type, ");
+        sql.append("         gr.[status] ");
+        sql.append("     FROM GuestRequests gr ");
+        sql.append("     WHERE gr.booking_id = b.booking_id ");
+        sql.append("     ORDER BY gr.submitted_at DESC, gr.request_id DESC ");
+        sql.append(" ) lr ");
+
+        sql.append(" WHERE 1 = 1 ");
+
+        List<Object> params = new ArrayList<>();
+
+        appendBookingListFilters(
+                sql,
+                params,
+                keyword,
+                status,
+                paymentStatus,
+                source,
+                roomTypeId,
+                staffId,
+                roomNumber,
+                dateFilter
+        );
+
+        sql.append(" ORDER BY ");
+        sql.append(getBookingListSortSql(sort));
+        sql.append(" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY ");
+
+        params.add((page - 1) * pageSize);
+        params.add(pageSize);
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            setBookingListParams(ps, params);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapBookingListRow(rs));
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("getBookingList error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public int countBookingList(
+            String keyword,
+            String status,
+            String paymentStatus,
+            String source,
+            Integer roomTypeId,
+            Integer staffId,
+            String roomNumber,
+            String dateFilter) {
+
+        cancelExpiredBookings();
+
+        StringBuilder sql = new StringBuilder();
+
+        sql.append(" SELECT COUNT(*) AS total ");
+        sql.append(" FROM Bookings b ");
+        sql.append(" LEFT JOIN Guests g ON b.guest_id = g.guest_id ");
+        sql.append(" INNER JOIN RoomTypes rt ON b.room_type_id = rt.room_type_id ");
+        sql.append(" LEFT JOIN StaffAccounts s ON b.staff_id = s.staff_id ");
+        sql.append(" WHERE 1 = 1 ");
+
+        List<Object> params = new ArrayList<>();
+
+        appendBookingListFilters(
+                sql,
+                params,
+                keyword,
+                status,
+                paymentStatus,
+                source,
+                roomTypeId,
+                staffId,
+                roomNumber,
+                dateFilter
+        );
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            setBookingListParams(ps, params);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("total");
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("countBookingList error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    public List<Map<String, Object>> getRoomTypesForBookingFilter() {
+        String sql = ""
+                + " SELECT "
+                + "     room_type_id AS roomTypeId, "
+                + "     type_name AS typeName "
+                + " FROM RoomTypes "
+                + " WHERE is_active = 1 "
+                + " ORDER BY type_name ";
+
+        return getBookingListSimpleRows(sql);
+    }
+
+    public List<Map<String, Object>> getStaffForBookingFilter() {
+        String sql = ""
+                + " SELECT "
+                + "     staff_id AS staffId, "
+                + "     full_name AS fullName "
+                + " FROM StaffAccounts "
+                + " WHERE is_active = 1 "
+                + "   AND [role] = N'Lễ tân' "
+                + " ORDER BY full_name ";
+
+        return getBookingListSimpleRows(sql);
+    }
+
+    private void appendBookingListFilters(
+            StringBuilder sql,
+            List<Object> params,
+            String keyword,
+            String status,
+            String paymentStatus,
+            String source,
+            Integer roomTypeId,
+            Integer staffId,
+            String roomNumber,
+            String dateFilter) {
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append(" AND ( ");
+            sql.append("     b.booking_code LIKE ? ");
+            sql.append("     OR g.full_name LIKE ? ");
+            sql.append("     OR g.phone LIKE ? ");
+            sql.append("     OR g.email LIKE ? ");
+            sql.append(" ) ");
+
+            String kw = "%" + keyword.trim() + "%";
+
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+
+        if (status != null && !status.trim().isEmpty()) {
+            sql.append(" AND b.[status] = ? ");
+            params.add(status.trim());
+        }
+
+        if (paymentStatus != null && !paymentStatus.trim().isEmpty()) {
+            sql.append(" AND b.payment_status = ? ");
+            params.add(paymentStatus.trim());
+        }
+
+        if (source != null && !source.trim().isEmpty()) {
+            sql.append(" AND b.[source] = ? ");
+            params.add(source.trim());
+        }
+
+        if (roomTypeId != null && roomTypeId > 0) {
+            sql.append(" AND b.room_type_id = ? ");
+            params.add(roomTypeId);
+        }
+
+        /*
+     * QUAN TRỌNG:
+     * staffId null thì không lọc nhân viên.
+     * Nghĩa là chọn "Tất cả lễ tân" thì phải truyền staffId = null từ controller.
+         */
+        if (staffId != null && staffId > 0) {
+            sql.append(" AND b.staff_id = ? ");
+            params.add(staffId);
+        }
+
+        if (roomNumber != null && !roomNumber.trim().isEmpty()) {
+            String rn = roomNumber.trim().toLowerCase();
+
+            if (rn.equals("chưa gán") || rn.equals("chua gan") || rn.equals("null")) {
+                sql.append(" AND NOT EXISTS ( ");
+                sql.append("     SELECT 1 ");
+                sql.append("     FROM BookingRooms br ");
+                sql.append("     WHERE br.booking_id = b.booking_id ");
+                sql.append(" ) ");
+            } else {
+                sql.append(" AND EXISTS ( ");
+                sql.append("     SELECT 1 ");
+                sql.append("     FROM BookingRooms br ");
+                sql.append("     INNER JOIN Rooms r ON br.room_id = r.room_id ");
+                sql.append("     WHERE br.booking_id = b.booking_id ");
+                sql.append("       AND CAST(r.room_number AS NVARCHAR(20)) LIKE ? ");
+                sql.append(" ) ");
+
+                params.add("%" + roomNumber.trim() + "%");
+            }
+        }
+
+        if (dateFilter != null && !dateFilter.trim().isEmpty()) {
+            Date d = Date.valueOf(dateFilter.trim());
+
+            sql.append(" AND (b.checkin_date = ? OR b.checkout_date = ?) ");
+
+            params.add(d);
+            params.add(d);
+        }
+    }
+
+    private String getBookingListSortSql(String sort) {
+        if ("oldest".equals(sort)) {
+            return " b.created_at ASC, b.booking_id ASC ";
+        }
+
+        if ("checkinAsc".equals(sort)) {
+            return " b.checkin_date ASC, b.booking_id DESC ";
+        }
+
+        if ("checkoutAsc".equals(sort)) {
+            return " b.checkout_date ASC, b.booking_id DESC ";
+        }
+
+        return " b.created_at DESC, b.booking_id DESC ";
+    }
+
+    private List<Map<String, Object>> getBookingListSimpleRows(String sql) {
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                list.add(mapBookingListRow(rs));
+            }
+
+        } catch (Exception e) {
+            System.out.println("getBookingListSimpleRows error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    private Map<String, Object> mapBookingListRow(ResultSet rs) throws SQLException {
+        Map<String, Object> row = new HashMap<>();
+        ResultSetMetaData meta = rs.getMetaData();
+
+        for (int i = 1; i <= meta.getColumnCount(); i++) {
+            row.put(meta.getColumnLabel(i), rs.getObject(i));
+        }
+
+        return row;
+    }
+
+    private void setBookingListParams(PreparedStatement ps, List<Object> params) throws SQLException {
+        for (int i = 0; i < params.size(); i++) {
+            Object value = params.get(i);
+            int index = i + 1;
+
+            if (value instanceof Integer) {
+                ps.setInt(index, (Integer) value);
+            } else if (value instanceof Date) {
+                ps.setDate(index, (Date) value);
+            } else {
+                ps.setString(index, value.toString());
+            }
+        }
+    }
+
+    // =========================
+// STAFF BOOKING DETAIL POPUP
+// =========================
+    public Map<String, Object> getStaffBookingDetailForPopup(int bookingId) {
+        cancelExpiredBookings();
+        StringBuilder sql = new StringBuilder();
+
+        sql.append(" SELECT ");
+        sql.append("     b.booking_id AS bookingId, ");
+        sql.append("     b.booking_code AS bookingCode, ");
+        sql.append("     b.[status] AS bookingStatus, ");
+        sql.append("     b.payment_status AS paymentStatus, ");
+        sql.append("     b.[source] AS source, ");
+        sql.append("     ISNULL(g.full_name, N'Khách vãng lai') AS guestName, ");
+        sql.append("     ISNULL(g.phone, '') AS guestPhone, ");
+        sql.append("     ISNULL(g.email, '') AS guestEmail, ");
+        sql.append("     rt.type_name AS roomTypeName, ");
+        sql.append("     b.num_rooms AS numRooms, ");
+        sql.append("     b.num_guests AS numGuests, ");
+        sql.append("     b.num_children AS numChildren, ");
+        sql.append("     ISNULL(roomData.roomNumbers, N'Chưa gán') AS roomNumbers, ");
+        sql.append("     CONVERT(VARCHAR(10), b.checkin_date, 103) AS checkinDateText, ");
+        sql.append("     CONVERT(VARCHAR(10), b.checkout_date, 103) AS checkoutDateText, ");
+        sql.append("     b.booked_price_per_night AS bookedPricePerNight, ");
+        sql.append("     ISNULL(b.deposit_amount, 0) AS depositAmount, ");
+        sql.append("     CAST((b.booked_price_per_night * b.num_rooms * ");
+        sql.append("         CASE ");
+        sql.append("             WHEN DATEDIFF(DAY, b.checkin_date, b.checkout_date) <= 0 ");
+        sql.append("             THEN 1 ");
+        sql.append("             ELSE DATEDIFF(DAY, b.checkin_date, b.checkout_date) ");
+        sql.append("         END ");
+        sql.append("     ) AS DECIMAL(15,2)) AS estimatedTotal, ");
+        sql.append("     ISNULL(s.full_name, N'Chưa có') AS staffName ");
+        sql.append(" FROM Bookings b ");
+        sql.append(" LEFT JOIN Guests g ON b.guest_id = g.guest_id ");
+        sql.append(" INNER JOIN RoomTypes rt ON b.room_type_id = rt.room_type_id ");
+        sql.append(" LEFT JOIN StaffAccounts s ON b.staff_id = s.staff_id ");
+
+        sql.append(" OUTER APPLY ( ");
+        sql.append("     SELECT ");
+        sql.append("         STUFF(( ");
+        sql.append("             SELECT N', ' + CAST(r2.room_number AS NVARCHAR(20)) ");
+        sql.append("             FROM BookingRooms br2 ");
+        sql.append("             INNER JOIN Rooms r2 ON br2.room_id = r2.room_id ");
+        sql.append("             WHERE br2.booking_id = b.booking_id ");
+        sql.append("             ORDER BY r2.room_number ");
+        sql.append("             FOR XML PATH(''), TYPE ");
+        sql.append("         ).value('.', 'NVARCHAR(MAX)'), 1, 2, N'') AS roomNumbers ");
+        sql.append(" ) roomData ");
+
+        sql.append(" WHERE b.booking_id = ? ");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            ps.setInt(1, bookingId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapStaffBookingDetailRow(rs);
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("getStaffBookingDetailForPopup error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public List<Map<String, Object>> getStaffBookingRecentRequests(int bookingId) {
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder();
+
+        sql.append(" SELECT TOP 5 ");
+        sql.append("     gr.request_id AS requestId, ");
+        sql.append("     gr.request_type AS requestType, ");
+        sql.append("     gr.request_details AS requestDetails, ");
+        sql.append("     gr.[status] AS requestStatus, ");
+        sql.append("     CONVERT(VARCHAR(10), gr.submitted_at, 103) AS submittedAtText, ");
+        sql.append("     CONVERT(VARCHAR(16), gr.requested_checkin, 120) AS requestedCheckinText, ");
+        sql.append("     CONVERT(VARCHAR(16), gr.requested_checkout, 120) AS requestedCheckoutText, ");
+        sql.append("     ISNULL(rt.type_name, '') AS targetRoomTypeName, ");
+        sql.append("     ISNULL(gr.response_notes, '') AS responseNotes ");
+        sql.append(" FROM GuestRequests gr ");
+        sql.append(" LEFT JOIN RoomTypes rt ON gr.target_room_type_id = rt.room_type_id ");
+        sql.append(" WHERE gr.booking_id = ? ");
+        sql.append(" ORDER BY gr.submitted_at DESC, gr.request_id DESC ");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            ps.setInt(1, bookingId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapStaffBookingDetailRow(rs));
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("getStaffBookingRecentRequests error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    private Map<String, Object> mapStaffBookingDetailRow(ResultSet rs) throws SQLException {
+        Map<String, Object> row = new HashMap<>();
+        ResultSetMetaData meta = rs.getMetaData();
+
+        for (int i = 1; i <= meta.getColumnCount(); i++) {
+            row.put(meta.getColumnLabel(i), rs.getObject(i));
+        }
+
+        return row;
+    }
+
+    // =========================
+// COUNTER REQUEST - TẠO & PHÊ DUYỆT TẠI QUẦY
+// =========================
+    public Map<String, Object> getCounterRequestBookingInfo(int bookingId) {
+        cancelExpiredBookings();
+        StringBuilder sql = new StringBuilder();
+
+        sql.append(" SELECT ");
+        sql.append("     b.booking_id AS bookingId, ");
+        sql.append("     b.booking_code AS bookingCode, ");
+        sql.append("     b.guest_id AS guestId, ");
+        sql.append("     ISNULL(g.full_name, N'Khách vãng lai') AS guestName, ");
+        sql.append("     ISNULL(g.phone, '') AS guestPhone, ");
+        sql.append("     ISNULL(g.email, '') AS guestEmail, ");
+        sql.append("     rt.type_name AS roomTypeName, ");
+        sql.append("     b.room_type_id AS roomTypeId, ");
+        sql.append("     b.num_rooms AS numRooms, ");
+        sql.append("     b.num_guests AS numGuests, ");
+        sql.append("     b.num_children AS numChildren, ");
+        sql.append("     b.booked_price_per_night AS bookedPricePerNight, ");
+        sql.append("     ISNULL(b.deposit_amount, 0) AS depositAmount, ");
+        sql.append("     b.payment_status AS paymentStatus, ");
+        sql.append("     b.[status] AS bookingStatus, ");
+        sql.append("     CONVERT(VARCHAR(10), b.checkin_date, 103) AS checkinDateText, ");
+        sql.append("     CONVERT(VARCHAR(10), b.checkout_date, 103) AS checkoutDateText, ");
+        sql.append("     CONVERT(VARCHAR(10), b.checkin_date, 120) AS checkinDateSql, ");
+        sql.append("     CONVERT(VARCHAR(10), b.checkout_date, 120) AS checkoutDateSql, ");
+        sql.append("     DATEDIFF(DAY, b.checkin_date, b.checkout_date) AS totalNights, ");
+        sql.append("     (b.booked_price_per_night * b.num_rooms * DATEDIFF(DAY, b.checkin_date, b.checkout_date)) AS estimatedRoomAmount, ");
+        sql.append("     ISNULL(( ");
+        sql.append("         SELECT COUNT(1) ");
+        sql.append("         FROM BookingRooms br ");
+        sql.append("         WHERE br.booking_id = b.booking_id ");
+        sql.append("     ), 0) AS assignedRoomCount ");
+        sql.append(" FROM Bookings b ");
+        sql.append(" LEFT JOIN Guests g ON b.guest_id = g.guest_id ");
+        sql.append(" INNER JOIN RoomTypes rt ON b.room_type_id = rt.room_type_id ");
+        sql.append(" WHERE b.booking_id = ? ");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            ps.setInt(1, bookingId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapCounterRequestRow(rs);
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("getCounterRequestBookingInfo error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public boolean applyCounterUpgradeRoomTypeRequest(
+            int bookingId,
+            int targetRoomTypeId,
+            String note) {
+
+        String getBookingSql = ""
+                + " SELECT "
+                + "     b.booking_id, "
+                + "     b.num_rooms, "
+                + "     b.booked_price_per_night AS oldPrice, "
+                + "     b.checkin_date, "
+                + "     b.checkout_date, "
+                + "     b.[status] AS bookingStatus, "
+                + "     rt.type_name AS oldRoomTypeName "
+                + " FROM Bookings b "
+                + " INNER JOIN RoomTypes rt ON b.room_type_id = rt.room_type_id "
+                + " WHERE b.booking_id = ? ";
+
+        String getRoomTypeSql = ""
+                + " SELECT "
+                + "     type_name, "
+                + "     base_price "
+                + " FROM RoomTypes "
+                + " WHERE room_type_id = ? "
+                + "   AND is_active = 1 ";
+
+        String updateBookingSql = ""
+                + " UPDATE Bookings "
+                + " SET room_type_id = ?, "
+                + "     booked_price_per_night = ? "
+                + " WHERE booking_id = ? "
+                + "   AND [status] IN (N'Đã xác nhận', N'Đã nhận phòng') ";
+
+        String insertRequestSql = ""
+                + " INSERT INTO GuestRequests ( "
+                + "     booking_id, guest_id, request_type, request_details, target_room_type_id, "
+                + "     [status], submitted_at, processed_at, response_notes "
+                + " ) "
+                + " SELECT "
+                + "     b.booking_id, b.guest_id, N'Đổi hạng phòng', ?, ?, "
+                + "     N'Đã phê duyệt', GETDATE(), GETDATE(), ? "
+                + " FROM Bookings b "
+                + " WHERE b.booking_id = ? ";
+
+        try {
+            connection.setAutoCommit(false);
+
+            int numRooms = 0;
+            BigDecimal oldPrice = BigDecimal.ZERO;
+            String oldRoomTypeName = "";
+            String bookingStatus = "";
+            LocalDate checkinDate = null;
+            LocalDate checkoutDate = null;
+
+            try (PreparedStatement ps = connection.prepareStatement(getBookingSql)) {
+                ps.setInt(1, bookingId);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        numRooms = rs.getInt("num_rooms");
+                        oldPrice = rs.getBigDecimal("oldPrice");
+                        oldRoomTypeName = rs.getNString("oldRoomTypeName");
+                        bookingStatus = rs.getNString("bookingStatus");
+
+                        java.sql.Date sqlCheckinDate = rs.getDate("checkin_date");
+                        java.sql.Date sqlCheckoutDate = rs.getDate("checkout_date");
+
+                        if (sqlCheckinDate != null) {
+                            checkinDate = sqlCheckinDate.toLocalDate();
+                        }
+
+                        if (sqlCheckoutDate != null) {
+                            checkoutDate = sqlCheckoutDate.toLocalDate();
+                        }
+                    }
+                }
+            }
+
+            if (!"Đã xác nhận".equals(bookingStatus)
+                    && !"Đã nhận phòng".equals(bookingStatus)) {
+                connection.rollback();
+                return false;
+            }
+
+            BigDecimal newPrice = null;
+            String newRoomTypeName = "";
+
+            try (PreparedStatement ps = connection.prepareStatement(getRoomTypeSql)) {
+                ps.setInt(1, targetRoomTypeId);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        newPrice = rs.getBigDecimal("base_price");
+                        newRoomTypeName = rs.getNString("type_name");
+                    }
+                }
+            }
+
+            if (newPrice == null) {
+                connection.rollback();
+                return false;
+            }
+
+            int chargeableNights = calculateUpgradeChargeableNightsForDao(
+                    bookingStatus,
+                    checkinDate,
+                    checkoutDate
+            );
+
+            BigDecimal priceDiff = newPrice.subtract(oldPrice);
+
+            BigDecimal upgradeAmount = priceDiff
+                    .multiply(BigDecimal.valueOf(numRooms))
+                    .multiply(BigDecimal.valueOf(chargeableNights))
+                    .setScale(2, RoundingMode.CEILING.HALF_UP);
+
+            String priceDiffText;
+            String upgradeAmountText;
+            String responseAmountText;
+
+            if (priceDiff.compareTo(BigDecimal.ZERO) > 0) {
+                priceDiffText = "Chênh lệch tăng: " + priceDiff + " đ/đêm";
+            } else if (priceDiff.compareTo(BigDecimal.ZERO) < 0) {
+                priceDiffText = "Chênh lệch giảm: " + priceDiff.abs() + " đ/đêm";
+            } else {
+                priceDiffText = "Không chênh lệch đơn giá";
+            }
+
+            if (upgradeAmount.compareTo(BigDecimal.ZERO) > 0) {
+                upgradeAmountText = "Khách cần thanh toán thêm: " + upgradeAmount + " đ";
+                responseAmountText = "Khách cần thanh toán thêm: " + upgradeAmount + " đ.";
+            } else if (upgradeAmount.compareTo(BigDecimal.ZERO) < 0) {
+                upgradeAmountText = "Khách được giảm/hoàn lại: " + upgradeAmount.abs() + " đ";
+                responseAmountText = "Khách được giảm/hoàn lại: " + upgradeAmount.abs() + " đ.";
+            } else {
+                upgradeAmountText = "Không phát sinh chênh lệch tiền";
+                responseAmountText = "Không phát sinh chênh lệch tiền.";
+            }
+
+            int updatedRows;
+
+            try (PreparedStatement ps = connection.prepareStatement(updateBookingSql)) {
+                ps.setInt(1, targetRoomTypeId);
+                ps.setBigDecimal(2, newPrice);
+                ps.setInt(3, bookingId);
+
+                updatedRows = ps.executeUpdate();
+            }
+
+            if (updatedRows <= 0) {
+                connection.rollback();
+                return false;
+            }
+
+            String detail = "Đổi hạng phòng tại quầy. "
+                    + "Hạng cũ: " + oldRoomTypeName + ". "
+                    + "Hạng mới: " + newRoomTypeName + ". "
+                    + "Giá cũ: " + oldPrice + " đ/đêm. "
+                    + "Giá mới: " + newPrice + " đ/đêm. "
+                    + priceDiffText + ". "
+                    + "Số phòng: " + numRooms + ". "
+                    + "Số đêm tính đổi hạng: " + chargeableNights + ". "
+                    + upgradeAmountText + ".";
+
+            if (note != null && !note.trim().isEmpty()) {
+                detail += " Ghi chú: " + note.trim();
+            }
+
+            String responseNote = "Đã xử lý nâng hạng tại quầy. "
+                    + "Tổng tiền phát sinh: " + upgradeAmount + " đ.";
+
+            try (PreparedStatement ps = connection.prepareStatement(insertRequestSql)) {
+                ps.setNString(1, detail);
+                ps.setInt(2, targetRoomTypeId);
+                ps.setNString(3, responseNote);
+                ps.setInt(4, bookingId);
+
+                ps.executeUpdate();
+            }
+
+            connection.commit();
+            return true;
+
+        } catch (Exception e) {
+            rollbackCounterRequestQuietly();
+            System.out.println("applyCounterUpgradeRoomTypeRequest error: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+
+        } finally {
+            restoreCounterRequestAutoCommit();
+        }
+    }
+
+    private int calculateUpgradeChargeableNightsForDao(
+            String bookingStatus,
+            LocalDate checkinDate,
+            LocalDate checkoutDate) {
+
+        if (checkoutDate == null) {
+            return 0;
+        }
+
+        if ("Đã nhận phòng".equals(bookingStatus)) {
+            LocalDate today = LocalDate.now();
+
+            if (!checkoutDate.isAfter(today)) {
+                return 0;
+            }
+
+            return (int) ChronoUnit.DAYS.between(today, checkoutDate);
+        }
+
+        if ("Đã xác nhận".equals(bookingStatus)) {
+            if (checkinDate != null && checkoutDate.isAfter(checkinDate)) {
+                return (int) ChronoUnit.DAYS.between(checkinDate, checkoutDate);
+            }
+        }
+
+        return 0;
+    }
+
+    public boolean applyCounterExtendStayRequest(
+            int bookingId,
+            java.sql.Date newCheckoutDate,
+            String note) {
+
+        String updateBookingSql = ""
+                + " UPDATE Bookings "
+                + " SET checkout_date = ? "
+                + " WHERE booking_id = ? "
+                + "   AND [status] IN (N'Chờ xử lý', N'Đã xác nhận', N'Đã nhận phòng') ";
+
+        String insertRequestSql = ""
+                + " INSERT INTO GuestRequests ( "
+                + "     booking_id, guest_id, request_type, request_details, requested_checkout, "
+                + "     [status], submitted_at, processed_at, response_notes "
+                + " ) "
+                + " SELECT "
+                + "     b.booking_id, b.guest_id, N'Gia hạn phòng', ?, ?, "
+                + "     N'Đã phê duyệt', GETDATE(), GETDATE(), "
+                + "     N'Yêu cầu gia hạn được tạo và phê duyệt tại quầy' "
+                + " FROM Bookings b "
+                + " WHERE b.booking_id = ? ";
+
+        try {
+            connection.setAutoCommit(false);
+
+            int updatedRows;
+
+            try (PreparedStatement ps = connection.prepareStatement(updateBookingSql)) {
+                ps.setDate(1, newCheckoutDate);
+                ps.setInt(2, bookingId);
+                updatedRows = ps.executeUpdate();
+            }
+
+            if (updatedRows <= 0) {
+                connection.rollback();
+                return false;
+            }
+
+            String detail = "Gia hạn ngày ở đến " + newCheckoutDate;
+            if (note != null && !note.trim().isEmpty()) {
+                detail += ". Ghi chú: " + note.trim();
+            }
+
+            try (PreparedStatement ps = connection.prepareStatement(insertRequestSql)) {
+                ps.setNString(1, detail);
+                ps.setDate(2, newCheckoutDate);
+                ps.setInt(3, bookingId);
+                ps.executeUpdate();
+            }
+
+            connection.commit();
+            return true;
+
+        } catch (Exception e) {
+            rollbackCounterRequestQuietly();
+            System.out.println("applyCounterExtendStayRequest error: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+
+        } finally {
+            restoreCounterRequestAutoCommit();
+        }
+    }
+
+    public boolean applyCounterCancelBookingRequest(
+            int bookingId,
+            int cancelRooms,
+            String note) {
+
+        String getBookingSql = ""
+                + " SELECT "
+                + "     b.booking_id, "
+                + "     b.guest_id, "
+                + "     b.num_rooms, "
+                + "     b.checkin_date, "
+                + "     ISNULL(b.deposit_amount, 0) AS depositAmount, "
+                + "     b.[status] AS bookingStatus "
+                + " FROM Bookings b WITH (UPDLOCK) "
+                + " WHERE b.booking_id = ? ";
+
+        String updateFullCancelSql = ""
+                + " UPDATE Bookings "
+                + " SET [status] = N'Đã hủy', "
+                + "     deposit_amount = ? "
+                + " WHERE booking_id = ? "
+                + "   AND [status] IN (N'Chờ xử lý', N'Đã xác nhận') ";
+
+        String updatePartialCancelSql = ""
+                + " UPDATE Bookings "
+                + " SET num_rooms = num_rooms - ?, "
+                + "     deposit_amount = ? "
+                + " WHERE booking_id = ? "
+                + "   AND num_rooms > ? "
+                + "   AND [status] IN (N'Chờ xử lý', N'Đã xác nhận') ";
+
+        String insertRequestSql = ""
+                + " INSERT INTO GuestRequests ( "
+                + "     booking_id, guest_id, request_type, request_details, "
+                + "     [status], submitted_at, processed_at, response_notes "
+                + " ) "
+                + " SELECT "
+                + "     b.booking_id, b.guest_id, N'Yêu cầu khác', ?, "
+                + "     N'Đã phê duyệt', GETDATE(), GETDATE(), ? "
+                + " FROM Bookings b "
+                + " WHERE b.booking_id = ? ";
+
+        try {
+            connection.setAutoCommit(false);
+
+            int currentRooms = 0;
+            String bookingStatus = "";
+            BigDecimal depositAmount = BigDecimal.ZERO;
+            LocalDate checkinDate = null;
+
+            try (PreparedStatement ps = connection.prepareStatement(getBookingSql)) {
+                ps.setInt(1, bookingId);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        currentRooms = rs.getInt("num_rooms");
+                        bookingStatus = rs.getNString("bookingStatus");
+                        depositAmount = rs.getBigDecimal("depositAmount");
+
+                        java.sql.Date sqlCheckinDate = rs.getDate("checkin_date");
+                        if (sqlCheckinDate != null) {
+                            checkinDate = sqlCheckinDate.toLocalDate();
+                        }
+                    }
+                }
+            }
+
+            if (currentRooms <= 0) {
+                connection.rollback();
+                return false;
+            }
+
+            if (!"Chờ xử lý".equals(bookingStatus) && !"Đã xác nhận".equals(bookingStatus)) {
+                connection.rollback();
+                return false;
+            }
+
+            if (cancelRooms <= 0 || cancelRooms > currentRooms) {
+                connection.rollback();
+                return false;
+            }
+
+            boolean fullCancel = cancelRooms == currentRooms;
+
+            BigDecimal feeRate = getCancelFeeRateByCheckin(checkinDate);
+
+            BigDecimal depositPerRoom = depositAmount
+                    .divide(BigDecimal.valueOf(currentRooms), 2, RoundingMode.HALF_UP);
+
+            BigDecimal cancelDeposit = depositPerRoom
+                    .multiply(BigDecimal.valueOf(cancelRooms))
+                    .setScale(2, RoundingMode.HALF_UP);
+
+            BigDecimal cancelFee = cancelDeposit
+                    .multiply(feeRate)
+                    .setScale(2, RoundingMode.HALF_UP);
+
+            BigDecimal refundAmount = cancelDeposit
+                    .subtract(cancelFee)
+                    .setScale(2, RoundingMode.HALF_UP);
+
+            BigDecimal newDepositAmount;
+
+            if (fullCancel) {
+                newDepositAmount = cancelFee;
+            } else {
+                newDepositAmount = depositAmount.subtract(refundAmount).setScale(2, RoundingMode.HALF_UP);
+            }
+
+            if (newDepositAmount.compareTo(BigDecimal.ZERO) < 0) {
+                newDepositAmount = BigDecimal.ZERO;
+            }
+
+            int updatedRows;
+
+            if (fullCancel) {
+                try (PreparedStatement ps = connection.prepareStatement(updateFullCancelSql)) {
+                    ps.setBigDecimal(1, newDepositAmount);
+                    ps.setInt(2, bookingId);
+                    updatedRows = ps.executeUpdate();
+                }
+            } else {
+                try (PreparedStatement ps = connection.prepareStatement(updatePartialCancelSql)) {
+                    ps.setInt(1, cancelRooms);
+                    ps.setBigDecimal(2, newDepositAmount);
+                    ps.setInt(3, bookingId);
+                    ps.setInt(4, cancelRooms);
+                    updatedRows = ps.executeUpdate();
+                }
+            }
+
+            if (updatedRows <= 0) {
+                connection.rollback();
+                return false;
+            }
+
+            String detail = "Hủy booking tại quầy. "
+                    + "Số phòng hủy: " + cancelRooms + "/" + currentRooms + ". "
+                    + "Loại xử lý: " + (fullCancel ? "Hủy toàn bộ booking" : "Hủy một phần booking") + ". "
+                    + "Tiền cọc mỗi phòng: " + depositPerRoom + " đ. "
+                    + "Cọc phần hủy: " + cancelDeposit + " đ. "
+                    + "Tỷ lệ phí hủy: " + feeRate.multiply(new BigDecimal("100")).setScale(0, RoundingMode.HALF_UP) + "%. "
+                    + "Phí hủy: " + cancelFee + " đ. "
+                    + "Tiền hoàn khách: " + refundAmount + " đ.";
+
+            if (note != null && !note.trim().isEmpty()) {
+                detail += " Lý do/Ghi chú: " + note.trim();
+            }
+
+            String responseNote = "Đã xử lý hủy tại quầy. "
+                    + (fullCancel ? "Booking đã được chuyển sang trạng thái Đã hủy. " : "Booking đã được giảm số lượng phòng. ")
+                    + "Số phòng hủy: " + cancelRooms + ". "
+                    + "Phí hủy: " + cancelFee + " đ. "
+                    + "Tiền hoàn khách: " + refundAmount + " đ.";
+
+            try (PreparedStatement ps = connection.prepareStatement(insertRequestSql)) {
+                ps.setNString(1, detail);
+                ps.setNString(2, responseNote);
+                ps.setInt(3, bookingId);
+                ps.executeUpdate();
+            }
+
+            connection.commit();
+            return true;
+
+        } catch (Exception e) {
+            rollbackCounterRequestQuietly();
+            System.out.println("applyCounterCancelBookingRequest error: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+
+        } finally {
+            restoreCounterRequestAutoCommit();
+        }
+    }
+
+    private BigDecimal getCancelFeeRateByCheckin(LocalDate checkinDate) {
+        if (checkinDate == null) {
+            return new BigDecimal("0.70");
+        }
+
+        LocalDateTime checkinDeadline = checkinDate.atTime(14, 0);
+        long hoursBeforeCheckin = ChronoUnit.HOURS.between(LocalDateTime.now(), checkinDeadline);
+
+        if (hoursBeforeCheckin >= 72) {
+            return BigDecimal.ZERO;
+        }
+
+        if (hoursBeforeCheckin >= 48) {
+            return new BigDecimal("0.30");
+        }
+
+        if (hoursBeforeCheckin >= 24) {
+            return new BigDecimal("0.50");
+        }
+
+        return new BigDecimal("0.70");
+    }
+
+    public boolean applyCounterOtherRequest(
+            int bookingId,
+            String note) {
+
+        String insertRequestSql = ""
+                + " INSERT INTO GuestRequests ( "
+                + "     booking_id, guest_id, request_type, request_details, "
+                + "     [status], submitted_at, processed_at, response_notes "
+                + " ) "
+                + " SELECT "
+                + "     b.booking_id, b.guest_id, N'Yêu cầu khác', ?, "
+                + "     N'Đã phê duyệt', GETDATE(), GETDATE(), "
+                + "     N'Yêu cầu được tạo và phê duyệt tại quầy' "
+                + " FROM Bookings b "
+                + " WHERE b.booking_id = ? "
+                + "   AND b.[status] NOT IN (N'Đã hủy', N'Đã trả phòng') ";
+
+        try (PreparedStatement ps = connection.prepareStatement(insertRequestSql)) {
+            ps.setNString(1, note == null ? "" : note.trim());
+            ps.setInt(2, bookingId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            System.out.println("applyCounterOtherRequest error: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private Map<String, Object> mapCounterRequestRow(ResultSet rs)
+            throws SQLException {
+
+        Map<String, Object> row = new HashMap<>();
+        ResultSetMetaData meta = rs.getMetaData();
+
+        for (int i = 1; i <= meta.getColumnCount(); i++) {
+            row.put(meta.getColumnLabel(i), rs.getObject(i));
+        }
+
+        return row;
+    }
+
+    private void rollbackCounterRequestQuietly() {
+        try {
+            connection.rollback();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void restoreCounterRequestAutoCommit() {
+        try {
+            connection.setAutoCommit(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Map<String, Object>> getRoomTypesForCounterUpgrade(int currentRoomTypeId) {
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        String sql = ""
+                + " SELECT "
+                + "     room_type_id AS roomTypeId, "
+                + "     type_name AS typeName, "
+                + "     base_price AS basePrice "
+                + " FROM RoomTypes "
+                + " WHERE is_active = 1 "
+                + "   AND room_type_id <> ? "
+                + " ORDER BY base_price ASC, type_name ASC ";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, currentRoomTypeId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> row = new HashMap<>();
+
+                    row.put("roomTypeId", rs.getInt("roomTypeId"));
+                    row.put("typeName", rs.getNString("typeName"));
+                    row.put("basePrice", rs.getBigDecimal("basePrice"));
+
+                    list.add(row);
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("getRoomTypesForCounterUpgrade error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return list;
     }
 }

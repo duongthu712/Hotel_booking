@@ -1,6 +1,7 @@
 package controller;
 
 import dao.BookingDAO;
+import dao.FeedbackDAO;
 import dao.RoomTypeDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -93,6 +94,17 @@ public class BookingDetailController extends HttpServlet {
 
             verificationStatus = "Chưa gửi minh chứng";
         }
+
+        FeedbackDAO feedbackDAO = new FeedbackDAO();
+
+        boolean hasFeedback = feedbackDAO.hasFeedback(booking.getBookingId());
+
+        boolean canWriteFeedback
+                = "Đã trả phòng".equals(booking.getStatus())
+                && !hasFeedback;
+
+        request.setAttribute("hasFeedback", hasFeedback);
+        request.setAttribute("canWriteFeedback", canWriteFeedback);
 
         setBookingDetailData(
                 request,

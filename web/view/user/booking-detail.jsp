@@ -804,6 +804,44 @@
                                         </div>
                                     </c:otherwise>
                                 </c:choose>
+                                <c:choose>
+                                    <c:when test="${canWriteFeedback}">
+                                        <a href="${pageContext.request.contextPath}/feedback-submission?bookingId=${booking.bookingId}"
+                                           class="detail-management-button feedback">
+
+                                            <span class="detail-management-icon">★</span>
+
+                                            <span>
+                                                <strong>Viết đánh giá</strong>
+                                                <small>Chia sẻ trải nghiệm lưu trú</small>
+                                            </span>
+                                        </a>
+                                    </c:when>
+
+                                    <c:when test="${hasFeedback}">
+                                        <div class="detail-management-button feedback disabled">
+
+                                            <span class="detail-management-icon">✓</span>
+
+                                            <span>
+                                                <strong>Đã đánh giá</strong>
+                                                <small>Cảm ơn phản hồi của bạn</small>
+                                            </span>
+                                        </div>
+                                    </c:when>
+
+                                    <c:otherwise>
+                                        <div class="detail-management-button feedback disabled">
+
+                                            <span class="detail-management-icon">★</span>
+
+                                            <span>
+                                                <strong>Viết đánh giá</strong>
+                                                <small>Khả dụng sau khi trả phòng</small>
+                                            </span>
+                                        </div>
+                                    </c:otherwise>
+                                </c:choose>
                             </div>
                         </section>
 
