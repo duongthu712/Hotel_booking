@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Map;
 import model.Booking;
 import model.Guest;
 import model.RoomType;
@@ -94,6 +96,15 @@ public class BookingDetailController extends HttpServlet {
 
             verificationStatus = "Chưa gửi minh chứng";
         }
+
+        List<Map<String, Object>> publicRequests
+                = bookingDAO.getPublicBookingRequests(booking.getBookingId());
+
+        List<Map<String, Object>> publicChanges
+                = bookingDAO.getPublicBookingChanges(booking.getBookingId());
+
+        request.setAttribute("publicRequests", publicRequests);
+        request.setAttribute("publicChanges", publicChanges);
 
         FeedbackDAO feedbackDAO = new FeedbackDAO();
 
@@ -211,7 +222,7 @@ public class BookingDetailController extends HttpServlet {
         if (bookingCode.isEmpty()) {
             return "Vui lòng nhập mã đặt phòng.";
         }
-
+        
         if (!bookingCode.matches("^LMHB[A-Za-z0-9]{8}$")) {
             return "Mã đặt phòng không đúng định dạng.";
         }

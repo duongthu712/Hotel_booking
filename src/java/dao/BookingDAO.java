@@ -2289,4 +2289,99 @@ public class BookingDAO extends DBContext {
 
         return list;
     }
+    
+    public List<Map<String, Object>> getPublicBookingRequests(int bookingId) {
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        String sql = """
+             SELECT
+                 gr.request_id AS requestId,
+                 gr.request_type AS requestType,
+                 gr.request_details AS requestDetails,
+                 gr.[status] AS requestStatus,
+                 CONVERT(VARCHAR(10), gr.submitted_at, 103) AS submittedAtText,
+                 CONVERT(VARCHAR(16), gr.requested_checkin, 120) AS requestedCheckinText,
+                 CONVERT(VARCHAR(16), gr.requested_checkout, 120) AS requestedCheckoutText,
+                 ISNULL(rt.type_name, '') AS targetRoomTypeName,
+                 ISNULL(gr.response_notes, '') AS responseNotes
+             FROM GuestRequests gr
+             LEFT JOIN RoomTypes rt ON gr.target_room_type_id = rt.room_type_id
+             WHERE gr.booking_id = ?
+             ORDER BY gr.submitted_at DESC, gr.request_id DESC
+             """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, bookingId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> row = new HashMap<>();
+
+                    row.put("requestId", rs.getInt("requestId"));
+                    row.put("requestType", rs.getNString("requestType"));
+                    row.put("requestDetails", rs.getNString("requestDetails"));
+                    row.put("requestStatus", rs.getNString("requestStatus"));
+                    row.put("submittedAtText", rs.getString("submittedAtText"));
+                    row.put("requestedCheckinText", rs.getString("requestedCheckinText"));
+                    row.put("requestedCheckoutText", rs.getString("requestedCheckoutText"));
+                    row.put("targetRoomTypeName", rs.getNString("targetRoomTypeName"));
+                    row.put("responseNotes", rs.getNString("responseNotes"));
+
+                    list.add(row);
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("getPublicBookingRequests error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    
+    public List<Map<String, Object>> getPublicBookingChanges(int bookingId) {
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        String sql = """
+             SELECT
+                 gr.request_id AS requestId,
+                 gr.request_type AS requestType,
+                 gr.request_details AS requestDetails,
+                 gr.[status] AS requestStatus,
+                 CONVERT(VARCHAR(10), gr.processed_at, 103) AS processedAtText,
+                 ISNULL(rt.type_name, '') AS targetRoomTypeName,
+                 ISNULL(gr.response_notes, '') AS responseNotes
+             FROM GuestRequests gr
+             LEFT JOIN RoomTypes rt ON gr.target_room_type_id = rt.room_type_id
+             WHERE gr.booking_id = ?
+               AND gr.[status] IN (N'Đã phê duyệt', N'Đã từ chối')
+             ORDER BY gr.processed_at DESC, gr.request_id DESC
+             """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, bookingId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> row = new HashMap<>();
+
+                    row.put("requestId", rs.getInt("requestId"));
+                    row.put("requestType", rs.getNString("requestType"));
+                    row.put("requestDetails", rs.getNString("requestDetails"));
+                    row.put("requestStatus", rs.getNString("requestStatus"));
+                    row.put("processedAtText", rs.getString("processedAtText"));
+                    row.put("targetRoomTypeName", rs.getNString("targetRoomTypeName"));
+                    row.put("responseNotes", rs.getNString("responseNotes"));
+
+                    list.add(row);
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("getPublicBookingChanges error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 }
