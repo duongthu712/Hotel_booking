@@ -15,18 +15,20 @@ public class Feedback {
     private int rating;
     private String comment;
     private LocalDateTime submittedAt;
+    private String guestName;
 
     //Constructor
     public Feedback() {
     }
 
-    public Feedback(int feedbackId, int bookingId, Integer guestId, int rating, String comment, LocalDateTime submittedAt) {
+    public Feedback(int feedbackId, int bookingId, Integer guestId, int rating, String comment, LocalDateTime submittedAt, String guestName) {
         this.feedbackId = feedbackId;
         this.bookingId = bookingId;
         this.guestId = guestId;
         this.rating = rating;
         this.comment = comment;
         this.submittedAt = submittedAt;
+        this.guestName = guestName;
     }
 
     //Getter & Setter
@@ -76,6 +78,14 @@ public class Feedback {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public String getGuestName() {
+        return guestName;
+    }
+
+    public void setGuestName(String guestName) {
+        this.guestName = guestName;
     }
 
 }
