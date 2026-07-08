@@ -16,14 +16,30 @@ document.addEventListener("DOMContentLoaded", function() {
     const depositSummaryRow = document.getElementById("depositSummaryRow");
     const stayNowNotice = document.getElementById("stayNowNotice");
     const qrMemoSpan = document.getElementById("qrMemo");
+    const qrDepositAmount = document.getElementById("qrDepositAmount");
 
-    // 1. Thu thập dữ liệu ngày và số phòng từ bộ lọc tìm kiếm phía trên
+    // Thu thập dữ liệu ngày và số phòng từ bộ lọc tìm kiếm phía trên
     const checkInInput = document.getElementById("checkIn");
     const checkOutInput = document.getElementById("checkOut");
     const numRoomsSearchInput = document.getElementById("searchNumRooms");
 
+    // Ô nhập liệu công khai trong Form đặt phòng (Đã cấu hình readonly ở JSP)
+    const formNumRoomsInput = document.getElementById("formNumRooms");
+    const numGuestsInput = document.getElementById("numGuests");
+    const numChildrenInput = document.getElementById("numChildren");
+
+    // Các nhãn báo lỗi inline của bộ ba ô số lượng
+    const guestsError = document.getElementById("guests-error-msg");
+    const childrenError = document.getElementById("children-error-msg");
+
     let checkInStr = checkInInput ? checkInInput.value : "";
     let checkOutStr = checkOutInput ? checkOutInput.value : "";
+
+    // Lưu trữ cấu hình định mức của hạng phòng đang chọn
+    let currentMaxAdultsPerRoom = 2;
+    let currentMaxChildrenPerRoom = 0;
+    let currentBasePrice = 0;
+    let currentTypeId = "";
 
     // 2. Tính toán số đêm lưu trú chuẩn nghiệp vụ
     let nights = 1;
@@ -45,63 +61,113 @@ document.addEventListener("DOMContentLoaded", function() {
     const todayStr = `${yyyy}-${mm}-${dd}`;
     const isStayNow = (checkInStr === todayStr);
 
+    // Hàm tính toán lại tiền và validate sức chứa theo thời gian thực
+    function validateCapacityAndRecalculate() {
+        const numRooms = formNumRoomsInput ? (parseInt(formNumRoomsInput.value) || 1) : 1;
+        const numGuests = numGuestsInput ? (parseInt(numGuestsInput.value) || 0) : 0;
+        const numChildren = numChildrenInput ? (parseInt(numChildrenInput.value) || 0) : 0;
+
+        // Đồng bộ ngược lại ô input hidden "numRooms" cũ để Servlet không bị lỗi đọc thiếu parameter
+        const hiddenNumRooms = document.getElementById("numRooms");
+        if (hiddenNumRooms) {
+            hiddenNumRooms.value = numRooms;
+        }
+
+        // Tính toán tổng sức chứa tối đa dựa vào số phòng hiện tại
+        const totalMaxAdults = currentMaxAdultsPerRoom * numRooms;
+        const totalMaxChildren = currentMaxChildrenPerRoom * numRooms;
+
+        // Kiểm tra định mức số người lớn dựa trên số phòng cố định từ bộ lọc tìm kiếm
+        if (guestsError && numGuestsInput) {
+            if (numGuests > totalMaxAdults) {
+                numGuestsInput.classList.add("input-error-border");
+                guestsError.textContent = `Quá tải! ${numRooms} phòng chỉ chứa tối đa ${totalMaxAdults} người lớn. Vui lòng thay đổi "Số phòng cần thuê" ở bộ lọc phía trên và tìm kiếm lại!`;
+                guestsError.style.color = "#c92a2a";
+                guestsError.style.display = "block";
+            } else {
+                numGuestsInput.classList.remove("input-error-border");
+                guestsError.textContent = `Hợp lệ (Tối đa ${totalMaxAdults} người lớn)`;
+                guestsError.style.color = "#2f855a";
+                guestsError.style.display = "block";
+            }
+        }
+
+        // Kiểm tra định mức số trẻ em dựa trên số phòng cố định từ bộ lọc tìm kiếm
+        if (childrenError && numChildrenInput) {
+            if (numChildren > totalMaxChildren) {
+                numChildrenInput.classList.add("input-error-border");
+                childrenError.textContent = `Quá tải! Tối đa ${totalMaxChildren} trẻ em cho ${numRooms} phòng. Vui lòng thay đổi số phòng ở bộ lọc phía trên và tìm kiếm lại!`;
+                childrenError.style.color = "#c92a2a";
+                childrenError.style.display = "block";
+            } else {
+                numChildrenInput.classList.remove("input-error-border");
+                childrenError.textContent = `Hợp lệ (Tối đa ${totalMaxChildren} trẻ em)`;
+                childrenError.style.color = "#2f855a";
+                childrenError.style.display = "block";
+            }
+        }
+
+        // Tính toán lại các mốc hóa đơn tổng tiền
+        const calculatedTotal = currentBasePrice * numRooms * nights;
+        const roomsAndNightsSpan = document.getElementById("summaryRoomsAndNights");
+        if (roomsAndNightsSpan) {
+            roomsAndNightsSpan.textContent = `${numRooms} phòng x ${nights} đêm`;
+        }
+        if (summaryTotalAmount) {
+            summaryTotalAmount.textContent = calculatedTotal.toLocaleString('vi-VN') + " đ";
+        }
+
+        // Rẽ nhánh giao diện hiển thị tài chính cọc/ở ngay hôm nay
+        if (isStayNow) {
+            if (financialSection) financialSection.style.display = "none";
+            if (depositSummaryRow) depositSummaryRow.style.display = "none";
+            if (stayNowNotice) stayNowNotice.style.display = "block";
+        } else {
+            if (financialSection) financialSection.style.display = "block";
+            if (depositSummaryRow) depositSummaryRow.style.display = "flex";
+            if (stayNowNotice) stayNowNotice.style.display = "none";
+
+            const calculatedDeposit = Math.round(calculatedTotal * 0.3);
+            if (summaryDepositAmount) {
+                summaryDepositAmount.textContent = calculatedDeposit.toLocaleString('vi-VN') + " đ";
+            }
+
+            // Đồng bộ số tiền đặt cọc vào bảng thông tin ngân hàng hiển thị công khai
+            if (qrDepositAmount) {
+                qrDepositAmount.textContent = calculatedDeposit.toLocaleString('vi-VN') + " đ";
+            }
+
+            // Lấy mã đơn hàng tạm thời gán lên khung nội dung chuyển khoản
+            const generatedCode = document.getElementById("walkInForm").querySelector("input[name='bookingCode']")?.value || "LAMER";
+            if (qrMemoSpan) {
+                qrMemoSpan.textContent = generatedCode;
+            }
+        }
+    }
+
     // 4. Lắng nghe sự kiện click nút "Đặt ngay" trên từng hàng hạng phòng
     buttons.forEach(button => {
         button.addEventListener("click", function() {
-            const typeId = this.getAttribute("data-typeid");
+            currentTypeId = this.getAttribute("data-typeid");
             const typeName = this.getAttribute("data-typename");
+            currentMaxAdultsPerRoom = parseInt(this.getAttribute("data-maxadults")) || 2;
+            currentMaxChildrenPerRoom = parseInt(this.getAttribute("data-maxchildren")) || 0;
             
             const priceTd = this.closest("tr").querySelector(".room-price");
-            const basePrice = parseFloat(priceTd.textContent.replace(/[^0-9]/g, ''));
+            currentBasePrice = parseFloat(priceTd.textContent.replace(/[^0-9]/g, ''));
             const numRooms = numRoomsSearchInput ? parseInt(numRoomsSearchInput.value) : 1;
 
-            // ĐỒNG BỘ: Gán số lượng phòng tìm kiếm xuống ô input ẩn thuộc Form gửi đi để Servlet tiếp nhận
-            const hiddenNumRooms = document.getElementById("numRooms");
-            if (hiddenNumRooms) {
-                hiddenNumRooms.value = numRooms;
-            }
-
+            // Đồng bộ dữ liệu khởi tạo xuống form hiển thị phía dưới (Khóa cứng không cho sửa đổi tự phát)
+            if (formNumRoomsInput) formNumRoomsInput.value = numRooms;
             if (displayRoomType) displayRoomType.textContent = typeName;
-            if (formRoomTypeId) formRoomTypeId.value = typeId;
-            if (formBasePrice) formBasePrice.value = basePrice;
+            if (formRoomTypeId) formRoomTypeId.value = currentTypeId;
+            if (formBasePrice) formBasePrice.value = currentBasePrice;
             if (summaryPricePerNight) {
-                summaryPricePerNight.textContent = basePrice.toLocaleString('vi-VN') + " đ";
+                summaryPricePerNight.textContent = currentBasePrice.toLocaleString('vi-VN') + " đ";
             }
 
-            const calculatedTotal = basePrice * numRooms * nights;
-            if (summaryTotalAmount) {
-                summaryTotalAmount.textContent = calculatedTotal.toLocaleString('vi-VN') + " đ";
-            }
-
-            // 5. Rẽ nhánh giao diện tài chính dựa vào biến cờ hiệu isStayNow
-            if (isStayNow) {
-                if (financialSection) financialSection.style.display = "none";
-                if (depositSummaryRow) depositSummaryRow.style.display = "none";
-                if (stayNowNotice) stayNowNotice.style.display = "block";
-            } else {
-                if (financialSection) financialSection.style.display = "block";
-                if (depositSummaryRow) depositSummaryRow.style.display = "flex";
-                if (stayNowNotice) stayNowNotice.style.display = "none";
-
-                const calculatedDeposit = Math.round(calculatedTotal * 0.3);
-                if (summaryDepositAmount) {
-                    summaryDepositAmount.textContent = calculatedDeposit.toLocaleString('vi-VN') + " đ";
-                }
-
-                const memoText = "LAMER_DEPOSIT_T" + typeId + "_" + checkInStr.replace(/-/g, '');
-                if (qrMemoSpan) qrMemoSpan.textContent = memoText;
-
-                const bankId = "Vietcombank"; 
-                const accountNo = "1023456789"; 
-                const accountName = "CONG TY TNHH LA MER HOTEL";
-                
-                const qrUrl = `https://img.vietqr.io/image/${bankId}-${accountNo}-qr_only.png?amount=${calculatedDeposit}&addInfo=${encodeURIComponent(memoText)}&accountName=${encodeURIComponent(accountName)}`;
-                
-                const qrImg = document.getElementById("vietQrCode");
-                if (qrImg) {
-                    qrImg.src = qrUrl;
-                }
-            }
+            // Chạy kiểm tra định mức và tính tiền lần đầu tiên khi mở form
+            validateCapacityAndRecalculate();
 
             if (bookingSection) {
                 bookingSection.style.display = "block";
@@ -109,6 +175,11 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     });
+
+    // Lắng nghe sự thay đổi động của 2 ô cấu hình số khách (Bỏ formNumRoomsInput ra để ép search)
+    if (numGuestsInput) numGuestsInput.addEventListener("input", validateCapacityAndRecalculate);
+    if (numChildrenInput) numChildrenInput.addEventListener("input", validateCapacityAndRecalculate);
+
 
     // ==========================================================================
     // KHU VỰC CHỨC NĂNG VALIDATE THÔNG TIN FORM KHÁCH HÀNG (HIỂN THỊ LỖI INLINE)
@@ -264,7 +335,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (dobInput) dobInput.addEventListener("change", validateAge);
     if (idNumberInput) idNumberInput.addEventListener("input", validateIdNumber);
 
-    // Kiểm tra chặn gửi dữ liệu Form lên Server nếu tồn tại lỗi
+    // Kiểm tra chặn gửi dữ liệu Form lên Server nếu tồn tại bất kỳ lỗi nào kể cả quá tải phòng
     if (walkInForm) {
         walkInForm.addEventListener("submit", function(event) {
             const isNameValid = validateName();
@@ -272,8 +343,27 @@ document.addEventListener("DOMContentLoaded", function() {
             const isEmailValid = validateEmail();
             const isAgeValid = validateAge();
             const isIdNumberValid = validateIdNumber();
+
+            // Khóa chặn submit nếu số khách vượt sức chứa cố định của số phòng thuê từ bộ lọc search
+            const numRooms = formNumRoomsInput ? (parseInt(formNumRoomsInput.value) || 1) : 1;
+            const numGuests = numGuestsInput ? (parseInt(numGuestsInput.value) || 0) : 0;
+            const numChildren = numChildrenInput ? (parseInt(numChildrenInput.value) || 0) : 0;
+
+            const totalMaxAdults = currentMaxAdultsPerRoom * numRooms;
+            const totalMaxChildren = currentMaxChildrenPerRoom * numRooms;
+
+            let isCapacityValid = true;
+            if (numGuests > totalMaxAdults) {
+                alert(`Số lượng người lớn vượt quá sức chứa tối đa của ${numRooms} phòng (${totalMaxAdults} người). Vui lòng đổi "Số phòng cần thuê" ở bộ lọc phía trên màn hình và bấm tìm kiếm lại!`);
+                if (numGuestsInput) numGuestsInput.focus();
+                isCapacityValid = false;
+            } else if (numChildren > totalMaxChildren) {
+                alert(`Số lượng trẻ em vượt quá giới hạn sức chứa tối đa của ${numRooms} phòng (${totalMaxChildren} trẻ). Vui lòng đổi "Số phòng cần thuê" ở bộ lọc phía trên màn hình và bấm tìm kiếm lại!`);
+                if (numChildrenInput) numChildrenInput.focus();
+                isCapacityValid = false;
+            }
             
-            if (!isNameValid || !isPhoneValid || !isEmailValid || !isAgeValid || !isIdNumberValid) {
+            if (!isNameValid || !isPhoneValid || !isEmailValid || !isAgeValid || !isIdNumberValid || !isCapacityValid) {
                 event.preventDefault();
                 
                 if (!isNameValid) nameInput.focus();
@@ -300,51 +390,44 @@ function togglePaymentView(type) {
         if (qrGateway) qrGateway.style.display = "block";
     }
 }
+
 // ==========================================================================
-    // 11. TỰ ĐỘNG BẬT POP-UP THÔNG BÁO THÀNH CÔNG CHO ĐƠN TƯƠNG LAI
-    // ==========================================================================
-    // ==========================================================================
-    // 11. TỰ ĐỘNG BẬT POP-UP THÔNG BÁO THÀNH CÔNG CHO CẢ 2 LUỒNG ĐẶT PHÒNG
-    // ==========================================================================
-    const urlParams = new URLSearchParams(window.location.search);
-    const status = urlParams.get('status');
-    const bookingCode = urlParams.get('code');
+// 11. TỰ ĐỘNG BẬT POP-UP THÔNG BÁO THÀNH CÔNG CHO CẢ 2 LUỒNG ĐẶT PHÒNG
+// ==========================================================================
+const urlParams = new URLSearchParams(window.location.search);
+const status = urlParams.get('status');
+const bookingCode = urlParams.get('code');
 
-    if ((status === 'future_success' || status === 'stay_now_success') && bookingCode) {
-        // Xác định dòng mô tả ngắn dựa vào luồng đặt phòng
-        const msgText = (status === 'stay_now_success') 
-            ? "Hệ thống đã ghi nhận đơn đặt phòng nhận ngay hôm nay."
-            : "Hệ thống đã ghi nhận đơn đặt giữ chỗ tương lai thành công.";
+if ((status === 'future_success' || status === 'stay_now_success') && bookingCode) {
+    const msgText = (status === 'stay_now_success') 
+        ? "Hệ thống đã ghi nhận đơn đặt phòng nhận ngay hôm nay."
+        : "Hệ thống đã ghi nhận đơn đặt giữ chỗ tương lai thành công.";
 
-        // Tạo khối div Pop-up Modal phủ lên màn hình
-        const popup = document.createElement("div");
-        popup.className = "walkin-popup-overlay";
-        popup.innerHTML = `
-            <div class="walkin-popup-content">
-                <h3>Lập Đơn Thành Công!</h3>
-                <p>${msgText}</p>
-                <div class="popup-code-box">
-                    <span>Mã đặt phòng:</span>
-                    <strong>${bookingCode}</strong>
-                </div>
-                <button type="button" class="popup-close-btn">
-                    ${status === 'stay_now_success' ? 'Tiếp tục xếp phòng vật lý' : 'Đóng thông báo'}
-                </button>
+    const popup = document.createElement("div");
+    popup.className = "walkin-popup-overlay";
+    popup.innerHTML = `
+        <div class="walkin-popup-content">
+            <h3>Lập Đơn Thành Công!</h3>
+            <p>${msgText}</p>
+            <div class="popup-code-box">
+                <span>Mã đặt phòng:</span>
+                <strong>${bookingCode}</strong>
             </div>
-        `;
-        document.body.appendChild(popup);
+            <button type="button" class="popup-close-btn">
+                ${status === 'stay_now_success' ? 'Tiếp tục xếp phòng vật lý' : 'Đóng thông báo'}
+            </button>
+        </div>
+    `;
+    document.body.appendChild(popup);
 
-        // Lắng nghe sự kiện bấm nút đóng Pop-up
-        popup.querySelector(".popup-close-btn").addEventListener("click", function() {
-            popup.remove();
-            
-            if (status === 'stay_now_success') {
-                // Nếu là khách ở luôn -> Tắt Pop-up xong sẽ tự động chuyển hướng sang trang tiếp đón nhận phòng
-                window.location.href = `${window.location.origin}${window.location.pathname.replace('/walk-in-booking', '')}/checkin?searchBookingCode=${bookingCode}&status=created_success`;
-            } else {
-                // Nếu là khách đặt tương lai -> Ở lại trang và xóa sạch tham số trên URL để tránh lặp Pop-up khi F5
-                const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-                window.history.pushState({ path: cleanUrl }, '', cleanUrl);
-            }
-        });
-    }
+    popup.querySelector(".popup-close-btn").addEventListener("click", function() {
+        popup.remove();
+        
+        if (status === 'stay_now_success') {
+            window.location.href = `${window.location.origin}${window.location.pathname.replace('/walk-in-booking', '')}/checkin?searchBookingCode=${bookingCode}&status=created_success`;
+        } else {
+            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.pushState({ path: cleanUrl }, '', cleanUrl);
+        }
+    });
+}

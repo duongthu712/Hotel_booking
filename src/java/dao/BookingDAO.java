@@ -193,11 +193,13 @@ public class BookingDAO extends DBContext {
     // Lấy đơn lên để cập nhật thêm thông tin lúc check in
     public boolean updateCheckInAdvance(int bookingId, int currentGuestId, String fullName, String phone, String email,
             String idNumber, String nationality, String dobStr, int numGuests, boolean isDifferentGuest) {
+
+        // ĐÃ SỬA: Thêm email vào SQL INSERT và UPDATE
         String insertNewGuestSql = "INSERT INTO Guests (full_name, phone, email, id_number, nationality, date_of_birth) VALUES (?, ?, ?, ?, ?, ?)";
         String updateBookingGuestSql = "UPDATE Bookings SET guest_id = ?, num_guests = ?, actual_checkin_time = GETDATE() WHERE booking_id = ?";
+        // ĐÃ SỬA: Thêm email = ? vào câu lệnh này
         String updateOldGuestSql = "UPDATE Guests SET full_name = ?, phone = ?, email = ?, id_number = ?, nationality = ?, date_of_birth = ? WHERE guest_id = ?";
         String updateBookingOnlySql = "UPDATE Bookings SET num_guests = ?, actual_checkin_time = GETDATE() WHERE booking_id = ?";
-
         try {
             connection.setAutoCommit(false);
 
@@ -231,10 +233,11 @@ public class BookingDAO extends DBContext {
                 }
 
             } else {
+                // Nhánh cập nhật thông tin khách hiện tại (đã thêm email)
                 try (PreparedStatement psUpdateOld = connection.prepareStatement(updateOldGuestSql)) {
                     psUpdateOld.setNString(1, fullName.trim());
                     psUpdateOld.setString(2, phone != null ? phone.trim() : null);
-                    psUpdateOld.setString(3, email != null ? email.trim() : null);
+                    psUpdateOld.setString(3, email != null ? email.trim() : null); // CẬP NHẬT: Email
                     psUpdateOld.setString(4, idNumber.trim());
                     psUpdateOld.setNString(5, nationality.trim());
                     if (dobStr != null && !dobStr.trim().isEmpty()) {
@@ -1159,7 +1162,7 @@ public class BookingDAO extends DBContext {
         }
         return false;
     }
-    
+
     //booking list - GiangTTT
     public List<Map<String, Object>> getBookingList(
             String keyword,
@@ -2289,7 +2292,7 @@ public class BookingDAO extends DBContext {
 
         return list;
     }
-    
+
     public List<Map<String, Object>> getPublicBookingRequests(int bookingId) {
         List<Map<String, Object>> list = new ArrayList<>();
 
@@ -2338,7 +2341,7 @@ public class BookingDAO extends DBContext {
 
         return list;
     }
-    
+
     public List<Map<String, Object>> getPublicBookingChanges(int bookingId) {
         List<Map<String, Object>> list = new ArrayList<>();
 

@@ -38,7 +38,7 @@ public class WalkinBookingDAO extends DBContext {
     }
 
     // Tìm kiếm phòng trống theo ngày, số lượng phòng cần thuê và hạng phòng cụ thể
-    public List<AvailableRoomTypeView> searchAvailableRooms(String checkIn, String checkOut, int roomTypeId, int numRooms) {
+    public List<AvailableRoomTypeView> searchAvailableRooms(String checkIn, String checkOut, int roomTypeId, int numRooms, int numGuests, int numChildren) {
         List<AvailableRoomTypeView> list = new ArrayList<>();
 
         String sql = "WITH BookedRooms AS ("
@@ -55,7 +55,7 @@ public class WalkinBookingDAO extends DBContext {
                 + "    GROUP BY room_type_id "
                 + "), "
                 + "FinalAvailable AS ("
-                + "    SELECT rt.room_type_id, rt.type_name, rt.num_guests, rt.num_children, rt.base_price, "
+                + "    SELECT rt.room_type_id, rt.type_name, rt.num_guests AS max_adults, rt.num_children AS max_children, rt.base_price, "
                 + "           (ISNULL(tar.total_rooms, 0) - ISNULL(br.total_booked_rooms, 0)) AS available_rooms "
                 + "    FROM RoomTypes rt "
                 + "    LEFT JOIN TotalActiveRooms tar ON rt.room_type_id = tar.room_type_id "
@@ -63,7 +63,9 @@ public class WalkinBookingDAO extends DBContext {
                 + "    WHERE rt.is_active = 1 "
                 + ") "
                 + "SELECT * FROM FinalAvailable "
-                + "WHERE available_rooms >= ? ";
+                + "WHERE available_rooms >= ? "
+                + "  AND (max_adults * ?) >= ? "
+                + "  AND (max_children * ?) >= ? ";
 
         if (roomTypeId > 0) {
             sql += "  AND room_type_id = ? ";
@@ -71,20 +73,24 @@ public class WalkinBookingDAO extends DBContext {
         sql += "ORDER BY base_price ASC";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-
             ps.setString(1, checkOut);
             ps.setString(2, checkIn);
             ps.setInt(3, numRooms);
 
+            ps.setInt(4, numRooms); 
+            ps.setInt(5, numGuests); 
+            ps.setInt(6, numRooms); 
+            ps.setInt(7, numChildren); 
+
             if (roomTypeId > 0) {
-                ps.setInt(4, roomTypeId);
+                ps.setInt(8, roomTypeId);
             }
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     AvailableRoomTypeView view = new AvailableRoomTypeView(
                             rs.getInt("room_type_id"), rs.getString("type_name"),
-                            rs.getInt("num_guests"), rs.getInt("num_children"),
+                            rs.getInt("max_adults"), rs.getInt("max_children"),
                             rs.getBigDecimal("base_price"), rs.getInt("available_rooms")
                     );
                     list.add(view);
@@ -257,7 +263,31 @@ public class WalkinBookingDAO extends DBContext {
                 }
             }
 
-            // 7. Ghi nhận minh chứng tài chính vào DepositPayments nếu luồng Đặt tương lai đóng cọc thành công tại quầy
+            // BỔ SUNG BƯỚC 6.1: TỰ ĐỘNG TẠO HÓA ĐƠN NHÁP (INVOICES) CHO CẢ 2 LUỒNG
+            if (bookingId != -1) {
+                String insertInvoiceSql = """
+                    INSERT INTO Invoices 
+                    (booking_id, room_charges, consumable_charges, amenity_damages, total_amount, remaining_amount, payment_status, created_by)
+                    VALUES (?, ?, 0, 0, ?, ?, N'Chưa thanh toán', ?)
+                    """;
+                try (PreparedStatement psInvoice = connection.prepareStatement(insertInvoiceSql)) {
+                    psInvoice.setInt(1, bookingId);
+                    psInvoice.setBigDecimal(2, roomCharges);
+                    psInvoice.setBigDecimal(3, roomCharges); // total_amount ban đầu bằng tiền phòng
+                    
+                    // remaining_amount = tổng tiền phòng trừ đi tiền cọc giữ phòng (nếu có)
+                    java.math.BigDecimal remainingAmount = roomCharges.subtract(booking.getDepositAmount());
+                    psInvoice.setBigDecimal(4, remainingAmount);
+                    
+                    if (booking.getStaffId() == null) {
+                        psInvoice.setNull(5, Types.INTEGER);
+                    } else {
+                        psInvoice.setInt(5, booking.getStaffId());
+                    }
+                    psInvoice.executeUpdate();
+                }
+            }
+
             // 7. Ghi nhận minh chứng tài chính vào DepositPayments nếu luồng Đặt tương lai đóng cọc thành công tại quầy
             if (!isStayNow && bookingId != -1 && booking.getDepositAmount().compareTo(java.math.BigDecimal.ZERO) > 0) {
                 String insertDepositSQL = """
@@ -267,10 +297,7 @@ public class WalkinBookingDAO extends DBContext {
                 try (PreparedStatement psDeposit = connection.prepareStatement(insertDepositSQL)) {
                     psDeposit.setInt(1, bookingId);
                     psDeposit.setBigDecimal(2, booking.getDepositAmount());
-
-                    // QUAY LẠI ID SỐ: Truyền lại đúng ID nhân viên (số 4) để đảm bảo tính toàn vẹn khóa ngoại (FK JOIN)
                     psDeposit.setInt(3, booking.getStaffId());
-
                     psDeposit.executeUpdate();
                 }
             }

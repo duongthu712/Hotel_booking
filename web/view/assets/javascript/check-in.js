@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
     errorContainer.style.textAlign = "center";
     errorContainer.style.width = "100%";
     errorContainer.style.display = "none";
-    
+
     if (formFooter) {
         formFooter.parentNode.insertBefore(errorContainer, formFooter);
     }
@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function showJsError(message) {
         errorContainer.innerHTML = "⚠️ " + message;
         errorContainer.style.display = "block";
-        errorContainer.scrollIntoView({ behavior: "smooth", block: "center" });
+        errorContainer.scrollIntoView({behavior: "smooth", block: "center"});
     }
 
     function clearJsError() {
@@ -45,14 +45,18 @@ document.addEventListener("DOMContentLoaded", function () {
             clearJsError();
 
             if (this.checked) {
-                nameInput.value = ""; phoneInput.value = ""; emailInput.value = "";
-                idNumberInput.value = ""; dobInput.value = "";
+                nameInput.value = "";
+                phoneInput.value = "";
+                emailInput.value = "";
+                idNumberInput.value = "";
+                dobInput.value = "";
                 nameInput.focus();
             } else {
                 nameInput.value = originalProfile.fullName;
                 phoneInput.value = originalProfile.phone;
                 emailInput.value = originalProfile.email;
-                idNumberInput.value = ""; dobInput.value = "";
+                idNumberInput.value = "";
+                dobInput.value = "";
             }
         });
     }
@@ -60,20 +64,27 @@ document.addEventListener("DOMContentLoaded", function () {
     if (checkInForm) {
         checkInForm.addEventListener("submit", function (e) {
             const action = e.submitter ? e.submitter.value : "";
-            
+
             if (action === "cancel") {
                 return;
             }
 
             clearJsError();
-            
+
             const phone = document.getElementsByName("idPhone")[0]?.value.trim() || "";
             const idNumber = document.getElementsByName("idNumber")[0]?.value.trim() || "";
             const dobValue = document.getElementsByName("dateOfBirth")[0]?.value || "";
-
+            const emailInput = document.getElementsByName("idEmail")[0];
+            const email = emailInput ? emailInput.value.trim() : "";
             const phoneRegex = /^(0[3|5|7|8|9])[0-9]{8}$/;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (phone !== "" && !phoneRegex.test(phone)) {
                 showJsError("Định dạng số điện thoại không hợp lệ! (Phải gồm 10 chữ số và bắt đầu bằng đầu số VN như 03, 05, 07, 08, 09)");
+                e.preventDefault();
+                return;
+            }
+            if (email !== "" && !emailRegex.test(email)) {
+                showJsError("Định dạng email không hợp lệ! (Ví dụ: example@gmail.com)");
                 e.preventDefault();
                 return;
             }
@@ -92,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             const parts = dobValue.split('-');
-            const dob = new Date(parts[0], parts[1] - 1, parts[2]); 
+            const dob = new Date(parts[0], parts[1] - 1, parts[2]);
             const today = new Date();
 
             if (dob > today) {
@@ -103,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             let age = today.getFullYear() - dob.getFullYear();
             const monthDiff = today.getMonth() - dob.getMonth();
-            
+
             if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
                 age--;
             }
@@ -113,6 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 e.preventDefault();
                 return;
             }
+
         });
     }
 

@@ -15,6 +15,13 @@
 
         <div class="walkin-container">
 
+            <!-- HIỂN THỊ CẢNH BÁO LỖI BACK-END NẾU CÓ -->
+            <c:if test="${param.status == 'over_capacity_error'}">
+                <div style="background-color: #fff5f5; border: 1px solid #fed7d7; color: #c53030; padding: 15px; margin-bottom: 20px; border-radius: 6px; font-weight: bold;">
+                    Lỗi hệ thống: Số lượng người lớn hoặc trẻ em vượt quá tổng sức chứa của số phòng đã chọn! Vui lòng tăng số lượng phòng hoặc chọn hạng phòng khác lớn hơn.
+                </div>
+            </c:if>
+
             <!-- CARD TÌM KIẾM PHÒNG TRỐNG NÂNG CAO -->
             <div class="walkin-search-card">
                 <h3 class="walkin-title">Tìm Phòng Trống</h3>
@@ -59,10 +66,10 @@
                         <th style="width: 25%;">Hạng phòng</th>
                         <th style="width: 35%;">Mô tả & Sức chứa</th>
                         <th style="width: 15%;">Giá/đêm</th>
-                        <c:if test="${isSearching}">
+                            <c:if test="${isSearching}">
                             <th style="width: 13%;">Trống</th>
                             <th style="width: 12%;">Hành động</th>
-                        </c:if>
+                            </c:if>
                     </tr>
                 </thead>
                 <tbody>
@@ -71,8 +78,8 @@
                             <td><strong class="room-type-name">${rt.roomTypeName}</strong></td>
                             <td>
                                 <div class="room-capacity-badges">
-                                    <span class="capacity-badge">${rt.maxAdults} Người lớn</span>
-                                    <span class="capacity-badge">${rt.maxChildren} Trẻ em</span>
+                                    <span class="capacity-badge" data-adults="${rt.maxAdults}">${rt.maxAdults} Người lớn</span>
+                                    <span class="capacity-badge" data-children="${rt.maxChildren}">${rt.maxChildren} Trẻ em</span>
                                 </div>
                             </td>
                             <td class="room-price">
@@ -95,7 +102,10 @@
                                         <button type="button" 
                                                 class="walkin-action-btn select-room-btn"
                                                 data-typeid="${rt.roomTypeId}"
-                                                data-typename="${rt.roomTypeName}">
+                                                data-typename="${rt.roomTypeName}"
+                                                data-baseprice="${rt.basePrice}"
+                                                data-maxadults="${rt.maxAdults}"
+                                                data-maxchildren="${rt.maxChildren}">
                                             Đặt ngay
                                         </button>
                                     </c:if>
@@ -129,7 +139,6 @@
                     <input type="hidden" id="formBasePrice" name="basePrice">
                     <input type="hidden" name="checkInDate" value="${param.checkInDate}">
                     <input type="hidden" name="checkOutDate" value="${param.checkOutDate}">
-                    <input type="hidden" id="numRooms" name="numRooms" value="${param.numRooms != null ? param.numRooms : 1}">
 
                     <div class="booking-layout">
 
@@ -163,9 +172,29 @@
                                         <span id="idNumber-error-msg" class="form-error-inline"></span>
                                     </div>
                                     <div class="form-group">
-                                        <label>Ngày sinh <span>*</span> <small>(Khách từ 18 tuổi)</small></label>
+                                        <label>Ngày sinh <span>*</span></label>
                                         <input type="date" id="dateOfBirth" name="dateOfBirth" required>
                                         <span id="dob-error-msg" class="form-error-inline"></span>
+                                    </div>
+
+                                    <!-- BỔ SUNG: Ô ĐIỀU CHỈNH SỐ PHÒNG, NGƯỜI LỚN VÀ TRẺ EM TẠI FORM -->
+                                    <div class="form-group">
+                                        <label>Số lượng phòng thuê <span>*</span></label>
+                                        <input type="number" id="formNumRooms" name="numRooms" 
+                                               value="${param.numRooms != null ? param.numRooms : 1}" 
+                                               readonly 
+                                               style="background-color: #e2e8f0; cursor: not-allowed;" required>
+                                        <span id="rooms-error-msg" class="form-error-inline"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Số người lớn <span>*</span></label>
+                                        <input type="number" id="numGuests" name="numGuests" value="1" min="1" required>
+                                        <span id="guests-error-msg" class="form-error-inline"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Số trẻ em <span>*</span></label>
+                                        <input type="number" id="numChildren" name="numChildren" value="0" min="0" required>
+                                        <span id="children-error-msg" class="form-error-inline"></span>
                                     </div>
                                 </div>
                             </section>
@@ -180,22 +209,59 @@
                                 <div style="display: flex; gap: 35px; margin-bottom: 20px;">
                                     <label class="payment-method-label">
                                         <input type="radio" name="paymentMethod" value="Tiền mặt" checked onchange="togglePaymentView('cash')">
-                                         Thu tiền mặt tại quầy
+                                        Thu tiền mặt tại quầy
                                     </label>
                                     <label class="payment-method-label">
                                         <input type="radio" name="paymentMethod" value="Chuyển khoản" onchange="togglePaymentView('qr')">
-                                         Khách quét mã VietQR cọc
+                                        Khách quét mã VietQR cọc
                                     </label>
                                 </div>
 
                                 <div id="cashPaymentGuide">
                                     <strong>Hướng dẫn lễ tân:</strong> Thu trực tiếp số tiền đặt cọc hiển thị ở mục "TIỀN CỌC CẦN THU" bên phải. Kiểm đếm chính xác tiền mặt trước khi lưu đơn.
                                 </div>
-
                                 <div id="qrPaymentGateway" style="display: none;">
-                                    <p style="font-weight: bold; color: #2d3748;">Yêu cầu khách mở App ngân hàng quét mã QR để chuyển khoản tiền cọc:</p>
-                                    <img id="vietQrCode" src="" alt="Mã QR VietQR Động">
-                                    <p style="font-size: 12px; color: #718096; margin-top: 8px;">Nội dung bắt buộc: <span id="qrMemo" style="font-weight: bold; color: #3182ce;"></span></p>
+                                    <!-- ĐỒNG BỘ 100% THÔNG TIN VÀ CẤU TRÚC NGÂN HÀNG VỚI ONLINE (KHÔNG CÓ UPLOAD) -->
+                                    <div class="bank-card" style="display: flex; gap: 20px; text-align: left; background: #fff; padding: 20px; border: 1px dashed #ebd9b4; border-radius: 8px; margin-top: 15px;">
+
+                                        <div class="bank-information" style="flex: 1;">
+                                            <h2 style="font-family: 'Lora', serif !important; font-size: 15px; font-weight: 700; color: #1a446c; margin-bottom: 12px; text-transform: uppercase;">
+                                                THÔNG TIN CHUYỂN KHOẢN
+                                            </h2>
+                                            <div class="bank-row" style="margin-bottom: 8px; font-size: 13.5px;">
+                                                <span style="color: #718096;">Ngân hàng:</span> <strong>Vietcombank</strong>
+                                            </div>
+                                            <div class="bank-row" style="margin-bottom: 8px; font-size: 13.5px;">
+                                                <span style="color: #718096;">Số tài khoản:</span> <strong>123456789999</strong>
+                                            </div>
+                                            <div class="bank-row" style="margin-bottom: 8px; font-size: 13.5px;">
+                                                <span style="color: #718096;">Chủ tài khoản:</span> <strong>LA MER HOTEL</strong>
+                                            </div>
+                                            <div class="bank-row" style="margin-bottom: 8px; font-size: 13.5px;">
+                                                <span style="color: #718096;">Nội dung chuyển khoản:</span> <strong id="qrMemo" style="color: #1a446c;">-</strong>
+                                            </div>
+                                            <div class="booking-code-note" style="font-size: 12px; color: #718096; line-height: 1.4; margin-top: 10px; padding-top: 8px; border-top: 1px dashed #ebd9b4;">
+                                                <strong>Hướng dẫn:</strong> Hướng dẫn khách quét mã hoặc chuyển khoản đúng nội dung. Sau khi màn hình thiết bị của khách hoặc SMS ngân hàng báo nhận tiền thành công, lễ tân bấm nút xác nhận phía dưới để hoàn tất.
+                                            </div>
+                                        </div>
+
+                                        <div class="qr-payment" style="width: 160px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 1px dashed #ebd9b4; padding-left: 20px;">
+                                            <strong style="font-size: 12px; color: #1a446c; display: block; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                                QUÉT QR ĐỂ THANH TOÁN
+                                            </strong>
+                                            <div class="qr-image-box" style="width: 130px; height: 160px; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid #ebd9b4; padding: 5px; border-radius: 4px;">
+                                                <!-- ẢNH QR GẮN CỐ ĐỊNH THỐNG NHẤT VỚI ONLINE -->
+                                                <img src="https://i.ibb.co/GQZ9XWjM/36eec7bc-5c63-4d80-881e-2bdabccbc226.png" 
+                                                     alt="QR thanh toán" 
+                                                     style="max-width: 100%; max-height: 100%; object-fit: contain;"
+                                                     onerror="this.style.display='none'; document.getElementById('qrFallbackDesk').style.display='flex';">
+
+                                                <div id="qrFallbackDesk" class="qr-fallback" style="display: none; font-size: 12px; font-weight: bold; color: #718096; text-align: center;">
+                                                    QR<br>PAYMENT
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </section>
                         </div>
@@ -229,7 +295,7 @@
                             </div>
                             <div class="summary-row">
                                 <span>Số lượng:</span>
-                                <strong>${param.numRooms} phòng x <span id="summaryNights">0</span> đêm</strong>
+                                <strong id="summaryRoomsAndNights">0 phòng x 0 đêm</strong>
                             </div>
                             <div class="summary-row">
                                 <span>Đơn giá/đêm:</span>
@@ -247,7 +313,7 @@
                                 <strong id="summaryDepositAmount" style="font-size: 18px; color: #c92a2a;">0 đ</strong>
                             </div>
 
-                            <div id="stayNowNotice" style="display: none;">
+                            <div id="stayNowNotice" style="display: none; font-size: 13px; color: #2f855a; font-weight: bold; background-color: #f0fff4; padding: 10px; border-radius: 4px; border: 1px solid #c6f6d5; margin-top: 10px;">
                                 Khách ở luôn hôm nay. Không thu cọc trước, trả 100% tiền phòng khi làm thủ tục Checkout trả phòng.
                             </div>
 

@@ -246,8 +246,8 @@
         <servlet-class>controller.RoomDeleteController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RoomTypeConflictController</servlet-name>
-        <servlet-class>controller.RoomTypeConflictController</servlet-class>
+        <servlet-name>GuestRequestController</servlet-name>
+        <servlet-class>controller.GuestRequestController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>BookingListController</servlet-name>
@@ -506,8 +506,8 @@
         <url-pattern>/RoomDelete</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RoomTypeConflictController</servlet-name>
-        <url-pattern>/roomtypeconflict</url-pattern>
+        <servlet-name>GuestRequestController</servlet-name>
+        <url-pattern>/guest-request</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>BookingListController</servlet-name>
