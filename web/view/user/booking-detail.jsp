@@ -674,22 +674,87 @@
                                 <h2>YÊU CẦU CỦA BẠN</h2>
 
                                 <span class="detail-request-count">
-                                    0 yêu cầu
+                                    ${empty publicRequests ? 0 : publicRequests.size()} yêu cầu
                                 </span>
                             </div>
 
-                            <div class="detail-request-empty">
-                                <span class="detail-request-empty-icon">✓</span>
+                            <c:choose>
+                                <c:when test="${empty publicRequests}">
+                                    <div class="detail-request-empty">
+                                        <span class="detail-request-empty-icon">✓</span>
 
-                                <div>
-                                    <strong>Chưa có yêu cầu nào</strong>
+                                        <div>
+                                            <strong>Chưa có yêu cầu nào</strong>
 
-                                    <p>
-                                        Các yêu cầu thay đổi và trạng thái xử lý
-                                        sẽ được hiển thị tại đây.
-                                    </p>
-                                </div>
-                            </div>
+                                            <p>
+                                                Các yêu cầu thay đổi và trạng thái xử lý
+                                                sẽ được hiển thị tại đây.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </c:when>
+
+                                <c:otherwise>
+                                    <div class="detail-request-list">
+                                        <c:forEach var="r" items="${publicRequests}">
+                                            <div class="detail-change-item">
+                                                <span class="detail-change-icon">i</span>
+
+                                                <div>
+                                                    <div class="detail-request-row">
+                                                        <strong>
+                                                            <c:out value="${r.requestType}"/>
+                                                        </strong>
+
+                                                        <span class="detail-status-badge
+                                                              ${r.requestStatus eq 'Đã phê duyệt' ? 'success' :
+                                                                r.requestStatus eq 'Đã từ chối' ? 'cancelled' : 'waiting'}">
+                                                            <c:out value="${r.requestStatus}"/>
+                                                        </span>
+                                                    </div>
+
+                                                    <p>
+                                                        <c:out value="${r.requestDetails}"/>
+                                                    </p>
+
+                                                    <c:if test="${not empty r.requestedCheckinText}">
+                                                        <p>
+                                                            Check-in yêu cầu:
+                                                            <c:out value="${r.requestedCheckinText}"/>
+                                                        </p>
+                                                    </c:if>
+
+                                                    <c:if test="${not empty r.requestedCheckoutText}">
+                                                        <p>
+                                                            Check-out yêu cầu:
+                                                            <c:out value="${r.requestedCheckoutText}"/>
+                                                        </p>
+                                                    </c:if>
+
+                                                    <c:if test="${not empty r.targetRoomTypeName}">
+                                                        <p>
+                                                            Hạng phòng liên quan:
+                                                            <c:out value="${r.targetRoomTypeName}"/>
+                                                        </p>
+                                                    </c:if>
+
+                                                    <c:if test="${not empty r.responseNotes}">
+                                                        <p>
+                                                            Phản hồi:
+                                                            <c:out value="${r.responseNotes}"/>
+                                                        </p>
+                                                    </c:if>
+
+                                                    <small>
+                                                        Ngày gửi:
+                                                        <c:out value="${r.submittedAtText}"/>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </c:forEach>
+                                    </div>
+                                </c:otherwise>
+                            </c:choose>
 
                             <div class="detail-request-divider"></div>
 
@@ -702,9 +767,7 @@
                                             <span class="detail-change-icon">×</span>
 
                                             <div>
-                                                <strong>
-                                                    Đơn đặt phòng đã được hủy
-                                                </strong>
+                                                <strong>Đơn đặt phòng đã được hủy</strong>
 
                                                 <c:choose>
                                                     <c:when test="${not empty booking.cancellationReason}">
@@ -725,7 +788,7 @@
                                         </div>
                                     </c:when>
 
-                                    <c:otherwise>
+                                    <c:when test="${empty publicChanges}">
                                         <div class="detail-change-empty">
                                             <span class="detail-change-icon">i</span>
 
@@ -740,6 +803,51 @@
                                                 </p>
                                             </div>
                                         </div>
+                                    </c:when>
+
+                                    <c:otherwise>
+                                        <c:forEach var="c" items="${publicChanges}">
+                                            <div class="detail-change-item">
+                                                <span class="detail-change-icon">i</span>
+
+                                                <div>
+                                                    <div class="detail-request-row">
+                                                        <strong>
+                                                            <c:out value="${c.requestType}"/>
+                                                        </strong>
+
+                                                        <span class="detail-status-badge
+                                                              ${c.requestStatus eq 'Đã phê duyệt' ? 'success' :
+                                                                c.requestStatus eq 'Đã từ chối' ? 'cancelled' : 'waiting'}">
+                                                            <c:out value="${c.requestStatus}"/>
+                                                        </span>
+                                                    </div>
+
+                                                    <p>
+                                                        <c:out value="${c.requestDetails}"/>
+                                                    </p>
+
+                                                    <c:if test="${not empty c.targetRoomTypeName}">
+                                                        <p>
+                                                            Hạng phòng liên quan:
+                                                            <c:out value="${c.targetRoomTypeName}"/>
+                                                        </p>
+                                                    </c:if>
+
+                                                    <c:if test="${not empty c.responseNotes}">
+                                                        <p>
+                                                            Phản hồi:
+                                                            <c:out value="${c.responseNotes}"/>
+                                                        </p>
+                                                    </c:if>
+
+                                                    <small>
+                                                        Ngày xử lý:
+                                                        <c:out value="${c.processedAtText}"/>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </c:forEach>
                                     </c:otherwise>
                                 </c:choose>
                             </div>
@@ -800,6 +908,44 @@
                                             <span>
                                                 <strong>Hủy đặt phòng</strong>
                                                 <small>Không còn khả dụng</small>
+                                            </span>
+                                        </div>
+                                    </c:otherwise>
+                                </c:choose>
+                                <c:choose>
+                                    <c:when test="${canWriteFeedback}">
+                                        <a href="${pageContext.request.contextPath}/feedback-submission?bookingId=${booking.bookingId}"
+                                           class="detail-management-button feedback">
+
+                                            <span class="detail-management-icon">★</span>
+
+                                            <span>
+                                                <strong>Viết đánh giá</strong>
+                                                <small>Chia sẻ trải nghiệm lưu trú</small>
+                                            </span>
+                                        </a>
+                                    </c:when>
+
+                                    <c:when test="${hasFeedback}">
+                                        <div class="detail-management-button feedback disabled">
+
+                                            <span class="detail-management-icon">✓</span>
+
+                                            <span>
+                                                <strong>Đã đánh giá</strong>
+                                                <small>Cảm ơn phản hồi của bạn</small>
+                                            </span>
+                                        </div>
+                                    </c:when>
+
+                                    <c:otherwise>
+                                        <div class="detail-management-button feedback disabled">
+
+                                            <span class="detail-management-icon">★</span>
+
+                                            <span>
+                                                <strong>Viết đánh giá</strong>
+                                                <small>Khả dụng sau khi trả phòng</small>
                                             </span>
                                         </div>
                                     </c:otherwise>
