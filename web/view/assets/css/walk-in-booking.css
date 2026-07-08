@@ -634,3 +634,44 @@ body {
     from { transform: scale(0.9); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
 }
+/* ==========================================================================
+   12. ĐỊNH DẠNG BỔ SUNG CHO CÁC Ô NHẬP ĐỘNG KHỐI SỐ LƯỢNG (PHÒNG/KHÁCH)
+   ========================================================================== */
+/* Định dạng riêng cho thẻ input[type="number"] nằm trong Form nhập liệu */
+.form-grid .form-group input[type="number"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ebd9b4;
+    border-radius: 4px;
+    font-family: 'Lora', serif !important;
+    font-size: 14px;
+    color: #1a446c;
+    background-color: #ffffff;
+    outline: none;
+    height: 40px;
+    transition: all 0.2s ease;
+}
+
+/* Hiệu ứng focus đồng bộ cho ô nhập số lượng */
+.form-grid .form-group input[type="number"]:focus {
+    border-color: #1a446c;
+    box-shadow: 0 0 0 3px rgba(26, 68, 108, 0.04);
+}
+
+/* Đảm bảo các nhãn thông báo trạng thái của ô Số khách/Số phòng luôn hiển thị chuẩn */
+#rooms-error-msg,
+#guests-error-msg,
+#children-error-msg {
+    font-family: 'Lora', serif !important;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 4px;
+    display: block; /* Chuyển thành block để hiển thị ngay dưới ô input */
+    line-height: 1.4;
+}
+
+/* Lớp hỗ trợ đổi màu viền ô input khi bị trạng thái quá tải */
+.form-group input[type="number"].input-error-border {
+    border-color: #c92a2a !important;
+    background-color: #fdf3f3 !important;
+}

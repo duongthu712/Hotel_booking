@@ -9,9 +9,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-/**
- * @author Minh Thu
- */
 @WebServlet(name = "RoomTypeDeleteServlet", urlPatterns = {"/roomtypedelete"})
 public class RoomTypeDeleteServlet extends HttpServlet {
 
@@ -21,7 +18,6 @@ public class RoomTypeDeleteServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // 1. Lấy và kiểm tra ID
             String idStr = request.getParameter("id");
             if (idStr == null || idStr.trim().isEmpty()) {
                 response.sendRedirect(request.getContextPath() + "/roomtypelist?status=error");
@@ -29,28 +25,36 @@ public class RoomTypeDeleteServlet extends HttpServlet {
             }
             int roomTypeId = Integer.parseInt(idStr);
 
-            // 2. Kiểm tra xung đột dữ liệu (số khách đang ở, số đơn tương lai)
+            // 1. Kiểm tra xem có tham số xác nhận xóa từ Pop-up gửi lên hay không
+            String confirm = request.getParameter("confirm");
+            
+            // 2. Lấy dữ liệu kiểm tra từ cơ sở dữ liệu
             DeactiveValidationResult result = roomTypeDAO.getDeactiveValidationResult(roomTypeId);
+            
+            // 3. Nếu đã bấm nút "Đồng ý" từ Pop-up (confirm=true) HOẶC phòng hoàn toàn trống đơn
+            if ("true".equals(confirm) || !result.isBlocked()) {
+                boolean isDeleted = roomTypeDAO.deleteRoomType(roomTypeId);
+                if (isDeleted) {
+                    if (result.getStayingCount() > 0 || result.getFutureCount() > 0) {
+                        response.sendRedirect(request.getContextPath() + "/roomtypelist?status=deleted_with_orders"
+                                + "&staying=" + result.getStayingCount()
+                                + "&future=" + result.getFutureCount());
+                    } else {
+                        response.sendRedirect(request.getContextPath() + "/roomtypelist?status=deleted");
+                    }
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/roomtypelist?status=delete_failed");
+                }
+                return;
+            }
 
-            // 3. Nếu hạng phòng bị chặn
+            // 4. Lần đầu nhấn nút Xóa ngoài danh sách & phát hiện có đơn -> Bắn param để JS mở Pop-up hỏi
             if (result.isBlocked()) {
-                // Redirect về trang danh sách kèm các tham số để JS bắt được
                 String redirectUrl = request.getContextPath() + "/roomtypelist?status=conflict"
                         + "&id=" + roomTypeId
                         + "&staying=" + result.getStayingCount()
                         + "&future=" + result.getFutureCount();
                 response.sendRedirect(redirectUrl);
-                return;
-            }
-
-            // 4. Nếu an toàn, thực hiện xóa (hoặc update is_active = 0)
-            boolean isDeleted = roomTypeDAO.deleteRoomType(roomTypeId);
-
-            // 5. Điều hướng sau khi xóa thành công
-            if (isDeleted) {
-                response.sendRedirect(request.getContextPath() + "/roomtypelist?status=deleted");
-            } else {
-                response.sendRedirect(request.getContextPath() + "/roomtypelist?status=delete_failed");
             }
 
         } catch (Exception e) {

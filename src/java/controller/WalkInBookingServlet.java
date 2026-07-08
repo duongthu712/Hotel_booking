@@ -3,6 +3,7 @@ package controller;
 import dao.WalkinBookingDAO;
 import dto.AvailableRoomTypeView;
 import model.Booking;
+import dal.EmailUtil;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,26 +18,43 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet(name = "WalkInBookingServlet", urlPatterns = {"/walk-in-booking"})
 public class WalkInBookingServlet extends HttpServlet {
 
-    // Xử lý yêu cầu hiển thị trang và tìm kiếm danh sách phòng trống
+    // Xử lý yêu cầu hiển thị trang và tìm kiếm danh sách phòng trống dựa theo điều kiện lọc
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         WalkinBookingDAO walkinDAO = new WalkinBookingDAO();
 
-        // Lấy danh sách hạng phòng ban đầu để đổ vào thẻ <select> dropdown
+        // Lấy danh sách hạng phòng ban đầu để đổ vào thẻ <select> dropdown của thanh tìm kiếm
         List<AvailableRoomTypeView> dropdownRoomTypes = walkinDAO.getAllRoomTypes();
         request.setAttribute("dropdownRoomTypes", dropdownRoomTypes);
 
-        // Thu thập tham số tìm kiếm từ bộ lọc
+        // Thu thập tham số tìm kiếm từ bộ lọc ở phía đầu trang
         String checkIn = request.getParameter("checkInDate");
         String checkOut = request.getParameter("checkOutDate");
         String roomTypeIdParam = request.getParameter("roomTypeId");
         String numRoomsParam = request.getParameter("numRooms");
+        String numGuestsParam = request.getParameter("numGuests");
+        String numChildrenParam = request.getParameter("numChildren");
 
+        int numGuestsSearch = 1; // Mặc định nếu chưa nhập gì
+        if (numGuestsParam != null && !numGuestsParam.isEmpty()) {
+            try {
+                numGuestsSearch = Integer.parseInt(numGuestsParam);
+            } catch (NumberFormatException e) {
+            }
+        }
+
+        int numChildrenSearch = 0; // Mặc định nếu chưa nhập gì
+        if (numChildrenParam != null && !numChildrenParam.isEmpty()) {
+            try {
+                numChildrenSearch = Integer.parseInt(numChildrenParam);
+            } catch (NumberFormatException e) {
+            }
+        }
         List<AvailableRoomTypeView> allRoomTypes;
 
-        // Điều kiện bắt buộc: Có nhập Ngày đến và Ngày đi
+        // Điều kiện bắt buộc thực thi filter: Có nhập đầy đủ Ngày đến và Ngày đi
         if (checkIn != null && !checkIn.isEmpty() && checkOut != null && !checkOut.isEmpty()) {
 
             int roomTypeId = 0;
@@ -44,7 +62,7 @@ public class WalkInBookingServlet extends HttpServlet {
                 roomTypeId = Integer.parseInt(roomTypeIdParam);
             }
 
-            // Chuẩn hóa số lượng phòng cần thuê (Mặc định tối thiểu là 1 phòng)
+            // Chuẩn hóa số lượng phòng cần thuê (Mặc định tối thiểu luôn là 1 phòng)
             int numRooms = 1;
             if (numRoomsParam != null && !numRoomsParam.isEmpty()) {
                 try {
@@ -57,12 +75,12 @@ public class WalkInBookingServlet extends HttpServlet {
                 }
             }
 
-            // Gọi hàm xử lý tìm kiếm hạng phòng khả dụng từ DAO
-            allRoomTypes = walkinDAO.searchAvailableRooms(checkIn, checkOut, roomTypeId, numRooms);
+            // Gọi hàm xử lý tìm kiếm hạng phòng khả dụng từ dữ liệu database (Đã tối ưu hóa thầu đủ 6 tham số)
+            allRoomTypes = walkinDAO.searchAvailableRooms(checkIn, checkOut, roomTypeId, numRooms, numGuestsSearch, numChildrenSearch);
             request.setAttribute("isSearching", true);
 
         } else {
-            // Lần đầu load trang: Chưa bấm tìm kiếm
+            // Lần đầu load trang: Chưa kích hoạt nút bấm tìm kiếm
             allRoomTypes = dropdownRoomTypes;
             request.setAttribute("isSearching", false);
         }
@@ -71,14 +89,14 @@ public class WalkInBookingServlet extends HttpServlet {
         request.getRequestDispatcher("/view/receptionist/walk-in-booking.jsp").forward(request, response);
     }
 
-    // Xử lý tiếp nhận dữ liệu lưu đơn đặt phòng và rẽ nhánh tài chính
+    // Xử lý tiếp nhận dữ liệu lưu đơn đặt phòng và gửi thông báo xác nhận đến email của khách hàng
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         WalkinBookingDAO walkinDAO = new WalkinBookingDAO();
 
-        // 1. Đọc thông tin chi tiết của khách hàng mới từ Form nhập liệu
+        // 1. Đọc thông tin chi tiết của khách hàng mới từ các ô Form nhập liệu
         String fullName = request.getParameter("fullName");
         String phone = request.getParameter("phone");
         String email = request.getParameter("email");
@@ -90,12 +108,16 @@ public class WalkInBookingServlet extends HttpServlet {
             dateOfBirth = LocalDate.parse(dobParam);
         }
 
-        // 2. Thu thập các thông tin cấu hình phòng thuê từ Form ẩn
+        // 2. Thu thập các thông tin cấu hình phòng thuê gửi lên trực tiếp từ Form nhập động công khai
         int roomTypeId = Integer.parseInt(request.getParameter("roomTypeId"));
         String checkInStr = request.getParameter("checkInDate");
         String checkOutStr = request.getParameter("checkOutDate");
         int numRooms = Integer.parseInt(request.getParameter("numRooms"));
         String paymentMethod = request.getParameter("paymentMethod");
+
+        // ĐỌC ĐỘNG SỐ LƯỢNG KHÁCH ĐI CÙNG (Đồng bộ xử lý tính toán)
+        int numGuests = Integer.parseInt(request.getParameter("numGuests"));
+        int numChildren = Integer.parseInt(request.getParameter("numChildren"));
 
         // Giả lập ID tài khoản của lễ tân đang thực hiện giao dịch trực ca (Gắn cố định theo tài khoản mẫu)
         int staffId = 4;
@@ -103,25 +125,46 @@ public class WalkInBookingServlet extends HttpServlet {
         LocalDate checkInDate = LocalDate.parse(checkInStr);
         LocalDate checkOutDate = LocalDate.parse(checkOutStr);
 
-        // 3. Kiểm tra mốc thời gian xem khách lưu trú luôn hôm nay hay đặt cho tương lai
+        // 3. KIỂM TRA SỨC CHỨA CHẶN TRƯỚC TẠI TẦNG BACK-END (BẢO VỆ CHỐNG TRÀN DỮ LIỆU)
+        int maxAdultsPerRoom = 2; // Biến dự phòng mặc định nếu có sự cố lọt lưới
+        int maxChildrenPerRoom = 0;
+
+        List<AvailableRoomTypeView> dropdownRoomTypes = walkinDAO.getAllRoomTypes();
+        for (AvailableRoomTypeView type : dropdownRoomTypes) {
+            if (type.getRoomTypeId() == roomTypeId) {
+                maxAdultsPerRoom = type.getMaxAdults();
+                maxChildrenPerRoom = type.getMaxChildren();
+                break;
+            }
+        }
+
+        int totalMaxAdults = maxAdultsPerRoom * numRooms;
+        int totalMaxChildren = maxChildrenPerRoom * numRooms;
+
+        // Nếu phát hiện lễ tân cố tình lách qua JS để nhập quá số người quy định của hệ thống
+        if (numGuests > totalMaxAdults || numChildren > totalMaxChildren) {
+            response.sendRedirect(request.getContextPath() + "/walk-in-booking?status=over_capacity_error"
+                    + "&checkInDate=" + checkInStr + "&checkOutDate=" + checkOutStr + "&numRooms=" + numRooms + "&roomTypeId=" + roomTypeId);
+            return; // Ngắt dòng xử lý ngay lập tức
+        }
+
+        // 4. Kiểm tra mốc thời gian xem khách làm thủ tục lưu trú luôn hôm nay hay đặt giữ chỗ cho tương lai
         LocalDate today = LocalDate.now();
         boolean isStayNow = checkInDate.equals(today);
 
-        // 4. Khởi tạo đối tượng model và đóng gói dữ liệu Booking để chuẩn bị truyền xuống DAO
+        // 5. Khởi tạo đối tượng model và đóng gói dữ liệu Booking để truyền xuống DAO
         Booking booking = new Booking();
         booking.setStaffId(staffId);
         booking.setRoomTypeId(roomTypeId);
         booking.setNumRooms(numRooms);
         booking.setCheckinDate(checkInDate);
         booking.setCheckoutDate(checkOutDate);
+        booking.setNumGuests(numGuests);
+        booking.setNumChildren(numChildren);
 
         // Lấy đơn giá gốc của hạng phòng truyền từ thuộc tính ẩn trên giao diện
         BigDecimal basePrice = new BigDecimal(request.getParameter("basePrice"));
         booking.setBookedPricePerNight(basePrice);
-
-        // Thiết lập các chỉ số số lượng khách lưu trú mặc định ban đầu
-        booking.setNumGuests(1);
-        booking.setNumChildren(0);
 
         // ĐỒNG BỘ MÃ BOOKING: Sinh mã ngẫu nhiên duy nhất bắt đầu bằng LMHW (8 ký tự ngẫu nhiên sau)
         String uniqueCode;
@@ -139,12 +182,34 @@ public class WalkInBookingServlet extends HttpServlet {
         booking.setBookingCode(uniqueCode);
 
         try {
-            // 5. Gọi hàm xử lý luồng Transaction nghiệp vụ tổng tại tầng DAO
+            // 6. Gọi hàm xử lý luồng Transaction nghiệp vụ tổng tại tầng DAO
             boolean isSuccess = walkinDAO.createWalkinBookingProcess(booking, fullName, email, phone, idNumber, dateOfBirth, isStayNow);
 
-            // 6. Điều hướng giao diện dựa trên kết quả thực thi thành công
-            // 6. Điều hướng giao diện dựa trên kết quả thực thi thành công
+            // 7. Điều hướng giao diện dựa trên kết quả thực thi thành công và tự động kích hoạt gửi mail
             if (isSuccess) {
+                
+                // Gửi Email xác nhận lập đơn tại quầy cho khách hàng (bọc khối try-catch biệt lập để an toàn dữ liệu)
+                try {
+                    EmailUtil.sendWalkInBookingConfirmed(
+                        email, 
+                        fullName, 
+                        phone, 
+                        idNumber, 
+                        dateOfBirth, 
+                        uniqueCode, 
+                        checkInDate, 
+                        checkOutDate, 
+                        numRooms, 
+                        numGuests, 
+                        numChildren, 
+                        booking.getDepositAmount(), 
+                        isStayNow
+                    );
+                } catch (Exception mailEx) {
+                    System.out.println("Lỗi hệ thống gửi email xác nhận đặt phòng tại quầy: " + mailEx.getMessage());
+                    mailEx.printStackTrace();
+                }
+
                 if (isStayNow) {
                     // Khách ở luôn hôm nay -> Quay lại trang kèm status ở luôn để hiện Pop-up trước, tắt Pop-up sẽ nhảy sang Check-in
                     response.sendRedirect(request.getContextPath() + "/walk-in-booking?status=stay_now_success&code=" + uniqueCode);
