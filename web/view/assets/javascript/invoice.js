@@ -7,14 +7,12 @@ function parseCurrency(str) {
         return str;
     if (!str)
         return 0;
-
     return parseFloat(str.replace(/[^0-9.-]+/g, '')) || 0;
 }
 
 function changeQty(type, index, delta) {
     const input = document.getElementById(type + 'Qty_' + index);
-    let currentVal = parseInt(input.value) || 0;
-    let newVal = currentVal + delta;
+    let newVal = (parseInt(input.value) || 0) + delta;
     if (newVal < 0)
         newVal = 0;
     const maxVal = input.getAttribute('max');
@@ -34,12 +32,8 @@ function calculateService(index) {
     const unitPrice = parseFloat(input.dataset.unitPrice) || 0;
     const isFree = parseInt(input.dataset.isFree) || 0;
     const numRooms = parseInt(input.dataset.numRooms) || 1;
-
     const chargeQty = Math.max(0, qty - (isFree * numRooms));
-    const total = chargeQty * unitPrice;
-
-    document.getElementById('serviceTotal_' + index).textContent = formatCurrency(total);
-
+    document.getElementById('serviceTotal_' + index).textContent = formatCurrency(chargeQty * unitPrice);
     updateSummary();
 }
 
@@ -47,50 +41,51 @@ function calculateAmenity(index) {
     const input = document.getElementById('amenityQty_' + index);
     const qty = parseInt(input.value) || 0;
     const unitPrice = parseFloat(input.dataset.unitPrice) || 0;
-
-    const total = qty * unitPrice;
-
-    document.getElementById('amenityTotal_' + index).textContent = formatCurrency(total);
-
+    document.getElementById('amenityTotal_' + index).textContent = formatCurrency(qty * unitPrice);
     updateSummary();
 }
 
-// Lưu giá trị gốc (đã render từ server) ngay khi trang load, dùng làm baseline để cộng dồn
-let baseServicesTotal = null;
-let baseDamagesTotal = null;
-let baseRoomCharges = null;
-let baseRemaining = null;
+// Baseline — giá trị gốc từ server, chỉ capture 1 lần duy nhất khi trang load
+let baseServicesTotal = 0;
+let baseDamagesTotal = 0;
+let baseRoomCharges = 0;
+let baseLateCharge = 0;
+let baseDeposit = 0;
+let baseRemaining = 0;
 
 function captureBaseline() {
-    if (baseServicesTotal === null) {
-        baseServicesTotal = parseCurrency(document.getElementById('summaryServices').textContent);
-    }
-    if (baseDamagesTotal === null) {
-        baseDamagesTotal = parseCurrency(document.getElementById('summaryDamages').textContent);
-    }
-    if (baseRoomCharges === null) {
-        const totalNow = parseCurrency(document.getElementById('summaryTotal').textContent);
-        let lateChargeBase = 0;
-        const lateChargeEl = document.getElementById('summaryLateCharge');
-        if (lateChargeEl) {
-            lateChargeBase = parseCurrency(lateChargeEl.textContent);
-        }
-        baseRoomCharges = totalNow - lateChargeBase - baseServicesTotal - baseDamagesTotal;
-    }
-    if (baseRemaining === null) {
-        const remainingEl = document.getElementById("summaryRemaining");
-        if (remainingEl) {
-            const dataRemaining = remainingEl.getAttribute('data-remaining');
-            baseRemaining = dataRemaining ? parseFloat(dataRemaining) : parseCurrency(remainingEl.textContent);
-        }
+    // Dịch vụ đã có từ server
+    baseServicesTotal = parseCurrency(document.getElementById('summaryServices').textContent);
+
+    // Hư hỏng đã có từ server
+    baseDamagesTotal = parseCurrency(document.getElementById('summaryDamages').textContent);
+
+    // Late charge
+    const lateChargeEl = document.getElementById('summaryLateCharge');
+    baseLateCharge = lateChargeEl ? parseCurrency(lateChargeEl.textContent) : 0;
+
+    // Deposit
+    const depositEl = document.getElementById('summaryDeposit');
+    baseLateCharge = lateChargeEl ? parseCurrency(lateChargeEl.textContent) : 0;
+    baseDeposit = depositEl ? parseCurrency(depositEl.textContent) : 0;
+
+    // Room charges = tổng - late - service - damage
+    const totalEl = document.getElementById('summaryTotal');
+    const total = parseCurrency(totalEl.textContent);
+    baseRoomCharges = total - baseLateCharge - baseServicesTotal - baseDamagesTotal;
+
+    // Remaining — lấy từ data-remaining để tránh parse lỗi format
+    const remainingEl = document.getElementById('summaryRemaining');
+    if (remainingEl) {
+        const dataRemaining = remainingEl.getAttribute('data-remaining');
+        baseRemaining = dataRemaining ? parseFloat(dataRemaining) : parseCurrency(remainingEl.textContent);
     }
 }
 
 function updateSummary() {
-    captureBaseline();
-
+    // Tính tổng dịch vụ mới nhập trên form (chưa lưu DB)
     let newServicesTotal = 0;
-    document.querySelectorAll('input[name="serviceQuantity"]').forEach((input) => {
+    document.querySelectorAll('input[name="serviceQuantity"]').forEach(input => {
         const qty = parseInt(input.value) || 0;
         const unitPrice = parseFloat(input.getAttribute('data-unit-price')) || 0;
         const isFree = parseInt(input.getAttribute('data-is-free')) || 0;
@@ -98,8 +93,9 @@ function updateSummary() {
         newServicesTotal += Math.max(0, qty - (isFree * numRooms)) * unitPrice;
     });
 
+    // Tính tổng hư hỏng mới nhập trên form (chưa lưu DB)
     let newDamagesTotal = 0;
-    document.querySelectorAll('input[name="damageQuantity"]').forEach((input) => {
+    document.querySelectorAll('input[name="damageQuantity"]').forEach(input => {
         const qty = parseInt(input.value) || 0;
         const unitPrice = parseFloat(input.getAttribute('data-unit-price')) || 0;
         newDamagesTotal += qty * unitPrice;
@@ -107,24 +103,23 @@ function updateSummary() {
 
     const servicesTotal = baseServicesTotal + newServicesTotal;
     const damagesTotal = baseDamagesTotal + newDamagesTotal;
-    let lateChargeTotal = 0;
-    const lateChargeEl = document.getElementById('summaryLateCharge');
-    if (lateChargeEl) {
-        lateChargeTotal = parseCurrency(lateChargeEl.textContent);
-    }
+    const totalAmount = baseRoomCharges + baseLateCharge + servicesTotal + damagesTotal;
+    const newRemaining = Math.max(0, baseRemaining + newServicesTotal + newDamagesTotal);
 
-    const totalAmount = baseRoomCharges + lateChargeTotal + servicesTotal + damagesTotal;
-
+    // Cập nhật UI
     document.getElementById('summaryServices').textContent = formatCurrency(servicesTotal);
     document.getElementById('summaryDamages').textContent = formatCurrency(damagesTotal);
     document.getElementById('summaryTotal').textContent = formatCurrency(totalAmount);
 
-    // Cập nhật ước lượng số tiền còn phải thanh toán
-    // remaining = totalAmount - đã thanh toán (không trừ cọc)
     const remainingEl = document.getElementById('summaryRemaining');
     if (remainingEl) {
-        const addedAmount = newServicesTotal + newDamagesTotal;
-        remainingEl.textContent = formatCurrency(baseRemaining + addedAmount);
+        remainingEl.textContent = formatCurrency(newRemaining);
+    }
+
+    // Cập nhật max của input thu tiền theo số tiền còn lại thực tế
+    const collectInput = document.getElementById('collectAmount');
+    if (collectInput) {
+        collectInput.max = Math.round(newRemaining);
     }
 }
 
@@ -144,49 +139,46 @@ function setupSearch(inputId, tableId) {
 
 function validateForm() {
     const collectInput = document.getElementById('collectAmount');
-    if (collectInput && collectInput.value && parseFloat(collectInput.value) > 0) {
-        const paymentMethod = document.querySelector('select[name="paymentMethod"]');
-        if (paymentMethod && !paymentMethod.value) {
-            alert('Vui lòng chọn phương thức thanh toán khi thu tiền.');
-            return false;
-        }
+    if (!collectInput || !collectInput.value.trim())
+        return true;
+
+    const collectAmount = parseFloat(collectInput.value.replace(/[^0-9.]/g, ''));
+    const maxAllowed = parseFloat(collectInput.max) || 0;
+
+    if (isNaN(collectAmount) || collectAmount <= 0) {
+        alert('Vui lòng nhập số tiền hợp lệ.');
+        collectInput.focus();
+        return false;
     }
-    return true;
-}
 
-function validateForm() {
-    const collectInput = document.getElementById('collectAmount');
-    if (collectInput && collectInput.value.trim()) {
-        const collectAmount = parseFloat(collectInput.value.replace(/[^0-9.]/g, ''));
-        const remainingEl = document.getElementById('summaryRemaining');
-        const remainingAmount = parseCurrency(remainingEl.textContent);
-
-        if (isNaN(collectAmount) || collectAmount <= 0) {
-            alert('Vui lòng nhập số tiền hợp lệ.');
-            collectInput.focus();
-            return false;
-        }
-
-        if (collectAmount > remainingAmount) {
-            alert('Số tiền thu không được vượt quá ' + formatCurrency(remainingAmount));
-            collectInput.focus();
-            return false;
-        }
-
-        const paymentMethod = document.querySelector('select[name="paymentMethod"]');
-        if (paymentMethod && !paymentMethod.value) {
-            alert('Vui lòng chọn phương thức thanh toán khi thu tiền.');
-            paymentMethod.focus();
-            return false;
-        }
+    if (collectAmount > maxAllowed) {
+        alert('Số tiền thu không được vượt quá ' + formatCurrency(maxAllowed));
+        collectInput.focus();
+        return false;
     }
+
+    const paymentMethod = document.querySelector('select[name="paymentMethod"]');
+    if (paymentMethod && !paymentMethod.value) {
+        alert('Vui lòng chọn phương thức thanh toán khi thu tiền.');
+        paymentMethod.focus();
+        return false;
+    }
+
     return true;
 }
 
 document.addEventListener('DOMContentLoaded', function () {
     setupSearch('serviceSearch', 'serviceTable');
     setupSearch('amenitySearch', 'amenityTable');
+
+    // Capture baseline trước, sau đó mới set max
     captureBaseline();
+
+    // Set max ngay từ đầu theo baseRemaining từ server
+    const collectInput = document.getElementById('collectAmount');
+    if (collectInput) {
+        collectInput.max = Math.round(baseRemaining);
+    }
 
     const form = document.getElementById('invoiceForm');
     if (form) {

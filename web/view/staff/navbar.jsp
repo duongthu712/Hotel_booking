@@ -19,7 +19,7 @@
 
     <% if ("MANAGER".equals(role)) { %>
 
-    <a href="${pageContext.request.contextPath}/view/manager/dashboard.jsp">Tổng quan</a>
+    <a href="${pageContext.request.contextPath}/ManagerDashboard">Tổng quan</a>
     <a href="${pageContext.request.contextPath}/HotelInfo">Thông tin chung</a>
     <a href="${pageContext.request.contextPath}/roomtypelist">Loại phòng</a>
     <a href="${pageContext.request.contextPath}/RoomList">Phòng</a>

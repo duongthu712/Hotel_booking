@@ -75,7 +75,7 @@ public class LoginController extends HttpServlet {
         if (role.equalsIgnoreCase("Lễ tân")) {
             response.sendRedirect(request.getContextPath() + "/receptionist-dashboard");
         } else if (role.equalsIgnoreCase("Quản lý")) {
-            response.sendRedirect(request.getContextPath() + "/view/manager/dashboard.jsp");
+            response.sendRedirect(request.getContextPath() + "/ManagerDashboard");
 
         } else if (role.equalsIgnoreCase("Administrator")
                 || role.equalsIgnoreCase("Admin")
