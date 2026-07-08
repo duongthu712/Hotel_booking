@@ -97,7 +97,8 @@
                 <input type="hidden" name="bookingCode" value="${booking.bookingCode}">
                 <input type="hidden" id="oldBasePrice" value="${booking.bookedPricePerNight}">
                 <input type="hidden" name="checkOutDate" value="${booking.checkoutDate}">
-                
+                <input type="hidden" id="bookingStatus" value="${booking.status}">
+
                 <!-- BỔ SUNG QUAN TRỌNG: Giữ lại email để khi quay về trang booking-detail không bị mất dữ liệu tra cứu -->
                 <input type="hidden" name="email" value="${param.email != null ? param.email : booking.guest.email}">
 
@@ -106,27 +107,21 @@
                     <div>
                         <label class="section-label">Loại yêu cầu <span class="required">*</span></label>
                         <div class="request-type-options">
-                            <label class="type-card-option">
-                                <input type="radio" name="requestType" value="Đổi hạng phòng" checked>
-                                <div class="card-content">
+                            <label class="type-card-option ${booking.status != 'Đã xác nhận' ? 'disabled-option' : ''}">
+                                <input type="radio" name="requestType" value="Đổi hạng phòng"> <div class="card-content">
                                     <strong>Thay đổi hạng phòng</strong>
-                                    <small>Yêu cầu thay đổi sang hạng phòng khác.</small>
                                 </div>
                             </label>
 
-                            <label class="type-card-option">
-                                <input type="radio" name="requestType" value="Gia hạn phòng">
-                                <div class="card-content">
+                            <label class="type-card-option ${booking.status == 'Đã trả phòng' || booking.status == 'Chờ xử lý' ? 'disabled-option' : ''}">
+                                <input type="radio" name="requestType" value="Gia hạn phòng"> <div class="card-content">
                                     <strong>Gia hạn thời gian ở</strong>
-                                    <small>Yêu cầu ở thêm hoặc rút ngắn thời gian trả phòng.</small>
                                 </div>
                             </label>
 
-                            <label class="type-card-option">
-                                <input type="radio" name="requestType" value="Hủy đặt phòng">
-                                <div class="card-content">
+                            <label class="type-card-option ${booking.status == 'Đã nhận phòng' || booking.status == 'Đã trả phòng' ? 'disabled-option' : ''}">
+                                <input type="radio" name="requestType" value="Hủy đặt phòng"> <div class="card-content">
                                     <strong>Hủy đặt phòng</strong>
-                                    <small>Yêu cầu hủy đơn đặt phòng hiện tại.</small>
                                 </div>
                             </label>
                         </div>
@@ -222,7 +217,7 @@
                                 </div>
                                 <div class="pane-right">
                                     <div class="form-group">
-                                        <label>Lý do gia hạn/rút ngắn <span class="required">*</span></label>
+                                        <label>Lý do gia hạn <span class="required">*</span></label>
                                         <textarea name="reason_details_extend" id="reasonDetailsExtend" placeholder="Vui lòng cung cấp lý do điều chỉnh thời gian ở..."></textarea>
                                     </div>
                                     <div class="info-alert-box">

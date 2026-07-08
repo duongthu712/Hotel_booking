@@ -70,8 +70,8 @@
                         </p>
                         <c:if test="${booking.status eq 'Đã nhận phòng' and not empty booking.actualCheckInTime}">
                             <p><strong>Thời gian nhận phòng:</strong> <span class="text-success-highlight">${fn:substring(booking.actualCheckInTime, 0, 19)}</span></p>
-                        </c:if>
-                        
+                            </c:if>
+
                         <!-- Hiển thị lịch hẹn hiện tại nếu có cuộc gọi note trước -->
                         <c:if test="${not empty booking.expectedCheckInTime}">
                             <p><strong>Lịch hẹn gọi điện:</strong> <span style="font-weight: 600;">Khách báo đến lúc ${fn:substring(booking.expectedCheckInTime, 0, 5)}</span></p>
@@ -106,7 +106,7 @@
                             <form action="${pageContext.request.contextPath}/checkin" method="POST" style="margin-top: 15px;">
                                 <input type="hidden" name="bookingId" value="${booking.bookingId}" />
                                 <input type="hidden" name="bookingCode" value="${booking.bookingCode}" />
-                                
+
                                 <div style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap; width: 100%;">
                                     <div style="flex: 1; min-width: 150px;">
                                         <label style="display: block; font-family: 'Lora', serif; font-size: 13.5px; font-weight: 600; margin-bottom: 6px; color: #1a446c;">Giờ hẹn đến *</label>
@@ -173,19 +173,22 @@
                         </div>
 
                         <div class="switch-block <c:if test="${booking.status eq 'Đã nhận phòng' or booking.status eq 'Đã hủy'}">hide-element</c:if>">
-                            <input type="checkbox" name="isDifferentGuest" id="isDifferentGuest" value="true">
-                            <label for="isDifferentGuest"><b>Khách làm thủ tục nhận phòng là người khác (Người đặt hộ)</b></label>
-                        </div>
+                                <input type="checkbox" name="isDifferentGuest" id="isDifferentGuest" value="true">
+                                <label for="isDifferentGuest"><b>Khách làm thủ tục nhận phòng là người khác (Người đặt hộ)</b></label>
+                            </div>
 
-                        <h5>Hồ Sơ Khách Đại Diện Lưu Trú</h5>
+                            <h5>Hồ Sơ Khách Đại Diện Lưu Trú</h5>
 
-                        <label>Họ và tên *</label>
-                        <input type="text" name="idFullName" value="${booking.guestFullName}" required />
+                            <label>Họ và tên *</label>
+                            <input type="text" name="idFullName" value="${booking.guestFullName}" required />
 
                         <label>Số điện thoại</label>
                         <input type="text" name="idPhone" value="${booking.guestPhone}" />
 
-                        <input type="hidden" name="idEmail" value="" />
+                        <label>Email liên hệ *</label>
+                        <input type="email" name="idEmail" 
+                               value="${not empty booking.guestEmail ? booking.guestEmail : ''}" 
+                               required placeholder="Nhập email khách hàng..." />
 
                         <label>Số CCCD / Hộ chiếu *</label>
                         <input type="text" name="idNumber" required placeholder="Nhập số giấy tờ tùy thân..." value="${booking.idNumber}" />
@@ -262,7 +265,7 @@
                                             Nhận phòng sớm
                                         </span>
                                     </c:if>
-                                    
+
                                     <!-- Hiển thị tag trạng thái đã gọi điện đặt lịch (Sử dụng badge-warning của hệ thống) -->
                                     <c:if test="${not empty b.expectedCheckInTime and b.status eq 'Đã xác nhận'}">
                                         <span class="badge-warning" style="font-size: 11px; padding: 2px 6px; text-transform: none; font-weight: 500; border-radius: 4px; display: inline-block; margin-top: 4px;" title="Ghi chú cuộc gọi: ${b.callNote}">

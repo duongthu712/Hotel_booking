@@ -315,3 +315,22 @@ textarea {
     font-weight: 600 !important;
     text-transform: uppercase !important;
 }
+/* Trạng thái làm mờ khi chưa cọc */
+.disabled-option {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important; /* Chặn click */
+}
+
+.disabled-option .card-content strong {
+    color: #94a3b8;
+}
+
+.disabled-option .card-content small {
+    color: #cbd5e1;
+}
+
+/* Đảm bảo radio button cũng bị vô hiệu hóa thị giác */
+.disabled-option input[type="radio"] {
+    cursor: not-allowed;
+}
