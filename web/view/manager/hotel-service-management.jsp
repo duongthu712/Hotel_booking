@@ -110,6 +110,9 @@
 
             <form action="${not empty serviceToEdit ? 'HotelServiceEdit' : 'HotelServiceCreate'}" method="POST" id="service-form" class="popup-content">
 
+                <div class="service-popup-action">
+                    <button class="btn-close" type="button" id="btn-close" style="font-size: 35px; margin-top: -25px; right: 5px;">&times;</button>
+                </div>
                 <h2 class="service-popup-title" id="modal-title">
                     ${not empty serviceToEdit ? 'Chỉnh sửa dịch vụ khách sạn' : 'Thêm dịch vụ khách sạn mới'}
                 </h2>
@@ -170,7 +173,6 @@
                 </div>
 
                 <div class="service-popup-action">
-                    <button class="btn-close" type="button" id="btn-close">Huỷ</button>
                     <button class="btn-submit" type="submit">Xác nhận lưu</button>
                 </div>
             </form>

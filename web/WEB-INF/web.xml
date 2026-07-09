@@ -277,6 +277,22 @@
         <servlet-name>MDashboardPDFController</servlet-name>
         <servlet-class>controller.MDashboardPDFController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>PolicyListController</servlet-name>
+        <servlet-class>controller.PolicyListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PolicyCreateController</servlet-name>
+        <servlet-class>controller.PolicyCreateController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PolicyEditController</servlet-name>
+        <servlet-class>controller.PolicyEditController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PolicyDeleteController</servlet-name>
+        <servlet-class>controller.PolicyDeleteController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>
         <url-pattern>/login</url-pattern>
@@ -544,5 +560,21 @@
     <servlet-mapping>
         <servlet-name>MDashboardPDFController</servlet-name>
         <url-pattern>/MDashboardPDF</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PolicyListController</servlet-name>
+        <url-pattern>/PolicyList</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PolicyCreateController</servlet-name>
+        <url-pattern>/PolicyCreate</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PolicyEditController</servlet-name>
+        <url-pattern>/PolicyEdit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PolicyDeleteController</servlet-name>
+        <url-pattern>/PolicyDelete</url-pattern>
     </servlet-mapping>
 </web-app>

@@ -22,11 +22,9 @@ Editor     : LinhLTHE200306
 
         <main class="content-container">
 
-            <!-- tiêu đề trang -->
             <div class="dashboard-header">
                 <h2 class="header-title">Tổng quan</h2>
                 <div class="header-actions">
-                    <!-- form lọc tháng/năm -->
                     <form action="${pageContext.request.contextPath}/ManagerDashboard" method="GET" class="filter-form">
 
                         <select name="month" class="filter-select">
@@ -43,15 +41,13 @@ Editor     : LinhLTHE200306
                         </select>
 
                         <button type="submit" class="search-btn">Lọc</button>
+                        <a href="${pageContext.request.contextPath}/MDashboardPDF?month=${selectedMonth}&year=${selectedYear}" class="search-btn">
+                            Export PDF
+                        </a>
                     </form>
-
-                    <a href="${pageContext.request.contextPath}/MDashboardPDF?month=${selectedMonth}&year=${selectedYear}" class="search-btn">
-                        Export PDF
-                    </a>
                 </div>
             </div>
 
-            <!-- thẻ KPI -->
             <div class="kpi-grid">
                 <div class="kpi-card kpi-card-gold">
                     <p class="kpi-label">Doanh thu hôm nay</p>
@@ -77,7 +73,6 @@ Editor     : LinhLTHE200306
                 </div>
             </div>
 
-            <!-- biểu đồ doanh thu -->
             <div class="chart-section">
                 <div class="section-header">
                     <h4 class="section-title">Doanh thu theo ngày - Tháng ${selectedMonth}/${selectedYear}</h4>
@@ -89,53 +84,43 @@ Editor     : LinhLTHE200306
                 </div>
             </div>
 
-            <!-- 2 cột: đặt phòng + đánh giá -->
             <div class="two-col-grid">
 
-                <!-- đặt phòng gần đây -->
                 <div class="panel">
-                    <div class="panel-header">
-                        <h4 class="section-title">Đặt phòng gần đây</h4>
-                        <a href="${pageContext.request.contextPath}/bookings" class="view-all-link">Xem tất cả</a>
+                    <h4 class="section-title">Tỷ lệ lấp đầy theo loại phòng</h4>
+                    <div class="data-table-wrapper">
+                        <table class="data-table dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Loại phòng</th>
+                                    <th class="text-center">Phòng có khách</th>
+                                    <th class="text-center">Tổng phòng</th>
+                                    <th class="text-right">Tỷ lệ lấp đầy</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach var="o" items="${occupancyByRoomType}">
+                                    <tr>
+                                        <td class="room-type-name">${o.typeName}</td>
+                                        <td class="text-center">${o.occupied}</td>
+                                        <td class="text-center">${o.total}</td>
+                                        <td class="text-right occupancy-value">${o.occupancyPct}%</td>
+                                    </tr>
+                                </c:forEach>
+                                <c:if test="${empty occupancyByRoomType}">
+                                    <tr>
+                                        <td colspan="4" class="empty-message">Không có dữ liệu.</td>
+                                    </tr>
+                                </c:if>
+                            </tbody>
+                        </table>
                     </div>
-                    <table class="data-table dashboard-table">
-                        <thead>
-                            <tr>
-                                <th>Mã booking</th>
-                                <th>Khách hàng</th>
-                                <th>Loại phòng</th>
-                                <th>Nhận phòng</th>
-                                <th>Trạng thái</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <c:forEach var="b" items="${recentBookings}">
-                                <tr>
-                                    <td class="booking-code">${b.bookingCode}</td>
-                                    <td>${b.guestName != null ? b.guestName : 'Khách vãng lai'}</td>
-                                    <td>${b.roomType}</td>
-                                    <td>${b.checkinDateStr}</td>
-                                    <td>
-                                        <span class="status-badge status-${b.statusClass}">
-                                            ${b.status}
-                                        </span>
-                                    </td>
-                                </tr>
-                            </c:forEach>
-                            <c:if test="${empty recentBookings}">
-                                <tr>
-                                    <td colspan="5" class="empty-message">Không có đặt phòng nào.</td>
-                                </tr>
-                            </c:if>
-                        </tbody>
-                    </table>
                 </div>
 
-                <!-- đánh giá gần đây -->
                 <div class="panel">
                     <div class="panel-header">
                         <h4 class="section-title">Đánh giá gần đây</h4>
-                        <a href="${pageContext.request.contextPath}/feedback" class="view-all-link">Xem tất cả</a>
+                        <a href="${pageContext.request.contextPath}/Feedback" class="view-all-link">Xem tất cả</a>
                     </div>
                     <table class="data-table dashboard-table">
                         <thead>
@@ -169,35 +154,44 @@ Editor     : LinhLTHE200306
                 </div>
             </div>
 
-            <!-- tỷ lệ lấp đầy theo loại phòng -->
             <div class="panel">
-                <h4 class="section-title">Tỷ lệ lấp đầy theo loại phòng</h4>
+                <div class="panel-header">
+                    <h4 class="section-title">Đặt phòng gần đây</h4>
+                    <a href="${pageContext.request.contextPath}/bookings" class="view-all-link">Xem tất cả</a>
+                </div>
                 <table class="data-table dashboard-table">
                     <thead>
                         <tr>
+                            <th>Mã booking</th>
+                            <th>Khách hàng</th>
                             <th>Loại phòng</th>
-                            <th class="text-center">Phòng có khách</th>
-                            <th class="text-center">Tổng phòng</th>
-                            <th class="text-right">Tỷ lệ lấp đầy</th>
+                            <th>Nhận phòng</th>
+                            <th>Trạng thái</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <c:forEach var="o" items="${occupancyByRoomType}">
+                        <c:forEach var="b" items="${recentBookings}">
                             <tr>
-                                <td class="room-type-name">${o.typeName}</td>
-                                <td class="text-center">${o.occupied}</td>
-                                <td class="text-center">${o.total}</td>
-                                <td class="text-right occupancy-value">${o.occupancyPct}%</td>
+                                <td class="booking-code">${b.bookingCode}</td>
+                                <td>${b.guestName != null ? b.guestName : 'Khách vãng lai'}</td>
+                                <td>${b.roomType}</td>
+                                <td>${b.checkinDateStr}</td>
+                                <td>
+                                    <span class="status-badge status-${b.statusClass}">
+                                        ${b.status}
+                                    </span>
+                                </td>
                             </tr>
                         </c:forEach>
-                        <c:if test="${empty occupancyByRoomType}">
+                        <c:if test="${empty recentBookings}">
                             <tr>
-                                <td colspan="4" class="empty-message">Không có dữ liệu.</td>
+                                <td colspan="5" class="empty-message">Không có đặt phòng nào.</td>
                             </tr>
                         </c:if>
                     </tbody>
                 </table>
             </div>
+
 
         </main>
 

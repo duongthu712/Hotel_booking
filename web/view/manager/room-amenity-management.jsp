@@ -107,6 +107,9 @@
              ${not empty openCreateModal or not empty amenityToEdit ? 'style="display: flex;"' : ''}>
 
             <form action="${not empty amenityToEdit ? 'RoomAmenityEdit' : 'RoomAmenityCreate'}" method="POST" id="service-form" class="popup-content">
+                <div class="service-popup-action">
+                    <button class="btn-close" type="button" id="btn-close" style="font-size: 35px; margin-top: -25px; right: 5px;">&times;</button>
+                </div>
 
                 <h2 class="service-popup-title" id="modal-title">
                     ${not empty amenityToEdit ? 'Chỉnh sửa tiện nghi phòng' : 'Thêm tiện nghi phòng mới'}
@@ -153,7 +156,6 @@
                 </div>
 
                 <div class="service-popup-action">
-                    <button class="btn-close" type="button" id="btn-close">Huỷ</button>
                     <button class="btn-submit" type="submit">Xác nhận lưu</button>
                 </div>
             </form>

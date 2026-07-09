@@ -2,14 +2,13 @@
     Created on : Jul 8, 2026, 1:04:21 PM
     Author     : LinhLTHE200306
 */
-/* ===== layout dashboard ===== */
+
 .dashboard-header {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     margin-bottom: 30px;
-    gap: 20px;
 }
 
 .header-subtitle {
@@ -26,7 +25,7 @@
     flex-wrap: wrap;
 }
 
-/* ===== form lọc ===== */
+
 .filter-form {
     display: flex;
     gap: 10px;
@@ -45,7 +44,6 @@
     min-width: 100px;
 }
 
-/* ===== thẻ KPI ===== */
 .kpi-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -100,7 +98,6 @@
     margin-left: 4px;
 }
 
-/* ===== khu vực biểu đồ ===== */
 .chart-section {
     background: white;
     padding: 24px;
@@ -127,7 +124,6 @@
     width: 100%;
 }
 
-/* ===== lưới 2 cột ===== */
 .two-col-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -135,7 +131,6 @@
     margin-bottom: 30px;
 }
 
-/* ===== panel ===== */
 .panel {
     background: white;
     padding: 24px;
@@ -163,18 +158,22 @@
     text-decoration: underline;
 }
 
-/* ===== ghi đè bảng dashboard ===== */
 .dashboard-table th {
     padding: 14px 12px;
     font-size: 0.75rem;
     letter-spacing: 0.05em;
+    text-align: left; 
 }
 
 .dashboard-table td {
     padding: 14px 12px;
     font-size: 0.9rem;
+    text-align: left; 
 }
-
+.panel .data-table-wrapper {
+    max-height: 300px;
+    overflow-y: auto;
+}
 .booking-code {
     font-weight: 700;
     color: var(--text-main);
@@ -190,7 +189,6 @@
     color: var(--accent-color);
 }
 
-/* ===== huy hiệu trạng thái ===== */
 .status-badge {
     display: inline-block;
     padding: 4px 10px;
@@ -232,7 +230,6 @@
     border: 1px solid #c62828;
 }
 
-/* ===== đánh giá sao ===== */
 .star-rating {
     display: flex;
     gap: 2px;
@@ -248,7 +245,6 @@
     color: var(--accent-color);
 }
 
-/* ===== căn chỉnh văn bản ===== */
 .text-center {
     text-align: center;
 }
@@ -257,7 +253,6 @@
     text-align: right;
 }
 
-/* ===== responsive ===== */
 @media (max-width: 1200px) {
     .kpi-grid {
         grid-template-columns: repeat(2, 1fr);
