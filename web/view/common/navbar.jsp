@@ -20,7 +20,7 @@
             <a href="${pageContext.request.contextPath}/view/user/booking-detail.jsp">ĐƠN ĐẶT CỦA TÔI</a>
         </li>
         <li>
-            <a href="${pageContext.request.contextPath}/view/public/feedback-list.jsp">ĐÁNH GIÁ</a>
+            <a href="${pageContext.request.contextPath}/feedback-list">ĐÁNH GIÁ</a>
         </li>
         <li>
             <a href="${pageContext.request.contextPath}/policies">CHÍNH SÁCH</a>

@@ -246,8 +246,28 @@
         <servlet-class>controller.RoomDeleteController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RoomTypeConflictController</servlet-name>
-        <servlet-class>controller.RoomTypeConflictController</servlet-class>
+        <servlet-name>GuestRequestController</servlet-name>
+        <servlet-class>controller.GuestRequestController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>BookingListController</servlet-name>
+        <servlet-class>controller.BookingListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CounterRequestController</servlet-name>
+        <servlet-class>controller.CounterRequestController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>FeedbackListController</servlet-name>
+        <servlet-class>controller.FeedbackListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>FeedbackSubmissionController</servlet-name>
+        <servlet-class>controller.FeedbackSubmissionController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>StaffBookingDetailController</servlet-name>
+        <servlet-class>controller.StaffBookingDetailController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ManagerDashboardController</servlet-name>
@@ -494,8 +514,28 @@
         <url-pattern>/RoomDelete</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RoomTypeConflictController</servlet-name>
-        <url-pattern>/roomtypeconflict</url-pattern>
+        <servlet-name>GuestRequestController</servlet-name>
+        <url-pattern>/guest-request</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>BookingListController</servlet-name>
+        <url-pattern>/booking-list</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CounterRequestController</servlet-name>
+        <url-pattern>/counter-request</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>FeedbackListController</servlet-name>
+        <url-pattern>/feedback-list</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>FeedbackSubmissionController</servlet-name>
+        <url-pattern>/feedback-submission</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StaffBookingDetailController</servlet-name>
+        <url-pattern>/staff-booking-detail</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ManagerDashboardController</servlet-name>

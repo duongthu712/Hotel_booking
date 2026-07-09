@@ -35,7 +35,27 @@ public class Booking {
     private LocalDateTime actualCheckinTime;
     private LocalDateTime actualCheckoutTime;
     private LocalDateTime createAt;
+    
 
+    private String roomTypeName;
+    private Guest guest;
+
+    public Guest getGuest() {
+        return guest;
+    }
+
+    public void setGuest(Guest guest) {
+        this.guest = guest;
+    }
+    
+
+    public String getRoomTypeName() {
+        return roomTypeName;
+    }
+
+    public void setRoomTypeName(String roomTypeName) {
+        this.roomTypeName = roomTypeName;
+    }
     // Constructor
     public Booking() {
     }
@@ -70,6 +90,7 @@ public class Booking {
         this.actualCheckinTime = actualCheckinTime;
         this.actualCheckoutTime = actualCheckoutTime;
         this.createAt = createAt;
+        
     }
 
     // --- CÁC GETTER & SETTER MỚI ---

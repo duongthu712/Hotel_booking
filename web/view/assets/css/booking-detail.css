@@ -1148,4 +1148,24 @@ body {
     .detail-home-button {
         width: 100%;
     }
+    
+    .detail-request-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .detail-request-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .detail-change-item small {
+        display: block;
+        margin-top: 6px;
+        color: #607086;
+        font-size: 12px;
+    }
 }
