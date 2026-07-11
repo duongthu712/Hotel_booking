@@ -153,7 +153,6 @@
                             </div>
                             <div id="proof-url-container" style="margin-top: 10px; word-break: break-all;">
                                 <div style="margin-top: 10px;">
-                                    <strong>Mã giao dịch / Mã tham chiếu:</strong>
                                     <p id="proof-notes"></p>
                                 </div>
                             </div>
