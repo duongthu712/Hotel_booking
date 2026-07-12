@@ -35,7 +35,6 @@ public class ManagerDashboardController extends HttpServlet {
         HttpSession session = request.getSession();
         StaffAccount staff = (StaffAccount) session.getAttribute("staff");
 
-        // kiểm tra đăng nhập
         if (staff == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;

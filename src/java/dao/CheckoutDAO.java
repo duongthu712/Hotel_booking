@@ -27,8 +27,8 @@ import model.RoomType;
 
 /**
  * @author LinhLTHE200306
- * @version 4.0
- * @since 2026-07-02
+ * @version 5.0
+ * @since 2026-07-12
  */
 public class CheckoutDAO extends DBContext {
 
@@ -706,78 +706,7 @@ public class CheckoutDAO extends DBContext {
         return null;
     }
 
-    /**
-     * Tính lại tổng room_charges từ đầu dựa trên tất cả phòng đã checkout
-     */
-    public void updateInvoiceForCheckout(int bookingId, List<Integer> roomIds, int staffId) throws Exception {
-
-        Booking booking = getBookingById(bookingId);
-
-        // Lấy tất cả phòng đã checkout của booking này
-        List<Map<String, Object>> checkedOutRooms = getCheckedOutRoomDetails(bookingId);
-
-        BigDecimal totalRoomCharges = BigDecimal.ZERO;
-        BigDecimal totalLateCharge = BigDecimal.ZERO;
-
-        // Tính cho từng phòng đã checkout
-        for (Map<String, Object> room : checkedOutRooms) {
-            LocalDateTime checkoutAt = (LocalDateTime) room.get("checkoutAt");
-            int roomId = (Integer) room.get("roomId");
-
-            // Số đêm từ checkin đến checkout thực tế
-            long nights = Math.max(1, ChronoUnit.DAYS.between(
-                    booking.getCheckinDate(), checkoutAt.toLocalDate()));
-
-            // Tiền phòng cho phòng này
-            BigDecimal roomCharge = booking.getBookedPricePerNight()
-                    .multiply(BigDecimal.valueOf(nights));
-
-            // Late charge cho phòng này
-            LocalDateTime expectedCheckout = booking.getCheckoutDate().atTime(12, 0);
-            double latePerRoom = lateCheckoutSurcharge(
-                    expectedCheckout, checkoutAt, booking.getBookedPricePerNight().doubleValue());
-
-            totalRoomCharges = totalRoomCharges.add(roomCharge);
-            totalLateCharge = totalLateCharge.add(BigDecimal.valueOf(latePerRoom));
-        }
-
-        // Gộp late vào room_charges
-        BigDecimal roomChargesCombined = totalRoomCharges.add(totalLateCharge);
-
-        // Tính services, damages
-        BigDecimal totalServices = sumAllBookingServices(bookingId);
-        BigDecimal totalDamages = sumAllRoomAmenityDamages(bookingId);
-
-        BigDecimal totalAmount = roomChargesCombined
-                .add(totalServices)
-                .add(totalDamages);
-
-        // Tính cọc đã dùng (tất cả phòng đã checkout)
-        BigDecimal depositUsed = calculateDepositUsed(bookingId, checkedOutRooms.size());
-
-        BigDecimal remainingAmount = totalAmount.subtract(depositUsed);
-        if (remainingAmount.compareTo(BigDecimal.ZERO) < 0) {
-            remainingAmount = BigDecimal.ZERO;
-        }
-
-        // GHI ĐÈ
-        String sql = """
-        update Invoices
-        set room_charges = ?,
-            total_amount = ?,
-            remaining_amount = ?
-        where booking_id = ?
-        """;
-
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setBigDecimal(1, roomChargesCombined);
-            stm.setBigDecimal(2, totalAmount);
-            stm.setBigDecimal(3, remainingAmount);
-            stm.setInt(4, bookingId);
-            stm.executeUpdate();
-        }
-    }
-
+    
     /**
      * Lấy danh sách phòng đã checkout với checkout_at
      */
@@ -804,24 +733,54 @@ public class CheckoutDAO extends DBContext {
     }
 
     /**
-     * Tính cọc đã dùng dựa trên số phòng đã checkout
+     * Tính lại TOÀN BỘ room_charges gồm 2 phần:
+     * 1) Phòng ĐÃ THỰC SỰ checkout: tính đúng theo checkout_at thực tế
+     *    (số đêm thực tế + phụ phí trễ giờ nếu có).
+     * 2) Phòng ĐÃ ASSIGN nhưng CHƯA checkout: tạm tính theo giá ước tính ban đầu
+     *    (số đêm dự kiến theo booking)
+     * (Phòng chưa từng assign - coi như đã huỷ )
+     * Dùng để GHI ĐÈ Invoices.room_charges trong processCheckout, tránh
+     * cộng dồn lên trên giá trị ước tính ban đầu gây tính tiền phòng 2 lần.
      */
-    private BigDecimal calculateDepositUsed(int bookingId, int checkedOutRoomCount) throws Exception {
-        Booking booking = getBookingById(bookingId);
-        BigDecimal totalDeposit = booking.getDepositAmount() != null
-                ? booking.getDepositAmount() : BigDecimal.ZERO;
-        int numRoomsBooking = booking.getNumRooms();
+    private BigDecimal recalcRoomChargesForBooking(int bookingId, Booking booking) throws Exception {
+        List<Map<String, Object>> checkedOutRooms = getCheckedOutRoomDetails(bookingId);
+        LocalDateTime expectedCheckout = booking.getCheckoutDate().atTime(12, 0);
 
-        if (numRoomsBooking <= 0) {
-            return BigDecimal.ZERO;
+        BigDecimal total = BigDecimal.ZERO;
+
+        // 1) Phòng đã checkout thật
+        for (Map<String, Object> room : checkedOutRooms) {
+            LocalDateTime checkoutAt = (LocalDateTime) room.get("checkoutAt");
+            if (checkoutAt == null) {
+                checkoutAt = LocalDateTime.now();
+            }
+
+            long nights = Math.max(1, ChronoUnit.DAYS.between(
+                    booking.getCheckinDate(), checkoutAt.toLocalDate()));
+
+            BigDecimal roomCharge = booking.getBookedPricePerNight()
+                    .multiply(BigDecimal.valueOf(nights));
+
+            double lateCharge = lateCheckoutSurcharge(
+                    expectedCheckout, checkoutAt, booking.getBookedPricePerNight().doubleValue());
+
+            total = total.add(roomCharge).add(BigDecimal.valueOf(lateCharge));
         }
 
-        BigDecimal depositPerRoom = totalDeposit
-                .divide(BigDecimal.valueOf(numRoomsBooking), 2, RoundingMode.HALF_UP);
+        // 2) Phòng đã assign nhưng chưa checkout: tạm tính theo giá ước tính ban đầu
+        int notYetCheckedOutRooms = countRemainingRooms(bookingId);
+        if (notYetCheckedOutRooms > 0) {
+            long plannedNights = Math.max(1, ChronoUnit.DAYS.between(
+                    booking.getCheckinDate(), booking.getCheckoutDate()));
+            BigDecimal estimatedPerRoom = booking.getBookedPricePerNight()
+                    .multiply(BigDecimal.valueOf(plannedNights));
+            total = total.add(estimatedPerRoom.multiply(BigDecimal.valueOf(notYetCheckedOutRooms)));
+        }
 
-        return depositPerRoom.multiply(BigDecimal.valueOf(checkedOutRoomCount));
+        return total;
     }
 
+    
     public double lateCheckoutSurcharge(LocalDateTime expectedCheckout,
             LocalDateTime actualCheckout, double roomPricePerNight) {
         if (actualCheckout == null || expectedCheckout == null) {
@@ -997,10 +956,6 @@ public class CheckoutDAO extends DBContext {
     }
 
     // ========== CHECKOUT ==========
-    /**
-     * Process checkout cho từng phòng riêng lẻ - Cộng dồn room_charges vào
-     * invoice (không ghi đè) - Ghi nhận cọc theo từng lần checkout
-     */
     public void processCheckout(int bookingId, List<Integer> roomIds, int staffId) throws Exception {
         connection.setAutoCommit(false);
         try {
@@ -1024,23 +979,6 @@ public class CheckoutDAO extends DBContext {
                 }
             }
 
-            LocalDateTime actualCheckout = LocalDateTime.now();
-            LocalDateTime expectedCheckout = booking.getCheckoutDate().atTime(12, 0);
-
-            // ========== 1. TÍNH TIỀN CHO LẦN CHECKOUT NÀY ==========
-            long nights = Math.max(1, ChronoUnit.DAYS.between(
-                    booking.getCheckinDate(), actualCheckout.toLocalDate()));
-
-            BigDecimal roomChargesThisCheckout = booking.getBookedPricePerNight()
-                    .multiply(BigDecimal.valueOf(nights))
-                    .multiply(BigDecimal.valueOf(roomIds.size()));
-
-            double lateChargePerRoom = lateCheckoutSurcharge(
-                    expectedCheckout, actualCheckout, booking.getBookedPricePerNight().doubleValue());
-            BigDecimal lateChargeThisCheckout = BigDecimal.valueOf(lateChargePerRoom * roomIds.size());
-
-            BigDecimal roomChargesCombined = roomChargesThisCheckout.add(lateChargeThisCheckout);
-
             // ========== 2. TÍNH TIỀN CỌC CHO LẦN CHECKOUT NÀY ==========
             int numRoomsBooking = booking.getNumRooms();
             BigDecimal totalDeposit = booking.getDepositAmount() != null
@@ -1056,15 +994,30 @@ public class CheckoutDAO extends DBContext {
                         .divide(BigDecimal.valueOf(numRoomsBooking), 2, RoundingMode.HALF_UP);
             }
 
+            // Phòng đã đặt nhưng CHƯA TỪNG được assign vào BookingRooms coi như đã huỷ.
+            // Phần cọc tương ứng của các phòng này phải được giữ lại làm phạt huỷ phòng,
+            // KHÔNG được cấn trừ vào công nợ (khác với phần lẻ do làm tròn của các phòng
+            // đã thực sự ở và checkout, phần lẻ đó phải được trả lại đủ 100%).
+            int assignedRoomsCount = getAssignedRoomsCount(bookingId);
+            int unassignedRooms = Math.max(0, numRoomsBooking - assignedRoomsCount);
+            BigDecimal cancelPenaltyDeposit = depositPerRoom.multiply(BigDecimal.valueOf(unassignedRooms));
+            BigDecimal depositForAssignedRooms = totalDeposit.subtract(cancelPenaltyDeposit);
+
             BigDecimal depositThisCheckout = depositPerRoom
                     .multiply(BigDecimal.valueOf(roomIds.size()));
 
             BigDecimal totalUsedDeposit = depositPerRoom
                     .multiply(BigDecimal.valueOf(checkedOutRoomsCount));
-            BigDecimal depositRemaining = totalDeposit.subtract(totalUsedDeposit);
+            // Số cọc còn lại dành cho các phòng ĐÃ ASSIGN (không tính phần phạt huỷ phòng
+            // của các phòng chưa từng assign)
+            BigDecimal depositRemainingForAssigned = depositForAssignedRooms.subtract(totalUsedDeposit);
 
             if (isLastCheckout) {
-                depositThisCheckout = depositRemaining;
+                // Trả hết phần cọc còn lại của các phòng đã assign + đã checkout, kể cả
+                // số lẻ phát sinh do làm tròn. Phần cancelPenaltyDeposit (nếu có) vẫn còn
+                // nguyên trong bản ghi 'Tiền đặt cọc' gốc và sẽ được đổi thành
+                // 'Tiền phạt hủy phòng' ở bước 8 bên dưới.
+                depositThisCheckout = depositRemainingForAssigned;
             }
 
             // ========== 3. LẤY SỐ PHÒNG TRƯỚC KHI UPDATE STATUS ==========
@@ -1110,19 +1063,21 @@ public class CheckoutDAO extends DBContext {
             // ========== 5. Update room status ==========
             updateRoomStatusAfterCheckout(bookingId, roomIds);
 
-            // ========== 6. CỘNG DỒN vào invoice ==========
+            // ========== 6. GHI ĐÈ room_charges (tính lại từ đầu, KHÔNG cộng dồn) ==========
+            // room_charges lúc tạo invoice (duyệt cọc / walk-in) chỉ là số ước tính ban đầu.
+            // Ở đây ta tính lại chính xác: phòng đã checkout dùng số tiền thật (theo
+            // checkout_at thực tế), phòng chưa checkout dùng giá ước tính ban đầu -
+            // để tổng tiền phòng không bị tụt xuống giữa chừng khi mới checkout 1 phần
+            // số phòng, đồng thời không bị cộng dồn 2 lần khi checkout xong hết.
+            BigDecimal roomChargesTotal = recalcRoomChargesForBooking(bookingId, booking);
             String updateInvoiceSql = """
             update Invoices
-            set room_charges = room_charges + ?,
-                total_amount = total_amount + ?,
-                remaining_amount = remaining_amount + ?
+            set room_charges = ?
             where booking_id = ?
             """;
             try (PreparedStatement stm = connection.prepareStatement(updateInvoiceSql)) {
-                stm.setBigDecimal(1, roomChargesCombined);
-                stm.setBigDecimal(2, roomChargesCombined);
-                stm.setBigDecimal(3, roomChargesCombined);
-                stm.setInt(4, bookingId);
+                stm.setBigDecimal(1, roomChargesTotal);
+                stm.setInt(2, bookingId);
                 stm.executeUpdate();
             }
 
