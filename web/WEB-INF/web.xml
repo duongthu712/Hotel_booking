@@ -269,6 +269,10 @@
         <servlet-name>StaffBookingDetailController</servlet-name>
         <servlet-class>controller.StaffBookingDetailController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ProcessRequestController</servlet-name>
+        <servlet-class>controller.ProcessRequestController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>
         <url-pattern>/login</url-pattern>
@@ -528,5 +532,9 @@
     <servlet-mapping>
         <servlet-name>StaffBookingDetailController</servlet-name>
         <url-pattern>/staff-booking-detail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProcessRequestController</servlet-name>
+        <url-pattern>/process-request</url-pattern>
     </servlet-mapping>
 </web-app>

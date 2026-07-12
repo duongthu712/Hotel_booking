@@ -3,11 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/F:/Hotel_booking/web/view/receptionist/walk-in-booking.jsp</file>
-            <file>file:/F:/Hotel_booking/src/java/dao/BookingDAO.java</file>
-            <file>file:/F:/Hotel_booking/src/java/controller/WalkInBookingServlet.java</file>
-            <file>file:/F:/Hotel_booking/src/java/controller/InvoicePDFController.java</file>
-            <file>file:/F:/Hotel_booking/src/java/dal/EmailUtil.java</file>
+            <file>file:/F:/Hotel_booking/web/view/assets/css/process-request.css</file>
+            <file>file:/F:/Hotel_booking/web/view/assets/javascript/request-processing.js</file>
+            <file>file:/F:/Hotel_booking/src/java/dao/GuestRequestDAO.java</file>
+            <file>file:/F:/Hotel_booking/src/java/controller/ProcessRequestController.java</file>
+            <file>file:/F:/Hotel_booking/web/view/receptionist/request-processing.jsp</file>
         </group>
     </open-files>
 </project-private>
