@@ -58,6 +58,23 @@
             </script>
         </c:if>
 
+        <c:if test="${param.status eq 'request_success'}">
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    Swal.fire({
+                        title: "Gửi yêu cầu thành công!",
+                        text: "Yêu cầu của bạn đã được ghi nhận. Lễ tân sẽ rà soát và xử lý trong thời gian sớm nhất.",
+                        icon: "success",
+                        confirmButtonColor: '#2c3e46'
+                    }).then(() => {
+                        // Xóa status trên URL để khi refresh trang không bị nổ popup lại
+                        const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + window.location.search.replace(/([\?&])status=[^&]*(&|$)/, '$1').replace(/[\?&]$/, '');
+                        window.history.replaceState({}, document.title, cleanUrl);
+                    });
+                });
+            </script>
+        </c:if>
+
         <main class="booking-detail-page">
 
             <section class="detail-search-section">
@@ -789,8 +806,12 @@
                                                             <c:out value="${r.requestType}"/>
                                                         </strong>
 
-                                                        <span class="detail-request-status ${requestStatusClass}">
-                                                            <c:out value="${r.requestStatus}"/>
+
+                                                        <span class="detail-status-badge
+                                                              ${r.requestStatus eq 'Đã phê duyệt' ? 'success' :
+                                                                r.requestStatus eq 'Đã từ chối' ? 'cancelled' : 'waiting'}">
+                                                              <c:out value="${r.requestStatus}"/>
+
                                                         </span>
                                                     </div>
 
@@ -892,6 +913,7 @@
 
                                                 <c:set var="changeStatusClass" value="waiting"/>
 
+
                                                 <c:if test="${change.requestStatus eq 'Đã phê duyệt'}">
                                                     <c:set var="changeStatusClass" value="success"/>
                                                 </c:if>
@@ -936,6 +958,7 @@
                                                             Ngày xử lý:
                                                             <c:out value="${change.processedAtText}"/>
                                                         </div>
+
                                                     </div>
                                                 </div>
                                             </c:forEach>

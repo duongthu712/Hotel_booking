@@ -35,7 +35,7 @@
     <a href="${pageContext.request.contextPath}/Checkout">Trả phòng</a>
     <a href="${pageContext.request.contextPath}/booking-list">Danh sách đặt phòng</a>
     <a href="${pageContext.request.contextPath}/walk-in-booking">Đặt phòng tại quầy</a>
-    <a href="${pageContext.request.contextPath}/requests">Xử lý yêu cầu</a>
+    <a href="${pageContext.request.contextPath}/process-request">Xử lý yêu cầu</a>
     <a href="${pageContext.request.contextPath}/DepositPaymentList">Danh sách đặt cọc</a>
     <a href="${pageContext.request.contextPath}/BillingList">Xem hóa đơn</a>
 
