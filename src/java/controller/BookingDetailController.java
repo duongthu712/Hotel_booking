@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -149,6 +150,14 @@ public class BookingDetailController extends HttpServlet {
             verificationStatus = "Chưa gửi minh chứng";
         }
 
+        boolean counterSameDayNoDeposit
+                = isCounterSameDayNoDeposit(booking);
+
+        request.setAttribute(
+                "counterSameDayNoDeposit",
+                counterSameDayNoDeposit
+        );
+
         List<Map<String, Object>> publicRequests
                 = bookingDAO.getPublicBookingRequests(booking.getBookingId());
 
@@ -266,6 +275,31 @@ public class BookingDetailController extends HttpServlet {
 
         request.setAttribute("createdAtText", createdAtText);
         request.setAttribute("dateOfBirthText", dateOfBirthText);
+    }
+
+    private boolean isCounterSameDayNoDeposit(Booking booking) {
+        if (booking == null) {
+            return false;
+        }
+
+        if (booking.getSource() == null
+                || !"Đặt phòng tại quầy".equals(booking.getSource())) {
+            return false;
+        }
+
+        if (booking.getCheckinDate() == null
+                || booking.getCreateAt() == null) {
+            return false;
+        }
+
+        boolean checkinIsCreateDate = booking.getCheckinDate()
+                .equals(booking.getCreateAt().toLocalDate());
+
+        boolean createdBefore14h = booking.getCreateAt()
+                .toLocalTime()
+                .isBefore(LocalTime.of(14, 0));
+
+        return checkinIsCreateDate && createdBefore14h;
     }
 
     private String validateLookupInformation(
