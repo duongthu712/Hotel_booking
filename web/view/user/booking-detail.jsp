@@ -1000,7 +1000,6 @@
                                             <button type="button"
                                                     class="detail-management-button request"
                                                     onclick="window.location.href = '${pageContext.request.contextPath}/guest-request?bookingCode=${booking.bookingCode}&email=${email}'">
-
                                                 <span class="detail-management-icon">✎</span>
 
                                                 <span>
@@ -1130,19 +1129,16 @@
                         QUAY LẠI TRA CỨU
                     </a>
 
-                    <a                        </section>
-                        </aside>
+                    <a href="${pageContext.request.contextPath}/home"
+                       class="detail-home-button">
+                        VỀ TRANG CHỦ
+                    </a>
                 </div>
 
-                <div class="detail-security-note">
-                    <span href="${pageContext.request.contextPath}/home"
-                          class="detail-home-button">
-                        VỀ TRANG CHỦ
-                        </a>
-                </div>
             </c:if>
         </main>
 
         <jsp:include page="/view/common/footer.jsp"/>
+
     </body>
 </html>
