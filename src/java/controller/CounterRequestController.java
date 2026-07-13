@@ -547,7 +547,6 @@ public class CounterRequestController extends HttpServlet {
 
         if ("Đã nhận phòng".equals(status)) {
             return "extend".equals(requestType)
-                    || "upgrade".equals(requestType)
                     || "other".equals(requestType);
         }
 

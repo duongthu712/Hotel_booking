@@ -225,7 +225,7 @@
                                 <c:set var="canAnyRequest" value="${!isCheckedOut && !isCancelled}" />
 
                                 <c:set var="canExtendRequest" value="${isConfirmed || isCheckedIn}" />
-                                <c:set var="canUpgradeRequest" value="${isConfirmed || isCheckedIn}" />
+                                <c:set var="canUpgradeRequest" value="${isConfirmed}" />
                                 <c:set var="canCancelRequest" value="${isPending || isConfirmed}" />
                                 <c:set var="canOtherRequest" value="${isConfirmed || isCheckedIn}" />
 

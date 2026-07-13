@@ -994,7 +994,9 @@
                                         </button>
                                     </c:when>
 
-                                    <c:when test="${booking.status eq 'Đã xác nhận' or booking.status eq 'Đã nhận phòng'}">
+                                    <c:when test="${booking.status eq 'Chờ xử lý'
+                                                    or booking.status eq 'Đã xác nhận'
+                                                    or booking.status eq 'Đã nhận phòng'}">
                                         <button type="button"
                                                 class="detail-management-button request"
                                                 onclick="window.location.href = '${pageContext.request.contextPath}/guest-request?bookingCode=${booking.bookingCode}&email=${email}'">
@@ -1128,12 +1130,7 @@
                         QUAY LẠI TRA CỨU
                     </a>
 
-                    <a                        </section>
-                    </aside>
-                </div>
-
-                <div class="detail-security-note">
-                    <span href="${pageContext.request.contextPath}/home"
+                    <a href="${pageContext.request.contextPath}/home"
                        class="detail-home-button">
                         VỀ TRANG CHỦ
                     </a>
@@ -1142,5 +1139,6 @@
         </main>
 
         <jsp:include page="/view/common/footer.jsp"/>
+        
     </body>
 </html>

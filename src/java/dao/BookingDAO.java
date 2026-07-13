@@ -1737,14 +1737,14 @@ public class BookingDAO extends DBContext {
                 + " FROM RoomTypes "
                 + " WHERE room_type_id = ? "
                 + "   AND is_active = 1 ";
-
+        
         String updateBookingSql = ""
                 + " UPDATE Bookings "
                 + " SET room_type_id = ?, "
                 + "     booked_price_per_night = ? "
                 + " WHERE booking_id = ? "
-                + "   AND [status] IN (N'Đã xác nhận', N'Đã nhận phòng') ";
-
+                + "   AND [status] = N'Đã xác nhận' ";
+        
         String insertRequestSql = ""
                 + " INSERT INTO GuestRequests ( "
                 + "     booking_id, guest_id, request_type, request_details, target_room_type_id, "
@@ -1790,8 +1790,7 @@ public class BookingDAO extends DBContext {
                 }
             }
 
-            if (!"Đã xác nhận".equals(bookingStatus)
-                    && !"Đã nhận phòng".equals(bookingStatus)) {
+            if (!"Đã xác nhận".equals(bookingStatus)) {
                 connection.rollback();
                 return false;
             }
@@ -1911,27 +1910,19 @@ public class BookingDAO extends DBContext {
             LocalDate checkinDate,
             LocalDate checkoutDate) {
 
-        if (checkoutDate == null) {
+        if (!"Đã xác nhận".equals(bookingStatus)) {
             return 0;
         }
 
-        if ("Đã nhận phòng".equals(bookingStatus)) {
-            LocalDate today = LocalDate.now();
-
-            if (!checkoutDate.isAfter(today)) {
-                return 0;
-            }
-
-            return (int) ChronoUnit.DAYS.between(today, checkoutDate);
+        if (checkinDate == null || checkoutDate == null) {
+            return 0;
         }
 
-        if ("Đã xác nhận".equals(bookingStatus)) {
-            if (checkinDate != null && checkoutDate.isAfter(checkinDate)) {
-                return (int) ChronoUnit.DAYS.between(checkinDate, checkoutDate);
-            }
+        if (!checkoutDate.isAfter(checkinDate)) {
+            return 0;
         }
 
-        return 0;
+        return (int) ChronoUnit.DAYS.between(checkinDate, checkoutDate);
     }
 
     public boolean applyCounterExtendStayRequest(
