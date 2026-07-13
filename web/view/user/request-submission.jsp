@@ -17,7 +17,6 @@
 
         <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/navbar.css?v=<%= System.currentTimeMillis() %>">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/footer.css?v=<%= System.currentTimeMillis() %>">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/walk-in-booking.css?v=<%=System.currentTimeMillis()%>">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/guest-request.css?v=<%=System.currentTimeMillis()%>">
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

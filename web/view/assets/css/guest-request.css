@@ -1,8 +1,9 @@
+
 /* Cấu hình phông chữ sang trọng hệ thống */
-.request-wrapper, 
-.request-wrapper input, 
-.request-wrapper select, 
-.request-wrapper textarea, 
+.request-wrapper,
+.request-wrapper input,
+.request-wrapper select,
+.request-wrapper textarea,
 .request-wrapper button {
     font-family: 'Cormorant Garamond', 'Lora', serif;
 }
@@ -38,9 +39,7 @@ body {
     font-size: 15px;
 }
 
-/* =========================================================================
-   THANH MINI SUMMARY: THIẾT KẾ CARD THON GỌN, SANG TRỌNG (3 CỘT - 2 HÀNG)
-   ========================================================================= */
+
 .booking-mini-summary {
     display: grid;
     grid-template-columns: repeat(3, 1fr); /* Giữ mảng 3 cột rộng rãi */
@@ -174,10 +173,13 @@ body {
     box-shadow: 0 4px 12px rgba(44, 62, 70, 0.05);
 }
 
-/*.type-card-option:has(input[type="radio"]:checked) {
+
+.type-card-option.active-card {
+
     border: 1px solid #2c3e46 !important;
     background-color: #f4f6f7;
-}*/
+}
+*/
 
 /* Phân chia bố cục hai cột bên trong mỗi tab chức năng (Trái điền form - Phải lý do & lưu ý) */
 .tab-content-grid {
@@ -200,8 +202,8 @@ body {
     margin-bottom: 8px;
 }
 
-textarea, 
-select, 
+textarea,
+select,
 input[type="date"],
 input[type="text"] {
     width: 100%;
@@ -216,8 +218,8 @@ input[type="text"] {
     transition: border-color 0.2s ease;
 }
 
-textarea:focus, 
-select:focus, 
+textarea:focus,
+select:focus,
 input[type="date"]:focus {
     border-color: #2c3e46;
 }
@@ -308,7 +310,7 @@ textarea {
 }
 
 /* Tinh chỉnh riêng cho nút bấm của popup thêm sắc nét và đồng bộ La Mer */
-.swal2-confirm, 
+.swal2-confirm,
 .swal2-cancel {
     letter-spacing: 1px !important;
     font-weight: 600 !important;

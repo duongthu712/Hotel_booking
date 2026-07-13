@@ -57,6 +57,18 @@ document.addEventListener("DOMContentLoaded", function () {
         } else if (activeTab === "Gia hạn phòng") {
             initDefaultExtensionNights();
         }
+
+        // ĐỒNG BỘ CLASS ACTIVE CHO THẺ CHA (THAY THẾ HOÀN TOÀN CHO :HAS() CỦA CSS PHÁT SINH LỖI)
+        radios.forEach(radio => {
+            const container = radio.closest('.type-card-option');
+            if (container) {
+                if (radio.checked) {
+                    container.classList.add("active-card");
+                } else {
+                    container.classList.remove("active-card");
+                }
+            }
+        });
     }
 
     function updateUIByBookingStatus() {

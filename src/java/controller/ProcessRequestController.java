@@ -46,7 +46,6 @@ public class ProcessRequestController extends HttpServlet {
                                 ? detail.getRequestedCheckout().toLocalDate()
                                 : detail.getCheckOutDate();
 
-                        // SỬA: Đưa detail.getBookingId() thay cho null để câu lệnh SQL loại trừ chính nó, không tự quét trúng mình gây treo.
                         isAvailable = requestDAO.checkRoomAvailability(
                                 detail.getRoomTypeId(),
                                 oldCheckout,
@@ -82,7 +81,7 @@ public class ProcessRequestController extends HttpServlet {
                                         currentRefundRate = 1.0;
                                         feePercentText = "0%";
                                     } else if (totalHoursLeft >= 48) {
-                                        currentRefundRate = 0.7; // ĐÃ SỬA: Đồng bộ biến chuẩn tránh Null
+                                        currentRefundRate = 0.7; 
                                         feePercentText = "30%";
                                     } else if (totalHoursLeft >= 24) {
                                         currentRefundRate = 0.5;
@@ -147,6 +146,9 @@ public class ProcessRequestController extends HttpServlet {
             return;
         }
 
+        // Khởi tạo DAO phục vụ cho việc lấy Email chuẩn từ bảng liên kết hệ thống
+        dao.BookingDAO bookingDAO = new dao.BookingDAO();
+
         if ("approve".equals(action)) {
             boolean isAvailable = true;
 
@@ -161,7 +163,6 @@ public class ProcessRequestController extends HttpServlet {
                     newCheckOut = dto.getRequestedCheckout().toLocalDate();
                 }
 
-                // SỬA: Thay dto.getCheckInDate() thành dto.getCheckOutDate() để đồng bộ logic với doGet
                 isAvailable = requestDAO.checkRoomAvailability(
                         dto.getRoomTypeId(),
                         dto.getCheckOutDate(),
@@ -172,13 +173,32 @@ public class ProcessRequestController extends HttpServlet {
             }
             if (isAvailable) {
 
-                System.out.println("===== START APPROVE =====");
-
                 boolean success = requestDAO.approveRequest(dto, notes);
+                
+                if (success) {
+                    try {
+                        model.Guest currentGuest = bookingDAO.getGuestByBookingId(dto.getBookingId());
+                        if (currentGuest != null && currentGuest.getEmail() != null && !currentGuest.getEmail().trim().isEmpty()) {
+                            final String targetEmail = currentGuest.getEmail().trim();
+                            final String guestName = dto.getGuestName() != null ? dto.getGuestName() : currentGuest.getFullName();
+                            final String bookingCode = dto.getBookingCode();
+                            final String reqType = dto.getRequestType();
+                            final String finalNotes = notes;
 
-                System.out.println("approveRequest() = " + success);
-
-                System.out.println("Preparing redirect...");
+                            new Thread(() -> {
+                                try {
+                                    dal.EmailUtil.sendRequestVerificationResult(
+                                            targetEmail, guestName, bookingCode, reqType, true, finalNotes
+                                    );
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }).start();
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
 
                 response.sendRedirect(
                         "process-request?type=" + encType
@@ -191,7 +211,33 @@ public class ProcessRequestController extends HttpServlet {
                 response.sendRedirect("process-request?action=detail&requestId=" + requestId + "&type=" + encType + "&status=" + encStatus + "&status_msg=no_room");
             }
         } else {
-            requestDAO.rejectRequest(requestId, notes);
+            boolean success = requestDAO.rejectRequest(requestId, notes);
+            
+            if (success) {
+                try {
+                    model.Guest currentGuest = bookingDAO.getGuestByBookingId(dto.getBookingId());
+                    if (currentGuest != null && currentGuest.getEmail() != null && !currentGuest.getEmail().trim().isEmpty()) {
+                        final String targetEmail = currentGuest.getEmail().trim();
+                        final String guestName = dto.getGuestName() != null ? dto.getGuestName() : currentGuest.getFullName();
+                        final String bookingCode = dto.getBookingCode();
+                        final String reqType = dto.getRequestType();
+                        final String finalNotes = notes;
+
+                        new Thread(() -> {
+                            try {
+                                dal.EmailUtil.sendRequestVerificationResult(
+                                        targetEmail, guestName, bookingCode, reqType, false, finalNotes
+                                );
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }).start();
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+
             response.sendRedirect("process-request?type=" + encType + "&status=" + encStatus + "&status_msg=reject_success");
         }
     }

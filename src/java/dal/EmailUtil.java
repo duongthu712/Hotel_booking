@@ -128,7 +128,7 @@ public class EmailUtil {
 
         message.setSubject(MimeUtility.encodeText(subject, "UTF-8", "B"));
         message.setContent(htmlContent, "text/html; charset=UTF-8");
-        
+
         Transport.send(message);
     }
 
@@ -301,60 +301,60 @@ public class EmailUtil {
     }
 
     public static void sendPaymentSubmitted(String toEmail, String guestName,
-                String bookingCode, String transactionReference) throws Exception {
+            String bookingCode, String transactionReference) throws Exception {
 
-            final String fromEmail = "phuonglinhthcsphuongdien@gmail.com";
-            final String appPassword = "pnzf biix zhmo zrxt";
+        final String fromEmail = "phuonglinhthcsphuongdien@gmail.com";
+        final String appPassword = "pnzf biix zhmo zrxt";
 
-            Properties props = new Properties();
-            props.put("mail.smtp.host", "smtp.gmail.com");
-            props.put("mail.smtp.port", "587");
-            props.put("mail.smtp.auth", "true");
-            props.put("mail.smtp.starttls.enable", "true");
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
 
-            Session session = Session.getInstance(props, new Authenticator() {
-                @Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(fromEmail, appPassword);
-                }
-            });
+        Session session = Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(fromEmail, appPassword);
+            }
+        });
 
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(fromEmail, "LaMer Hotel"));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(fromEmail, "LaMer Hotel"));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
 
-            String subject = "La Mer Hotel - Đã nhận thông tin thanh toán";
+        String subject = "La Mer Hotel - Đã nhận thông tin thanh toán";
 
-            String trackingUrl = "http://localhost:9999/Hotel_booking_project/view/user/booking-detail.jsp"
-                    + "?bookingCode=" + URLEncoder.encode(bookingCode, StandardCharsets.UTF_8);
+        String trackingUrl = "http://localhost:9999/Hotel_booking_project/view/user/booking-detail.jsp"
+                + "?bookingCode=" + URLEncoder.encode(bookingCode, StandardCharsets.UTF_8);
 
-            String htmlContent = "<div style='font-family: Arial, sans-serif; color: #073842;'>"
-                    + "<h2>La Mer Hotel - Đã nhận thông tin thanh toán</h2>"
-                    + "<p>Xin chào <strong>" + guestName + "</strong>,</p>"
-                    + "<p>Chúng tôi đã nhận được thông tin thanh toán đặt cọc của bạn.</p>"
-                    + "<h3>Thông tin giao dịch:</h3>"
-                    + "<ul>"
-                    + "<li>Mã đặt phòng: <strong>" + bookingCode + "</strong></li>"
-                    + "<li>Mã giao dịch: <strong>" + transactionReference + "</strong></li>"
-                    + "<li>Trạng thái: <strong style='color: #ef6c00;'>Đang chờ xử lý</strong></li>"
-                    + "</ul>"
-                    + "<p>Bạn có thể theo dõi trạng thái đặt phòng bằng nút bên dưới:</p>"
-                    + "<p style='margin-top: 25px;'>"
-                    + "<a href='" + trackingUrl + "' style='background-color: #073842; color: white; "
-                    + "padding: 12px 20px; text-decoration: none; border-radius: 5px;'>"
-                    + "Theo dõi trạng thái đặt phòng"
-                    + "</a>"
-                    + "</p>"
-                    + "<p>Vui lòng không gửi lại thông tin thanh toán nhiều lần.</p>"
-                    + "<p>La Mer Hotel sẽ liên hệ với bạn khi có thông tin mới.</p>"
-                    + "</div>";
+        String htmlContent = "<div style='font-family: Arial, sans-serif; color: #073842;'>"
+                + "<h2>La Mer Hotel - Đã nhận thông tin thanh toán</h2>"
+                + "<p>Xin chào <strong>" + guestName + "</strong>,</p>"
+                + "<p>Chúng tôi đã nhận được thông tin thanh toán đặt cọc của bạn.</p>"
+                + "<h3>Thông tin giao dịch:</h3>"
+                + "<ul>"
+                + "<li>Mã đặt phòng: <strong>" + bookingCode + "</strong></li>"
+                + "<li>Mã giao dịch: <strong>" + transactionReference + "</strong></li>"
+                + "<li>Trạng thái: <strong style='color: #ef6c00;'>Đang chờ xử lý</strong></li>"
+                + "</ul>"
+                + "<p>Bạn có thể theo dõi trạng thái đặt phòng bằng nút bên dưới:</p>"
+                + "<p style='margin-top: 25px;'>"
+                + "<a href='" + trackingUrl + "' style='background-color: #073842; color: white; "
+                + "padding: 12px 20px; text-decoration: none; border-radius: 5px;'>"
+                + "Theo dõi trạng thái đặt phòng"
+                + "</a>"
+                + "</p>"
+                + "<p>Vui lòng không gửi lại thông tin thanh toán nhiều lần.</p>"
+                + "<p>La Mer Hotel sẽ liên hệ với bạn khi có thông tin mới.</p>"
+                + "</div>";
 
-            message.setSubject(MimeUtility.encodeText(subject, "UTF-8", "B"));
-            message.setContent(htmlContent, "text/html; charset=UTF-8");
+        message.setSubject(MimeUtility.encodeText(subject, "UTF-8", "B"));
+        message.setContent(htmlContent, "text/html; charset=UTF-8");
 
-            Transport.send(message);
-        }
-    
+        Transport.send(message);
+    }
+
     public static void sendWalkInBookingConfirmed(String toEmail, String guestName, String phone, String idNumber,
             LocalDate dateOfBirth, String bookingCode, LocalDate checkinDate, LocalDate checkoutDate,
             int numRooms, int numGuests, int numChildren, BigDecimal depositAmount, boolean isStayNow) throws Exception {
@@ -420,6 +420,120 @@ public class EmailUtil {
                 + "<p style='margin-top: 20px;'>Đơn hàng của bạn đã được lưu trữ an toàn. Bạn có thể sử dụng Mã đặt phòng trên để tra cứu thông tin bất cứ lúc nào.</p>"
                 + "<p>La Mer Hotel rất hân hạnh được phục vụ bạn!</p>"
                 + "</div>";
+
+        message.setSubject(MimeUtility.encodeText(subject, "UTF-8", "B"));
+        message.setContent(htmlContent, "text/html; charset=UTF-8");
+        Transport.send(message);
+    }
+
+    public static void sendRequestSubmittedNotification(String toEmail,
+            String guestName,
+            String bookingCode,
+            String requestType,
+            String details) throws Exception {
+
+        final String fromEmail = "phuonglinhthcsphuongdien@gmail.com";
+        final String appPassword = "pnzf biix zhmo zrxt";
+
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+
+        Session session = Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(fromEmail, appPassword);
+            }
+        });
+
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(fromEmail, "LaMer Hotel"));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
+
+        String subject = "La Mer Hotel - Tiếp nhận yêu cầu " + requestType;
+
+        // Tùy biến màu sắc cảnh báo theo loại Request
+        String badgeColor = "Hủy đặt phòng".equals(requestType) ? "#c62828" : "#ef6c00";
+
+        String htmlContent = "<div style='font-family: Arial, sans-serif; color: #073842; max-width: 600px; border: 1px solid #e0e0e0; padding: 20px; border-radius: 8px;'>"
+                + "<h2>La Mer Hotel - Thông báo tiếp nhận yêu cầu</h2>"
+                + "<p>Xin chào <strong>" + guestName + "</strong>,</p>"
+                + "<p>Chúng tôi đã nhận được yêu cầu xử lý phát sinh cho mã đặt phòng: <strong style='color: #1a446c;'>" + bookingCode + "</strong> của bạn.</p>"
+                + "<div style='background-color: #f9f9f9; padding: 15px; border-left: 4px solid " + badgeColor + "; margin: 15px 0;'>"
+                + "  <p style='margin: 0 0 8px 0;'><strong>Loại yêu cầu:</strong> <span style='color: " + badgeColor + "; font-weight: bold;'>" + requestType + "</span></p>"
+                + "  <p style='margin: 0;'><strong>Chi tiết lý do / Nội dung:</strong> " + (details != null ? details : "Không có chi tiết") + "</p>"
+                + "</div>"
+                + "<p>⏱️ Trạng thái yêu cầu hiện tại: <strong style='color: #ef6c00;'>Đang chờ Lễ tân phê duyệt</strong>.</p>"
+                + "<p>Hệ thống sẽ tự động gửi email thông báo ngay sau khi bộ phận Lễ tân khách sạn kiểm tra tình trạng phòng thực tế và xác nhận yêu cầu của bạn.</p>"
+                + "<p>Nếu cần thay đổi gấp, vui lòng liên hệ trực tiếp hotline quầy lễ tân để được hỗ trợ nhanh nhất.</p>"
+                + "<p>Trân trọng,<br><strong>Ban quản lý La Mer Hotel</strong></p>"
+                + "</div>";
+
+        message.setSubject(MimeUtility.encodeText(subject, "UTF-8", "B"));
+        message.setContent(htmlContent, "text/html; charset=UTF-8");
+        Transport.send(message);
+    }
+
+    public static void sendRequestVerificationResult(String toEmail,
+            String guestName,
+            String bookingCode,
+            String requestType,
+            boolean isApproved,
+            String notes) throws Exception {
+
+        final String fromEmail = "phuonglinhthcsphuongdien@gmail.com";
+        final String appPassword = "pnzf biix zhmo zrxt";
+
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+
+        Session session = Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(fromEmail, appPassword);
+            }
+        });
+
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(fromEmail, "LaMer Hotel"));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
+
+        String subject;
+        String htmlContent;
+
+        if (isApproved) {
+            subject = "La Mer Hotel - Kết quả xử lý yêu cầu " + requestType + " [THÀNH CÔNG]";
+            htmlContent = "<div style='font-family: Arial, sans-serif; color: #073842; max-width: 600px; border: 1px solid #e0e0e0; padding: 20px; border-radius: 8px;'>"
+                    + "<h2>La Mer Hotel - Yêu cầu đã được phê duyệt</h2>"
+                    + "<p>Xin chào <strong>" + guestName + "</strong>,</p>"
+                    + "<p>Bộ phận Lễ tân thông báo: Yêu cầu liên quan đến đơn đặt phòng <strong style='color: #1a446c;'>" + bookingCode + "</strong> của bạn đã được đối soát và xử lý <strong style='color: #2e7d32;'>THÀNH CÔNG</strong>.</p>"
+                    + "<div style='background-color: #f2fbf2; padding: 15px; border-left: 4px solid #2e7d32; margin: 15px 0;'>"
+                    + "  <p style='margin: 0 0 8px 0;'><strong>Loại yêu cầu:</strong> " + requestType + "</p>"
+                    + "  <p style='margin: 0;'><strong>Trạng thái hệ thống:</strong> <span style='color: #2e7d32; font-weight: bold;'>Đã phê duyệt & Cập nhật dữ liệu</span></p>"
+                    + "</div>"
+                    + (notes != null && !notes.trim().isEmpty() ? "<p><strong>Phản hồi từ lễ tân:</strong> <em>" + notes + "</em></p>" : "")
+                    + "<p>Mọi thay đổi về thông tin chi tiết phòng/lịch trình đã được đồng bộ hóa. Quý khách có thể truy cập hệ thống để tra cứu trạng thái đơn mới nhất.</p>"
+                    + "<p>La Mer Hotel hân hạnh được phục vụ bạn!</p>"
+                    + "</div>";
+        } else {
+            subject = "La Mer Hotel - Kết quả xử lý yêu cầu " + requestType + " [BỊ TỪ CHỐI]";
+            htmlContent = "<div style='font-family: Arial, sans-serif; color: #073842; max-width: 600px; border: 1px solid #e0e0e0; padding: 20px; border-radius: 8px;'>"
+                    + "<h2>La Mer Hotel - Thông báo từ chối yêu cầu</h2>"
+                    + "<p>Xin chào <strong>" + guestName + "</strong>,</p>"
+                    + "<p>Chúng tôi rất tiếc phải thông báo: Yêu cầu chỉnh sửa đơn đặt phòng <strong style='color: #1a446c;'>" + bookingCode + "</strong> hiện tại <strong style='color: #c62828;'>CHƯA ĐƯỢC PHÊ DUYỆT</strong> bởi bộ phận quản lý.</p>"
+                    + "<div style='background-color: #fff5f5; padding: 15px; border-left: 4px solid #c62828; margin: 15px 0;'>"
+                    + "  <p style='margin: 0 0 8px 0;'><strong>Loại yêu cầu:</strong> " + requestType + "</p>"
+                    + "  <p style='margin: 0;'><strong>Trạng thái hệ thống:</strong> <span style='color: #c62828; font-weight: bold;'>Bị từ chối</span></p>"
+                    + "</div>"
+                    + (notes != null && !notes.trim().isEmpty() ? "<p><strong>Lý do từ chối cụ thể:</strong> <span style='color: #c62828;'>" + notes + "</span></p>" : "<p><strong>Lý do:</strong> Không đáp ứng đủ điều kiện quỹ phòng trống hoặc mốc thời gian quy định.</p>")
+                    + "<p>Thông tin lịch trình gốc của phòng vẫn được giữ nguyên vẹn không thay đổi. Vui lòng liên hệ hotline quầy lễ tân nếu bạn có thắc mắc khác.</p>"
+                    + "</div>";
+        }
 
         message.setSubject(MimeUtility.encodeText(subject, "UTF-8", "B"));
         message.setContent(htmlContent, "text/html; charset=UTF-8");

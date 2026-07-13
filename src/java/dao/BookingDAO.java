@@ -280,7 +280,7 @@ public class BookingDAO extends DBContext {
         return false;
     }
 
-    // Dùng cho thanh search của check in (ĐÃ TÍCH HỢP HẸN GIỜ ĐẾN)
+    // Dùng cho thanh search của check in (Bổ sung giờ hẹn đến)
     public BookingCheckInView getBookingForCheckIn(String bookingCode) {
         String sql = "SELECT b.booking_id, b.booking_code, b.num_rooms, b.num_guests, b.num_children AS booking_num_children, b.payment_status, b.deposit_amount, "
                 + "b.[status], b.actual_checkin_time, "
