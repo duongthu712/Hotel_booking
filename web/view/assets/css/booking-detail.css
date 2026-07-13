@@ -1319,4 +1319,25 @@ body {
     .detail-home-button {
         width: 100%;
     }
+    
+    .detail-management-button.cancel {
+        border-color: #b73535;
+        background: #b73535;
+        color: #ffffff;
+    }
+
+    .detail-management-button.cancel:hover {
+        border-color: #9f2f2f;
+        background: #9f2f2f;
+    }
+
+    .detail-management-button.cancel .detail-management-icon {
+        border-color: rgba(255, 255, 255, 0.75);
+        color: #ffffff;
+    }
+
+    .detail-management-button.cancel strong,
+    .detail-management-button.cancel small {
+        color: #ffffff;
+    }
 }
