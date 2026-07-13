@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <h5 class="profile-group-header">Khách lưu trú số ${globalIndex} (${label})</h5>
             <div class="form-field-block">
                 <label class="field-label">Họ và tên</label>
-                <input type="text" name="stayFullName" placeholder="Nhập họ và tên..." class="field-input-text" />
+                <input type="text" name="stayFullName" placeholder="Nhập họ và tên..." class="field-input-text" required/>
             </div>
             <div class="form-field-row">
                 <div class="field-col">

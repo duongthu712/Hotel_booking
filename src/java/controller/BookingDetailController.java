@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -26,15 +27,67 @@ public class BookingDetailController extends HttpServlet {
             = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     @Override
-    protected void doGet(HttpServletRequest request,
-            HttpServletResponse response)
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
 
-        request.getRequestDispatcher("/view/user/booking-detail.jsp")
-                .forward(request, response);
+        // 1. Lấy mã code từ URL (phục vụ cho việc redirect từ trang gửi yêu cầu về)
+        String bookingCode = request.getParameter("bookingCode");
+        String email = request.getParameter("email");
+        String status = request.getParameter("status"); // Lấy trạng thái từ URL
+
+        // 2. Nếu có bookingCode, tự động load lại dữ liệu để hiển thị
+        if (bookingCode != null && !bookingCode.trim().isEmpty()) {
+            BookingDAO bookingDAO = new BookingDAO();
+            Booking booking = bookingDAO.getBookingByCodeAndEmail(bookingCode, email);
+
+            if (booking != null) {
+                Guest guest = bookingDAO.getGuestByBookingId(booking.getBookingId());
+                RoomTypeDAO roomTypeDAO = new RoomTypeDAO();
+                RoomType roomType = roomTypeDAO.getRoomDetailById(booking.getRoomTypeId());
+                String verificationStatus = bookingDAO.getDepositVerificationStatus(booking.getBookingId());
+
+                if (verificationStatus == null || verificationStatus.trim().isEmpty()) {
+                    verificationStatus = "Chưa gửi minh chứng";
+                }
+
+                // =============================================================
+                // BỔ SUNG: Truy vấn dữ liệu Requests và Changes giống bên doPost
+                // =============================================================
+                List<Map<String, Object>> publicRequests
+                        = bookingDAO.getPublicBookingRequests(booking.getBookingId());
+
+                List<Map<String, Object>> publicChanges
+                        = bookingDAO.getPublicBookingChanges(booking.getBookingId());
+
+                request.setAttribute("publicRequests", publicRequests);
+                request.setAttribute("publicChanges", publicChanges);
+                // =============================================================
+
+                // BỔ SUNG THÊM: Tính toán quyền viết feedback giống bên doPost để tránh lỗi vặt
+                FeedbackDAO feedbackDAO = new FeedbackDAO();
+                boolean hasFeedback = feedbackDAO.hasFeedback(booking.getBookingId());
+                boolean canWriteFeedback = "Đã trả phòng".equals(booking.getStatus()) && !hasFeedback;
+                request.setAttribute("hasFeedback", hasFeedback);
+                request.setAttribute("canWriteFeedback", canWriteFeedback);
+
+                // Đẩy dữ liệu điều hướng vào request
+                request.setAttribute("booking", booking);
+                request.setAttribute("searched", true);
+                request.setAttribute("bookingCode", bookingCode);
+                request.setAttribute("email", email);
+
+                // Set status để script sweetalert2 hoạt động
+                request.setAttribute("status", status);
+
+                // Gọi hàm setBookingDetailData của bạn để tính toán ngày tháng/tiền
+                setBookingDetailData(request, booking, guest, roomType, verificationStatus);
+            }
+        }
+
+        request.getRequestDispatcher("/view/user/booking-detail.jsp").forward(request, response);
     }
 
     @Override
@@ -96,6 +149,14 @@ public class BookingDetailController extends HttpServlet {
 
             verificationStatus = "Chưa gửi minh chứng";
         }
+
+        boolean counterSameDayNoDeposit
+                = isCounterSameDayNoDeposit(booking);
+
+        request.setAttribute(
+                "counterSameDayNoDeposit",
+                counterSameDayNoDeposit
+        );
 
         List<Map<String, Object>> publicRequests
                 = bookingDAO.getPublicBookingRequests(booking.getBookingId());
@@ -216,13 +277,38 @@ public class BookingDetailController extends HttpServlet {
         request.setAttribute("dateOfBirthText", dateOfBirthText);
     }
 
+    private boolean isCounterSameDayNoDeposit(Booking booking) {
+        if (booking == null) {
+            return false;
+        }
+
+        if (booking.getSource() == null
+                || !"Đặt phòng tại quầy".equals(booking.getSource())) {
+            return false;
+        }
+
+        if (booking.getCheckinDate() == null
+                || booking.getCreateAt() == null) {
+            return false;
+        }
+
+        boolean checkinIsCreateDate = booking.getCheckinDate()
+                .equals(booking.getCreateAt().toLocalDate());
+
+        boolean createdBefore14h = booking.getCreateAt()
+                .toLocalTime()
+                .isBefore(LocalTime.of(14, 0));
+
+        return checkinIsCreateDate && createdBefore14h;
+    }
+
     private String validateLookupInformation(
             String bookingCode, String email) {
 
         if (bookingCode.isEmpty()) {
             return "Vui lòng nhập mã đặt phòng.";
         }
-        
+
         if (!bookingCode.matches("^LMHB[A-Za-z0-9]{8}$")) {
             return "Mã đặt phòng không đúng định dạng.";
         }

@@ -292,6 +292,8 @@
     <servlet>
         <servlet-name>PolicyDeleteController</servlet-name>
         <servlet-class>controller.PolicyDeleteController</servlet-class>
+        <servlet-name>ProcessRequestController</servlet-name>
+        <servlet-class>controller.ProcessRequestController</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>
@@ -576,5 +578,7 @@
     <servlet-mapping>
         <servlet-name>PolicyDeleteController</servlet-name>
         <url-pattern>/PolicyDelete</url-pattern>
+        <servlet-name>ProcessRequestController</servlet-name>
+        <url-pattern>/process-request</url-pattern>
     </servlet-mapping>
 </web-app>
