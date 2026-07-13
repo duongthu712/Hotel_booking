@@ -57,30 +57,14 @@
                            value="${keyword}">
 
                     <select name="status" class="filter-select">
-                        <option value="" ${empty status ? 'selected' : ''}>
-                            Chờ xử lý
-                        </option>
-
-                        <option value="all" ${status == 'all' ? 'selected' : ''}>
-                            Tất cả
-                        </option>
-
-                        <option value="Đã phê duyệt" ${status == 'Đã phê duyệt' ? 'selected' : ''}>
-                            Đã phê duyệt
-                        </option>
-
-                        <option value="Đã từ chối" ${status == 'Đã từ chối' ? 'selected' : ''}>
-                            Đã từ chối
-                        </option>
+                        <option value="" ${empty status ? 'selected' : ''}>Chờ xử lý</option>
+                        <option value="all" ${status == 'all' ? 'selected' : ''}>Tất cả</option>
+                        <option value="Đã phê duyệt" ${status == 'Đã phê duyệt' ? 'selected' : ''}>Đã phê duyệt</option>
+                        <option value="Đã từ chối" ${status == 'Đã từ chối' ? 'selected' : ''}>Đã từ chối</option>
                     </select>
 
-                    <button type="submit" class="search-btn">
-                        Lọc
-                    </button>
-
-                    <a href="DepositPaymentList" class="reset-btn">
-                        Làm mới
-                    </a>
+                    <button type="submit" class="search-btn">Lọc</button>
+                    <a href="DepositPaymentList" class="reset-btn">Làm mới</a>
                 </form>
             </div>
 
@@ -98,9 +82,7 @@
                 </thead>
 
                 <tbody class="data-table-tbody">
-                    <c:forEach var="payment"
-                               items="${paymentList}"
-                               varStatus="loop">
+                    <c:forEach var="payment" items="${paymentList}" varStatus="loop">
 
                         <tr data-deposit-id="${payment.depositId}"
                             data-booking-id="${payment.bookingId}"
@@ -113,23 +95,11 @@
                             data-proof-url="${payment.paymentProofUrl}"
                             data-notes="${not empty payment.notes ? payment.notes : ''}">
 
-                            <td class="col-stt">
-                                ${(currentPage - 1) * 10 + loop.index + 1}
-                            </td>
+                            <td class="col-stt">${(currentPage - 1) * 10 + loop.index + 1}</td>
 
-                            <td class="col-booking">
-                                ${bookingCodeMap[payment.getBookingId()]}
-                            </td>
-
-                            <td class="col-guest">
-                                ${guestNameMap[payment.getBookingId()]}
-                            </td>
-
-                            <td class="col-amount">
-                                <fmt:formatNumber value="${payment.amount}"
-                                                  type="number"
-                                                  pattern="#,###" />đ
-                            </td>
+                            <td class="col-booking">${bookingCodeMap[payment.getBookingId()]}</td>
+                            <td class="col-guest">${guestNameMap[payment.getBookingId()]}</td>
+                            <td class="col-amount"><fmt:formatNumber value="${payment.amount}" type="number" pattern="#,###" />đ</td>
 
                             <td class="col-date">
                                 ${payment.submittedAt.toLocalTime().toString().substring(0, 5)}
@@ -143,9 +113,7 @@
                             </td>
 
                             <td class="btn-action">
-                                <button type="button"
-                                        class="btn-view"
-                                        onclick="openPaymentDetailModal(${payment.depositId})">
+                                <button type="button" class="btn-view" onclick="openPaymentDetailModal(${payment.depositId})">
                                     Chi tiết
                                 </button>
                             </td>
@@ -173,161 +141,85 @@
 
             <div class="hotel-popup" id="payment-detail-modal">
                 <div class="popup-content payment-detail-content">
-
-                    <h2 class="popup-title">
-                        Chi tiết thanh toán
-                    </h2>
+                    <div class="popup-title-content">
+                        <h2 class="popup-title"> Chi tiết thanh toán </h2>
+                        <button type="button" class="btn-close" id="btn-close-detail" style="font-size: 35px; margin-top: -25px; right: 5px;">&times;</button>
+                    </div>
 
                     <div class="payment-detail-layout">
-
                         <div class="payment-proof-column">
-
-                            <div class="payment-proof-image"
-                                 id="payment-proof-wrapper">
-
-                                <img src=""
-                                     alt="Payment Proof"
-                                     id="proof-img">
+                            <div class="payment-proof-image" id="payment-proof-wrapper">
+                                <img src="" alt="Payment Proof" id="proof-img">
                             </div>
-
-                            <div id="proof-url-container"
-                                 style="margin-top: 10px; word-break: break-all;">
-
+                            <div id="proof-url-container" style="margin-top: 10px; word-break: break-all;">
                                 <div style="margin-top: 10px;">
-                                    <strong>Mã giao dịch / Mã tham chiếu:</strong>
                                     <p id="proof-notes"></p>
                                 </div>
                             </div>
                         </div>
-
                         <div class="payment-info-column">
-
                             <div class="payment-info">
-
                                 <div class="info-row">
                                     <span class="info-label">Mã đặt phòng:</span>
-                                    <span class="info-value"
-                                          id="detail-booking-code"></span>
+                                    <span class="info-value" id="detail-booking-code"></span>
                                 </div>
 
                                 <div class="info-row">
                                     <span class="info-label">Tên khách:</span>
-                                    <span class="info-value"
-                                          id="detail-guest-name"></span>
+                                    <span class="info-value" id="detail-guest-name"></span>
                                 </div>
 
                                 <div class="info-row">
                                     <span class="info-label">Số tiền cọc:</span>
-                                    <span class="info-value"
-                                          id="detail-amount"></span>
+                                    <span class="info-value" id="detail-amount"></span>
                                 </div>
 
                                 <div class="info-row">
                                     <span class="info-label">Ngày gửi:</span>
-                                    <span class="info-value"
-                                          id="detail-submitted-at"></span>
+                                    <span class="info-value"  id="detail-submitted-at"></span>
                                 </div>
 
                                 <div class="info-row">
                                     <span class="info-label">Trạng thái:</span>
-                                    <span class="info-value"
-                                          id="detail-status"></span>
+                                    <span class="info-value"  id="detail-status"></span>
                                 </div>
 
                                 <div class="info-row">
                                     <span class="info-label">Người duyệt:</span>
-                                    <span class="info-value"
-                                          id="detail-verified-by"></span>
+                                    <span class="info-value" id="detail-verified-by"></span>
                                 </div>
                             </div>
 
-                            <div class="verification-form"
-                                 id="verification-form">
-
+                            <div class="verification-form" id="verification-form">
                                 <div class="form-group">
                                     <label class="input-label">Ghi chú</label>
-
-                                    <textarea id="verify-notes"
-                                              class="popup-input-field"
-                                              rows="3"
-                                              placeholder="Nhập ghi chú..."></textarea>
+                                    <textarea id="verify-notes" class="popup-input-field" rows="3" placeholder="Nhập ghi chú..."></textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="popup-action">
-
-                        <button type="button"
-                                class="btn-close"
-                                id="btn-close-detail">
-                            Đóng
-                        </button>
-
-                        <form action="DepositPaymentReject"
-                              method="POST"
-                              style="display: inline-block; margin: 0;">
-
-                            <input type="hidden"
-                                   name="depositId"
-                                   id="reject-deposit-id">
-
-                            <input type="hidden"
-                                   name="notes"
-                                   id="reject-notes">
-
-                            <input type="hidden"
-                                   name="page"
-                                   value="${currentPage}">
-
-                            <input type="hidden"
-                                   name="keyword"
-                                   value="${keyword}">
-
-                            <input type="hidden"
-                                   name="status"
-                                   value="${status}">
-
-                            <button type="submit"
-                                    class="btn-reject"
-                                    onclick="return prepareReject()">
-                                Từ chối
-                            </button>
+                        <form action="DepositPaymentReject" method="POST" style="display: inline-block; margin: 0;">
+                            <input type="hidden" name="depositId" id="reject-deposit-id">
+                            <input type="hidden" name="notes" id="reject-notes">
+                            <input type="hidden" name="page" value="${currentPage}">
+                            <input type="hidden" name="keyword" value="${keyword}">
+                            <input type="hidden" name="status" value="${status}">
+                            <button type="submit" class="btn-reject" onclick="return prepareReject()">Từ chối</button>
                         </form>
 
-                        <form action="DepositPaymentVerify"
-                              method="POST"
-                              style="display: inline-block; margin: 0;">
-
-                            <input type="hidden"
-                                   name="depositId"
-                                   id="verify-deposit-id">
-
-                            <input type="hidden"
-                                   name="notes"
-                                   id="verify-notes-hidden">
-
-                            <input type="hidden"
-                                   name="page"
-                                   value="${currentPage}">
-
-                            <input type="hidden"
-                                   name="keyword"
-                                   value="${keyword}">
-
-                            <input type="hidden"
-                                   name="status"
-                                   value="${status}">
-
-                            <button type="submit"
-                                    class="btn-submit">
-                                Xác nhận
-                            </button>
+                        <form action="DepositPaymentVerify" method="POST" style="display: inline-block; margin: 0;">
+                            <input type="hidden" name="depositId" id="verify-deposit-id">
+                            <input type="hidden" name="notes" id="verify-notes-hidden">
+                            <input type="hidden" name="page" value="${currentPage}">
+                            <input type="hidden" name="keyword" value="${keyword}">
+                            <input type="hidden" name="status" value="${status}">
+                            <button type="submit" class="btn-submit">Xác nhận</button>
                         </form>
                     </div>
                 </div>
             </div>
-
         </main>
 
         <script src="${pageContext.request.contextPath}/view/assets/javascript/payment-verification.js?v=10"></script>

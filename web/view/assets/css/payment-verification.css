@@ -7,7 +7,22 @@
     margin: 0;
 }
 
-.popup-title{color: var(--text-main)}
+.popup-title-content {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.btn-close {
+    position: absolute;    
+}
+
+
+.popup-title {
+    color: var(--text-main)
+}
+
+
 
 .payment-proof-image {
     margin: 20px 0;

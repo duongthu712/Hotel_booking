@@ -10,9 +10,6 @@ import model.RoomService;
 import java.sql.SQLException;
 
 /**
- * RoomServiceDAO.java Data Processing Operator layer for room services Provides
- * CRUD with RoomServices table
- *
  * @author LinhLTHE200306
  * @version 1.0
  * @since 2026-06-02

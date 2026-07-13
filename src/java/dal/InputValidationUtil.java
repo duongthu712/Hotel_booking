@@ -127,7 +127,7 @@ public class InputValidationUtil {
 
         return null;
     }
-    
+
     public static String validateEditRoom(int roomNumber, int newRoomNumber, int floor,
             String oldStatus, String newStatus, int oldRoomTypeId, int newRoomTypeId,
             RoomDAO roomDao) {
@@ -164,7 +164,47 @@ public class InputValidationUtil {
             return validateCreateRoom(newRoomNumber, floor, newRoomTypeId, roomDao);
         }
 
-        
+        return null;
+    }
+
+    private static final String[] VALID_POLICY_TYPES = {
+        "Nhận/Trả phòng", "Hủy đặt phòng", "Vật nuôi", "Hút thuốc", "Thanh toán", "Khác"
+    };
+
+    public static String validatePolicyInput(String policyName, String policyType, String description) {
+
+        String trimmedName = policyName.trim();
+        if (trimmedName.length() < 2 || trimmedName.length() > 100) {
+            return "Tên chính sách phải có độ dài từ 2 đến 100 ký tự.";
+        }
+
+        if (!trimmedName.matches("^[\\p{L}\\p{N}\\s_\\-/]+$")) {
+            return "Tên chính sách không được chứa ký tự đặc biệt.";
+        }
+
+        if (policyType == null || policyType.trim().isEmpty()) {
+            return "Vui lòng chọn loại chính sách.";
+        }
+
+        boolean validType = false;
+        for (String type : VALID_POLICY_TYPES) {
+            if (type.equals(policyType.trim())) {
+                validType = true;
+                break;
+            }
+        }
+        if (!validType) {
+            return "Loại chính sách không hợp lệ.";
+        }
+
+        if (description == null || description.trim().isEmpty()) {
+            return "Nội dung chính sách không được để trống.";
+        }
+
+        if (description.trim().length() < 5) {
+            return "Nội dung chính sách phải có ít nhất 5 ký tự.";
+        }
+
         return null;
     }
 

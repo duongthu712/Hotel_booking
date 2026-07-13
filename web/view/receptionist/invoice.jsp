@@ -109,44 +109,6 @@
                             </div>
                         </div>
 
-                        <!-- DỊCH VỤ ĐÃ SỬ DỤNG -->
-                        <div class="card">
-                            <h3 class="section-title">DỊCH VỤ ĐÃ SỬ DỤNG</h3>
-                            <div class="table-container">
-                                <c:choose>
-                                    <c:when test="${not empty existingServices}">
-                                        <table class="data-table service-table">
-                                            <thead class="data-table-thead">
-                                                <tr>
-                                                    <th class="col-name">Dịch vụ</th>
-                                                    <th class="col-price">Đơn giá</th>
-                                                    <th class="col-qty">SL</th>
-                                                    <th class="col-total">Thành tiền</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="data-table-tbody">
-                                                <c:forEach var="svc" items="${existingServices}">
-                                                    <tr>
-                                                        <td class="col-name">${svc.serviceName}</td>
-                                                        <td class="col-price">
-                                                            <fmt:formatNumber value="${svc['unitPrice']}" type="number" pattern="#,###"/> đ
-                                                        </td>
-                                                        <td class="col-qty">${svc.quantityUsed}</td>
-                                                        <td class="col-total">
-                                                            <fmt:formatNumber value="${svc['totalPrice']}" type="number" pattern="#,###"/> đ
-                                                        </td>
-                                                    </tr>
-                                                </c:forEach>
-                                            </tbody>
-                                        </table>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <div class="empty-sub-message">Không có dịch vụ phát sinh thêm.</div>
-                                    </c:otherwise>
-                                </c:choose>
-                            </div>
-                        </div>
-
                         <!-- NHẬP THÊM DỊCH VỤ -->
                         <div class="card">
                             <div class="card-header-with-search">
@@ -197,44 +159,6 @@
                                         </c:forEach>
                                     </tbody>
                                 </table>
-                            </div>
-                        </div>
-
-                        <!-- HƯ HỎNG ĐÃ GHI NHẬN -->
-                        <div class="card">
-                            <h3 class="section-title">TIỆN NGHI BỊ HƯ HỎNG / MẤT ĐÃ GHI NHẬN</h3>
-                            <div class="table-container">
-                                <c:choose>
-                                    <c:when test="${not empty existingDamages}">
-                                        <table class="data-table amenity-table">
-                                            <thead class="data-table-thead">
-                                                <tr>
-                                                    <th class="col-name">Tiện nghi</th>
-                                                    <th class="col-price">Đơn giá</th>
-                                                    <th class="col-qty">SL hỏng</th>
-                                                    <th class="col-total">Thành tiền</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="data-table-tbody">
-                                                <c:forEach var="dmg" items="${existingDamages}">
-                                                    <tr>
-                                                        <td class="col-name">${dmg.amenityName}</td>
-                                                        <td class="col-price">
-                                                            <fmt:formatNumber value="${dmg.unitPrice}" type="number" pattern="#,###"/> đ
-                                                        </td>
-                                                        <td class="col-qty">${dmg.quantityDamaged}</td>
-                                                        <td class="col-total">
-                                                            <fmt:formatNumber value="${dmg.totalPrice}" type="number" pattern="#,###"/> đ
-                                                        </td>
-                                                    </tr>
-                                                </c:forEach>
-                                            </tbody>
-                                        </table>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <div class="empty-sub-message">Không có hư hỏng / mất mát nào.</div>
-                                    </c:otherwise>
-                                </c:choose>
                             </div>
                         </div>
 
