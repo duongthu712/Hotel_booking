@@ -1,5 +1,5 @@
-/*
- Cấu hình phông chữ sang trọng hệ thống 
+
+/* Cấu hình phông chữ sang trọng hệ thống */
 .request-wrapper, 
 .request-wrapper input, 
 .request-wrapper select, 
@@ -9,14 +9,14 @@
 }
 
 body {
-    background-color: #fcfbf7;  Nền vàng kem nhạt cao cấp 
+    background-color: #fcfbf7; /* Nền vàng kem nhạt cao cấp */
     margin: 0;
     padding: 0;
 }
 
 .request-wrapper {
     width: 100%;
-    max-width: 1200px;  Thu hẹp khung gom cụm nội dung chuẩn UI mẫu 
+    max-width: 1200px; /* Thu hẹp khung gom cụm nội dung chuẩn UI mẫu */
     margin: 40px auto;
     padding: 40px;
     box-sizing: border-box;
@@ -25,7 +25,7 @@ body {
     box-shadow: 0 4px 20px rgba(44, 62, 70, 0.05);
 }
 
- Tiêu đề trang 
+/* Tiêu đề trang */
 .request-header-card h1 {
     color: #2c3e46;
     font-size: 32px;
@@ -39,16 +39,13 @@ body {
     font-size: 15px;
 }
 
- =========================================================================
-   THANH MINI SUMMARY: THIẾT KẾ CARD THON GỌN, SANG TRỌNG (3 CỘT - 2 HÀNG)
-   ========================================================================= 
 .booking-mini-summary {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);  Giữ mảng 3 cột rộng rãi 
-    gap: 16px 40px;  Thắt chặt khoảng cách hàng (16px), nới rộng khoảng cách cột (40px) để thon gọn 
-    background-color: #fcfbf7;  Đổi màu nền thanh tóm tắt tiệp với nền body tạo sự đồng điệu 
+    grid-template-columns: repeat(3, 1fr); /* Giữ mảng 3 cột rộng rãi */
+    gap: 16px 40px; /* Thắt chặt khoảng cách hàng (16px), nới rộng khoảng cách cột (40px) để thon gọn */
+    background-color: #fcfbf7; /* Đổi màu nền thanh tóm tắt tiệp với nền body tạo sự đồng điệu */
     padding: 20px 24px;
-    border: 1px solid #e8e4db;  Đường viền mỏng tinh tế thay cho border thô mặc định 
+    border: 1px solid #e8e4db; /* Đường viền mỏng tinh tế thay cho border thô mặc định */
     border-radius: 6px;
     margin-bottom: 35px;
 }
@@ -56,51 +53,51 @@ body {
 .summary-item {
     display: flex;
     flex-direction: column;
-    gap: 4px;  Thu hẹp khoảng cách nhãn và nội dung 
-    border-right: 1px solid #e8e4db;  Đường kẻ dọc mỏng, tiệp màu viền 
+    gap: 4px; /* Thu hẹp khoảng cách nhãn và nội dung */
+    border-right: 1px solid #e8e4db; /* Đường kẻ dọc mỏng, tiệp màu viền */
     padding-right: 20px;
 }
 
- Khử đường viền kẻ dọc ở cột cuối cùng của mỗi hàng (Cột 3 và Cột 6) 
+/* Khử đường viền kẻ dọc ở cột cuối cùng của mỗi hàng (Cột 3 và Cột 6) */
 .summary-item:nth-child(3),
 .summary-item:nth-child(6) {
     border-right: none;
     padding-right: 0;
 }
 
- Nhãn tiêu đề nhỏ phía trên 
+/* Nhãn tiêu đề nhỏ phía trên */
 .summary-item span {
-    font-size: 11px;  Thu nhỏ tiêu đề xuống một chút 
-    color: #8a94a6;  Tông màu xám trung tính tinh tế 
+    font-size: 11px; /* Thu nhỏ tiêu đề xuống một chút */
+    color: #8a94a6; /* Tông màu xám trung tính tinh tế */
     text-transform: uppercase;
-    letter-spacing: 1px;  Giãn chữ tạo cảm giác cao cấp 
+    letter-spacing: 1px; /* Giãn chữ tạo cảm giác cao cấp */
     font-weight: 500;
 }
 
- Nội dung thông tin đậm phía dưới 
+/* Nội dung thông tin đậm phía dưới */
 .summary-item strong {
     font-size: 14.5px;
-    color: #1e293b;  Tăng tương phản lên màu xám than (gần đen) để chữ sắc nét, không mờ nhạt 
+    color: #1e293b; /* Tăng tương phản lên màu xám than (gần đen) để chữ sắc nét, không mờ nhạt */
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
- Dòng phụ (Số điện thoại, Số lượng phòng) 
+/* Dòng phụ (Số điện thoại, Số lượng phòng) */
 .summary-subtext {
     font-size: 13px !important;
-    color: #64748b !important;  Đẩy tông đậm lên để nhìn rõ nét 
+    color: #64748b !important; /* Đẩy tông đậm lên để nhìn rõ nét */
     font-weight: 400 !important;
     margin-top: 1px;
 }
 
- Điểm nhấn màu vàng thương hiệu đẳng cấp 
+/* Điểm nhấn màu vàng thương hiệu đẳng cấp */
 .text-gold {
-    color: #b39359 !important;  Đổi sang tông vàng Champagne tối, lì và sang hơn màu cũ 
+    color: #b39359 !important; /* Đổi sang tông vàng Champagne tối, lì và sang hơn màu cũ */
     font-weight: 700 !important;
 }
- Bố cục cấu trúc khối nội dung 1 cột phẳng phía dưới 
+/* Bố cục cấu trúc khối nội dung 1 cột phẳng phía dưới */
 .request-layout {
     width: 100%;
     display: flex;
@@ -122,7 +119,7 @@ body {
     color: #ef4444;
 }
 
- Lựa chọn loại yêu cầu bằng ô thẻ ma trận 3 cột trải ngang 
+/* Lựa chọn loại yêu cầu bằng ô thẻ ma trận 3 cột trải ngang */
 .request-type-options {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -175,12 +172,12 @@ body {
     box-shadow: 0 4px 12px rgba(44, 62, 70, 0.05);
 }
 
-.type-card-option:has(input[type="radio"]:checked) {
+.type-card-option.active-card {
     border: 1px solid #2c3e46 !important;
     background-color: #f4f6f7;
 }
 
- Phân chia bố cục hai cột bên trong mỗi tab chức năng (Trái điền form - Phải lý do & lưu ý) 
+/* Phân chia bố cục hai cột bên trong mỗi tab chức năng (Trái điền form - Phải lý do & lưu ý) */
 .tab-content-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -188,7 +185,7 @@ body {
     align-items: flex-start;
 }
 
- Các thành phần Form nhập liệu 
+/* Các thành phần Form nhập liệu */
 .form-group {
     margin-bottom: 20px;
 }
@@ -228,7 +225,7 @@ textarea {
     resize: none;
 }
 
- Hộp thông tin chi phí biến động (Bảng nhỏ góc dưới bên trái) 
+/* Hộp thông tin chi phí biến động (Bảng nhỏ góc dưới bên trái) */
 .info-price-table {
     background-color: #f8fafc;
     border: 1px solid #e2e8f0;
@@ -251,7 +248,7 @@ textarea {
     font-weight: 700;
 }
 
- Hộp thông báo lưu ý màu xanh nhẹ tinh tế 
+/* Hộp thông báo lưu ý màu xanh nhẹ tinh tế */
 .info-alert-box {
     background-color: #f0f4f8;
     border-left: 4px solid #2c3e46;
@@ -262,7 +259,7 @@ textarea {
     line-height: 1.5;
 }
 
- Nút Submit căn giữa dưới cùng 
+/* Nút Submit căn giữa dưới cùng */
 .form-actions {
     display: flex;
     justify-content: center;
@@ -270,7 +267,7 @@ textarea {
 }
 
 .btn-submit-request {
-    width: 200px;  Thu gọn vừa vặn tay bấm 
+    width: 200px; /* Thu gọn vừa vặn tay bấm */
     padding: 14px;
     background-color: #2c3e46;
     color: #ffffff;
@@ -288,7 +285,7 @@ textarea {
     background-color: #1a272c;
 }
 
- Khối banner hiển thị trạng thái lỗi hệ thống hoặc hết phòng từ Server (Không dùng icon) 
+/* Khối banner hiển thị trạng thái lỗi hệ thống hoặc hết phòng từ Server (Không dùng icon) */
 .error-status-banner {
     background-color: #fff5f5;
     color: #b91c1c;
@@ -308,18 +305,18 @@ textarea {
     font-family: 'Cormorant Garamond', 'Lora', serif !important;
 }
 
- Tinh chỉnh riêng cho nút bấm của popup thêm sắc nét và đồng bộ La Mer 
+/* Tinh chỉnh riêng cho nút bấm của popup thêm sắc nét và đồng bộ La Mer */
 .swal2-confirm, 
 .swal2-cancel {
     letter-spacing: 1px !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
 }
- Trạng thái làm mờ khi chưa cọc 
+/* Trạng thái làm mờ khi chưa cọc */
 .disabled-option {
     opacity: 0.5 !important;
     cursor: not-allowed !important;
-    pointer-events: none !important;  Chặn click 
+    pointer-events: none !important; /* Chặn click */
 }
 
 .disabled-option .card-content strong {
@@ -330,7 +327,7 @@ textarea {
     color: #cbd5e1;
 }
 
- Đảm bảo radio button cũng bị vô hiệu hóa thị giác 
+/* Đảm bảo radio button cũng bị vô hiệu hóa thị giác */
 .disabled-option input[type="radio"] {
     cursor: not-allowed;
-}*/
+}
