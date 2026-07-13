@@ -19,7 +19,7 @@
 
     <% if ("MANAGER".equals(role)) { %>
 
-    <a href="${pageContext.request.contextPath}/view/manager/dashboard.jsp">Tổng quan</a>
+    <a href="${pageContext.request.contextPath}/ManagerDashboard">Tổng quan</a>
     <a href="${pageContext.request.contextPath}/HotelInfo">Thông tin chung</a>
     <a href="${pageContext.request.contextPath}/roomtypelist">Loại phòng</a>
     <a href="${pageContext.request.contextPath}/RoomList">Phòng</a>
@@ -27,7 +27,7 @@
     <a href="${pageContext.request.contextPath}/RoomAmenityList">Tiện nghi phòng</a>
     <a href="${pageContext.request.contextPath}/HotelServiceList">Dịch vụ khách sạn</a>
     <a href="${pageContext.request.contextPath}/PolicyList">Chính sách</a>
-    <a href="${pageContext.request.contextPath}/FeedbackList">Đánh giá</a>
+    <a href="${pageContext.request.contextPath}/feedback-list">Đánh giá</a>
     <%}else if("RECEPTIONIST".equals(role)){%>
     <a href="${pageContext.request.contextPath}/receptionist-dashboard">Tổng quan</a>
     <a href="${pageContext.request.contextPath}/assign-room">Sơ đồ phòng</a>

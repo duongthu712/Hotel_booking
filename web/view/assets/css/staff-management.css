@@ -10,7 +10,6 @@
     
 }
 
-
 .btn-filter {
     background-color: var(--text-main);
     color: #ffffff;
@@ -38,10 +37,12 @@
 
 .col-username {
     width: 15%;
+    text-align: left;
 }
 
 .col-email {
     width: 20%;
+    text-align: left;
 }
 
 .col-phone {

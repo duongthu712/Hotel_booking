@@ -3,14 +3,12 @@
     Author     : LinhLTHE200306
 */
 
-/* Căn giữa TẤT CẢ th và td trong checkout-table */
 .checkout-table th,
 .checkout-table td {
     text-align: center;
     vertical-align: middle;
 }
 
-/* Cột tên khách CĂN TRÁI (ghi đè lại) */
 .checkout-table .col-guest,
 .checkout-table td.col-guest {
     text-align: left;
@@ -120,8 +118,6 @@
 }
 
 .booking-code {
-    font-size: 1.6rem;
-    font-weight: 700;
     color: var(--text-main);
 }
 

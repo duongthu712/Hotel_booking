@@ -270,6 +270,28 @@
         <servlet-class>controller.StaffBookingDetailController</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>ManagerDashboardController</servlet-name>
+        <servlet-class>controller.ManagerDashboardController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>MDashboardPDFController</servlet-name>
+        <servlet-class>controller.MDashboardPDFController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PolicyListController</servlet-name>
+        <servlet-class>controller.PolicyListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PolicyCreateController</servlet-name>
+        <servlet-class>controller.PolicyCreateController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PolicyEditController</servlet-name>
+        <servlet-class>controller.PolicyEditController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PolicyDeleteController</servlet-name>
+        <servlet-class>controller.PolicyDeleteController</servlet-class>
         <servlet-name>ProcessRequestController</servlet-name>
         <servlet-class>controller.ProcessRequestController</servlet-class>
     </servlet>
@@ -534,6 +556,28 @@
         <url-pattern>/staff-booking-detail</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+        <servlet-name>ManagerDashboardController</servlet-name>
+        <url-pattern>/ManagerDashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MDashboardPDFController</servlet-name>
+        <url-pattern>/MDashboardPDF</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PolicyListController</servlet-name>
+        <url-pattern>/PolicyList</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PolicyCreateController</servlet-name>
+        <url-pattern>/PolicyCreate</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PolicyEditController</servlet-name>
+        <url-pattern>/PolicyEdit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PolicyDeleteController</servlet-name>
+        <url-pattern>/PolicyDelete</url-pattern>
         <servlet-name>ProcessRequestController</servlet-name>
         <url-pattern>/process-request</url-pattern>
     </servlet-mapping>
