@@ -86,7 +86,8 @@ public class AuthorizationFilter implements Filter {
             "/FeedbackList",
             "/HotelNewsCreate",
             "/HotelNewsEdit",
-            "/HotelNewsDelete"
+            "/HotelNewsDelete",
+            "/feedback-management"
     );
 
     private final Set<String> receptionistServletUrls = Set.of(
@@ -97,7 +98,8 @@ public class AuthorizationFilter implements Filter {
             "/Checkout",
             "/InvoiceCreate",
             "/InvoicePDF",
-            "/BillingList"
+            "/BillingList",
+            "/booking-list"
     );
 
     @Override
