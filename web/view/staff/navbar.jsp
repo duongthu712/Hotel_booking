@@ -27,7 +27,7 @@
     <a href="${pageContext.request.contextPath}/RoomAmenityList">Tiện nghi phòng</a>
     <a href="${pageContext.request.contextPath}/HotelServiceList">Dịch vụ khách sạn</a>
     <a href="${pageContext.request.contextPath}/PolicyList">Chính sách</a>
-<!--    <a href="${pageContext.request.contextPath}/feedback-list">Đánh giá</a>-->
+    <a href="${pageContext.request.contextPath}/feedback-management">Đánh giá</a>
     <%}else if("RECEPTIONIST".equals(role)){%>
     <a href="${pageContext.request.contextPath}/receptionist-dashboard">Tổng quan</a>
     <a href="${pageContext.request.contextPath}/assign-room">Sơ đồ phòng</a>
