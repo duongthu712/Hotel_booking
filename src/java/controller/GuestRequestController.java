@@ -75,7 +75,7 @@ public class GuestRequestController extends HttpServlet {
             throws ServletException, IOException {
 
         try {
-            // Lấy tham số chung (GIỮ NGUYÊN HOÀN TOÀN)
+            // Lấy tham số chung 
             int bookingId = Integer.parseInt(request.getParameter("bookingId"));
             int guestId = Integer.parseInt(request.getParameter("guestId"));
             String requestType = request.getParameter("requestType");

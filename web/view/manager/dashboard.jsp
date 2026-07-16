@@ -120,7 +120,7 @@ Editor     : LinhLTHE200306
                 <div class="panel">
                     <div class="panel-header">
                         <h4 class="section-title">Đánh giá gần đây</h4>
-                        <a href="${pageContext.request.contextPath}/feedback-list" class="view-all-link">Xem tất cả</a>
+                        <a href="${pageContext.request.contextPath}/feedback-management" class="view-all-link">Xem tất cả</a>
                     </div>
                     <table class="data-table dashboard-table">
                         <thead>

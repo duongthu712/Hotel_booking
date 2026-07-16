@@ -87,7 +87,8 @@ public class AuthorizationFilter implements Filter {
             "/HotelNewsCreate",
             "/HotelNewsEdit",
             "/HotelNewsDelete",
-            "/feedback-management"
+            "/feedback-management",
+            "/booking-list"
     );
 
     private final Set<String> receptionistServletUrls = Set.of(
