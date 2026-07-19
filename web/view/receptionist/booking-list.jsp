@@ -184,15 +184,51 @@
                                 </td>
 
                                 <td>
-                                    <span class="badge status-badge" data-status="${b.bookingStatus}">
-                                        ${b.bookingStatus}
-                                    </span>
+                                    <c:choose>
+                                        <c:when test="${b.bookingStatus == 'Chờ xử lý'}">
+                                            <span class="badge status-pending">${b.bookingStatus}</span>
+                                        </c:when>
+
+                                        <c:when test="${b.bookingStatus == 'Đã xác nhận'}">
+                                            <span class="badge status-confirmed">${b.bookingStatus}</span>
+                                        </c:when>
+
+                                        <c:when test="${b.bookingStatus == 'Đã nhận phòng'}">
+                                            <span class="badge status-checked-in">${b.bookingStatus}</span>
+                                        </c:when>
+
+                                        <c:when test="${b.bookingStatus == 'Đã trả phòng'}">
+                                            <span class="badge status-checked-out">${b.bookingStatus}</span>
+                                        </c:when>
+
+                                        <c:when test="${b.bookingStatus == 'Đã hủy'}">
+                                            <span class="badge status-cancelled">${b.bookingStatus}</span>
+                                        </c:when>
+
+                                        <c:otherwise>
+                                            <span class="badge status-default">${b.bookingStatus}</span>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </td>
 
                                 <td>
-                                    <span class="badge payment-badge" data-payment="${b.paymentStatus}">
-                                        ${b.paymentStatus}
-                                    </span>
+                                    <c:choose>
+                                        <c:when test="${b.paymentStatus == 'Chưa thanh toán'}">
+                                            <span class="badge payment-unpaid">${b.paymentStatus}</span>
+                                        </c:when>
+
+                                        <c:when test="${b.paymentStatus == 'Đã đặt cọc'}">
+                                            <span class="badge payment-deposit">${b.paymentStatus}</span>
+                                        </c:when>
+
+                                        <c:when test="${b.paymentStatus == 'Đã thanh toán'}">
+                                            <span class="badge payment-paid">${b.paymentStatus}</span>
+                                        </c:when>
+
+                                        <c:otherwise>
+                                            <span class="badge payment-default">${b.paymentStatus}</span>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </td>
 
                                 <td>

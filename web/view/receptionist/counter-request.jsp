@@ -365,15 +365,15 @@
 
                                     <select name="cancelRooms" id="cancelRoomsSelect">
                                         <c:forEach begin="1" end="${booking.numRooms}" var="n">
-                                            <option value="${n}">
-                                            <c:choose>
-                                                <c:when test="${n == booking.numRooms}">
-                                                    Hủy ${n} phòng - Hủy toàn bộ booking
-                                                </c:when>
-                                                <c:otherwise>
-                                                    Hủy ${n} phòng, giữ lại ${booking.numRooms - n} phòng
-                                                </c:otherwise>
-                                            </c:choose>
+                                            <option value="${n}" ${n == selectedCancelRooms ? 'selected' : ''}>
+                                                <c:choose>
+                                                    <c:when test="${n == booking.numRooms}">
+                                                        Hủy ${n} phòng - Hủy toàn bộ booking
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        Hủy ${n} phòng, giữ lại ${booking.numRooms - n} phòng
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </option>
                                         </c:forEach>
                                     </select>
