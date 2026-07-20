@@ -511,34 +511,49 @@ public class BookingDAO extends DBContext {
 
     public boolean updateExpectedCheckInTime(int bookingId, String expectedTimeStr, String note) {
         String sql = """
-                     UPDATE Bookings 
-                     SET expected_checkin_time = ?,
-                         auto_cancel_deadline = CASE 
-                             WHEN CAST(? AS TIME) >= '18:00:00' THEN CAST(CAST(checkin_date AS VARCHAR(10)) + ' 23:59:00' AS DATETIME)
-                             ELSE auto_cancel_deadline
-                         END,
-                         cancellation_reason = ? 
-                     WHERE booking_id = ?
-                     """;
+        UPDATE Bookings
+        SET expected_checkin_time = ?,
+            auto_cancel_deadline =
+                CASE
+                    WHEN ? IS NULL
+                        THEN CAST(CAST(checkin_date AS VARCHAR(10)) + ' 18:00:00' AS DATETIME)
+                    WHEN CAST(? AS TIME) >= '18:00:00'
+                        THEN CAST(CAST(checkin_date AS VARCHAR(10)) + ' 23:59:00' AS DATETIME)
+                    ELSE
+                        CAST(CAST(checkin_date AS VARCHAR(10)) + ' 18:00:00' AS DATETIME)
+                END,
+            cancellation_reason = ?
+        WHERE booking_id = ?
+        """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
             if (expectedTimeStr != null && !expectedTimeStr.trim().isEmpty()) {
-                ps.setTime(1, java.sql.Time.valueOf(expectedTimeStr + ":00"));
-                ps.setString(2, expectedTimeStr + ":00");
+                java.sql.Time time = java.sql.Time.valueOf(expectedTimeStr + ":00");
+
+                ps.setTime(1, time);     // expected_checkin_time
+                ps.setTime(2, time);     // ? IS NULL
+                ps.setTime(3, time);     // CAST(? AS TIME)
             } else {
                 ps.setNull(1, java.sql.Types.TIME);
-                ps.setNull(2, java.sql.Types.VARCHAR);
+                ps.setNull(2, java.sql.Types.TIME);
+                ps.setNull(3, java.sql.Types.TIME);
             }
-            ps.setNString(3, note != null ? note.trim() : null);
-            ps.setInt(4, bookingId);
+
+            ps.setNString(4, note != null ? note.trim() : null);
+            ps.setInt(5, bookingId);
 
             return ps.executeUpdate() > 0;
+
         } catch (Exception e) {
             System.out.println("Lỗi updateExpectedCheckInTime: " + e.getMessage());
+            e.printStackTrace();
         }
+
         return false;
     }
 
+    //Hàm tự động hủy đơn 
     public int autoCancelExpiredBookings() {
         String sql = """
                      UPDATE Bookings 
@@ -1737,14 +1752,14 @@ public class BookingDAO extends DBContext {
                 + " FROM RoomTypes "
                 + " WHERE room_type_id = ? "
                 + "   AND is_active = 1 ";
-        
+
         String updateBookingSql = ""
                 + " UPDATE Bookings "
                 + " SET room_type_id = ?, "
                 + "     booked_price_per_night = ? "
                 + " WHERE booking_id = ? "
                 + "   AND [status] = N'Đã xác nhận' ";
-        
+
         String insertRequestSql = ""
                 + " INSERT INTO GuestRequests ( "
                 + "     booking_id, guest_id, request_type, request_details, target_room_type_id, "
