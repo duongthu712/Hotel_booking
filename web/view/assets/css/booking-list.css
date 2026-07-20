@@ -116,6 +116,7 @@ body {
     border-radius: 8px;
     border-top: 1px solid #ddd7cb;
     border-bottom: 1px solid #ddd7cb;
+    padding-bottom: 12px;
 }
 
 .booking-table {
@@ -254,10 +255,11 @@ body {
    BADGE
 ========================= */
 
-.badge,
-.status-badge,
-.source-badge,
-.payment-badge {
+/* =========================
+   BADGE
+========================= */
+
+.badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -269,8 +271,10 @@ body {
     font-weight: 700;
     line-height: 1.08;
     white-space: nowrap;
+    border: 1px solid transparent;
 }
 
+/* Nguồn */
 .source-online {
     color: #073763;
     background: #e3edf5;
@@ -283,39 +287,63 @@ body {
     border: 1px solid #f1d99d;
 }
 
-.status-badge[data-status="Chờ xử lý"] {
+/* Trạng thái booking */
+.status-pending {
     color: #c8750b;
     background: #fff4df;
     border: 1px solid #f2c978;
 }
 
-.status-badge[data-status="Đã xác nhận"] {
+.status-confirmed {
     color: #073763;
     background: #dfedf9;
     border: 1px solid #c1d7ec;
 }
 
-.status-badge[data-status="Đã nhận phòng"],
-.payment-badge[data-payment="Đã thanh toán"] {
+.status-checked-in {
     color: #14843b;
     background: #e0f5e8;
     border: 1px solid #b9e1c8;
 }
 
-.status-badge[data-status="Đã trả phòng"] {
+.status-checked-out {
     color: #6e3aa8;
     background: #eee5fb;
     border: 1px solid #dac6f2;
 }
 
-.status-badge[data-status="Đã hủy"],
-.payment-badge[data-payment="Chưa thanh toán"] {
+.status-cancelled {
     color: #d83d4a;
     background: #ffe7ea;
     border: 1px solid #f6b9c0;
 }
 
-.payment-badge[data-payment="Đã đặt cọc"] {
+.status-default {
+    color: #073763;
+    background: #dfedf9;
+    border: 1px solid #c1d7ec;
+}
+
+/* Thanh toán */
+.payment-unpaid {
+    color: #d83d4a;
+    background: #ffe7ea;
+    border: 1px solid #f6b9c0;
+}
+
+.payment-deposit {
+    color: #073763;
+    background: #dfedf9;
+    border: 1px solid #c1d7ec;
+}
+
+.payment-paid {
+    color: #14843b;
+    background: #e0f5e8;
+    border: 1px solid #b9e1c8;
+}
+
+.payment-default {
     color: #073763;
     background: #dfedf9;
     border: 1px solid #c1d7ec;
@@ -332,10 +360,12 @@ body {
 
 .request.waiting {
     color: #d66b00;
+    font-weight: 700;
 }
 
 .request.approved {
     color: #15913a;
+    font-weight: 700;
 }
 
 /* =========================
@@ -415,6 +445,7 @@ body {
     top: 38px;
     bottom: auto;
     min-width: 190px;
+    max-height: 220px;
     background: #fffaf2;
     border: 1px solid #dccdb8;
     border-radius: 8px;
@@ -430,14 +461,6 @@ body {
 .request-action-wrap.open-up .request-action-menu {
     top: auto;
     bottom: calc(100% + 6px);
-}
-
-.booking-table-wrap {
-    padding-bottom: 12px;
-}
-
-.request-action-menu {
-    max-height: 220px;
 }
 
 .request-action-menu a {
@@ -631,3 +654,4 @@ body.modal-open {
         width: 100%;
     }
 }
+
