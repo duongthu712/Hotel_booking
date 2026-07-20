@@ -46,6 +46,13 @@ public class BookingListController extends HttpServlet {
             }
         }
 
+        /*
+         * QUAN TRỌNG:
+         * Không đọc request.getParameter("staffId") nữa.
+         * Vì staffId có thể bị trùng với ID nhân viên đăng nhập.
+         *
+         * Filter nhân viên chỉ đọc từ filterStaffId.
+         */
         String filterStaffId = clean(request.getParameter("filterStaffId"));
         if (filterStaffId == null || filterStaffId.equalsIgnoreCase("all")) {
             filterStaffId = "all";

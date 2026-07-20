@@ -26,7 +26,7 @@
                     <h2>
                         <c:choose>
                             <c:when test="${requestType == 'extend'}">GIA HẠN NGÀY Ở</c:when>
-                            <c:when test="${requestType == 'upgrade'}">THAY ĐỔI HẠNG PHÒNG</c:when>
+                            <c:when test="${requestType == 'upgrade'}">NÂNG CẤP HẠNG PHÒNG</c:when>
                             <c:when test="${requestType == 'cancel'}">YÊU CẦU HỦY BOOKING</c:when>
                             <c:otherwise>YÊU CẦU KHÁC</c:otherwise>
                         </c:choose>
@@ -365,15 +365,15 @@
 
                                     <select name="cancelRooms" id="cancelRoomsSelect">
                                         <c:forEach begin="1" end="${booking.numRooms}" var="n">
-                                            <option value="${n}" ${n == selectedCancelRooms ? 'selected' : ''}>
-                                                <c:choose>
-                                                    <c:when test="${n == booking.numRooms}">
-                                                        Hủy ${n} phòng - Hủy toàn bộ booking
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        Hủy ${n} phòng, giữ lại ${booking.numRooms - n} phòng
-                                                    </c:otherwise>
-                                                </c:choose>
+                                            <option value="${n}">
+                                            <c:choose>
+                                                <c:when test="${n == booking.numRooms}">
+                                                    Hủy ${n} phòng - Hủy toàn bộ booking
+                                                </c:when>
+                                                <c:otherwise>
+                                                    Hủy ${n} phòng, giữ lại ${booking.numRooms - n} phòng
+                                                </c:otherwise>
+                                            </c:choose>
                                             </option>
                                         </c:forEach>
                                     </select>
