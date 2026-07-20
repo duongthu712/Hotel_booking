@@ -292,7 +292,7 @@
                                                         <a class="js-counter-request"
                                                            href="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=upgrade"
                                                            data-url="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=upgrade">
-                                                            Nâng cấp hạng phòng
+                                                            Thay đổi hạng phòng
                                                         </a>
                                                     </c:if>
 

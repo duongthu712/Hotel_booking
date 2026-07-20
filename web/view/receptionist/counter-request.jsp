@@ -26,7 +26,7 @@
                     <h2>
                         <c:choose>
                             <c:when test="${requestType == 'extend'}">GIA HẠN NGÀY Ở</c:when>
-                            <c:when test="${requestType == 'upgrade'}">NÂNG CẤP HẠNG PHÒNG</c:when>
+                            <c:when test="${requestType == 'upgrade'}">THAY ĐỔI HẠNG PHÒNG</c:when>
                             <c:when test="${requestType == 'cancel'}">YÊU CẦU HỦY BOOKING</c:when>
                             <c:otherwise>YÊU CẦU KHÁC</c:otherwise>
                         </c:choose>
