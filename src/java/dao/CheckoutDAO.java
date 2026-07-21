@@ -706,7 +706,6 @@ public class CheckoutDAO extends DBContext {
         return null;
     }
 
-    
     /**
      * Lấy danh sách phòng đã checkout với checkout_at
      */
@@ -733,14 +732,13 @@ public class CheckoutDAO extends DBContext {
     }
 
     /**
-     * Tính lại TOÀN BỘ room_charges gồm 2 phần:
-     * 1) Phòng ĐÃ THỰC SỰ checkout: tính đúng theo checkout_at thực tế
-     *    (số đêm thực tế + phụ phí trễ giờ nếu có).
-     * 2) Phòng ĐÃ ASSIGN nhưng CHƯA checkout: tạm tính theo giá ước tính ban đầu
-     *    (số đêm dự kiến theo booking)
-     * (Phòng chưa từng assign - coi như đã huỷ )
-     * Dùng để GHI ĐÈ Invoices.room_charges trong processCheckout, tránh
-     * cộng dồn lên trên giá trị ước tính ban đầu gây tính tiền phòng 2 lần.
+     * Tính lại TOÀN BỘ room_charges gồm 2 phần: 1) Phòng ĐÃ THỰC SỰ checkout:
+     * tính đúng theo checkout_at thực tế (số đêm thực tế + phụ phí trễ giờ nếu
+     * có). 2) Phòng ĐÃ ASSIGN nhưng CHƯA checkout: tạm tính theo giá ước tính
+     * ban đầu (số đêm dự kiến theo booking) (Phòng chưa từng assign - coi như
+     * đã huỷ ) Dùng để GHI ĐÈ Invoices.room_charges trong processCheckout,
+     * tránh cộng dồn lên trên giá trị ước tính ban đầu gây tính tiền phòng 2
+     * lần.
      */
     private BigDecimal recalcRoomChargesForBooking(int bookingId, Booking booking) throws Exception {
         List<Map<String, Object>> checkedOutRooms = getCheckedOutRoomDetails(bookingId);
@@ -780,7 +778,6 @@ public class CheckoutDAO extends DBContext {
         return total;
     }
 
-    
     public double lateCheckoutSurcharge(LocalDateTime expectedCheckout,
             LocalDateTime actualCheckout, double roomPricePerNight) {
         if (actualCheckout == null || expectedCheckout == null) {
@@ -1164,20 +1161,23 @@ public class CheckoutDAO extends DBContext {
             recalculateInvoice(bookingId);
 
             // ========== 10. Nếu remaining <= 0 → đánh dấu đã thanh toán ==========
-            String checkRemainingSql = "select remaining_amount from Invoices where invoice_id = ?";
-            try (PreparedStatement stm = connection.prepareStatement(checkRemainingSql)) {
-                stm.setInt(1, invoice.getInvoiceId());
-                try (ResultSet rs = stm.executeQuery()) {
-                    if (rs.next() && rs.getBigDecimal("remaining_amount").compareTo(BigDecimal.ZERO) <= 0) {
-                        String paidSql = "update Invoices set payment_status = N'Đã thanh toán' where invoice_id = ?";
-                        try (PreparedStatement ps = connection.prepareStatement(paidSql)) {
-                            ps.setInt(1, invoice.getInvoiceId());
-                            ps.executeUpdate();
-                        }
-                        String bookingPaidSql = "update Bookings set payment_status = N'Đã thanh toán' where booking_id = ?";
-                        try (PreparedStatement ps = connection.prepareStatement(bookingPaidSql)) {
-                            ps.setInt(1, bookingId);
-                            ps.executeUpdate();
+            if (isLastCheckout) {
+                String checkRemainingSql = "select remaining_amount from Invoices where invoice_id = ?";
+
+                try (PreparedStatement stm = connection.prepareStatement(checkRemainingSql)) {
+                    stm.setInt(1, invoice.getInvoiceId());
+                    try (ResultSet rs = stm.executeQuery()) {
+                        if (rs.next() && rs.getBigDecimal("remaining_amount").compareTo(BigDecimal.ZERO) <= 0) {
+                            String paidSql = "update Invoices set payment_status = N'Đã thanh toán' where invoice_id = ?";
+                            try (PreparedStatement ps = connection.prepareStatement(paidSql)) {
+                                ps.setInt(1, invoice.getInvoiceId());
+                                ps.executeUpdate();
+                            }
+                            String bookingPaidSql = "update Bookings set payment_status = N'Đã thanh toán' where booking_id = ?";
+                            try (PreparedStatement ps = connection.prepareStatement(bookingPaidSql)) {
+                                ps.setInt(1, bookingId);
+                                ps.executeUpdate();
+                            }
                         }
                     }
                 }
@@ -1510,22 +1510,28 @@ public class CheckoutDAO extends DBContext {
 
     public Map<String, Object> getInvoiceDetailById(int invoiceId) throws Exception {
         String sql = """
-                select i.*, b.booking_code, b.status as booking_status, sa.full_name as staff_name
-                from Invoices i
-                join Bookings b on i.booking_id = b.booking_id
-                left join StaffAccounts sa on i.created_by = sa.staff_id
-                where i.invoice_id = ?
-                """;
+            select i.*, b.booking_code, b.status as booking_status, sa.full_name as staff_name
+            from Invoices i
+            join Bookings b on i.booking_id = b.booking_id
+            left join StaffAccounts sa on i.created_by = sa.staff_id
+            where i.invoice_id = ?
+            """;
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, invoiceId);
             try (ResultSet rs = stm.executeQuery()) {
                 if (rs.next()) {
+                    int bookingId = rs.getInt("booking_id");
                     Map<String, Object> map = new HashMap<>();
                     map.put("invoice", mapInvoice(rs));
                     map.put("bookingCode", rs.getString("booking_code"));
                     map.put("bookingStatus", rs.getString("booking_status"));
                     map.put("staffName", rs.getString("staff_name"));
                     map.put("payments", getInvoicePaymentsByInvoiceId(invoiceId));
+
+                    // ✅ THÊM 2 DÒNG NÀY ĐỂ LẤY CHI TIẾT DỊCH VỤ VÀ HƯ HỎNG
+                    map.put("services", getBookingServicesWithNameByBookingId(bookingId));
+                    map.put("damages", getRoomAmenityDamagesWithNameByBookingId(bookingId));
+
                     return map;
                 }
             }

@@ -293,6 +293,7 @@ public class InvoiceCreateController extends HttpServlet {
                 }
             }
 
+            dao.recalculateInvoice(bookingId);
             session.removeAttribute("checkoutRoomId_" + bookingId);
             session.removeAttribute("checkoutRoomCount_" + bookingId);
 
@@ -306,3 +307,4 @@ public class InvoiceCreateController extends HttpServlet {
         }
     }
 }
+
