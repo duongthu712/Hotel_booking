@@ -30,17 +30,19 @@
                 </c:if>
 
                 <div class="filter-bar-container">
-                    <div class="filter-group room-type-width">
-                        <label for="filterRoomTypeName">Hạng phòng:</label>
-                        <select name="filterRoomTypeName" id="filterRoomTypeName">
-                            <option value="all">Tất cả hạng phòng</option>
-                            <c:forEach items="${activeRoomTypes}" var="typeName">
-                                <option value="${typeName}" ${param.filterRoomTypeName eq typeName ? 'selected' : ''}>
-                                    ${typeName}
-                                </option>
-                            </c:forEach>
-                        </select>
-                    </div>
+                    <c:if test="${empty targetBookingId}">
+                        <div class="filter-group room-type-width">
+                            <label for="filterRoomTypeName">Hạng phòng:</label>
+                            <select name="filterRoomTypeName" id="filterRoomTypeName">
+                                <option value="all">Tất cả hạng phòng</option>
+                                <c:forEach items="${activeRoomTypes}" var="typeName">
+                                    <option value="${typeName}" ${param.filterRoomTypeName eq typeName ? 'selected' : ''}>
+                                        ${typeName}
+                                    </option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                    </c:if>
 
                     <div class="filter-group floor-width">
                         <label for="filterFloor">Tầng:</label>

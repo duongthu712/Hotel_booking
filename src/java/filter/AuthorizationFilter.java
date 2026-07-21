@@ -78,7 +78,8 @@ public class AuthorizationFilter implements Filter {
                 "/feedback-list",
                 "/feedback-submission",
                 "/submit-feedback",
-                "/policies"
+                "/policies",
+                "/guest-request"
         );
     }
 
@@ -220,7 +221,6 @@ public class AuthorizationFilter implements Filter {
                 // Counter and walk-in workflows
                 "/counter-request",
                 "/walk-in-booking",
-                "/guest-request",
                 "/processrequest",
                 "/process-request",
                 "/request-processing",
@@ -275,8 +275,8 @@ public class AuthorizationFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
+//        request.setCharacterEncoding("UTF-8");
+//        response.setCharacterEncoding("UTF-8");
 
         String path = getNormalizedRequestPath(request);
 
