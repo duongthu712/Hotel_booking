@@ -133,162 +133,198 @@
                     </thead>
 
                     <tbody>
-                    <c:choose>
-                        <c:when test="${empty bookingList}">
-                            <tr>
-                                <td colspan="13" class="empty-row">Không có dữ liệu đặt phòng.</td>
-                            </tr>
-                        </c:when>
-
-                        <c:otherwise>
-                            <c:forEach var="b" items="${bookingList}" varStatus="loop">
+                        <c:choose>
+                            <c:when test="${empty bookingList}">
                                 <tr>
-                                    <td>${(currentPage - 1) * pageSize + loop.index + 1}</td>
-
-                                    <td>
-                                        <a class="booking-code js-booking-detail"
-                                           href="${pageContext.request.contextPath}/staff-booking-detail?bookingId=${b.bookingId}"
-                                           data-url="${pageContext.request.contextPath}/staff-booking-detail?bookingId=${b.bookingId}">
-                                            ${b.bookingCode}
-                                        </a>
-                                    </td>
-
-                                    <td>${b.guestName}</td>
-
-                                    <td>${b.roomTypeName}</td>
-
-                                    <td>
-                                <c:choose>
-                                    <c:when test="${not empty b.roomNumbers && b.roomNumbers != 'Chưa gán'}">
-                                        ${b.roomNumbers}
-                                    </c:when>
-                                    <c:otherwise>
-                                        Chưa gán
-                                    </c:otherwise>
-                                </c:choose>
-                                </td>
-
-                                <td>${b.checkinDateText}</td>
-
-                                <td>${b.checkoutDateText}</td>
-
-                                <td>
-                                <c:choose>
-                                    <c:when test="${b.source == 'Đặt phòng trực tuyến'}">
-                                        <span class="badge source-online">Online</span>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <span class="badge source-counter">Tại quầy</span>
-                                    </c:otherwise>
-                                </c:choose>
-                                </td>
-
-                                <td>
-                                    <span class="badge status-badge" data-status="${b.bookingStatus}">
-                                        ${b.bookingStatus}
-                                    </span>
-                                </td>
-
-                                <td>
-                                    <span class="badge payment-badge" data-payment="${b.paymentStatus}">
-                                        ${b.paymentStatus}
-                                    </span>
-                                </td>
-
-                                <td>
-                                <c:choose>
-                                    <c:when test="${b.pendingRequestCount > 0}">
-                                        <span class="request waiting">
-                                            ${b.pendingRequestCount} yêu cầu / Chờ xử lý
-                                        </span>
-                                    </c:when>
-                                    <c:when test="${not empty b.latestRequestType}">
-                                        <span class="request approved">
-                                            ${b.latestRequestType} / ${b.latestRequestStatus}
-                                        </span>
-                                    </c:when>
-                                    <c:otherwise>
-                                        Không có
-                                    </c:otherwise>
-                                </c:choose>
-                                </td>
-
-                                <td>${b.staffName}</td>
-
-                                <td class="action-cell">
-                                <c:set var="isPending" value="${b.bookingStatus == 'Chờ xử lý'}" />
-                                <c:set var="isConfirmed" value="${b.bookingStatus == 'Đã xác nhận'}" />
-                                <c:set var="isCheckedIn" value="${b.bookingStatus == 'Đã nhận phòng'}" />
-                                <c:set var="isCheckedOut" value="${b.bookingStatus == 'Đã trả phòng'}" />
-                                <c:set var="isCancelled" value="${b.bookingStatus == 'Đã hủy'}" />
-
-                                <c:set var="canAnyRequest" value="${!isCheckedOut && !isCancelled}" />
-
-                                <c:set var="canExtendRequest" value="${isConfirmed || isCheckedIn}" />
-                                <c:set var="canUpgradeRequest" value="${isConfirmed || isCheckedIn}" />
-                                <c:set var="canCancelRequest" value="${isPending || isConfirmed}" />
-                                <c:set var="canOtherRequest" value="${isConfirmed || isCheckedIn}" />
-
-                                <div class="action-buttons">
-                                    <a class="action-btn detail-btn js-booking-detail"
-                                       href="${pageContext.request.contextPath}/staff-booking-detail?bookingId=${b.bookingId}"
-                                       data-url="${pageContext.request.contextPath}/staff-booking-detail?bookingId=${b.bookingId}">
-                                        Chi tiết
-                                    </a>
-
-                                    <c:choose>
-                                        <c:when test="${canAnyRequest}">
-                                            <div class="request-action-wrap">
-                                                <button type="button" class="action-btn main-btn request-toggle">
-                                                    Yêu cầu
-                                                </button>
-
-                                                <div class="request-action-menu">
-                                                    <c:if test="${canExtendRequest}">
-                                                        <a class="js-counter-request"
-                                                           href="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=extend"
-                                                           data-url="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=extend">
-                                                            Gia hạn ngày ở
-                                                        </a>
-                                                    </c:if>
-
-                                                    <c:if test="${canUpgradeRequest}">
-                                                        <a class="js-counter-request"
-                                                           href="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=upgrade"
-                                                           data-url="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=upgrade">
-                                                            Nâng cấp hạng phòng
-                                                        </a>
-                                                    </c:if>
-
-                                                    <c:if test="${canCancelRequest}">
-                                                        <a class="js-counter-request"
-                                                           href="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=cancel"
-                                                           data-url="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=cancel">
-                                                            Hủy booking
-                                                        </a>
-                                                    </c:if>
-
-                                                    <c:if test="${canOtherRequest}">
-                                                        <a class="js-counter-request"
-                                                           href="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=other"
-                                                           data-url="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=other">
-                                                            Yêu cầu khác
-                                                        </a>
-                                                    </c:if>
-                                                </div>
-                                            </div>
-                                        </c:when>
-
-                                        <c:otherwise>
-                                            <span class="action-btn disabled-btn">Yêu cầu</span>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </div>
-                                </td>
+                                    <td colspan="13" class="empty-row">Không có dữ liệu đặt phòng.</td>
                                 </tr>
-                            </c:forEach>
-                        </c:otherwise>
-                    </c:choose>
+                            </c:when>
+
+                            <c:otherwise>
+                                <c:forEach var="b" items="${bookingList}" varStatus="loop">
+                                    <tr>
+                                        <td>${(currentPage - 1) * pageSize + loop.index + 1}</td>
+
+                                        <td>
+                                            <a class="booking-code js-booking-detail"
+                                               href="${pageContext.request.contextPath}/staff-booking-detail?bookingId=${b.bookingId}"
+                                               data-url="${pageContext.request.contextPath}/staff-booking-detail?bookingId=${b.bookingId}">
+                                                ${b.bookingCode}
+                                            </a>
+                                        </td>
+
+                                        <td>${b.guestName}</td>
+
+                                        <td>${b.roomTypeName}</td>
+
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${not empty b.roomNumbers && b.roomNumbers != 'Chưa gán'}">
+                                                    ${b.roomNumbers}
+                                                </c:when>
+                                                <c:otherwise>
+                                                    Chưa gán
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+
+                                        <td>${b.checkinDateText}</td>
+
+                                        <td>${b.checkoutDateText}</td>
+
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${b.source == 'Đặt phòng trực tuyến'}">
+                                                    <span class="badge source-online">Online</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="badge source-counter">Tại quầy</span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${b.bookingStatus == 'Chờ xử lý'}">
+                                                    <span class="badge status-pending">${b.bookingStatus}</span>
+                                                </c:when>
+
+                                                <c:when test="${b.bookingStatus == 'Đã xác nhận'}">
+                                                    <span class="badge status-confirmed">${b.bookingStatus}</span>
+                                                </c:when>
+
+                                                <c:when test="${b.bookingStatus == 'Đã nhận phòng'}">
+                                                    <span class="badge status-checked-in">${b.bookingStatus}</span>
+                                                </c:when>
+
+                                                <c:when test="${b.bookingStatus == 'Đã trả phòng'}">
+                                                    <span class="badge status-checked-out">${b.bookingStatus}</span>
+                                                </c:when>
+
+                                                <c:when test="${b.bookingStatus == 'Đã hủy'}">
+                                                    <span class="badge status-cancelled">${b.bookingStatus}</span>
+                                                </c:when>
+
+                                                <c:otherwise>
+                                                    <span class="badge status-default">${b.bookingStatus}</span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${b.paymentStatus == 'Chưa thanh toán'}">
+                                                    <span class="badge payment-unpaid">${b.paymentStatus}</span>
+                                                </c:when>
+
+                                                <c:when test="${b.paymentStatus == 'Đã đặt cọc'}">
+                                                    <span class="badge payment-deposit">${b.paymentStatus}</span>
+                                                </c:when>
+
+                                                <c:when test="${b.paymentStatus == 'Đã thanh toán'}">
+                                                    <span class="badge payment-paid">${b.paymentStatus}</span>
+                                                </c:when>
+
+                                                <c:otherwise>
+                                                    <span class="badge payment-default">${b.paymentStatus}</span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${b.pendingRequestCount > 0}">
+                                                    <span class="request waiting">
+                                                        ${b.pendingRequestCount} yêu cầu / Chờ xử lý
+                                                    </span>
+                                                </c:when>
+                                                <c:when test="${not empty b.latestRequestType}">
+                                                    <span class="request approved">
+                                                        ${b.latestRequestType} / ${b.latestRequestStatus}
+                                                    </span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    Không có
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+
+                                        <td>${b.staffName}</td>
+
+                                        <td class="action-cell">
+                                            <c:set var="isPending" value="${b.bookingStatus == 'Chờ xử lý'}" />
+                                            <c:set var="isConfirmed" value="${b.bookingStatus == 'Đã xác nhận'}" />
+                                            <c:set var="isCheckedIn" value="${b.bookingStatus == 'Đã nhận phòng'}" />
+                                            <c:set var="isCheckedOut" value="${b.bookingStatus == 'Đã trả phòng'}" />
+                                            <c:set var="isCancelled" value="${b.bookingStatus == 'Đã hủy'}" />
+
+                                            <c:set var="canAnyRequest" value="${!isCheckedOut && !isCancelled}" />
+
+                                            <c:set var="canExtendRequest" value="${isConfirmed || isCheckedIn}" />
+                                            <c:set var="canUpgradeRequest" value="${isConfirmed}" />
+                                            <c:set var="canCancelRequest" value="${isPending || isConfirmed}" />
+                                            <c:set var="canOtherRequest" value="${isConfirmed || isCheckedIn}" />
+
+                                            <div class="action-buttons">
+                                                <a class="action-btn detail-btn js-booking-detail"
+                                                   href="${pageContext.request.contextPath}/staff-booking-detail?bookingId=${b.bookingId}"
+                                                   data-url="${pageContext.request.contextPath}/staff-booking-detail?bookingId=${b.bookingId}">
+                                                    Chi tiết
+                                                </a>
+
+                                                <c:choose>
+                                                    <c:when test="${canAnyRequest}">
+                                                        <div class="request-action-wrap">
+                                                            <button type="button" class="action-btn main-btn request-toggle">
+                                                                Yêu cầu
+                                                            </button>
+
+                                                            <div class="request-action-menu">
+                                                                <c:if test="${canExtendRequest}">
+                                                                    <a class="js-counter-request"
+                                                                       href="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=extend"
+                                                                       data-url="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=extend">
+                                                                        Gia hạn ngày ở
+                                                                    </a>
+                                                                </c:if>
+
+                                                                <c:if test="${canUpgradeRequest}">
+                                                                    <a class="js-counter-request"
+                                                                       href="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=upgrade"
+                                                                       data-url="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=upgrade">
+                                                                        Thay đổi hạng phòng
+                                                                    </a>
+                                                                </c:if>
+
+                                                                <c:if test="${canCancelRequest}">
+                                                                    <a class="js-counter-request"
+                                                                       href="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=cancel"
+                                                                       data-url="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=cancel">
+                                                                        Hủy booking
+                                                                    </a>
+                                                                </c:if>
+
+                                                                <c:if test="${canOtherRequest}">
+                                                                    <a class="js-counter-request"
+                                                                       href="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=other"
+                                                                       data-url="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=other">
+                                                                        Yêu cầu khác
+                                                                    </a>
+                                                                </c:if>
+                                                            </div>
+                                                        </div>
+                                                    </c:when>
+
+                                                    <c:otherwise>
+                                                        <span class="action-btn disabled-btn">Yêu cầu</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                            </c:otherwise>
+                        </c:choose>
                     </tbody>
                 </table>
             </div>

@@ -75,7 +75,7 @@ public class GuestRequestController extends HttpServlet {
             throws ServletException, IOException {
 
         try {
-            // Lấy tham số chung
+            // Lấy tham số chung 
             int bookingId = Integer.parseInt(request.getParameter("bookingId"));
             int guestId = Integer.parseInt(request.getParameter("guestId"));
             String requestType = request.getParameter("requestType");
@@ -98,18 +98,68 @@ public class GuestRequestController extends HttpServlet {
                 return;
             }
 
-            // Chặn spam request (kiểm tra lại ở POST)
             if (requestDAO.hasPendingRequest(bookingId)) {
                 response.sendRedirect(request.getContextPath() + "/booking-detail?bookingCode=" + bookingCode + emailParam + "&status=duplicate_pending_error");
                 return;
             }
 
-            // Xử lý logic nghiệp vụ
             boolean isSuccess = processRequest(request, booking, bookingId, guestId, requestType);
 
             if (isSuccess) {
-                // SỬA ĐỔI THEO CÁCH 1: Redirect về trang chi tiết đơn hàng (booking-detail) 
-                // kèm status=request_success để nổ Popup thành công tại đó
+                
+
+                if (email != null && !email.trim().isEmpty()) {
+                    final String targetEmail = email.trim();
+                    final String finalRequestType = requestType;
+                    final String finalBookingCode = bookingCode;
+                    
+                    // Trích xuất lý do động chuẩn theo các tham số nguyên bản từ form JSP
+                    String emailReason = "";
+                    if ("Đổi hạng phòng".equals(requestType)) {
+                        emailReason = request.getParameter("reason_details");
+                        try {
+                            int targetId = Integer.parseInt(request.getParameter("targetRoomTypeId"));
+                            RoomType rt = roomTypeDAO.getRoomDetailById(targetId);
+                            if (rt != null) {
+                                emailReason = "[Mong muốn đổi sang hạng phòng: " + rt.getTypeName() + "] - Lý do: " + emailReason;
+                            }
+                        } catch (Exception ignored) {}
+                    } else if ("Gia hạn phòng".equals(requestType)) {
+                        emailReason = request.getParameter("reason_details_extend");
+                        String newCheckoutStr = request.getParameter("newCheckoutDate");
+                        emailReason = "[Mong muốn gia hạn đến ngày: " + newCheckoutStr + "] - Lý do: " + emailReason;
+                    } else if ("Hủy đặt phòng".equals(requestType)) {
+                        emailReason = request.getParameter("reason_details_cancel");
+                        if (emailReason == null || emailReason.trim().isEmpty()) {
+                            emailReason = request.getParameter("reason_details");
+                        }
+                        if (emailReason == null || emailReason.trim().isEmpty()) {
+                            emailReason = "Khách hàng gửi yêu cầu hủy đơn hàng.";
+                        }
+                    }
+                    
+                    final String finalReason = emailReason;
+
+                    // Tạo Thread chạy ngầm xử lý gửi mail bất đồng bộ
+                    new Thread(() -> {
+                        try {
+                            Guest currentGuest = bookingDAO.getGuestByBookingId(bookingId);
+                            String guestName = (currentGuest != null) ? currentGuest.getFullName() : "Quý khách";
+                            
+                            dal.EmailUtil.sendRequestSubmittedNotification(
+                                    targetEmail, 
+                                    guestName, 
+                                    finalBookingCode, 
+                                    finalRequestType, 
+                                    finalReason
+                            );
+                        } catch (Exception e) {
+                            e.printStackTrace(); // Ghi nhận lỗi SMTP ra console nếu phát sinh, không block Client redirect
+                        }
+                    }).start();
+                }
+         
+
                 response.sendRedirect(request.getContextPath() + "/booking-detail?bookingCode=" + bookingCode + emailParam + "&status=request_success");
             } else {
                 // Thất bại: Giữ người dùng ở lại trang /guest-request để sửa lỗi
@@ -127,6 +177,7 @@ public class GuestRequestController extends HttpServlet {
         }
     }
 
+    // Những requets đc làm trong các tình huống 
     private boolean isAuthorized(String requestType, String status) {
         return switch (requestType) {
             case "Hủy đặt phòng" ->
@@ -140,6 +191,7 @@ public class GuestRequestController extends HttpServlet {
         };
     }
 
+    // Xử lý request 
     private boolean processRequest(HttpServletRequest req, Booking booking, int bookingId, int guestId, String type) {
         switch (type) {
             case "Đổi hạng phòng": {

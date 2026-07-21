@@ -72,7 +72,7 @@ public class GuestRequestDAO extends DBContext {
         }
         return false;
     }
-
+// Thêm vào bảng request
     public boolean insertGuestRequest(int bookingId, int guestId, String requestType, String details,
             LocalDate reqCheckIn, LocalDate reqCheckOut, Integer targetRoomTypeId) {
         String sql = "INSERT INTO GuestRequests (booking_id, guest_id, request_type, request_details, requested_checkin, requested_checkout, target_room_type_id, submitted_at, [status]) "
@@ -113,9 +113,7 @@ public class GuestRequestDAO extends DBContext {
         return false;
     }
 
-    // =========================================================================
-    // SỬA ĐỔI 2: Hàm đọc thông tin Booking - Chống sập dữ liệu trống từ DB truyền lên
-    // =========================================================================
+ // Lấy đơn booking cho receptionist xử lý
     public model.Booking getBookingBasicInfoByCode(String bookingCode) {
         String sql = "SELECT b.*, rt.type_name, g.full_name, g.phone FROM Bookings b "
                 + "INNER JOIN RoomTypes rt ON b.room_type_id = rt.room_type_id "
@@ -162,9 +160,6 @@ public class GuestRequestDAO extends DBContext {
     }
 
     // 6. Lấy thông tin chi tiết một yêu cầu để xử lý (DÙNG CHO TRANG CHI TIẾT)
-    // SỬA ĐỔI CHÍNH: Đã select thêm b.room_type_id và mapping chuẩn thuộc tính requestedCheckout, formattedTime, formattedDate
-    // 6. Lấy thông tin chi tiết một yêu cầu để xử lý (DÙNG CHO TRANG CHI TIẾT)
-    // SỬA ĐỔI: Đã bổ sung gán thuộc tính setSubmittedAt(ldt) để chống lỗi NullPointerException khi đối soát Duration
     public dto.GuestRequestDTO getRequestForProcessing(int requestId) {
         String sql = """
     SELECT gr.*, b.booking_code, b.num_rooms, b.checkin_date, b.checkout_date, b.room_type_id,
@@ -247,7 +242,6 @@ public class GuestRequestDAO extends DBContext {
     }
 
     // 7. Duyệt phê duyệt yêu cầu (Chạy Transaction bọc an toàn)
-    // SỬA ĐỔI CHÍNH: Khi duyệt Gia hạn phòng, ngày checkout mới phải lấy từ requestedCheckout (ép kiểu về LocalDate)
     public boolean approveRequest(dto.GuestRequestDTO dto, String notes) {
         String updateReq = "UPDATE GuestRequests SET [status] = N'Đã phê duyệt', response_notes = ?, processed_at = GETDATE() WHERE request_id = ?";
 

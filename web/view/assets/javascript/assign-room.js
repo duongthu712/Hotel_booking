@@ -170,24 +170,31 @@ document.addEventListener("DOMContentLoaded", function () {
             const currentBookingCode = currentBookingCodeInput ? currentBookingCodeInput.value : null;
 
             if (assignFormContainer) {
+                // TRƯỜNG HỢP 1: Click chọn phòng trống để gán
                 if (radio && card.classList.contains("status-available")) {
                     document.querySelectorAll(".room-card").forEach(c => c.classList.remove("selected-active"));
                     card.classList.add("selected-active");
                     radio.checked = true;
 
+                    // Hiện lại form chính để nhập thông tin khách
+                    if (mainForm) mainForm.style.display = "block";
                     assignFormContainer.style.display = "block";
-                    if(submitBtnWrapper) submitBtnWrapper.style.display = "block"; 
-                    if(detailContainer) detailContainer.style.display = "none";
+                    if (submitBtnWrapper) submitBtnWrapper.style.display = "block"; 
+                    if (detailContainer) detailContainer.style.display = "none";
 
                     generateGuestFields(); 
                     return; 
                 }
                 
+                // TRƯỜNG HỢP 2: Click vào phòng ĐANG CÓ KHÁCH thuộc chính đơn đặt này (để hủy gán)
                 if (card.classList.contains("status-occupied") && currentBookingCode && roomBookingCode === currentBookingCode) {
                     assignFormContainer.style.display = "none";
-                    if(submitBtnWrapper) submitBtnWrapper.style.display = "none"; 
-                    if(detailContainer) detailContainer.style.display = "block";
+                    if (submitBtnWrapper) submitBtnWrapper.style.display = "none"; 
+                    if (detailContainer) detailContainer.style.display = "block";
                     
+                    // Ẩn form nhập thông tin khách mới đi để không bị lộ ô nhập bên dưới nút Hủy Gán
+                    if (mainForm) mainForm.style.display = "none"; 
+
                     const unassignForm = document.getElementById("unassignRoomForm");
                     const unassignInput = document.getElementById("unassignRoomId");
                     if (unassignForm && unassignInput) {
@@ -195,11 +202,15 @@ document.addEventListener("DOMContentLoaded", function () {
                         unassignForm.style.display = "block";
                     }
                 } else {
-                    if(submitBtnWrapper) submitBtnWrapper.style.display = "none"; 
+                    // TRƯỜNG HỢP 3: Click vào các phòng có khách của đoàn khác, hoặc phòng dọn dẹp/bảo trì
+                    if (submitBtnWrapper) submitBtnWrapper.style.display = "none"; 
+                    // Ẩn form nhập thông tin khách mới đi
+                    if (mainForm) mainForm.style.display = "none"; 
                     return; 
                 }
             }
 
+            // Xử lý hiển thị thông tin Chi tiết phòng ở Panel phải (Chế độ xem tổng quan hoặc sau khi click)
             if (detailContent && placeholder) {
                 document.querySelectorAll(".room-card").forEach(c => c.classList.remove("selected-active"));
                 card.classList.add("selected-active");
@@ -250,10 +261,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     const codeRow = document.getElementById("viewBookingCodeRow");
                     if (codeRow) codeRow.style.display = "none";
                     const guestTable = document.getElementById("viewGuestsTableContainer");
-                    if(guestTable) guestTable.style.display = "none";
+                    if (guestTable) guestTable.style.display = "none";
                     
                     const unassignForm = document.getElementById("unassignRoomForm");
-                    if(unassignForm) unassignForm.style.display = "none";
+                    if (unassignForm) unassignForm.style.display = "none";
                 }
 
                 placeholder.style.display = "none";

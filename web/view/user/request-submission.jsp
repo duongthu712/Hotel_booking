@@ -17,11 +17,10 @@
 
         <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/navbar.css?v=<%= System.currentTimeMillis() %>">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/footer.css?v=<%= System.currentTimeMillis() %>">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/walk-in-booking.css?v=<%=System.currentTimeMillis()%>">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/guest-request.css?v=<%=System.currentTimeMillis()%>">
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script src="${pageContext.request.contextPath}/view/assets/javascript/guest-request.js?v=<%= System.currentTimeMillis() %>"></script>
+        <script src="${pageContext.request.contextPath}/view/assets/javascript/guest-request.js?v=<%= System.currentTimeMillis() %>" charset="UTF-8"></script>
     </head>
     <body>
 

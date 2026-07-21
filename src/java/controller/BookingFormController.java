@@ -526,10 +526,6 @@ public class BookingFormController extends HttpServlet {
                     + maximumOccupants + " người.";
         }
 
-        if (numGuests < numRooms) {
-            return "Mỗi phòng phải có ít nhất một người lớn.";
-        }
-
         return null;
     }
 
