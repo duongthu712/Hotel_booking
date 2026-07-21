@@ -1179,9 +1179,9 @@ public class BookingDAO extends DBContext {
     }
 
     //booking list - GiangTTT
-    public List<Map<String, Object>> getBookingList(String keyword,String status,String paymentStatus,
-        String source,Integer roomTypeId,Integer staffId,String roomNumber,
-        String dateFilter,String sort, int page,int pageSize) {
+    public List<Map<String, Object>> getBookingList(String keyword, String status, String paymentStatus,
+            String source, Integer roomTypeId, Integer staffId, String roomNumber,
+            String dateFilter, String sort, int page, int pageSize) {
 
         List<Map<String, Object>> list = new ArrayList<>();
         cancelExpiredBookings();
@@ -1281,8 +1281,8 @@ public class BookingDAO extends DBContext {
 
         List<Object> params = new ArrayList<>();
 
-        appendBookingListFilters(sql,params,keyword, status,paymentStatus,source,
-            roomTypeId, staffId,roomNumber,dateFilter);
+        appendBookingListFilters(sql, params, keyword, status, paymentStatus, source,
+                roomTypeId, staffId, roomNumber, dateFilter);
 
         sql.append(" ORDER BY ");
         sql.append(getBookingListSortSql(sort));
@@ -1308,8 +1308,8 @@ public class BookingDAO extends DBContext {
         return list;
     }
 
-    public int countBookingList(String keyword, String status,String paymentStatus,
-        String source,Integer roomTypeId,Integer staffId,String roomNumber,String dateFilter) {
+    public int countBookingList(String keyword, String status, String paymentStatus,
+            String source, Integer roomTypeId, Integer staffId, String roomNumber, String dateFilter) {
 
         cancelExpiredBookings();
 
@@ -1324,8 +1324,8 @@ public class BookingDAO extends DBContext {
 
         List<Object> params = new ArrayList<>();
 
-        appendBookingListFilters(sql,params,keyword,status,paymentStatus,source,
-            roomTypeId,staffId,roomNumber,dateFilter);
+        appendBookingListFilters(sql, params, keyword, status, paymentStatus, source,
+                roomTypeId, staffId, roomNumber, dateFilter);
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             setBookingListParams(ps, params);
@@ -1369,9 +1369,9 @@ public class BookingDAO extends DBContext {
         return getBookingListSimpleRows(sql);
     }
 
-    private void appendBookingListFilters(StringBuilder sql,List<Object> params,String keyword,
-        String status, String paymentStatus, String source,Integer roomTypeId,Integer staffId,
-        String roomNumber,String dateFilter) {
+    private void appendBookingListFilters(StringBuilder sql, List<Object> params, String keyword,
+            String status, String paymentStatus, String source, Integer roomTypeId, Integer staffId,
+            String roomNumber, String dateFilter) {
 
         if (keyword != null && !keyword.trim().isEmpty()) {
             sql.append(" AND ( ");
@@ -1504,7 +1504,7 @@ public class BookingDAO extends DBContext {
             }
         }
     }
-    
+
 // STAFF BOOKING DETAIL POPUP
     public Map<String, Object> getStaffBookingDetailForPopup(int bookingId) {
         cancelExpiredBookings();

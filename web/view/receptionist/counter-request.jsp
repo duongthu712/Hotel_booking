@@ -265,8 +265,8 @@
                                                     <c:choose>
                                                         <c:when test="${rt.priceDiff >= 0}">
                                                             +<fmt:formatNumber value="${rt.priceDiff}"
-                                                                               type="number"
-                                                                               groupingUsed="true"/> đ / đêm
+                                                                              type="number"
+                                                                              groupingUsed="true"/> đ / đêm
                                                         </c:when>
                                                         <c:otherwise>
                                                             <fmt:formatNumber value="${rt.priceDiff}"
@@ -280,13 +280,13 @@
                                                     <c:choose>
                                                         <c:when test="${rt.upgradeTotal >= 0}">
                                                             Tổng +<fmt:formatNumber value="${rt.upgradeTotal}"
-                                                                                    type="number"
-                                                                                    groupingUsed="true"/> đ
+                                                                              type="number"
+                                                                              groupingUsed="true"/> đ
                                                         </c:when>
                                                         <c:otherwise>
                                                             Tổng <fmt:formatNumber value="${rt.upgradeTotal}"
-                                                                                   type="number"
-                                                                                   groupingUsed="true"/> đ
+                                                                              type="number"
+                                                                              groupingUsed="true"/> đ
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </div>

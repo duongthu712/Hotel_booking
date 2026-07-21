@@ -581,16 +581,20 @@
         <servlet-name>PolicyEditController</servlet-name>
         <url-pattern>/PolicyEdit</url-pattern>
     </servlet-mapping>
-    <servlet>
+
+    <servlet-mapping>
         <servlet-name>PolicyDeleteController</servlet-name>
-        <servlet-class>controller.PolicyDeleteController</servlet-class>
-    </servlet>
-    <servlet>
+        <url-pattern>/PolicyDelete</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
         <servlet-name>ProcessRequestController</servlet-name>
-        <servlet-class>controller.ProcessRequestController</servlet-class>
-    </servlet>
+        <url-pattern>/ProcessRequest</url-pattern>
+    </servlet-mapping>
+
     <servlet-mapping>
         <servlet-name>FeedbackManagementController</servlet-name>
         <url-pattern>/feedback-management</url-pattern>
     </servlet-mapping>
+
 </web-app>

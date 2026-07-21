@@ -14,111 +14,98 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 public class AuthorizationFilter implements Filter {
 
-    /*
-     * URL công khai, không cần đăng nhập.
-     */
+    private static final String ROLE_ADMIN = "ADMIN";
+    private static final String ROLE_MANAGER = "MANAGER";
+    private static final String ROLE_RECEPTIONIST = "RECEPTIONIST";
+
     private final Set<String> publicUrls = new HashSet<>();
-
-    /*
-     * URL dành cho tất cả nhân viên:
-     * ADMIN, MANAGER, RECEPTIONIST.
-     */
-    private final Set<String> staffUrls = new HashSet<>();
-
-    /*
-     * URL riêng theo từng role.
-     */
     private final Set<String> adminUrls = new HashSet<>();
     private final Set<String> managerUrls = new HashSet<>();
     private final Set<String> receptionistUrls = new HashSet<>();
-
-    /*
-     * URL dùng chung cho Manager và Receptionist.
-     */
     private final Set<String> managerReceptionistUrls = new HashSet<>();
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         initPublicUrls();
-        initStaffUrls();
         initAdminUrls();
         initManagerUrls();
         initReceptionistUrls();
-        initManagerReceptionistUrls();
+        initSharedUrls();
     }
 
     /**
-     * Các trang public không yêu cầu đăng nhập.
+     * Các URL không yêu cầu đăng nhập.
+     * Tất cả URL trong filter đều viết chữ thường vì request path sẽ được
+     * chuẩn hóa bằng toLowerCase().
      */
     private void initPublicUrls() {
         Collections.addAll(
                 publicUrls,
                 "/",
                 "/home",
+
+                // Authentication
                 "/login",
                 "/logout",
                 "/forgot-password",
                 "/verify-code",
                 "/reset-password",
                 "/access-denied",
-                "/policies",
 
+                // Authentication JSP
+                "/view/auth/login.jsp",
+                "/view/auth/forgot-password.jsp",
+                "/view/auth/reset-password.jsp",
+
+                // Public room and booking flow
                 "/room-list",
                 "/room-detail",
-
                 "/booking",
                 "/booking-form",
                 "/quick-booking",
                 "/booking-confirmation",
                 "/booking-payment",
-                "/deposit-payment",
                 "/booking-success",
+                "/deposit-payment",
                 "/booking-detail",
 
-                "/submit-feedback",
+                // Public feedback and policy pages
                 "/feedback-list",
-
-                "/view/auth/login.jsp",
-                "/view/auth/forgot-password.jsp",
-                "/view/auth/reset-password.jsp"
+                "/feedback-submission",
+                "/submit-feedback",
+                "/policies"
         );
     }
 
     /**
-     * Các chức năng mà tất cả nhân viên đã đăng nhập đều được dùng.
-     */
-    private void initStaffUrls() {
-        Collections.addAll(
-                staffUrls,
-                "/profile",
-                "/profile/change-password"
-        );
-    }
-
-    /**
-     * Các chức năng chỉ dành cho Admin.
+     * Chỉ Administrator/Admin/Quản trị viên được truy cập.
      */
     private void initAdminUrls() {
         Collections.addAll(
                 adminUrls,
                 "/admin-dashboard",
 
+                // Các mapping thật trong web.xml
+                "/staffaccountlist",
+                "/staffaccountdetail",
+                "/staffaccountedit",
+                "/staffaccountcreate",
+                "/staffaccountdelete",
+
+                // Các tên cũ nếu trong project vẫn còn link tới
                 "/staff-list",
                 "/staff-create",
                 "/staff-edit",
                 "/staff-delete",
                 "/staff-detail",
 
-                "/StaffAccountList",
-                "/StaffAccountDetail",
-                "/StaffAccountEdit",
-                "/StaffAccountCreate",
-                "/StaffAccountDelete",
-
+                // JSP nội bộ
+                "/view/admin/staff-management.jsp",
                 "/view/admin/dashboard.jsp",
                 "/view/admin/staff-list.jsp",
                 "/view/admin/staff-form.jsp",
@@ -127,98 +114,147 @@ public class AuthorizationFilter implements Filter {
     }
 
     /**
-     * Các chức năng chỉ dành cho Manager.
+     * Chỉ Manager/Quản lý được truy cập.
      */
     private void initManagerUrls() {
         Collections.addAll(
                 managerUrls,
+                // Dashboard and report
+                "/managerdashboard",
                 "/manager-dashboard",
-
-                "/room-management",
-                "/room-type-management",
-                "/service-management",
+                "/mdashboardpdf",
                 "/report",
                 "/revenue-report",
 
-                "/HotelInfo",
-                "/HotelInfoUpdate",
-                "/HotelImageUpdate",
+                // Room management
+                "/roomlist",
+                "/roomedit",
+                "/roomcreate",
+                "/roomdelete",
+                "/room-management",
 
+                // Room type management
                 "/roomtypelist",
                 "/create-roomtype",
+                "/add-room-type",
+                "/edit-room-type",
+                "/room-type-management",
 
-                "/RoomList",
-                "/RoomEdit",
-                "/RoomDetail",
+                // Room service management
+                "/roomservicelist",
+                "/roomservicecreate",
+                "/roomserviceedit",
+                "/roomservicedelete",
+                "/room-service-management",
 
-                "/RoomServiceList",
-                "/RoomServiceCreate",
-                "/RoomServiceEdit",
-                "/RoomServiceDelete",
+                // Hotel service management
+                "/servicelist",
+                "/servicecreate",
+                "/serviceedit",
+                "/servicedelete",
+                "/hotelservicelist",
+                "/hotelservicecreate",
+                "/hotelserviceedit",
+                "/hotelservicedelete",
+                "/service-management",
+                "/hotel-service-management",
 
-                "/RoomAmenityList",
-                "/RoomAmenityCreate",
-                "/RoomAmenityEdit",
-                "/RoomAmenityDelete",
+                // Amenity management
+                "/roomamenitylist",
+                "/roomamenitycreate",
+                "/roomamenityedit",
+                "/roomamenitydelete",
+                "/room-amenity-management",
 
-                "/HotelServiceList",
-                "/HotelServiceCreate",
-                "/HotelServiceEdit",
-                "/HotelServiceDelete",
+                // Hotel information
+                "/hotelinfo",
+                "/hotelinfoupdate",
+                "/hotelimageupdate",
+                "/hotelnewscreate",
+                "/hotelnewsedit",
+                "/hotelnewsdelete",
+                "/hotel-info-management",
 
-                "/ServiceList",
-                "/ServiceCreate",
-                "/ServiceEdit",
-                "/ServiceDelete",
+                // Policy management
+                "/policylist",
+                "/policycreate",
+                "/policyedit",
+                "/policydelete",
+                "/policy-management",
 
-                "/FeedbackList",
+                // Feedback management
                 "/feedback-management",
+                "/report-feedback",
 
-                "/HotelNewsCreate",
-                "/HotelNewsEdit",
-                "/HotelNewsDelete",
-
+                // JSP nội bộ
                 "/view/manager/dashboard.jsp",
+                "/view/manager/add-room-type.jsp",
+                "/view/manager/edit-room-type.jsp",
+                "/view/manager/add-service.jsp",
+                "/view/manager/feedback-management.jsp",
+                "/view/manager/hotel-info-management.jsp",
+                "/view/manager/hotel-service-management.jsp",
+                "/view/manager/policy-management.jsp",
+                "/view/manager/report-feedback.jsp",
+                "/view/manager/room-amenity-management.jsp",
                 "/view/manager/room-management.jsp",
-                "/view/manager/room-type-management.jsp",
-                "/view/manager/service-management.jsp",
-                "/view/manager/report.jsp",
-                "/view/manager/revenue-report.jsp"
+                "/view/manager/room-service-management.jsp",
+                "/view/manager/room-type-management.jsp"
         );
     }
 
     /**
-     * Các chức năng chỉ dành cho Receptionist.
+     * Chỉ Receptionist/Lễ tân được truy cập.
      */
     private void initReceptionistUrls() {
         Collections.addAll(
                 receptionistUrls,
                 "/receptionist-dashboard",
 
+                // Check-in, check-out and room assignment
+                "/assign-room",
+                "/unassign-room",
                 "/check-in",
                 "/check-out",
+
+                // Counter and walk-in workflows
                 "/counter-request",
+                "/walk-in-booking",
+                "/guest-request",
+                "/processrequest",
+                "/process-request",
+                "/request-processing",
 
-                "/DepositPaymentList",
-                "/DepositPaymentVerify",
-                "/DepositPaymentReject",
+                // Payment, billing and invoice
+                "/depositpaymentlist",
+                "/depositpaymentverify",
+                "/depositpaymentreject",
+                "/payment-verification",
+                "/checkout",
+                "/invoicecreate",
+                "/invoicepdf",
+                "/billinglist",
+                "/billing",
+                "/invoice",
 
-                "/Checkout",
-                "/InvoiceCreate",
-                "/InvoicePDF",
-                "/BillingList",
-
+                // JSP nội bộ
                 "/view/receptionist/dashboard.jsp",
+                "/view/receptionist/assign-room.jsp",
+                "/view/receptionist/billing.jsp",
                 "/view/receptionist/check-in.jsp",
                 "/view/receptionist/check-out.jsp",
-                "/view/receptionist/counter-request.jsp"
+                "/view/receptionist/counter-request.jsp",
+                "/view/receptionist/invoice.jsp",
+                "/view/receptionist/payment-verification.jsp",
+                "/view/receptionist/request-processing.jsp",
+                "/view/receptionist/walk-in-booking.jsp"
         );
     }
 
     /**
-     * Các chức năng Manager và Receptionist đều có thể truy cập.
+     * Manager và Receptionist đều được truy cập.
      */
-    private void initManagerReceptionistUrls() {
+    private void initSharedUrls() {
         Collections.addAll(
                 managerReceptionistUrls,
                 "/booking-list",
@@ -233,24 +269,25 @@ public class AuthorizationFilter implements Filter {
     public void doFilter(
             ServletRequest servletRequest,
             ServletResponse servletResponse,
-            FilterChain chain
-    ) throws IOException, ServletException {
+            FilterChain chain)
+            throws IOException, ServletException {
 
-        HttpServletRequest request
-                = (HttpServletRequest) servletRequest;
-
-        HttpServletResponse response
-                = (HttpServletResponse) servletResponse;
+        HttpServletRequest request = (HttpServletRequest) servletRequest;
+        HttpServletResponse response = (HttpServletResponse) servletResponse;
 
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
 
-        String path = getRequestPath(request);
+        String path = getNormalizedRequestPath(request);
 
-        /*
-         * Cho phép tài nguyên tĩnh và URL public đi qua.
-         */
-        if (isStaticResource(path) || isPublicUrl(path)) {
+        // CSS, JavaScript, ảnh, font... luôn được tải.
+        if (isStaticResource(path)) {
+            chain.doFilter(servletRequest, servletResponse);
+            return;
+        }
+
+        // Trang công khai không cần kiểm tra session.
+        if (isPublicUrl(path)) {
             chain.doFilter(servletRequest, servletResponse);
             return;
         }
@@ -258,10 +295,8 @@ public class AuthorizationFilter implements Filter {
         Set<String> allowedRoles = getAllowedRoles(path);
 
         /*
-         * URL chưa được khai báo phân quyền thì cho đi tiếp.
-         *
-         * Cách này tránh làm hỏng các servlet hoặc trang public
-         * chưa được thêm vào AuthorizationFilter.
+         * URL chưa được khai báo trong filter thì cho servlet xử lý tiếp.
+         * Cách này tránh làm hỏng các chức năng khác của project.
          */
         if (allowedRoles.isEmpty()) {
             chain.doFilter(servletRequest, servletResponse);
@@ -270,31 +305,21 @@ public class AuthorizationFilter implements Filter {
 
         HttpSession session = request.getSession(false);
 
-        /*
-         * URL cần quyền nhưng chưa đăng nhập.
-         */
         if (session == null) {
             redirectToLogin(request, response);
             return;
         }
 
-        String userRole = getUserRoleFromSession(session);
+        String role = getUserRoleFromSession(session);
+        String normalizedRole = normalizeRole(role);
 
-        /*
-         * Có session nhưng không lấy được role.
-         */
-        if (userRole == null || userRole.trim().isEmpty()) {
+        if (normalizedRole.isEmpty()) {
             redirectToLogin(request, response);
             return;
         }
 
-        userRole = normalizeRole(userRole);
-
-        /*
-         * Đã đăng nhập nhưng không có quyền truy cập.
-         */
-        if (!allowedRoles.contains(userRole)) {
-            sendAccessDenied(response);
+        if (!allowedRoles.contains(normalizedRole)) {
+            redirectToAccessDenied(request, response);
             return;
         }
 
@@ -302,14 +327,9 @@ public class AuthorizationFilter implements Filter {
     }
 
     /**
-     * Lấy đường dẫn request và loại bỏ context path.
-     *
-     * Ví dụ:
-     * /Hotel_booking_project/booking-list
-     * thành:
-     * /booking-list
+     * Lấy URI, bỏ context path, bỏ jsessionid và chuyển thành chữ thường.
      */
-    private String getRequestPath(HttpServletRequest request) {
+    private String getNormalizedRequestPath(HttpServletRequest request) {
         String contextPath = request.getContextPath();
         String requestUri = request.getRequestURI();
 
@@ -320,299 +340,210 @@ public class AuthorizationFilter implements Filter {
         if (contextPath != null
                 && !contextPath.isEmpty()
                 && requestUri.startsWith(contextPath)) {
-
             requestUri = requestUri.substring(contextPath.length());
         }
 
+        int sessionIdIndex = requestUri.indexOf(";jsessionid=");
+        if (sessionIdIndex >= 0) {
+            requestUri = requestUri.substring(0, sessionIdIndex);
+        }
+
         if (requestUri.isEmpty()) {
-            return "/";
+            requestUri = "/";
         }
 
-        /*
-         * Chuẩn hóa URL có dấu "/" ở cuối.
-         *
-         * Ví dụ:
-         * /booking-list/
-         * thành:
-         * /booking-list
-         */
         if (requestUri.length() > 1 && requestUri.endsWith("/")) {
-            requestUri = requestUri.substring(
-                    0,
-                    requestUri.length() - 1
-            );
+            requestUri = requestUri.substring(0, requestUri.length() - 1);
         }
 
-        return requestUri;
+        return requestUri.toLowerCase(Locale.ROOT);
     }
 
-    /**
-     * Kiểm tra tài nguyên tĩnh.
-     */
     private boolean isStaticResource(String path) {
-        if (path == null) {
-            return false;
+        return path.startsWith("/view/assets/")
+                || path.startsWith("/assets/")
+                || path.startsWith("/css/")
+                || path.startsWith("/javascript/")
+                || path.startsWith("/js/")
+                || path.startsWith("/images/")
+                || path.startsWith("/image/")
+                || path.startsWith("/uploads/")
+                || path.startsWith("/fonts/")
+                || path.endsWith(".css")
+                || path.endsWith(".js")
+                || path.endsWith(".png")
+                || path.endsWith(".jpg")
+                || path.endsWith(".jpeg")
+                || path.endsWith(".gif")
+                || path.endsWith(".webp")
+                || path.endsWith(".svg")
+                || path.endsWith(".ico")
+                || path.endsWith(".woff")
+                || path.endsWith(".woff2")
+                || path.endsWith(".ttf")
+                || path.endsWith(".map");
+    }
+
+    private boolean isPublicUrl(String path) {
+        if (publicUrls.contains(path)) {
+            return true;
         }
 
-        String lowerPath = path.toLowerCase();
-
-        return lowerPath.startsWith("/view/assets/")
-                || lowerPath.startsWith("/assets/")
-                || lowerPath.startsWith("/css/")
-                || lowerPath.startsWith("/js/")
-                || lowerPath.startsWith("/images/")
-                || lowerPath.startsWith("/uploads/")
-                || lowerPath.endsWith(".css")
-                || lowerPath.endsWith(".js")
-                || lowerPath.endsWith(".png")
-                || lowerPath.endsWith(".jpg")
-                || lowerPath.endsWith(".jpeg")
-                || lowerPath.endsWith(".gif")
-                || lowerPath.endsWith(".svg")
-                || lowerPath.endsWith(".ico")
-                || lowerPath.endsWith(".woff")
-                || lowerPath.endsWith(".woff2")
-                || lowerPath.endsWith(".ttf")
-                || lowerPath.endsWith(".map");
+        // Các JSP thuộc khu vực công khai.
+        return path.startsWith("/view/public/")
+                || path.startsWith("/view/user/")
+                || path.startsWith("/view/common/");
     }
 
-    /**
-     * Kiểm tra URL public.
-     */
-    private boolean isPublicUrl(String path) {
-        return publicUrls.contains(path);
-    }
-
-    /**
-     * Xác định những role được truy cập URL.
-     */
     private Set<String> getAllowedRoles(String path) {
         Set<String> roles = new HashSet<>();
 
-        /*
-         * URL dành cho toàn bộ nhân viên.
-         */
-        if (staffUrls.contains(path)) {
-            roles.add("ADMIN");
-            roles.add("MANAGER");
-            roles.add("RECEPTIONIST");
+        if (adminUrls.contains(path) || path.startsWith("/view/admin/")) {
+            roles.add(ROLE_ADMIN);
         }
 
-        /*
-         * URL riêng của Admin.
-         */
-        if (adminUrls.contains(path)
-                || path.startsWith("/view/admin/")) {
-
-            roles.add("ADMIN");
+        if (managerUrls.contains(path) || path.startsWith("/view/manager/")) {
+            roles.add(ROLE_MANAGER);
         }
 
-        /*
-         * URL riêng của Manager.
-         */
-        if (managerUrls.contains(path)
-                || path.startsWith("/view/manager/")) {
-
-            roles.add("MANAGER");
+        if (receptionistUrls.contains(path)) {
+            roles.add(ROLE_RECEPTIONIST);
         }
 
-        /*
-         * URL riêng của Receptionist.
-         */
-        if (receptionistUrls.contains(path)
-                || path.startsWith("/view/receptionist/")) {
-
-            roles.add("RECEPTIONIST");
-        }
-
-        /*
-         * URL dùng chung cho Manager và Receptionist.
-         *
-         * Nếu URL là JSP trong thư mục receptionist, đoạn phía trên
-         * sẽ thêm RECEPTIONIST. Đoạn này tiếp tục thêm MANAGER.
-         */
         if (managerReceptionistUrls.contains(path)) {
-            roles.add("MANAGER");
-            roles.add("RECEPTIONIST");
+            roles.add(ROLE_MANAGER);
+            roles.add(ROLE_RECEPTIONIST);
         }
 
         return roles;
     }
 
     /**
-     * Lấy role từ session.
-     *
-     * Hỗ trợ nhiều tên session attribute để phù hợp với
-     * các phần đăng nhập khác nhau trong dự án.
+     * LoginController hiện lưu:
+     * session.setAttribute("staff", staff);
+     * session.setAttribute("staffRole", staff.getRole());
      */
     private String getUserRoleFromSession(HttpSession session) {
-        Object roleObj = session.getAttribute("role");
+        Object roleObject = session.getAttribute("staffRole");
 
-        if (roleObj != null) {
-            return String.valueOf(roleObj);
+        if (roleObject == null) {
+            roleObject = session.getAttribute("role");
         }
 
-        Object accountObj = session.getAttribute("account");
-
-        if (accountObj == null) {
-            accountObj = session.getAttribute("staff");
+        if (roleObject == null) {
+            roleObject = session.getAttribute("roleName");
         }
 
-        if (accountObj == null) {
-            accountObj = session.getAttribute("staffAccount");
+        if (roleObject == null) {
+            roleObject = session.getAttribute("userRole");
         }
 
-        if (accountObj == null) {
-            accountObj = session.getAttribute("loggedInStaff");
+        if (roleObject != null) {
+            return String.valueOf(roleObject);
         }
 
-        if (accountObj == null) {
-            accountObj = session.getAttribute("user");
+        Object accountObject = session.getAttribute("staff");
+
+        if (accountObject == null) {
+            accountObject = session.getAttribute("account");
         }
 
-        if (accountObj == null) {
+        if (accountObject == null) {
+            accountObject = session.getAttribute("staffAccount");
+        }
+
+        if (accountObject == null) {
+            accountObject = session.getAttribute("loggedInStaff");
+        }
+
+        if (accountObject == null) {
+            accountObject = session.getAttribute("user");
+        }
+
+        if (accountObject == null) {
             return null;
         }
 
-        String role = getValueByGetter(accountObj, "getRole");
+        String role = getValueByGetter(accountObject, "getRole");
 
         if (role != null && !role.trim().isEmpty()) {
             return role;
         }
 
-        role = getValueByGetter(accountObj, "getRoleName");
+        role = getValueByGetter(accountObject, "getRoleName");
 
         if (role != null && !role.trim().isEmpty()) {
             return role;
         }
 
-        role = getValueByGetter(accountObj, "getUserRole");
-
-        if (role != null && !role.trim().isEmpty()) {
-            return role;
-        }
-
-        return null;
+        return getValueByGetter(accountObject, "getUserRole");
     }
 
-    /**
-     * Gọi getter bằng reflection để tránh phụ thuộc trực tiếp
-     * vào một model Account cụ thể.
-     */
-    private String getValueByGetter(
-            Object object,
-            String getterName
-    ) {
+    private String getValueByGetter(Object object, String getterName) {
         try {
             Method method = object.getClass().getMethod(getterName);
             Object value = method.invoke(object);
-
-            if (value == null) {
-                return null;
-            }
-
-            return String.valueOf(value);
-
+            return value == null ? null : String.valueOf(value);
         } catch (Exception exception) {
             return null;
         }
     }
 
     /**
-     * Chuẩn hóa tên role.
+     * Chuẩn hóa các tên role trong database về ba role dùng trong filter.
      */
     private String normalizeRole(String role) {
         if (role == null) {
             return "";
         }
 
-        String normalizedRole = role.trim();
+        String normalized = role.trim().toUpperCase(Locale.ROOT);
 
-        if (normalizedRole.equalsIgnoreCase("admin")) {
-            return "ADMIN";
+        if (normalized.startsWith("ROLE_")) {
+            normalized = normalized.substring(5).trim();
         }
 
-        if (normalizedRole.equalsIgnoreCase("manager")) {
-            return "MANAGER";
+        switch (normalized) {
+            case "ADMIN":
+            case "ADMINISTRATOR":
+            case "QUẢN TRỊ VIÊN":
+            case "QUAN TRI VIEN":
+                return ROLE_ADMIN;
+
+            case "MANAGER":
+            case "QUẢN LÝ":
+            case "QUAN LY":
+                return ROLE_MANAGER;
+
+            case "RECEPTIONIST":
+            case "LỄ TÂN":
+            case "LE TAN":
+                return ROLE_RECEPTIONIST;
+
+            default:
+                return normalized;
         }
-
-        if (normalizedRole.equalsIgnoreCase("receptionist")) {
-            return "RECEPTIONIST";
-        }
-
-        if (normalizedRole.equalsIgnoreCase("lễ tân")
-                || normalizedRole.equalsIgnoreCase("le tan")) {
-
-            return "RECEPTIONIST";
-        }
-
-        if (normalizedRole.equalsIgnoreCase("quản lý")
-                || normalizedRole.equalsIgnoreCase("quan ly")) {
-
-            return "MANAGER";
-        }
-
-        return normalizedRole.toUpperCase();
     }
 
-    /**
-     * Chuyển người dùng chưa đăng nhập về trang login.
-     */
     private void redirectToLogin(
             HttpServletRequest request,
-            HttpServletResponse response
-    ) throws IOException {
+            HttpServletResponse response)
+            throws IOException {
 
-        response.sendRedirect(
-                request.getContextPath() + "/login"
-        );
+        response.sendRedirect(request.getContextPath() + "/login");
     }
 
-    /**
-     * Trả về trang thông báo không có quyền.
-     */
-    private void sendAccessDenied(
-            HttpServletResponse response
-    ) throws IOException {
+    private void redirectToAccessDenied(
+            HttpServletRequest request,
+            HttpServletResponse response)
+            throws IOException {
 
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        response.setContentType("text/html;charset=UTF-8");
-
-        response.getWriter().write(
-                "<!DOCTYPE html>"
-                + "<html lang='vi'>"
-                + "<head>"
-                + "<meta charset='UTF-8'>"
-                + "<meta name='viewport' "
-                + "content='width=device-width, initial-scale=1.0'>"
-                + "<title>Không có quyền truy cập</title>"
-                + "</head>"
-                + "<body style='"
-                + "font-family:Segoe UI,Arial,sans-serif;"
-                + "padding:40px;"
-                + "text-align:center;"
-                + "'>"
-                + "<h2>Không có quyền truy cập</h2>"
-                + "<p>Tài khoản hiện tại không có quyền "
-                + "truy cập chức năng này.</p>"
-                + "<button onclick='history.back()' "
-                + "style='"
-                + "padding:10px 18px;"
-                + "border:none;"
-                + "border-radius:6px;"
-                + "cursor:pointer;"
-                + "'>"
-                + "Quay lại"
-                + "</button>"
-                + "</body>"
-                + "</html>"
-        );
+        response.sendRedirect(request.getContextPath() + "/access-denied");
     }
 
     @Override
     public void destroy() {
         publicUrls.clear();
-        staffUrls.clear();
         adminUrls.clear();
         managerUrls.clear();
         receptionistUrls.clear();
