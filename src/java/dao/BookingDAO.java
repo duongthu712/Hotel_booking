@@ -511,34 +511,49 @@ public class BookingDAO extends DBContext {
 
     public boolean updateExpectedCheckInTime(int bookingId, String expectedTimeStr, String note) {
         String sql = """
-                     UPDATE Bookings 
-                     SET expected_checkin_time = ?,
-                         auto_cancel_deadline = CASE 
-                             WHEN CAST(? AS TIME) >= '18:00:00' THEN CAST(CAST(checkin_date AS VARCHAR(10)) + ' 23:59:00' AS DATETIME)
-                             ELSE auto_cancel_deadline
-                         END,
-                         cancellation_reason = ? 
-                     WHERE booking_id = ?
-                     """;
+        UPDATE Bookings
+        SET expected_checkin_time = ?,
+            auto_cancel_deadline =
+                CASE
+                    WHEN ? IS NULL
+                        THEN CAST(CAST(checkin_date AS VARCHAR(10)) + ' 18:00:00' AS DATETIME)
+                    WHEN CAST(? AS TIME) >= '18:00:00'
+                        THEN CAST(CAST(checkin_date AS VARCHAR(10)) + ' 23:59:00' AS DATETIME)
+                    ELSE
+                        CAST(CAST(checkin_date AS VARCHAR(10)) + ' 18:00:00' AS DATETIME)
+                END,
+            cancellation_reason = ?
+        WHERE booking_id = ?
+        """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
             if (expectedTimeStr != null && !expectedTimeStr.trim().isEmpty()) {
-                ps.setTime(1, java.sql.Time.valueOf(expectedTimeStr + ":00"));
-                ps.setString(2, expectedTimeStr + ":00");
+                java.sql.Time time = java.sql.Time.valueOf(expectedTimeStr + ":00");
+
+                ps.setTime(1, time);     // expected_checkin_time
+                ps.setTime(2, time);     // ? IS NULL
+                ps.setTime(3, time);     // CAST(? AS TIME)
             } else {
                 ps.setNull(1, java.sql.Types.TIME);
-                ps.setNull(2, java.sql.Types.VARCHAR);
+                ps.setNull(2, java.sql.Types.TIME);
+                ps.setNull(3, java.sql.Types.TIME);
             }
-            ps.setNString(3, note != null ? note.trim() : null);
-            ps.setInt(4, bookingId);
+
+            ps.setNString(4, note != null ? note.trim() : null);
+            ps.setInt(5, bookingId);
 
             return ps.executeUpdate() > 0;
+
         } catch (Exception e) {
             System.out.println("Lỗi updateExpectedCheckInTime: " + e.getMessage());
+            e.printStackTrace();
         }
+
         return false;
     }
 
+    //Hàm tự động hủy đơn 
     public int autoCancelExpiredBookings() {
         String sql = """
                      UPDATE Bookings 
@@ -1164,18 +1179,9 @@ public class BookingDAO extends DBContext {
     }
 
     //booking list - GiangTTT
-    public List<Map<String, Object>> getBookingList(
-            String keyword,
-            String status,
-            String paymentStatus,
-            String source,
-            Integer roomTypeId,
-            Integer staffId,
-            String roomNumber,
-            String dateFilter,
-            String sort,
-            int page,
-            int pageSize) {
+    public List<Map<String, Object>> getBookingList(String keyword,String status,String paymentStatus,
+        String source,Integer roomTypeId,Integer staffId,String roomNumber,
+        String dateFilter,String sort, int page,int pageSize) {
 
         List<Map<String, Object>> list = new ArrayList<>();
         cancelExpiredBookings();
@@ -1275,18 +1281,8 @@ public class BookingDAO extends DBContext {
 
         List<Object> params = new ArrayList<>();
 
-        appendBookingListFilters(
-                sql,
-                params,
-                keyword,
-                status,
-                paymentStatus,
-                source,
-                roomTypeId,
-                staffId,
-                roomNumber,
-                dateFilter
-        );
+        appendBookingListFilters(sql,params,keyword, status,paymentStatus,source,
+            roomTypeId, staffId,roomNumber,dateFilter);
 
         sql.append(" ORDER BY ");
         sql.append(getBookingListSortSql(sort));
@@ -1312,15 +1308,8 @@ public class BookingDAO extends DBContext {
         return list;
     }
 
-    public int countBookingList(
-            String keyword,
-            String status,
-            String paymentStatus,
-            String source,
-            Integer roomTypeId,
-            Integer staffId,
-            String roomNumber,
-            String dateFilter) {
+    public int countBookingList(String keyword, String status,String paymentStatus,
+        String source,Integer roomTypeId,Integer staffId,String roomNumber,String dateFilter) {
 
         cancelExpiredBookings();
 
@@ -1335,18 +1324,8 @@ public class BookingDAO extends DBContext {
 
         List<Object> params = new ArrayList<>();
 
-        appendBookingListFilters(
-                sql,
-                params,
-                keyword,
-                status,
-                paymentStatus,
-                source,
-                roomTypeId,
-                staffId,
-                roomNumber,
-                dateFilter
-        );
+        appendBookingListFilters(sql,params,keyword,status,paymentStatus,source,
+            roomTypeId,staffId,roomNumber,dateFilter);
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             setBookingListParams(ps, params);
@@ -1390,17 +1369,9 @@ public class BookingDAO extends DBContext {
         return getBookingListSimpleRows(sql);
     }
 
-    private void appendBookingListFilters(
-            StringBuilder sql,
-            List<Object> params,
-            String keyword,
-            String status,
-            String paymentStatus,
-            String source,
-            Integer roomTypeId,
-            Integer staffId,
-            String roomNumber,
-            String dateFilter) {
+    private void appendBookingListFilters(StringBuilder sql,List<Object> params,String keyword,
+        String status, String paymentStatus, String source,Integer roomTypeId,Integer staffId,
+        String roomNumber,String dateFilter) {
 
         if (keyword != null && !keyword.trim().isEmpty()) {
             sql.append(" AND ( ");
@@ -1438,11 +1409,6 @@ public class BookingDAO extends DBContext {
             params.add(roomTypeId);
         }
 
-        /*
-     * QUAN TRỌNG:
-     * staffId null thì không lọc nhân viên.
-     * Nghĩa là chọn "Tất cả lễ tân" thì phải truyền staffId = null từ controller.
-         */
         if (staffId != null && staffId > 0) {
             sql.append(" AND b.staff_id = ? ");
             params.add(staffId);
@@ -1538,10 +1504,8 @@ public class BookingDAO extends DBContext {
             }
         }
     }
-
-    // =========================
+    
 // STAFF BOOKING DETAIL POPUP
-// =========================
     public Map<String, Object> getStaffBookingDetailForPopup(int bookingId) {
         cancelExpiredBookings();
         StringBuilder sql = new StringBuilder();
@@ -1656,9 +1620,7 @@ public class BookingDAO extends DBContext {
         return row;
     }
 
-    // =========================
 // COUNTER REQUEST - TẠO & PHÊ DUYỆT TẠI QUẦY
-// =========================
     public Map<String, Object> getCounterRequestBookingInfo(int bookingId) {
         cancelExpiredBookings();
         StringBuilder sql = new StringBuilder();
@@ -1737,14 +1699,14 @@ public class BookingDAO extends DBContext {
                 + " FROM RoomTypes "
                 + " WHERE room_type_id = ? "
                 + "   AND is_active = 1 ";
-        
+
         String updateBookingSql = ""
                 + " UPDATE Bookings "
                 + " SET room_type_id = ?, "
                 + "     booked_price_per_night = ? "
                 + " WHERE booking_id = ? "
                 + "   AND [status] = N'Đã xác nhận' ";
-        
+
         String insertRequestSql = ""
                 + " INSERT INTO GuestRequests ( "
                 + "     booking_id, guest_id, request_type, request_details, target_room_type_id, "
@@ -2002,16 +1964,18 @@ public class BookingDAO extends DBContext {
                 + "     b.num_rooms, "
                 + "     b.checkin_date, "
                 + "     ISNULL(b.deposit_amount, 0) AS depositAmount, "
-                + "     b.[status] AS bookingStatus "
+                + "     LTRIM(RTRIM(b.[status])) AS bookingStatus "
                 + " FROM Bookings b WITH (UPDLOCK) "
                 + " WHERE b.booking_id = ? ";
 
         String updateFullCancelSql = ""
                 + " UPDATE Bookings "
                 + " SET [status] = N'Đã hủy', "
+                + "     cancelled_at = GETDATE(), "
+                + "     cancellation_reason = ?, "
                 + "     deposit_amount = ? "
                 + " WHERE booking_id = ? "
-                + "   AND [status] IN (N'Chờ xử lý', N'Đã xác nhận') ";
+                + "   AND LTRIM(RTRIM([status])) IN (N'Chờ xử lý', N'Đã xác nhận') ";
 
         String updatePartialCancelSql = ""
                 + " UPDATE Bookings "
@@ -2019,7 +1983,7 @@ public class BookingDAO extends DBContext {
                 + "     deposit_amount = ? "
                 + " WHERE booking_id = ? "
                 + "   AND num_rooms > ? "
-                + "   AND [status] IN (N'Chờ xử lý', N'Đã xác nhận') ";
+                + "   AND LTRIM(RTRIM([status])) IN (N'Chờ xử lý', N'Đã xác nhận') ";
 
         String insertRequestSql = ""
                 + " INSERT INTO GuestRequests ( "
@@ -2047,9 +2011,19 @@ public class BookingDAO extends DBContext {
                     if (rs.next()) {
                         currentRooms = rs.getInt("num_rooms");
                         bookingStatus = rs.getNString("bookingStatus");
+
+                        if (bookingStatus != null) {
+                            bookingStatus = bookingStatus.trim();
+                        }
+
                         depositAmount = rs.getBigDecimal("depositAmount");
 
+                        if (depositAmount == null) {
+                            depositAmount = BigDecimal.ZERO;
+                        }
+
                         java.sql.Date sqlCheckinDate = rs.getDate("checkin_date");
+
                         if (sqlCheckinDate != null) {
                             checkinDate = sqlCheckinDate.toLocalDate();
                         }
@@ -2062,7 +2036,8 @@ public class BookingDAO extends DBContext {
                 return false;
             }
 
-            if (!"Chờ xử lý".equals(bookingStatus) && !"Đã xác nhận".equals(bookingStatus)) {
+            if (!"Chờ xử lý".equals(bookingStatus)
+                    && !"Đã xác nhận".equals(bookingStatus)) {
                 connection.rollback();
                 return false;
             }
@@ -2076,8 +2051,15 @@ public class BookingDAO extends DBContext {
 
             BigDecimal feeRate = getCancelFeeRateByCheckin(checkinDate);
 
-            BigDecimal depositPerRoom = depositAmount
-                    .divide(BigDecimal.valueOf(currentRooms), 2, RoundingMode.HALF_UP);
+            BigDecimal depositPerRoom = BigDecimal.ZERO;
+
+            if (currentRooms > 0) {
+                depositPerRoom = depositAmount.divide(
+                        BigDecimal.valueOf(currentRooms),
+                        2,
+                        RoundingMode.HALF_UP
+                );
+            }
 
             BigDecimal cancelDeposit = depositPerRoom
                     .multiply(BigDecimal.valueOf(cancelRooms))
@@ -2096,7 +2078,9 @@ public class BookingDAO extends DBContext {
             if (fullCancel) {
                 newDepositAmount = cancelFee;
             } else {
-                newDepositAmount = depositAmount.subtract(refundAmount).setScale(2, RoundingMode.HALF_UP);
+                newDepositAmount = depositAmount
+                        .subtract(refundAmount)
+                        .setScale(2, RoundingMode.HALF_UP);
             }
 
             if (newDepositAmount.compareTo(BigDecimal.ZERO) < 0) {
@@ -2106,9 +2090,15 @@ public class BookingDAO extends DBContext {
             int updatedRows;
 
             if (fullCancel) {
+                String cancellationReason = note == null || note.trim().isEmpty()
+                        ? "Hủy booking tại quầy."
+                        : note.trim();
+
                 try (PreparedStatement ps = connection.prepareStatement(updateFullCancelSql)) {
-                    ps.setBigDecimal(1, newDepositAmount);
-                    ps.setInt(2, bookingId);
+                    ps.setNString(1, cancellationReason);
+                    ps.setBigDecimal(2, newDepositAmount);
+                    ps.setInt(3, bookingId);
+
                     updatedRows = ps.executeUpdate();
                 }
             } else {
@@ -2117,6 +2107,7 @@ public class BookingDAO extends DBContext {
                     ps.setBigDecimal(2, newDepositAmount);
                     ps.setInt(3, bookingId);
                     ps.setInt(4, cancelRooms);
+
                     updatedRows = ps.executeUpdate();
                 }
             }
@@ -2126,29 +2117,32 @@ public class BookingDAO extends DBContext {
                 return false;
             }
 
-            String detail = "Hủy booking tại quầy. "
-                    + "Số phòng hủy: " + cancelRooms + "/" + currentRooms + ". "
-                    + "Loại xử lý: " + (fullCancel ? "Hủy toàn bộ booking" : "Hủy một phần booking") + ". "
-                    + "Tiền cọc mỗi phòng: " + depositPerRoom + " đ. "
-                    + "Cọc phần hủy: " + cancelDeposit + " đ. "
-                    + "Tỷ lệ phí hủy: " + feeRate.multiply(new BigDecimal("100")).setScale(0, RoundingMode.HALF_UP) + "%. "
-                    + "Phí hủy: " + cancelFee + " đ. "
-                    + "Tiền hoàn khách: " + refundAmount + " đ.";
+            String detail;
+
+            if (fullCancel) {
+                detail = "Hủy toàn bộ booking tại quầy. Số phòng hủy: "
+                        + cancelRooms + "/" + currentRooms + ".";
+            } else {
+                detail = "Hủy một phần booking tại quầy. Số phòng hủy: "
+                        + cancelRooms + "/" + currentRooms + ".";
+            }
 
             if (note != null && !note.trim().isEmpty()) {
-                detail += " Lý do/Ghi chú: " + note.trim();
+                detail += " Lý do: " + note.trim();
             }
 
             String responseNote = "Đã xử lý hủy tại quầy. "
-                    + (fullCancel ? "Booking đã được chuyển sang trạng thái Đã hủy. " : "Booking đã được giảm số lượng phòng. ")
-                    + "Số phòng hủy: " + cancelRooms + ". "
-                    + "Phí hủy: " + cancelFee + " đ. "
-                    + "Tiền hoàn khách: " + refundAmount + " đ.";
+                    + "Loại xử lý: "
+                    + (fullCancel ? "Hủy toàn bộ booking" : "Hủy một phần booking")
+                    + ". Số phòng hủy: " + cancelRooms + "/" + currentRooms
+                    + ". Phí hủy: " + cancelFee + " đ"
+                    + ". Tiền hoàn khách: " + refundAmount + " đ.";
 
             try (PreparedStatement ps = connection.prepareStatement(insertRequestSql)) {
                 ps.setNString(1, detail);
                 ps.setNString(2, responseNote);
                 ps.setInt(3, bookingId);
+
                 ps.executeUpdate();
             }
 

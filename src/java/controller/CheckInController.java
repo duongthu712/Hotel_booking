@@ -19,6 +19,7 @@ public class CheckInController extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
 
         BookingDAO bookingDAO = new BookingDAO();
+        bookingDAO.autoCancelExpiredBookings();
         List<BookingCheckInView> listToday = bookingDAO.getBookingsToday();
         request.setAttribute("listToday", listToday);
 
