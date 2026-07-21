@@ -293,10 +293,7 @@
         <servlet-name>PolicyDeleteController</servlet-name>
         <servlet-class>controller.PolicyDeleteController</servlet-class>
     </servlet>
-    <servlet>
-        <servlet-name>ProcessRequestController</servlet-name>
-        <servlet-class>controller.ProcessRequestController</servlet-class>
-    </servlet>
+
     <servlet>
         <servlet-name>FeedbackManagementController</servlet-name>
         <servlet-class>controller.FeedbackManagementController</servlet-class>
@@ -587,10 +584,7 @@
         <url-pattern>/PolicyDelete</url-pattern>
     </servlet-mapping>
 
-    <servlet-mapping>
-        <servlet-name>ProcessRequestController</servlet-name>
-        <url-pattern>/ProcessRequest</url-pattern>
-    </servlet-mapping>
+
 
     <servlet-mapping>
         <servlet-name>FeedbackManagementController</servlet-name>
