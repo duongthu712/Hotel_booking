@@ -1,3 +1,5 @@
+@charset "UTF-8";
+
 /* ==========================================================================
    ROOM DETAIL PAGE - LA MER HOTEL
    ========================================================================== */
@@ -164,11 +166,11 @@ body {
 }
 
 .gallery-btn-left::before {
-    content: "‹";
+    content: "\2039";
 }
 
 .gallery-btn-right::before {
-    content: "›";
+    content: "\203A";
 }
 
 .gallery-btn:hover {
