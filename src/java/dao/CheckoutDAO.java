@@ -1376,7 +1376,7 @@ public class CheckoutDAO extends DBContext {
         return 0;
     }
 
-    private void updateRoomStatusAfterCheckout(int bookingId, List<Integer> roomIds) throws Exception {
+    public void updateRoomStatusAfterCheckout(int bookingId, List<Integer> roomIds) throws Exception {
         if (roomIds == null || roomIds.isEmpty()) {
             return;
         }

@@ -175,6 +175,7 @@ public class InvoiceCreateController extends HttpServlet {
             request.setAttribute("formattedCheckinTime", formattedCheckinTime);
             request.setAttribute("checkinDateDisplay", booking.getCheckinDate().format(DATE_FORMATTER));
             request.setAttribute("checkoutDateDisplay", booking.getCheckoutDate().format(DATE_FORMATTER));
+            request.setAttribute("actualCheckinTime", booking.getActualCheckinTime().format(DISPLAY_FORMATTER));
             request.setAttribute("actualCheckoutTime", LocalDateTime.now().format(DISPLAY_FORMATTER));
             request.setAttribute("roomTypeServices", roomTypeServices);
             request.setAttribute("roomTypeAmenities", roomTypeAmenities);
@@ -278,7 +279,9 @@ public class InvoiceCreateController extends HttpServlet {
                 }
             }
 
-            dao.recalculateInvoice(bookingId);
+            if (checkoutRoomId != null) {
+                dao.updateRoomStatusAfterCheckout(bookingId, List.of(checkoutRoomId));
+            }
 
             String collectAmountStr = request.getParameter("collectAmount");
             if (collectAmountStr != null && !collectAmountStr.isEmpty()) {
