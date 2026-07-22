@@ -79,6 +79,12 @@
                                                 <span class="info-value">${checkoutDateDisplay} ${hotelInfo.checkoutTime}</span>
                                             </div>
                                             <div class="info-row">
+                                                <span class="info-label">Check-in thực tế</span>
+                                                <span class="info-value">
+                                                    <input type="text" class="time-input" value="${actualCheckinTime}" readonly>
+                                                </span>
+                                            </div>
+                                            <div class="info-row">
                                                 <span class="info-label">Check-out thực tế</span>
                                                 <span class="info-value">
                                                     <input type="text" class="time-input" value="${actualCheckoutTime}" readonly>
