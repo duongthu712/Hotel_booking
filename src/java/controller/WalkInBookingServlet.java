@@ -23,6 +23,46 @@ public class WalkInBookingServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        String action = request.getParameter("action");
+        if ("calculate".equals(action)) {
+            String checkInStr = request.getParameter("checkInDate");
+            String checkOutStr = request.getParameter("checkOutDate");
+            int numRooms = 1;
+            try {
+                numRooms = Integer.parseInt(request.getParameter("numRooms"));
+            } catch (NumberFormatException e) {
+            }
+            BigDecimal basePrice = BigDecimal.ZERO;
+            try {
+                basePrice = new BigDecimal(request.getParameter("basePrice"));
+            } catch (Exception e) {
+            }
+
+            long nights = 1;
+            boolean isStayNow = false;
+            if (checkInStr != null && !checkInStr.isEmpty() && checkOutStr != null && !checkOutStr.isEmpty()) {
+                LocalDate checkInDate = LocalDate.parse(checkInStr);
+                LocalDate checkOutDate = LocalDate.parse(checkOutStr);
+                nights = java.time.temporal.ChronoUnit.DAYS.between(checkInDate, checkOutDate);
+                if (nights <= 0) nights = 1;
+
+                LocalDate today = LocalDate.now();
+                isStayNow = checkInDate.equals(today);
+            }
+
+            BigDecimal roomCharges = basePrice.multiply(BigDecimal.valueOf(nights)).multiply(BigDecimal.valueOf(numRooms));
+            BigDecimal depositAmount = BigDecimal.ZERO;
+            if (!isStayNow) {
+                depositAmount = roomCharges.multiply(new BigDecimal("0.30")).setScale(0, java.math.RoundingMode.HALF_UP);
+            }
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(String.format("{\"nights\":%d, \"roomCharges\":%s, \"depositAmount\":%s, \"isStayNow\":%b}", 
+                    nights, roomCharges.toPlainString(), depositAmount.toPlainString(), isStayNow));
+            return;
+        }
+
         WalkinBookingDAO walkinDAO = new WalkinBookingDAO();
 
         // Lấy danh sách hạng phòng ban đầu để đổ vào thẻ <select> dropdown của thanh tìm kiếm
@@ -152,6 +192,27 @@ public class WalkInBookingServlet extends HttpServlet {
         LocalDate today = LocalDate.now();
         boolean isStayNow = checkInDate.equals(today);
 
+        // Tính toán số đêm lưu trú chuẩn nghiệp vụ từ ngày đến và ngày đi
+        long nights = java.time.temporal.ChronoUnit.DAYS.between(checkInDate, checkOutDate);
+        if (nights <= 0) {
+            nights = 1;
+        }
+
+        // Lấy đơn giá gốc của hạng phòng truyền từ thuộc tính ẩn trên giao diện
+        BigDecimal basePrice = new BigDecimal(request.getParameter("basePrice"));
+        
+        // Tính tổng tiền phòng = Đơn giá x Số đêm x Số phòng
+        BigDecimal roomCharges = basePrice.multiply(BigDecimal.valueOf(nights)).multiply(BigDecimal.valueOf(numRooms));
+
+        // Phân tách thiết lập tài chính theo luồng chọn
+        BigDecimal depositAmount = BigDecimal.ZERO;
+        String paymentStatus = "Chưa thanh toán";
+        // Tính tiền cọc
+        if (!isStayNow) {
+            depositAmount = roomCharges.multiply(new BigDecimal("0.30")).setScale(0, java.math.RoundingMode.HALF_UP);
+            paymentStatus = "Đã đặt cọc";
+        }
+
         // 5. Khởi tạo đối tượng model và đóng gói dữ liệu Booking để truyền xuống DAO
         Booking booking = new Booking();
         booking.setStaffId(staffId);
@@ -162,9 +223,9 @@ public class WalkInBookingServlet extends HttpServlet {
         booking.setNumGuests(numGuests);
         booking.setNumChildren(numChildren);
 
-        // Lấy đơn giá gốc của hạng phòng truyền từ thuộc tính ẩn trên giao diện
-        BigDecimal basePrice = new BigDecimal(request.getParameter("basePrice"));
         booking.setBookedPricePerNight(basePrice);
+        booking.setDepositAmount(depositAmount);
+        booking.setPaymentStatus(paymentStatus);
 
         // ĐỒNG BỘ MÃ BOOKING: Sinh mã ngẫu nhiên duy nhất bắt đầu bằng LMHW (8 ký tự ngẫu nhiên sau)
         String uniqueCode;
@@ -183,7 +244,7 @@ public class WalkInBookingServlet extends HttpServlet {
 
         try {
             // 6. Gọi hàm xử lý luồng Transaction nghiệp vụ tổng tại tầng DAO
-            boolean isSuccess = walkinDAO.createWalkinBookingProcess(booking, fullName, email, phone, idNumber, dateOfBirth, isStayNow);
+            boolean isSuccess = walkinDAO.createWalkinBookingProcess(booking, fullName, email, phone, idNumber, dateOfBirth, isStayNow, roomCharges);
 
             // 7. Điều hướng giao diện dựa trên kết quả thực thi thành công và tự động kích hoạt gửi mail
             if (isSuccess) {

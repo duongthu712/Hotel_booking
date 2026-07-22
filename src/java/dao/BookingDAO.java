@@ -553,20 +553,49 @@ public class BookingDAO extends DBContext {
         return false;
     }
 
-    //Hàm tự động hủy đơn 
+    //Hàm tự động hủy đơn No-show
     public int autoCancelExpiredBookings() {
-        String sql = """
-                     UPDATE Bookings 
-                     SET [status] = N'Đã hủy', 
-                         cancellation_reason = ISNULL(cancellation_reason, '') + N' [Hệ thống]: Tự động hủy do quá hạn deadline check-in.'
-                     WHERE [status] = N'Đã xác nhận' 
-                       AND auto_cancel_deadline < GETDATE()
+        String updateInvoicesSql = """
+                     UPDATE i
+                     SET i.room_charges = 0,
+                         i.consumable_charges = 0,
+                         i.amenity_damages = 0,
+                         i.total_amount = ISNULL(b.deposit_amount, 0),
+                         i.remaining_amount = 0,
+                         i.payment_status = N'Đã thanh toán'
+                     FROM Invoices i
+                     JOIN Bookings b ON i.booking_id = b.booking_id
+                     WHERE b.[status] = N'Đã xác nhận' 
+                       AND CAST(b.checkin_date AS DATE) < CAST(GETDATE() AS DATE)
                      """;
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            return ps.executeUpdate();
+        String updateBookingsSql = """
+                     UPDATE Bookings 
+                     SET [status] = N'Đã hủy', 
+                         cancellation_reason = ISNULL(cancellation_reason, '') + N' [Hệ thống]: Tự động hủy do khách không đến nhận phòng trong ngày check-in (No-show).'
+                     WHERE [status] = N'Đã xác nhận' 
+                       AND CAST(checkin_date AS DATE) < CAST(GETDATE() AS DATE)
+                     """;
+
+        try {
+            connection.setAutoCommit(false);
+            try (PreparedStatement ps1 = connection.prepareStatement(updateInvoicesSql);
+                 PreparedStatement ps2 = connection.prepareStatement(updateBookingsSql)) {
+                
+                ps1.executeUpdate();
+                int canceledCount = ps2.executeUpdate();
+                
+                connection.commit();
+                return canceledCount;
+            } catch (Exception e) {
+                connection.rollback();
+                System.out.println("Lỗi autoCancelExpiredBookings: " + e.getMessage());
+                throw e;
+            } finally {
+                connection.setAutoCommit(true);
+            }
         } catch (Exception e) {
-            System.out.println("Lỗi autoCancelExpiredBookings: " + e.getMessage());
+            e.printStackTrace();
         }
         return 0;
     }

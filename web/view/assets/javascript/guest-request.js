@@ -202,91 +202,71 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // --- LOGIC TÍNH TOÁN VÀ MAP CHÍNH SÁCH HỦY PHÒNG ---
-    function calculateCancellationDetails() {
+    async function calculateCancellationDetails() {
         const checkInDateEl = document.getElementById("checkInDate");
-        if (!checkInDateEl)
-            return;
+        if (!checkInDateEl) return;
 
         const checkInDateStr = checkInDateEl.value;
-        if (!checkInDateStr)
-            return;
+        if (!checkInDateStr) return;
 
-        // Thiết lập mốc giờ check-in cố định 14:00 theo chính sách
-        const checkInDateTime = new Date(`${checkInDateStr}T14:00:00`);
-        const now = new Date();
+        const numRooms = parseInt(requestForm.querySelector("input[name='numRooms']").value) || 1;
+        const oldCheckoutDateStr = requestForm.querySelector("input[name='oldCheckoutDate']").value;
+        const oldBasePrice = parseFloat(document.getElementById("oldBasePrice").value) || 0;
 
-        // Tính toán số giờ chênh lệch thực tế từ lúc gửi đơn đến khi check-in
-        const diffMs = checkInDateTime - now;
-        const diffHours = diffMs / (1000 * 60 * 60);
+        try {
+            const url = `guest-request?action=calculate&checkInDate=${checkInDateStr}&oldCheckoutDate=${oldCheckoutDateStr}&numRooms=${numRooms}&oldBasePrice=${oldBasePrice}`;
+            const response = await fetch(url);
+            if (!response.ok) return;
+            const data = await response.json();
 
-        // HIỂN THỊ SỐ GIỜ CÒN LẠI MINH BẠCH LÊN GIAO DIỆN
-        const lblHoursRemaining = document.getElementById("lblHoursRemaining");
-        if (lblHoursRemaining) {
-            if (diffHours > 0) {
-                lblHoursRemaining.textContent = diffHours.toFixed(1) + " giờ";
-            } else {
-                lblHoursRemaining.textContent = "0 giờ (Đã quá mốc giờ check-in " + Math.abs(diffHours).toFixed(1) + " giờ)";
-            }
-        }
-
-        // Xác định tỷ lệ hoàn cọc và dòng cần highlight dựa trên số giờ còn lại
-        let refundPercent = 0;
-        let activeRowId = "policy-row-72";
-
-        if (diffHours >= 72) {
-            refundPercent = 1.00;
-            activeRowId = "policy-row-72";
-        } else if (diffHours >= 48 && diffHours < 72) {
-            refundPercent = 0.70;
-            activeRowId = "policy-row-48";
-        } else if (diffHours >= 24 && diffHours < 48) {
-            refundPercent = 0.50;
-            activeRowId = "policy-row-24";
-        } else {
-            refundPercent = 0.30;
-            activeRowId = "policy-row-0";
-        }
-
-        // Duyệt qua các dòng để xóa các định dạng cũ và làm nổi bật dòng hiện tại (màu xám nhạt cao cấp)
-        ["policy-row-72", "policy-row-48", "policy-row-24", "policy-row-0"].forEach(rowId => {
-            const row = document.getElementById(rowId);
-            if (row) {
-                if (rowId === activeRowId) {
-                    row.style.backgroundColor = "#f1f5f9";
-                    row.style.fontWeight = "bold";
-                    row.style.color = "#0f172a";
+            // Hiển thị số giờ còn lại
+            const diffHours = data.hoursLeft;
+            const lblHoursRemaining = document.getElementById("lblHoursRemaining");
+            if (lblHoursRemaining) {
+                if (diffHours > 0) {
+                    lblHoursRemaining.textContent = diffHours + " giờ";
                 } else {
-                    row.style.backgroundColor = "";
-                    row.style.fontWeight = "normal";
-                    row.style.color = "";
+                    lblHoursRemaining.textContent = "0 giờ (Đã quá mốc giờ check-in " + Math.abs(diffHours) + " giờ)";
                 }
             }
-        });
 
-        // Tính toán các con số tài chính cụ thể
-        const bookedPricePerNight = parseFloat(document.getElementById("oldBasePrice").value) || 0;
-        const numRooms = parseInt(requestForm.querySelector("input[name='numRooms']").value) || 1;
-        const checkOutDateStr = requestForm.querySelector("input[name='oldCheckoutDate']").value;
-        const totalNights = Math.round((new Date(checkOutDateStr) - new Date(checkInDateStr)) / (1000 * 60 * 60 * 24)) || 1;
+            let activeRowId = "policy-row-72";
+            if (diffHours >= 72) activeRowId = "policy-row-72";
+            else if (diffHours >= 48) activeRowId = "policy-row-48";
+            else if (diffHours >= 24) activeRowId = "policy-row-24";
+            else activeRowId = "policy-row-0";
 
-        const totalBookingValue = bookedPricePerNight * totalNights * numRooms;
-        const depositValue = totalBookingValue * 0.30;
-        const finalRefund = depositValue * refundPercent;
+            ["policy-row-72", "policy-row-48", "policy-row-24", "policy-row-0"].forEach(rowId => {
+                const row = document.getElementById(rowId);
+                if (row) {
+                    if (rowId === activeRowId) {
+                        row.style.backgroundColor = "#f1f5f9";
+                        row.style.fontWeight = "bold";
+                        row.style.color = "#0f172a";
+                    } else {
+                        row.style.backgroundColor = "";
+                        row.style.fontWeight = "normal";
+                        row.style.color = "";
+                    }
+                }
+            });
 
-        // Ghi đè toàn bộ dữ liệu thật lên giao diện
-        if (document.getElementById("cancelTotalBooking")) {
-            document.getElementById("cancelTotalBooking").textContent = totalBookingValue.toLocaleString('vi-VN') + " VND";
-        }
-        if (document.getElementById("cancelDepositValue")) {
-            document.getElementById("cancelDepositValue").textContent = depositValue.toLocaleString('vi-VN') + " VND";
-        }
-        if (document.getElementById("cancelFeeValue")) {
-            const cancelFeeText = (depositValue - finalRefund).toLocaleString('vi-VN') + " VND";
-            const currentPenaltyPercent = ((1 - refundPercent) * 100).toFixed(0);
-            document.getElementById("cancelFeeValue").textContent = `${cancelFeeText} (Khấu trừ ${currentPenaltyPercent}% tiền cọc)`;
-        }
-        if (document.getElementById("cancelRefundValue")) {
-            document.getElementById("cancelRefundValue").textContent = finalRefund.toLocaleString('vi-VN') + " VND";
+            if (document.getElementById("cancelTotalBooking")) {
+                document.getElementById("cancelTotalBooking").textContent = data.totalBookingValue.toLocaleString('vi-VN') + " VND";
+            }
+            if (document.getElementById("cancelDepositValue")) {
+                document.getElementById("cancelDepositValue").textContent = data.depositPaid.toLocaleString('vi-VN') + " VND";
+            }
+            if (document.getElementById("cancelFeeValue")) {
+                const currentPenaltyPercent = ((1 - data.refundPercent) * 100).toFixed(0);
+                document.getElementById("cancelFeeValue").textContent = `${data.penaltyFee.toLocaleString('vi-VN')} VND (Khấu trừ ${currentPenaltyPercent}% tiền cọc)`;
+            }
+            if (document.getElementById("cancelRefundValue")) {
+                document.getElementById("cancelRefundValue").textContent = data.finalRefund.toLocaleString('vi-VN') + " VND";
+            }
+
+        } catch (error) {
+            console.error("Error calculating cancellation details:", error);
         }
     }
 
