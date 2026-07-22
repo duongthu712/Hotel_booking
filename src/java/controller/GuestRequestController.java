@@ -8,7 +8,10 @@ import model.Guest;
 import model.RoomType;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Duration;
 import java.util.List;
 
 import jakarta.servlet.ServletException;
@@ -27,6 +30,58 @@ public class GuestRequestController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        String action = request.getParameter("action");
+        if ("calculate".equals(action)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            try (PrintWriter out = response.getWriter()) {
+                String checkInDateStr = request.getParameter("checkInDate");
+                String checkOutDateStr = request.getParameter("oldCheckoutDate");
+                int numRooms = Integer.parseInt(request.getParameter("numRooms"));
+                double pricePerNight = Double.parseDouble(request.getParameter("oldBasePrice"));
+
+                LocalDate checkInDate = LocalDate.parse(checkInDateStr);
+                LocalDate checkOutDate = LocalDate.parse(checkOutDateStr);
+
+                long totalNights = java.time.temporal.ChronoUnit.DAYS.between(checkInDate, checkOutDate);
+                if (totalNights <= 0) totalNights = 1;
+
+                double totalBookingValue = pricePerNight * totalNights * numRooms;
+                double depositPaid = totalBookingValue * 0.30;
+
+                LocalDateTime checkInDateTime = checkInDate.atTime(14, 0, 0);
+                LocalDateTime now = LocalDateTime.now(); // Since guest is viewing, we use now()
+                
+                Duration duration = Duration.between(now, checkInDateTime);
+                long totalHoursLeft = duration.toHours();
+
+                double refundPercent = 0.30;
+                if (totalHoursLeft >= 72) {
+                    refundPercent = 1.00;
+                } else if (totalHoursLeft >= 48) {
+                    refundPercent = 0.70;
+                } else if (totalHoursLeft >= 24) {
+                    refundPercent = 0.50;
+                }
+
+                double finalRefund = depositPaid * refundPercent;
+                double penaltyFee = depositPaid - finalRefund;
+
+                String json = String.format(
+                    "{\"totalBookingValue\": %.0f, \"depositPaid\": %.0f, \"refundPercent\": %.2f, \"finalRefund\": %.0f, \"penaltyFee\": %.0f, \"hoursLeft\": %d}",
+                    totalBookingValue, depositPaid, refundPercent, finalRefund, penaltyFee, totalHoursLeft
+                );
+                out.print(json);
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                try (PrintWriter out = response.getWriter()) {
+                    out.print("{\"error\": \"Invalid parameters\"}");
+                }
+            }
+            return;
+        }
 
         String bookingCode = request.getParameter("bookingCode");
 

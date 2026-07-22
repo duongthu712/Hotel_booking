@@ -13,6 +13,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import model.HotelPolicy;
 
 /**
@@ -29,7 +32,19 @@ public class HotelPolicyServlet extends HttpServlet {
         HotelPolicyDAO policyDAO = new HotelPolicyDAO();
         List<HotelPolicy> fullPoliciesList = policyDAO.getAllActivePolicies();
 
+        Map<String, List<HotelPolicy>> groupedPolicies = new LinkedHashMap<>();
+        if (fullPoliciesList != null) {
+            for (HotelPolicy p : fullPoliciesList) {
+                String type = p.getPolicyType();
+                if (!groupedPolicies.containsKey(type)) {
+                    groupedPolicies.put(type, new ArrayList<>());
+                }
+                groupedPolicies.get(type).add(p);
+            }
+        }
+
         request.setAttribute("fullPoliciesList", fullPoliciesList);
+        request.setAttribute("groupedPolicies", groupedPolicies);
         
 
         // Chuyển tiếp sang trang giao diện chi tiết chính sách riêng

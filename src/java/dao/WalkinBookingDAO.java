@@ -176,7 +176,7 @@ public class WalkinBookingDAO extends DBContext {
 
     // Xử lý tạo đơn đặt phòng tại quầy phân tách luồng ở luôn hoặc tính cọc 30% cho đơn tương lai
     public boolean createWalkinBookingProcess(Booking booking, String fullName, String email, String phone,
-            String idNumber, LocalDate dateOfBirth, boolean isStayNow) {
+            String idNumber, LocalDate dateOfBirth, boolean isStayNow, java.math.BigDecimal roomCharges) {
 
         cancelExpiredBookings();
         boolean oldAutoCommit = true;
@@ -195,31 +195,6 @@ public class WalkinBookingDAO extends DBContext {
 
             // 2. Thiết lập trạng thái mặc định cho đơn đặt tại quầy là ĐÃ XÁC NHẬN
             booking.setStatus("Đã xác nhận");
-
-            // 3. Tính toán số đêm lưu trú chuẩn nghiệp vụ từ ngày đến và ngày đi
-            long nights = java.time.temporal.ChronoUnit.DAYS.between(booking.getCheckinDate(), booking.getCheckoutDate());
-            if (nights <= 0) {
-                nights = 1;
-            }
-
-            // 4. Tính tổng tiền phòng = Đơn giá x Số đêm x Số phòng
-            java.math.BigDecimal roomCharges = booking.getBookedPricePerNight()
-                    .multiply(java.math.BigDecimal.valueOf(nights))
-                    .multiply(java.math.BigDecimal.valueOf(booking.getNumRooms()));
-
-            // 5. Phân tách thiết lập tài chính theo luồng chọn
-            if (isStayNow) {
-                // Luồng 1: Ở luôn -> Chưa thu tiền ngay, cọc bằng 0, thanh toán 100% khi checkout trả phòng
-                booking.setPaymentStatus("Chưa thanh toán");
-                booking.setDepositAmount(java.math.BigDecimal.ZERO);
-            } else {
-                // Luồng 2: Đặt tương lai -> Tự động tính tiền cọc chuẩn 30% tổng tiền phòng
-                java.math.BigDecimal depositAmount = roomCharges.multiply(new java.math.BigDecimal("0.30"))
-                        .setScale(0, java.math.RoundingMode.HALF_UP);
-
-                booking.setPaymentStatus("Đã đặt cọc");
-                booking.setDepositAmount(depositAmount);
-            }
 
             // 6. Thực thi lưu dữ liệu đơn đặt phòng vào bảng Bookings
             String insertBookingSql = """
