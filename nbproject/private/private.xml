@@ -3,17 +3,21 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/F:/Hotel_booking/src/java/controller/RoomServiceDeleteController.java</file>
-            <file>file:/F:/Hotel_booking/src/java/filter/AuthorizationFilter.java</file>
-            <file>file:/F:/Hotel_booking/src/java/controller/GuestRequestController.java</file>
-            <file>file:/F:/Hotel_booking/web/view/receptionist/walk-in-booking.jsp</file>
-            <file>file:/F:/Hotel_booking/src/java/dao/GuestRequestDAO.java</file>
-            <file>file:/F:/Hotel_booking/web/view/assets/javascript/guest-request.js</file>
-            <file>file:/F:/Hotel_booking/src/java/controller/WalkInBookingServlet.java</file>
-            <file>file:/F:/Hotel_booking/web/view/assets/javascript/walk-in-booking.js</file>
-            <file>file:/F:/Hotel_booking/web/view/user/request-submission.jsp</file>
-            <file>file:/F:/Hotel_booking/src/java/dao/WalkinBookingDAO.java</file>
-            <file>file:/F:/Hotel_booking/src/java/controller/ProcessRequestController.java</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/assets/css/billing.css</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/CheckoutController.java</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/receptionist/invoice.jsp</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/assets/css/policy-management.css</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/filter/AuthorizationFilter.java</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/manager/dashboard.jsp</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/dao/CheckoutDAO.java</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/public/room-detail.jsp</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/receptionist/billing.jsp</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/assets/css/invoice.css</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/manager/policy-management.jsp</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/dao/BookingDAO.java</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/InvoiceCreateController.java</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/receptionist/check-out.jsp</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/BillingListController.java</file>
         </group>
     </open-files>
 </project-private>

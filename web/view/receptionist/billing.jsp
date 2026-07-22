@@ -155,19 +155,34 @@
                             <a href="${closeUrl}" class="btn-close-panel">&times;</a>
                         </div>
 
-                        <div class="detail-section">
-                            <h3 class="detail-section-title">Lịch sử thanh toán</h3>
-                            <c:forEach var="p" items="${selectedInvoice.payments}">
-                                <div class="detail-row">
-                                    <span>${p.note}</span>
-                                    <span><fmt:formatNumber value="${p.amount}" type="number" pattern="#,###"/> đ</span>
-                                </div>
-                            </c:forEach>
-                            <c:if test="${empty selectedInvoice.payments}">
-                                <div class="empty-sub-message">Chưa có khoản thanh toán nào.</div>
-                            </c:if>
-                        </div>
 
+
+                        <div class="detail-section">
+                            <h3 class="detail-section-title">Chi phí</h3>
+                            <div class="detail-row">
+                                <span>Tiền phòng</span>
+                                <span><fmt:formatNumber value="${selectedInvoice.invoice.roomCharges}" type="number" pattern="#,###"/> đ</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Đồ tiêu hao</span>
+                                <span><fmt:formatNumber value="${selectedInvoice.invoice.consumableCharges}" type="number" pattern="#,###"/> đ</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Thiệt hại</span>
+                                <span><fmt:formatNumber value="${selectedInvoice.invoice.amenityDamages}" type="number" pattern="#,###"/> đ</span>
+                            </div>
+
+                            <div class="detail-row detail-total">
+                                <span>Tổng tiền</span>
+                                <span><fmt:formatNumber value="${selectedInvoice.invoice.totalAmount}" type="number" pattern="#,###"/> đ</span>
+                            </div>
+                            <div class="detail-row detail-remaining">
+                                <span>Còn phải thanh toán</span>
+                                <span class="text-success">
+                                    <fmt:formatNumber value="${selectedInvoice.invoice.remainingAmount}" type="number" pattern="#,###"/> đ
+                                </span>
+                            </div>
+                        </div>
                         <c:if test="${selectedInvoice.invoice.remainingAmount > 0}">
                             <div class="detail-section">
                                 <h3 class="detail-section-title">Thu tiền</h3>
@@ -189,30 +204,16 @@
                         </c:if>
 
                         <div class="detail-section">
-                            <h3 class="detail-section-title">Chi tiết chi phí</h3>
-                            <div class="detail-row">
-                                <span>Tiền phòng</span>
-                                <span><fmt:formatNumber value="${selectedInvoice.invoice.roomCharges}" type="number" pattern="#,###"/> đ</span>
-                            </div>
-                            <div class="detail-row">
-                                <span>Đồ tiêu hao</span>
-                                <span><fmt:formatNumber value="${selectedInvoice.invoice.consumableCharges}" type="number" pattern="#,###"/> đ</span>
-                            </div>
-                            <div class="detail-row">
-                                <span>Thiệt hại</span>
-                                <span><fmt:formatNumber value="${selectedInvoice.invoice.amenityDamages}" type="number" pattern="#,###"/> đ</span>
-                            </div>
-                            
-                            <div class="detail-row detail-total">
-                                <span>Tổng tiền</span>
-                                <span><fmt:formatNumber value="${selectedInvoice.invoice.totalAmount}" type="number" pattern="#,###"/> đ</span>
-                            </div>
-                            <div class="detail-row detail-remaining">
-                                <span>Còn phải thanh toán</span>
-                                <span class="text-success">
-                                    <fmt:formatNumber value="${selectedInvoice.invoice.remainingAmount}" type="number" pattern="#,###"/> đ
-                                </span>
-                            </div>
+                            <h3 class="detail-section-title">Lịch sử thanh toán</h3>
+                            <c:forEach var="p" items="${selectedInvoice.payments}">
+                                <div class="detail-row">
+                                    <span>${p.note}</span>
+                                    <span><fmt:formatNumber value="${p.amount}" type="number" pattern="#,###"/> đ</span>
+                                </div>
+                            </c:forEach>
+                            <c:if test="${empty selectedInvoice.payments}">
+                                <div class="empty-sub-message">Chưa có khoản thanh toán nào.</div>
+                            </c:if>
                         </div>
 
                         <div class="detail-panel-actions">
