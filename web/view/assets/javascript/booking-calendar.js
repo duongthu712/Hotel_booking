@@ -1,5 +1,7 @@
-/* * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 26/05/2026
+ * Purpose: Initialize and handle UI logic for the booking calendar.
  */
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -8,32 +10,33 @@ window.addEventListener('DOMContentLoaded', () => {
         const checkInInput = document.getElementById(checkInId);
         const checkOutInput = document.getElementById(checkOutId);
 
-        // Nếu trang hiện tại không có các ô input này thì bỏ qua (tránh lỗi crash script)
+        // Nếu trang hiện tại không có các ô input này thì bỏ qua 
         if (!checkInInput || !checkOutInput) return;
 
-        // 1. Lấy ngày hôm nay định dạng yyyy-MM-dd chuẩn hệ thống
+        //  Lấy ngày hôm nay định dạng yyyy-MM-dd chuẩn hệ thống
         const today = new Date();
         const yyyy = today.getFullYear();
         const mm = String(today.getMonth() + 1).padStart(2, '0');
         const dd = String(today.getDate()).padStart(2, '0');
         const todayStr = `${yyyy}-${mm}-${dd}`;
 
-        // 2. Gạch bỏ toàn bộ các ngày trong quá khứ của ô Check-In
+        //  Gạch bỏ toàn bộ các ngày trong quá khứ của ô Check-In
         checkInInput.min = todayStr;
 
-        // 3. Nếu ô Check-In đã có sẵn dữ liệu cũ (Trang kết quả tìm kiếm)
+        //  Nếu ô check in có dữ liệu thì validate ô checkout sau check in 1 ngày
         if (checkInInput.value) {
             const currentInDate = new Date(checkInInput.value);
             currentInDate.setDate(currentInDate.getDate() + 1);
-            // 🔥 ĐÃ SỬA: Đổi getUTCDate() thành getDate() để không bị lệch múi giờ lùi ngày
+            // Đổi getUTCDate() thành getDate() để không bị lệch múi giờ lùi ngày
             const limitStr = `${currentInDate.getFullYear()}-${String(currentInDate.getMonth() + 1).padStart(2, '0')}-${String(currentInDate.getDate()).padStart(2, '0')}`;
             // Khóa các ngày trước ngày Check-in tại ô Check-out
             checkOutInput.min = limitStr;
         }
 
-        // 4. Lắng nghe sự kiện thay đổi ngày của ô Check-In
+        //  Khi ô check in thay đổi 
         checkInInput.addEventListener('change', () => {
             if (checkInInput.value) {
+                // Cập nhật lịch check out so với check in 
                 const nextDay = new Date(checkInInput.value);
                 nextDay.setDate(nextDay.getDate() + 1);
 
@@ -45,7 +48,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 // Ép ô Check-Out tối thiểu phải là ngày hôm sau của ngày Check-In mới chọn
                 checkOutInput.min = nextDayStr;
 
-                // Nếu ngày Check-Out cũ nhỏ hơn hoặc bằng ngày Check-In mới chọn, tự động nhảy lịch
+                // Tự động nhảy lịch nếu checkout chưa sau check in 1 ngày 
                 if (!checkOutInput.value || checkOutInput.value <= checkInInput.value) {
                     checkOutInput.value = nextDayStr;
                 }

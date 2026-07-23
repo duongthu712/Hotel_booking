@@ -22,6 +22,8 @@ import java.time.LocalTime;
  * @author Minh Thu
  */
 public class HotelInfoDAO extends DBContext {
+    
+    // ThuDNMHE204370
 
     // Lấy các service còn hoạt động để hiện trên homepage 
     public List<HotelService> getActiveHotelServices() {
@@ -51,10 +53,11 @@ public class HotelInfoDAO extends DBContext {
         return list;
     }
 
-    // Lấy thông tin khách sạn để hiện trên homepage 
+    // Lấy thông tin khách sạn để hiện trên hompage
     public HotelInfo getHotelDetails(int hotelId) {
         HotelInfo info = null;
         try {
+            // Lấy thông tin cho footer
             String sqlHotel = "SELECT hotel_id, hotel_name, [description], "
                     + "CAST(checkin_time AS TIME(0)) AS checkin, "
                     + "CAST(checkout_time AS TIME(0)) AS checkout, "
