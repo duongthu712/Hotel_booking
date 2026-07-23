@@ -37,6 +37,8 @@
         <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/user-profile.css">
     </head>
     <body>
+        <%@ include file="/view/staff/header.jsp" %>
+        <jsp:include page="/view/staff/navbar.jsp" />
 
         <main class="profile-page">
             <div class="profile-container">

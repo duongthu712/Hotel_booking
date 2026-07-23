@@ -15,44 +15,72 @@
     <body>
         <jsp:include page="/view/staff/navbar.jsp" />
 
+        <c:set var="ctx" value="${pageContext.request.contextPath}" />
+
         <main class="booking-page">
 
-            <form class="booking-filter" method="get" action="${pageContext.request.contextPath}/booking-list">
+            <form class="booking-filter" method="get" action="${ctx}/booking-list">
 
                 <div class="filter-row filter-row-1">
                     <input class="filter-control search-control"
                            type="text"
                            name="keyword"
                            value="${keyword}"
-                           placeholder="Tìm theo mã booking, tên khách, SĐT, email...">
+                           placeholder="Tìm theo mã booking, tên khách, SĐT hoặc email">
 
                     <select class="filter-control" name="status">
-                        <option value="" ${empty status ? 'selected="selected"' : ''}>Tất cả trạng thái</option>
-                        <option value="Chờ xử lý" ${status == 'Chờ xử lý' ? 'selected="selected"' : ''}>Chờ xử lý</option>
-                        <option value="Đã xác nhận" ${status == 'Đã xác nhận' ? 'selected="selected"' : ''}>Đã xác nhận</option>
-                        <option value="Đã nhận phòng" ${status == 'Đã nhận phòng' ? 'selected="selected"' : ''}>Đã nhận phòng</option>
-                        <option value="Đã trả phòng" ${status == 'Đã trả phòng' ? 'selected="selected"' : ''}>Đã trả phòng</option>
-                        <option value="Đã hủy" ${status == 'Đã hủy' ? 'selected="selected"' : ''}>Đã hủy</option>
+                        <option value="" ${empty status ? 'selected="selected"' : ''}>
+                            Trạng thái booking
+                        </option>
+                        <option value="Chờ xử lý" ${status == 'Chờ xử lý' ? 'selected="selected"' : ''}>
+                            Chờ xử lý
+                        </option>
+                        <option value="Đã xác nhận" ${status == 'Đã xác nhận' ? 'selected="selected"' : ''}>
+                            Đã xác nhận
+                        </option>
+                        <option value="Đã nhận phòng" ${status == 'Đã nhận phòng' ? 'selected="selected"' : ''}>
+                            Đã nhận phòng
+                        </option>
+                        <option value="Đã trả phòng" ${status == 'Đã trả phòng' ? 'selected="selected"' : ''}>
+                            Đã trả phòng
+                        </option>
+                        <option value="Đã hủy" ${status == 'Đã hủy' ? 'selected="selected"' : ''}>
+                            Đã hủy
+                        </option>
                     </select>
 
                     <select class="filter-control" name="paymentStatus">
-                        <option value="" ${empty paymentStatus ? 'selected="selected"' : ''}>Tất cả thanh toán</option>
-                        <option value="Chưa thanh toán" ${paymentStatus == 'Chưa thanh toán' ? 'selected="selected"' : ''}>Chưa thanh toán</option>
-                        <option value="Đã đặt cọc" ${paymentStatus == 'Đã đặt cọc' ? 'selected="selected"' : ''}>Đã đặt cọc</option>
-                        <option value="Đã thanh toán" ${paymentStatus == 'Đã thanh toán' ? 'selected="selected"' : ''}>Đã thanh toán</option>
+                        <option value="" ${empty paymentStatus ? 'selected="selected"' : ''}>
+                            Trạng thái thanh toán
+                        </option>
+                        <option value="Chưa thanh toán" ${paymentStatus == 'Chưa thanh toán' ? 'selected="selected"' : ''}>
+                            Chưa thanh toán
+                        </option>
+                        <option value="Đã đặt cọc" ${paymentStatus == 'Đã đặt cọc' ? 'selected="selected"' : ''}>
+                            Đã đặt cọc
+                        </option>
+                        <option value="Đã thanh toán" ${paymentStatus == 'Đã thanh toán' ? 'selected="selected"' : ''}>
+                            Đã thanh toán
+                        </option>
                     </select>
 
                     <select class="filter-control" name="source">
-                        <option value="" ${empty source ? 'selected="selected"' : ''}>Tất cả nguồn</option>
-                        <option value="Đặt phòng trực tuyến" ${source == 'Đặt phòng trực tuyến' ? 'selected="selected"' : ''}>Online</option>
-                        <option value="Đặt phòng tại quầy" ${source == 'Đặt phòng tại quầy' ? 'selected="selected"' : ''}>Tại quầy</option>
+                        <option value="" ${empty source ? 'selected="selected"' : ''}>
+                            Kênh đặt phòng
+                        </option>
+                        <option value="Đặt phòng trực tuyến" ${source == 'Đặt phòng trực tuyến' ? 'selected="selected"' : ''}>
+                            Đặt online
+                        </option>
+                        <option value="Đặt phòng tại quầy" ${source == 'Đặt phòng tại quầy' ? 'selected="selected"' : ''}>
+                            Đặt tại quầy
+                        </option>
                     </select>
                 </div>
 
                 <div class="filter-row filter-row-2">
                     <select class="filter-control" name="roomTypeId">
                         <option value="all" ${filterRoomTypeId == 'all' ? 'selected="selected"' : ''}>
-                            Tất cả hạng phòng
+                            Hạng phòng đã đặt
                         </option>
 
                         <c:forEach var="rt" items="${roomTypes}">
@@ -64,7 +92,7 @@
 
                     <select class="filter-control" name="filterStaffId">
                         <option value="all" ${filterStaffId == 'all' ? 'selected="selected"' : ''}>
-                            Tất cả lễ tân
+                            Lễ tân phụ trách
                         </option>
 
                         <c:forEach var="s" items="${staffList}">
@@ -78,21 +106,29 @@
                            type="text"
                            name="roomNumber"
                            value="${roomNumber}"
-                           placeholder="Số phòng / Chưa gán">
+                           placeholder="Tìm theo số phòng được gán hoặc Chưa gán">
 
                     <input class="filter-control"
                            type="text"
                            name="dateFilter"
                            value="${dateFilterDisplay}"
-                           placeholder="dd/mm/yyyy">
+                           placeholder="Ngày nhận/trả phòng dự kiến: dd/mm/yyyy">
                 </div>
 
                 <div class="filter-row filter-row-3">
                     <select class="filter-control sort-control" name="sort">
-                        <option value="newest" ${sort == 'newest' || empty sort ? 'selected="selected"' : ''}>Sắp xếp: Mới nhất</option>
-                        <option value="oldest" ${sort == 'oldest' ? 'selected="selected"' : ''}>Sắp xếp: Cũ nhất</option>
-                        <option value="checkinAsc" ${sort == 'checkinAsc' ? 'selected="selected"' : ''}>Check-in gần nhất</option>
-                        <option value="checkoutAsc" ${sort == 'checkoutAsc' ? 'selected="selected"' : ''}>Check-out gần nhất</option>
+                        <option value="newest" ${sort == 'newest' || empty sort ? 'selected="selected"' : ''}>
+                            Sắp xếp theo ngày tạo: Mới nhất
+                        </option>
+                        <option value="oldest" ${sort == 'oldest' ? 'selected="selected"' : ''}>
+                            Sắp xếp theo ngày tạo: Cũ nhất
+                        </option>
+                        <option value="checkinAsc" ${sort == 'checkinAsc' ? 'selected="selected"' : ''}>
+                            Sắp xếp theo ngày nhận phòng gần nhất
+                        </option>
+                        <option value="checkoutAsc" ${sort == 'checkoutAsc' ? 'selected="selected"' : ''}>
+                            Sắp xếp theo ngày trả phòng gần nhất
+                        </option>
                     </select>
 
                     <div class="filter-buttons">
@@ -100,13 +136,13 @@
                             Tìm kiếm
                         </button>
 
-                        <a href="${pageContext.request.contextPath}/booking-list" class="blue-btn">
+                        <a href="${ctx}/booking-list" class="blue-btn">
                             Làm mới
                         </a>
                     </div>
 
-                    <a href="${pageContext.request.contextPath}/walk-in-booking" class="add-booking-btn">
-                        THÊM ĐẶT PHÒNG (TẠI QUẦY)
+                    <a href="${ctx}/walk-in-booking" class="add-booking-btn">
+                        THÊM ĐẶT PHÒNG TẠI QUẦY
                     </a>
                 </div>
 
@@ -119,15 +155,12 @@
                             <th>STT</th>
                             <th>MÃ BOOKING</th>
                             <th>KHÁCH HÀNG</th>
-                            <th>HẠNG PHÒNG</th>
-                            <th>SỐ PHÒNG</th>
-                            <th>CHECK-IN</th>
-                            <th>CHECK-OUT</th>
-                            <th>NGUỒN</th>
+                            <th>PHÒNG / HẠNG PHÒNG</th>
+                            <th>THỜI GIAN THEO ĐƠN</th>
+                            <th>THỜI GIAN THỰC TẾ</th>
                             <th>TRẠNG THÁI</th>
                             <th>THANH TOÁN</th>
-                            <th>YÊU CẦU / THAY ĐỔI</th>
-                            <th>NHÂN VIÊN</th>
+                            <th>LỄ TÂN</th>
                             <th>HÀNH ĐỘNG</th>
                         </tr>
                     </thead>
@@ -136,7 +169,9 @@
                         <c:choose>
                             <c:when test="${empty bookingList}">
                                 <tr>
-                                    <td colspan="13" class="empty-row">Không có dữ liệu đặt phòng.</td>
+                                    <td colspan="${bookingTableColumnCount}" class="empty-row">
+                                        Không có dữ liệu đặt phòng.
+                                    </td>
                                 </tr>
                             </c:when>
 
@@ -147,40 +182,57 @@
 
                                         <td>
                                             <a class="booking-code js-booking-detail"
-                                               href="${pageContext.request.contextPath}/staff-booking-detail?bookingId=${b.bookingId}"
-                                               data-url="${pageContext.request.contextPath}/staff-booking-detail?bookingId=${b.bookingId}">
+                                               href="${ctx}/staff-booking-detail?bookingId=${b.bookingId}"
+                                               data-url="${ctx}/staff-booking-detail?bookingId=${b.bookingId}">
                                                 ${b.bookingCode}
                                             </a>
                                         </td>
 
                                         <td>${b.guestName}</td>
 
-                                        <td>${b.roomTypeName}</td>
-
                                         <td>
-                                            <c:choose>
-                                                <c:when test="${not empty b.roomNumbers && b.roomNumbers != 'Chưa gán'}">
-                                                    ${b.roomNumbers}
-                                                </c:when>
-                                                <c:otherwise>
-                                                    Chưa gán
-                                                </c:otherwise>
-                                            </c:choose>
+                                            <div class="room-type-line">
+                                                ${b.roomTypeName}
+                                            </div>
+
+                                            <div class="room-number-line">
+                                                ${b.numRooms} phòng -
+                                                <c:choose>
+                                                    <c:when test="${not empty b.roomNumbers && b.roomNumbers != 'Chưa gán'}">
+                                                        ${b.roomNumbers}
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        Chưa gán
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
                                         </td>
 
-                                        <td>${b.checkinDateText}</td>
-
-                                        <td>${b.checkoutDateText}</td>
+                                        <td>
+                                            <div>CI dự kiến: ${b.checkinDateText}</div>
+                                            <div>CO dự kiến: ${b.checkoutDateText}</div>
+                                        </td>
 
                                         <td>
-                                            <c:choose>
-                                                <c:when test="${b.source == 'Đặt phòng trực tuyến'}">
-                                                    <span class="badge source-online">Online</span>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <span class="badge source-counter">Tại quầy</span>
-                                                </c:otherwise>
-                                            </c:choose>
+                                            <div>
+                                                CI thực tế:
+                                                <c:choose>
+                                                    <c:when test="${not empty b.actualCheckinTime}">
+                                                        ${b.actualCheckinTime}
+                                                    </c:when>
+                                                    <c:otherwise>-</c:otherwise>
+                                                </c:choose>
+                                            </div>
+
+                                            <div>
+                                                CO thực tế:
+                                                <c:choose>
+                                                    <c:when test="${not empty b.actualCheckoutTime}">
+                                                        ${b.actualCheckoutTime}
+                                                    </c:when>
+                                                    <c:otherwise>-</c:otherwise>
+                                                </c:choose>
+                                            </div>
                                         </td>
 
                                         <td>
@@ -233,23 +285,12 @@
 
                                         <td>
                                             <c:choose>
-                                                <c:when test="${b.pendingRequestCount > 0}">
-                                                    <span class="request waiting">
-                                                        ${b.pendingRequestCount} yêu cầu / Chờ xử lý
-                                                    </span>
+                                                <c:when test="${not empty b.staffName}">
+                                                    ${b.staffName}
                                                 </c:when>
-                                                <c:when test="${not empty b.latestRequestType}">
-                                                    <span class="request approved">
-                                                        ${b.latestRequestType} / ${b.latestRequestStatus}
-                                                    </span>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    Không có
-                                                </c:otherwise>
+                                                <c:otherwise>-</c:otherwise>
                                             </c:choose>
                                         </td>
-
-                                        <td>${b.staffName}</td>
 
                                         <td class="action-cell">
                                             <c:set var="isPending" value="${b.bookingStatus == 'Chờ xử lý'}" />
@@ -259,19 +300,12 @@
                                             <c:set var="isCancelled" value="${b.bookingStatus == 'Đã hủy'}" />
 
                                             <c:set var="canAnyRequest" value="${!isCheckedOut && !isCancelled}" />
-
                                             <c:set var="canExtendRequest" value="${isConfirmed || isCheckedIn}" />
                                             <c:set var="canUpgradeRequest" value="${isConfirmed}" />
                                             <c:set var="canCancelRequest" value="${isPending || isConfirmed}" />
                                             <c:set var="canOtherRequest" value="${isConfirmed || isCheckedIn}" />
 
                                             <div class="action-buttons">
-                                                <a class="action-btn detail-btn js-booking-detail"
-                                                   href="${pageContext.request.contextPath}/staff-booking-detail?bookingId=${b.bookingId}"
-                                                   data-url="${pageContext.request.contextPath}/staff-booking-detail?bookingId=${b.bookingId}">
-                                                    Chi tiết
-                                                </a>
-
                                                 <c:choose>
                                                     <c:when test="${canAnyRequest}">
                                                         <div class="request-action-wrap">
@@ -282,32 +316,32 @@
                                                             <div class="request-action-menu">
                                                                 <c:if test="${canExtendRequest}">
                                                                     <a class="js-counter-request"
-                                                                       href="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=extend"
-                                                                       data-url="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=extend">
+                                                                       href="${ctx}/counter-request?bookingId=${b.bookingId}&type=extend"
+                                                                       data-url="${ctx}/counter-request?bookingId=${b.bookingId}&type=extend">
                                                                         Gia hạn ngày ở
                                                                     </a>
                                                                 </c:if>
 
                                                                 <c:if test="${canUpgradeRequest}">
                                                                     <a class="js-counter-request"
-                                                                       href="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=upgrade"
-                                                                       data-url="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=upgrade">
+                                                                       href="${ctx}/counter-request?bookingId=${b.bookingId}&type=upgrade"
+                                                                       data-url="${ctx}/counter-request?bookingId=${b.bookingId}&type=upgrade">
                                                                         Thay đổi hạng phòng
                                                                     </a>
                                                                 </c:if>
 
                                                                 <c:if test="${canCancelRequest}">
                                                                     <a class="js-counter-request"
-                                                                       href="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=cancel"
-                                                                       data-url="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=cancel">
+                                                                       href="${ctx}/counter-request?bookingId=${b.bookingId}&type=cancel"
+                                                                       data-url="${ctx}/counter-request?bookingId=${b.bookingId}&type=cancel">
                                                                         Hủy booking
                                                                     </a>
                                                                 </c:if>
 
                                                                 <c:if test="${canOtherRequest}">
                                                                     <a class="js-counter-request"
-                                                                       href="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=other"
-                                                                       data-url="${pageContext.request.contextPath}/counter-request?bookingId=${b.bookingId}&type=other">
+                                                                       href="${ctx}/counter-request?bookingId=${b.bookingId}&type=other"
+                                                                       data-url="${ctx}/counter-request?bookingId=${b.bookingId}&type=other">
                                                                         Yêu cầu khác
                                                                     </a>
                                                                 </c:if>
@@ -338,103 +372,88 @@
                     </c:choose>
                     đến
                     <c:choose>
-                        <c:when test="${currentPage * pageSize > totalBookings}">${totalBookings}</c:when>
-                        <c:otherwise>${currentPage * pageSize}</c:otherwise>
+                        <c:when test="${currentPage * pageSize > totalBookings}">
+                            ${totalBookings}
+                        </c:when>
+                        <c:otherwise>
+                            ${currentPage * pageSize}
+                        </c:otherwise>
                     </c:choose>
                     trong tổng số ${totalBookings} đặt phòng
                 </div>
 
-                <div class="pagination">
-                    <a class="page-link ${currentPage <= 1 ? 'disabled' : ''}"
-                       href="${pageContext.request.contextPath}/booking-list?page=${currentPage - 1}&pageSize=${pageSize}&keyword=${keyword}&status=${status}&paymentStatus=${paymentStatus}&source=${source}&roomTypeId=${filterRoomTypeId}&filterStaffId=${filterStaffId}&roomNumber=${roomNumber}&dateFilter=${dateFilterDisplay}&sort=${sort}">
-                        ‹
-                    </a>
+                <c:if test="${totalPages > 1}">
+                    <div class="pagination">
+                        <c:choose>
+                            <c:when test="${currentPage > 1}">
+                                <a class="page-btn"
+                                   href="${ctx}/booking-list?${pagingQuery}&page=${currentPage - 1}">
+                                    ‹ Trước
+                                </a>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="page-btn disabled">‹ Trước</span>
+                            </c:otherwise>
+                        </c:choose>
 
-                    <c:if test="${totalPages > 1}">
-                        <div class="pagination-wrap">
-                            <div class="pagination">
+                        <c:set var="windowSize" value="${paginationWindowSize}" />
+                        <c:set var="startPage" value="${currentPage - windowSize}" />
+                        <c:set var="endPage" value="${currentPage + windowSize}" />
 
-                                <c:choose>
-                                    <c:when test="${currentPage > 1}">
-                                        <a class="page-btn"
-                                           href="${pageContext.request.contextPath}/booking-list?page=${currentPage - 1}">
-                                            ‹ Trước
-                                        </a>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <span class="page-btn disabled">‹ Trước</span>
-                                    </c:otherwise>
-                                </c:choose>
+                        <c:if test="${startPage < 1}">
+                            <c:set var="startPage" value="1" />
+                        </c:if>
 
-                                <c:set var="windowSize" value="2" />
-                                <c:set var="startPage" value="${currentPage - windowSize}" />
-                                <c:set var="endPage" value="${currentPage + windowSize}" />
+                        <c:if test="${endPage > totalPages}">
+                            <c:set var="endPage" value="${totalPages}" />
+                        </c:if>
 
-                                <c:if test="${startPage < 1}">
-                                    <c:set var="startPage" value="1" />
-                                </c:if>
+                        <c:if test="${startPage > 1}">
+                            <a class="page-btn" href="${ctx}/booking-list?${pagingQuery}&page=1">
+                                1
+                            </a>
 
-                                <c:if test="${endPage > totalPages}">
-                                    <c:set var="endPage" value="${totalPages}" />
-                                </c:if>
+                            <c:if test="${startPage > 2}">
+                                <span class="page-dot">...</span>
+                            </c:if>
+                        </c:if>
 
-                                <c:if test="${startPage > 1}">
-                                    <a class="page-btn ${currentPage == 1 ? 'active' : ''}"
-                                       href="${pageContext.request.contextPath}/booking-list?page=1">
-                                        1
+                        <c:forEach begin="${startPage}" end="${endPage}" var="p">
+                            <c:choose>
+                                <c:when test="${p == currentPage}">
+                                    <span class="page-btn active">${p}</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <a class="page-btn" href="${ctx}/booking-list?${pagingQuery}&page=${p}">
+                                        ${p}
                                     </a>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:forEach>
 
-                                    <c:if test="${startPage > 2}">
-                                        <span class="page-dot">...</span>
-                                    </c:if>
-                                </c:if>
+                        <c:if test="${endPage < totalPages}">
+                            <c:if test="${endPage < totalPages - 1}">
+                                <span class="page-dot">...</span>
+                            </c:if>
 
-                                <c:forEach begin="${startPage}" end="${endPage}" var="p">
-                                    <c:choose>
-                                        <c:when test="${p == currentPage}">
-                                            <span class="page-btn active">${p}</span>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <a class="page-btn"
-                                               href="${pageContext.request.contextPath}/booking-list?page=${p}">
-                                                ${p}
-                                            </a>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </c:forEach>
+                            <a class="page-btn" href="${ctx}/booking-list?${pagingQuery}&page=${totalPages}">
+                                ${totalPages}
+                            </a>
+                        </c:if>
 
-                                <c:if test="${endPage < totalPages}">
-                                    <c:if test="${endPage < totalPages - 1}">
-                                        <span class="page-dot">...</span>
-                                    </c:if>
-
-                                    <a class="page-btn ${currentPage == totalPages ? 'active' : ''}"
-                                       href="${pageContext.request.contextPath}/booking-list?page=${totalPages}">
-                                        ${totalPages}
-                                    </a>
-                                </c:if>
-
-                                <c:choose>
-                                    <c:when test="${currentPage < totalPages}">
-                                        <a class="page-btn"
-                                           href="${pageContext.request.contextPath}/booking-list?page=${currentPage + 1}">
-                                            Sau ›
-                                        </a>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <span class="page-btn disabled">Sau ›</span>
-                                    </c:otherwise>
-                                </c:choose>
-
-                            </div>
-                        </div>
-                    </c:if>
-
-                    <a class="page-link ${currentPage >= totalPages ? 'disabled' : ''}"
-                       href="${pageContext.request.contextPath}/booking-list?page=${currentPage + 1}&pageSize=${pageSize}&keyword=${keyword}&status=${status}&paymentStatus=${paymentStatus}&source=${source}&roomTypeId=${filterRoomTypeId}&filterStaffId=${filterStaffId}&roomNumber=${roomNumber}&dateFilter=${dateFilterDisplay}&sort=${sort}">
-                        ›
-                    </a>
-                </div>
+                        <c:choose>
+                            <c:when test="${currentPage < totalPages}">
+                                <a class="page-btn"
+                                   href="${ctx}/booking-list?${pagingQuery}&page=${currentPage + 1}">
+                                    Sau ›
+                                </a>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="page-btn disabled">Sau ›</span>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                </c:if>
             </div>
 
         </main>
@@ -450,6 +469,9 @@
         </div>
 
         <script>
+            var POPUP_CLOSE_DELAY_MS = Number("${popupCloseDelayMs}");
+            var REQUEST_MENU_SAFE_GAP_PX = Number("${requestMenuSafeGapPx}");
+
             function openBookingPopup(url) {
                 var modal = document.getElementById("bookingPopupModal");
                 var frame = document.getElementById("bookingPopupFrame");
@@ -472,7 +494,7 @@
                     if (reloadPage === true) {
                         window.location.reload();
                     }
-                }, 150);
+                }, POPUP_CLOSE_DELAY_MS);
             }
 
             function closeBookingDetailPopup() {
@@ -541,11 +563,12 @@
 
                         var spaceBelowInTable = tableBottom - buttonRect.bottom;
 
-                        if (spaceBelowInTable < menuHeight + 18) {
+                        if (spaceBelowInTable < menuHeight + REQUEST_MENU_SAFE_GAP_PX) {
                             wrap.classList.add("open-up");
                         }
                     });
                 });
+
                 document.addEventListener("click", function () {
                     document.querySelectorAll(".request-action-wrap.open").forEach(function (item) {
                         item.classList.remove("open");

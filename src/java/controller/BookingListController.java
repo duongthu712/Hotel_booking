@@ -2,6 +2,8 @@ package controller;
 
 import dao.BookingDAO;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import jakarta.servlet.ServletException;
@@ -11,7 +13,33 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class BookingListController extends HttpServlet {
 
+    private static final int DEFAULT_PAGE = 1;
     private static final int DEFAULT_PAGE_SIZE = 10;
+    private static final int MIN_TOTAL_PAGES = 1;
+    private static final int MIN_PAGE_SIZE = 5;
+    private static final int MAX_PAGE_SIZE = 50;
+    private static final int PAGINATION_WINDOW_SIZE = 2;
+
+    /*
+     * Sau khi gộp Hạng phòng + Phòng thành 1 cột:
+     * 1. STT
+     * 2. Mã booking
+     * 3. Khách hàng
+     * 4. Phòng / Hạng phòng
+     * 5. Thời gian theo đơn
+     * 6. Thời gian thực tế
+     * 7. Trạng thái
+     * 8. Thanh toán
+     * 9. Lễ tân
+     * 10. Hành động
+     */
+    private static final int BOOKING_TABLE_COLUMN_COUNT = 10;
+
+    private static final int POPUP_CLOSE_DELAY_MS = 150;
+    private static final int REQUEST_MENU_SAFE_GAP_PX = 18;
+
+    private static final String ALL_FILTER_VALUE = "all";
+    private static final String DEFAULT_SORT = "newest";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -25,42 +53,43 @@ public class BookingListController extends HttpServlet {
         String paymentStatus = clean(request.getParameter("paymentStatus"));
         String source = clean(request.getParameter("source"));
         String roomNumber = clean(request.getParameter("roomNumber"));
+
         String sort = clean(request.getParameter("sort"));
+        if (sort == null) {
+            sort = DEFAULT_SORT;
+        }
 
         String dateFilterRaw = clean(request.getParameter("dateFilter"));
         String dateFilter = normalizeDate(dateFilterRaw);
 
-        /*
-         * Hạng phòng vẫn dùng roomTypeId, nhưng option tất cả là "all".
-         */
-        String filterRoomTypeId = clean(request.getParameter("roomTypeId"));
-        if (filterRoomTypeId == null || filterRoomTypeId.equalsIgnoreCase("all")) {
-            filterRoomTypeId = "all";
-        }
-
+        String filterRoomTypeId = normalizeAllFilter(request.getParameter("roomTypeId"));
         Integer roomTypeId = null;
-        if (!filterRoomTypeId.equalsIgnoreCase("all")) {
+
+        if (!isAllFilter(filterRoomTypeId)) {
             roomTypeId = parseInteger(filterRoomTypeId);
+
             if (roomTypeId == null) {
-                filterRoomTypeId = "all";
+                filterRoomTypeId = ALL_FILTER_VALUE;
             }
         }
 
-        String filterStaffId = clean(request.getParameter("filterStaffId"));
-        if (filterStaffId == null || filterStaffId.equalsIgnoreCase("all")) {
-            filterStaffId = "all";
-        }
-
+        String filterStaffId = normalizeAllFilter(request.getParameter("filterStaffId"));
         Integer staffId = null;
-        if (!filterStaffId.equalsIgnoreCase("all")) {
+
+        if (!isAllFilter(filterStaffId)) {
             staffId = parseInteger(filterStaffId);
+
             if (staffId == null) {
-                filterStaffId = "all";
+                filterStaffId = ALL_FILTER_VALUE;
             }
         }
 
-        int page = parseInt(request.getParameter("page"), 1);
+        int page = parseInt(request.getParameter("page"), DEFAULT_PAGE);
         int pageSize = parseInt(request.getParameter("pageSize"), DEFAULT_PAGE_SIZE);
+
+        if (pageSize < MIN_PAGE_SIZE || pageSize > MAX_PAGE_SIZE) {
+            pageSize = DEFAULT_PAGE_SIZE;
+        }
 
         BookingDAO bookingDAO = new BookingDAO();
 
@@ -77,8 +106,8 @@ public class BookingListController extends HttpServlet {
 
         int totalPages = (int) Math.ceil((double) totalBookings / pageSize);
 
-        if (totalPages == 0) {
-            totalPages = 1;
+        if (totalPages < MIN_TOTAL_PAGES) {
+            totalPages = MIN_TOTAL_PAGES;
         }
 
         if (page > totalPages) {
@@ -105,6 +134,19 @@ public class BookingListController extends HttpServlet {
         addStringKey(roomTypes, "roomTypeId", "roomTypeIdText");
         addStringKey(staffList, "staffId", "staffIdText");
 
+        String pagingQuery = buildPagingQuery(
+                pageSize,
+                keyword,
+                status,
+                paymentStatus,
+                source,
+                filterRoomTypeId,
+                filterStaffId,
+                roomNumber,
+                dateFilterRaw,
+                sort
+        );
+
         request.setAttribute("bookingList", bookingList);
         request.setAttribute("roomTypes", roomTypes);
         request.setAttribute("staffList", staffList);
@@ -125,9 +167,29 @@ public class BookingListController extends HttpServlet {
         request.setAttribute("roomNumber", roomNumber);
         request.setAttribute("dateFilterDisplay", dateFilterRaw);
         request.setAttribute("sort", sort);
+        request.setAttribute("pagingQuery", pagingQuery);
+
+        request.setAttribute("paginationWindowSize", PAGINATION_WINDOW_SIZE);
+        request.setAttribute("bookingTableColumnCount", BOOKING_TABLE_COLUMN_COUNT);
+        request.setAttribute("popupCloseDelayMs", POPUP_CLOSE_DELAY_MS);
+        request.setAttribute("requestMenuSafeGapPx", REQUEST_MENU_SAFE_GAP_PX);
 
         request.getRequestDispatcher("/view/receptionist/booking-list.jsp")
                 .forward(request, response);
+    }
+
+    private String normalizeAllFilter(String value) {
+        value = clean(value);
+
+        if (value == null || value.equalsIgnoreCase(ALL_FILTER_VALUE)) {
+            return ALL_FILTER_VALUE;
+        }
+
+        return value;
+    }
+
+    private boolean isAllFilter(String value) {
+        return value == null || value.equalsIgnoreCase(ALL_FILTER_VALUE);
     }
 
     private String clean(String value) {
@@ -148,11 +210,7 @@ public class BookingListController extends HttpServlet {
         try {
             value = clean(value);
 
-            if (value == null) {
-                return null;
-            }
-
-            if (value.equalsIgnoreCase("all")) {
+            if (value == null || isAllFilter(value)) {
                 return null;
             }
 
@@ -240,6 +298,56 @@ public class BookingListController extends HttpServlet {
             } else {
                 row.put(targetKey, String.valueOf(value));
             }
+        }
+    }
+
+    private String buildPagingQuery(
+            int pageSize,
+            String keyword,
+            String status,
+            String paymentStatus,
+            String source,
+            String filterRoomTypeId,
+            String filterStaffId,
+            String roomNumber,
+            String dateFilterDisplay,
+            String sort) {
+
+        StringBuilder query = new StringBuilder();
+
+        appendQueryParam(query, "pageSize", String.valueOf(pageSize));
+        appendQueryParam(query, "keyword", keyword);
+        appendQueryParam(query, "status", status);
+        appendQueryParam(query, "paymentStatus", paymentStatus);
+        appendQueryParam(query, "source", source);
+        appendQueryParam(query, "roomTypeId", filterRoomTypeId);
+        appendQueryParam(query, "filterStaffId", filterStaffId);
+        appendQueryParam(query, "roomNumber", roomNumber);
+        appendQueryParam(query, "dateFilter", dateFilterDisplay);
+        appendQueryParam(query, "sort", sort);
+
+        return query.toString();
+    }
+
+    private void appendQueryParam(StringBuilder query, String name, String value) {
+        if (value == null) {
+            value = "";
+        }
+
+        if (query.length() > 0) {
+            query.append("&");
+        }
+
+        query.append(urlEncode(name));
+        query.append("=");
+        query.append(urlEncode(value));
+    }
+
+    private String urlEncode(String value) {
+        try {
+            return URLEncoder.encode(value, StandardCharsets.UTF_8.name());
+        } catch (Exception e) {
+            return "";
         }
     }
 }
