@@ -26,6 +26,17 @@ public class BookingDetailController extends HttpServlet {
     private static final DateTimeFormatter DATE_TIME_FORMATTER
             = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
+    private static final String DEFAULT_VERIFICATION_STATUS = "Chưa gửi minh chứng";
+    private static final String WALK_IN_SOURCE = "Đặt phòng tại quầy";
+
+    private static final String STATUS_CHECKED_OUT = "Đã trả phòng";
+    private static final String STATUS_CANCELLED = "Đã hủy";
+    private static final String STATUS_CHECKED_IN = "Đã nhận phòng";
+
+    private static final int MAX_EMAIL_LENGTH = 100;
+    private static final int SAME_DAY_COUNTER_DEPOSIT_LIMIT_HOUR = 14;
+    private static final long DEFAULT_NIGHTS = 0;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -33,29 +44,26 @@ public class BookingDetailController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
 
-        // 1. Lấy mã code từ URL (phục vụ cho việc redirect từ trang gửi yêu cầu về)
         String bookingCode = request.getParameter("bookingCode");
         String email = request.getParameter("email");
-        String status = request.getParameter("status"); // Lấy trạng thái từ URL
+        String status = request.getParameter("status");
 
-        // 2. Nếu có bookingCode, tự động load lại dữ liệu để hiển thị
         if (bookingCode != null && !bookingCode.trim().isEmpty()) {
             BookingDAO bookingDAO = new BookingDAO();
             Booking booking = bookingDAO.getBookingByCodeAndEmail(bookingCode, email);
 
             if (booking != null) {
                 Guest guest = bookingDAO.getGuestByBookingId(booking.getBookingId());
+
                 RoomTypeDAO roomTypeDAO = new RoomTypeDAO();
                 RoomType roomType = roomTypeDAO.getRoomDetailById(booking.getRoomTypeId());
+
                 String verificationStatus = bookingDAO.getDepositVerificationStatus(booking.getBookingId());
 
                 if (verificationStatus == null || verificationStatus.trim().isEmpty()) {
-                    verificationStatus = "Chưa gửi minh chứng";
+                    verificationStatus = DEFAULT_VERIFICATION_STATUS;
                 }
 
-                // =============================================================
-                // BỔ SUNG: Truy vấn dữ liệu Requests và Changes giống bên doPost
-                // =============================================================
                 List<Map<String, Object>> publicRequests
                         = bookingDAO.getPublicBookingRequests(booking.getBookingId());
 
@@ -64,30 +72,35 @@ public class BookingDetailController extends HttpServlet {
 
                 request.setAttribute("publicRequests", publicRequests);
                 request.setAttribute("publicChanges", publicChanges);
-                // =============================================================
 
-                // BỔ SUNG THÊM: Tính toán quyền viết feedback giống bên doPost để tránh lỗi vặt
                 FeedbackDAO feedbackDAO = new FeedbackDAO();
                 boolean hasFeedback = feedbackDAO.hasFeedback(booking.getBookingId());
-                boolean canWriteFeedback = "Đã trả phòng".equals(booking.getStatus()) && !hasFeedback;
+                boolean canWriteFeedback = STATUS_CHECKED_OUT.equals(booking.getStatus()) && !hasFeedback;
+
                 request.setAttribute("hasFeedback", hasFeedback);
                 request.setAttribute("canWriteFeedback", canWriteFeedback);
 
-                // Đẩy dữ liệu điều hướng vào request
                 request.setAttribute("booking", booking);
                 request.setAttribute("searched", true);
                 request.setAttribute("bookingCode", bookingCode);
                 request.setAttribute("email", email);
-
-                // Set status để script sweetalert2 hoạt động
                 request.setAttribute("status", status);
 
-                // Gọi hàm setBookingDetailData của bạn để tính toán ngày tháng/tiền
-                setBookingDetailData(request, booking, guest, roomType, verificationStatus);
+                boolean counterSameDayNoDeposit = isCounterSameDayNoDeposit(booking);
+                request.setAttribute("counterSameDayNoDeposit", counterSameDayNoDeposit);
+
+                setBookingDetailData(
+                        request,
+                        booking,
+                        guest,
+                        roomType,
+                        verificationStatus
+                );
             }
         }
 
-        request.getRequestDispatcher("/view/user/booking-detail.jsp").forward(request, response);
+        request.getRequestDispatcher("/view/user/booking-detail.jsp")
+                .forward(request, response);
     }
 
     @Override
@@ -147,7 +160,7 @@ public class BookingDetailController extends HttpServlet {
         if (verificationStatus == null
                 || verificationStatus.trim().isEmpty()) {
 
-            verificationStatus = "Chưa gửi minh chứng";
+            verificationStatus = DEFAULT_VERIFICATION_STATUS;
         }
 
         boolean counterSameDayNoDeposit
@@ -172,7 +185,7 @@ public class BookingDetailController extends HttpServlet {
         boolean hasFeedback = feedbackDAO.hasFeedback(booking.getBookingId());
 
         boolean canWriteFeedback
-                = "Đã trả phòng".equals(booking.getStatus())
+                = STATUS_CHECKED_OUT.equals(booking.getStatus())
                 && !hasFeedback;
 
         request.setAttribute("hasFeedback", hasFeedback);
@@ -196,13 +209,17 @@ public class BookingDetailController extends HttpServlet {
             RoomType roomType,
             String verificationStatus) {
 
-        long numberOfNights = 0;
+        long numberOfNights = DEFAULT_NIGHTS;
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         String checkInText = "";
         String checkOutText = "";
-        String timelineCheckInText = "";
-        String timelineCheckOutText = "";
+
+        String plannedCheckInText = "";
+        String plannedCheckOutText = "";
+        String actualCheckInText = "";
+        String actualCheckOutText = "";
+
         String createdAtText = "";
         String dateOfBirthText = "";
 
@@ -210,14 +227,14 @@ public class BookingDetailController extends HttpServlet {
             checkInText = booking.getCheckinDate()
                     .format(DATE_FORMATTER);
 
-            timelineCheckInText = checkInText;
+            plannedCheckInText = checkInText;
         }
 
         if (booking.getCheckoutDate() != null) {
             checkOutText = booking.getCheckoutDate()
                     .format(DATE_FORMATTER);
 
-            timelineCheckOutText = checkOutText;
+            plannedCheckOutText = checkOutText;
         }
 
         if (booking.getCheckinDate() != null
@@ -228,8 +245,8 @@ public class BookingDetailController extends HttpServlet {
                     booking.getCheckoutDate()
             );
 
-            if (numberOfNights < 0) {
-                numberOfNights = 0;
+            if (numberOfNights < DEFAULT_NIGHTS) {
+                numberOfNights = DEFAULT_NIGHTS;
             }
         }
 
@@ -245,12 +262,12 @@ public class BookingDetailController extends HttpServlet {
         }
 
         if (booking.getActualCheckinTime() != null) {
-            timelineCheckInText = booking.getActualCheckinTime()
+            actualCheckInText = booking.getActualCheckinTime()
                     .format(DATE_TIME_FORMATTER);
         }
 
         if (booking.getActualCheckoutTime() != null) {
-            timelineCheckOutText = booking.getActualCheckoutTime()
+            actualCheckOutText = booking.getActualCheckoutTime()
                     .format(DATE_TIME_FORMATTER);
         }
 
@@ -270,8 +287,11 @@ public class BookingDetailController extends HttpServlet {
         request.setAttribute("checkInText", checkInText);
         request.setAttribute("checkOutText", checkOutText);
 
-        request.setAttribute("timelineCheckInText", timelineCheckInText);
-        request.setAttribute("timelineCheckOutText", timelineCheckOutText);
+        request.setAttribute("plannedCheckInText", plannedCheckInText);
+        request.setAttribute("plannedCheckOutText", plannedCheckOutText);
+
+        request.setAttribute("actualCheckInText", actualCheckInText);
+        request.setAttribute("actualCheckOutText", actualCheckOutText);
 
         request.setAttribute("createdAtText", createdAtText);
         request.setAttribute("dateOfBirthText", dateOfBirthText);
@@ -283,7 +303,7 @@ public class BookingDetailController extends HttpServlet {
         }
 
         if (booking.getSource() == null
-                || !"Đặt phòng tại quầy".equals(booking.getSource())) {
+                || !WALK_IN_SOURCE.equals(booking.getSource())) {
             return false;
         }
 
@@ -295,11 +315,11 @@ public class BookingDetailController extends HttpServlet {
         boolean checkinIsCreateDate = booking.getCheckinDate()
                 .equals(booking.getCreateAt().toLocalDate());
 
-        boolean createdBefore14h = booking.getCreateAt()
+        boolean createdBeforeLimitTime = booking.getCreateAt()
                 .toLocalTime()
-                .isBefore(LocalTime.of(14, 0));
+                .isBefore(LocalTime.of(SAME_DAY_COUNTER_DEPOSIT_LIMIT_HOUR, 0));
 
-        return checkinIsCreateDate && createdBefore14h;
+        return checkinIsCreateDate && createdBeforeLimitTime;
     }
 
     private String validateLookupInformation(
@@ -317,7 +337,7 @@ public class BookingDetailController extends HttpServlet {
             return "Vui lòng nhập email đặt phòng.";
         }
 
-        if (email.length() > 100) {
+        if (email.length() > MAX_EMAIL_LENGTH) {
             return "Email không được vượt quá 100 ký tự.";
         }
 

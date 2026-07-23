@@ -20,6 +20,36 @@ public class CounterRequestController extends HttpServlet {
     private static final DateTimeFormatter DATE_FORMATTER
             = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+    private static final String REQUEST_TYPE_EXTEND = "extend";
+    private static final String REQUEST_TYPE_UPGRADE = "upgrade";
+    private static final String REQUEST_TYPE_CANCEL = "cancel";
+    private static final String REQUEST_TYPE_OTHER = "other";
+
+    private static final String STATUS_PENDING = "Chờ xử lý";
+    private static final String STATUS_CONFIRMED = "Đã xác nhận";
+    private static final String STATUS_CHECKED_IN = "Đã nhận phòng";
+    private static final String STATUS_CHECKED_OUT = "Đã trả phòng";
+    private static final String STATUS_CANCELLED = "Đã hủy";
+
+    private static final int DEFAULT_INT_VALUE = 0;
+    private static final int DEFAULT_CANCEL_ROOMS = 1;
+    private static final int EMPTY_CANCEL_ROOMS = 0;
+
+    private static final int STANDARD_CHECKIN_HOUR = 14;
+    private static final int STANDARD_CHECKIN_MINUTE = 0;
+
+    private static final int FREE_CANCEL_HOURS = 72;
+    private static final int LOW_FEE_CANCEL_HOURS = 48;
+    private static final int MEDIUM_FEE_CANCEL_HOURS = 24;
+
+    private static final BigDecimal FREE_CANCEL_FEE_RATE = BigDecimal.ZERO;
+    private static final BigDecimal LOW_CANCEL_FEE_RATE = new BigDecimal("0.30");
+    private static final BigDecimal MEDIUM_CANCEL_FEE_RATE = new BigDecimal("0.50");
+    private static final BigDecimal HIGH_CANCEL_FEE_RATE = new BigDecimal("0.70");
+
+    private static final int MONEY_SCALE = 2;
+    private static final RoundingMode MONEY_ROUNDING_MODE = RoundingMode.HALF_UP;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -46,10 +76,10 @@ public class CounterRequestController extends HttpServlet {
 
         if (requestType == null) {
             request.setAttribute("error", "Trạng thái booking hiện tại không thể tạo yêu cầu.");
-            requestType = "other";
+            requestType = REQUEST_TYPE_OTHER;
         }
 
-        preparePageData(request, bookingDAO, booking, requestType, null, null, 0);
+        preparePageData(request, bookingDAO, booking, requestType, null, null, DEFAULT_INT_VALUE);
 
         request.getRequestDispatcher("/view/receptionist/counter-request.jsp")
                 .forward(request, response);
@@ -82,21 +112,21 @@ public class CounterRequestController extends HttpServlet {
             }
 
             if (requestType == null) {
-                requestType = "other";
+                requestType = REQUEST_TYPE_OTHER;
             }
 
-            preparePageData(request, bookingDAO, booking, requestType, null, note, 0);
+            preparePageData(request, bookingDAO, booking, requestType, null, note, DEFAULT_INT_VALUE);
             forwardBack(request, response);
             return;
         }
 
         boolean success;
 
-        if ("extend".equals(requestType)) {
+        if (REQUEST_TYPE_EXTEND.equals(requestType)) {
             success = handleExtendStay(request, response, bookingDAO, booking, note);
-        } else if ("upgrade".equals(requestType)) {
+        } else if (REQUEST_TYPE_UPGRADE.equals(requestType)) {
             success = handleUpgradeRoomType(request, response, bookingDAO, booking, note);
-        } else if ("cancel".equals(requestType)) {
+        } else if (REQUEST_TYPE_CANCEL.equals(requestType)) {
             success = handleCancelBooking(request, response, bookingDAO, booking, note);
         } else {
             success = handleOtherRequest(request, response, bookingDAO, booking, note);
@@ -124,14 +154,14 @@ public class CounterRequestController extends HttpServlet {
 
         if (newCheckoutDate == null) {
             request.setAttribute("error", "Vui lòng chọn ngày check-out mới.");
-            preparePageData(request, bookingDAO, booking, "extend", newCheckoutDateRaw, note, 0);
+            preparePageData(request, bookingDAO, booking, REQUEST_TYPE_EXTEND, newCheckoutDateRaw, note, DEFAULT_INT_VALUE);
             forwardBack(request, response);
             return false;
         }
 
         if (currentCheckoutDate == null || !newCheckoutDate.isAfter(currentCheckoutDate)) {
             request.setAttribute("error", "Ngày check-out mới phải sau ngày check-out hiện tại.");
-            preparePageData(request, bookingDAO, booking, "extend", newCheckoutDateRaw, note, 0);
+            preparePageData(request, bookingDAO, booking, REQUEST_TYPE_EXTEND, newCheckoutDateRaw, note, DEFAULT_INT_VALUE);
             forwardBack(request, response);
             return false;
         }
@@ -144,7 +174,7 @@ public class CounterRequestController extends HttpServlet {
 
         if (!success) {
             request.setAttribute("error", "Không thể áp dụng yêu cầu gia hạn.");
-            preparePageData(request, bookingDAO, booking, "extend", newCheckoutDateRaw, note, 0);
+            preparePageData(request, bookingDAO, booking, REQUEST_TYPE_EXTEND, newCheckoutDateRaw, note, DEFAULT_INT_VALUE);
             forwardBack(request, response);
             return false;
         }
@@ -164,16 +194,16 @@ public class CounterRequestController extends HttpServlet {
         int currentRoomTypeId = asInt(booking.get("roomTypeId"));
         int targetRoomTypeId = parseInt(request.getParameter("targetRoomTypeId"));
 
-        if (targetRoomTypeId <= 0) {
+        if (targetRoomTypeId <= DEFAULT_INT_VALUE) {
             request.setAttribute("error", "Vui lòng chọn hạng phòng mới.");
-            preparePageData(request, bookingDAO, booking, "upgrade", null, note, 0);
+            preparePageData(request, bookingDAO, booking, REQUEST_TYPE_UPGRADE, null, note, DEFAULT_INT_VALUE);
             forwardBack(request, response);
             return false;
         }
 
         if (targetRoomTypeId == currentRoomTypeId) {
             request.setAttribute("error", "Hạng phòng mới không được trùng với hạng phòng hiện tại.");
-            preparePageData(request, bookingDAO, booking, "upgrade", null, note, 0);
+            preparePageData(request, bookingDAO, booking, REQUEST_TYPE_UPGRADE, null, note, DEFAULT_INT_VALUE);
             forwardBack(request, response);
             return false;
         }
@@ -186,7 +216,7 @@ public class CounterRequestController extends HttpServlet {
 
         if (!success) {
             request.setAttribute("error", "Không thể áp dụng yêu cầu nâng cấp hạng phòng.");
-            preparePageData(request, bookingDAO, booking, "upgrade", null, note, 0);
+            preparePageData(request, bookingDAO, booking, REQUEST_TYPE_UPGRADE, null, note, DEFAULT_INT_VALUE);
             forwardBack(request, response);
             return false;
         }
@@ -206,16 +236,16 @@ public class CounterRequestController extends HttpServlet {
         int totalRooms = asInt(booking.get("numRooms"));
         int cancelRooms = parseInt(request.getParameter("cancelRooms"));
 
-        if (cancelRooms <= 0 || cancelRooms > totalRooms) {
+        if (cancelRooms <= DEFAULT_INT_VALUE || cancelRooms > totalRooms) {
             request.setAttribute("error", "Số phòng muốn hủy không hợp lệ.");
-            preparePageData(request, bookingDAO, booking, "cancel", null, note, cancelRooms);
+            preparePageData(request, bookingDAO, booking, REQUEST_TYPE_CANCEL, null, note, cancelRooms);
             forwardBack(request, response);
             return false;
         }
 
         if (note == null || note.trim().isEmpty()) {
             request.setAttribute("error", "Vui lòng nhập lý do hủy.");
-            preparePageData(request, bookingDAO, booking, "cancel", null, note, cancelRooms);
+            preparePageData(request, bookingDAO, booking, REQUEST_TYPE_CANCEL, null, note, cancelRooms);
             forwardBack(request, response);
             return false;
         }
@@ -228,7 +258,7 @@ public class CounterRequestController extends HttpServlet {
 
         if (!success) {
             request.setAttribute("error", "Không thể hủy booking. Chỉ hủy được booking ở trạng thái Chờ xử lý hoặc Đã xác nhận.");
-            preparePageData(request, bookingDAO, booking, "cancel", null, note, cancelRooms);
+            preparePageData(request, bookingDAO, booking, REQUEST_TYPE_CANCEL, null, note, cancelRooms);
             forwardBack(request, response);
             return false;
         }
@@ -248,7 +278,7 @@ public class CounterRequestController extends HttpServlet {
 
         if (note == null || note.trim().isEmpty()) {
             request.setAttribute("error", "Vui lòng nhập nội dung yêu cầu.");
-            preparePageData(request, bookingDAO, booking, "other", null, note, 0);
+            preparePageData(request, bookingDAO, booking, REQUEST_TYPE_OTHER, null, note, DEFAULT_INT_VALUE);
             forwardBack(request, response);
             return false;
         }
@@ -257,7 +287,7 @@ public class CounterRequestController extends HttpServlet {
 
         if (!success) {
             request.setAttribute("error", "Không thể tạo yêu cầu khác.");
-            preparePageData(request, bookingDAO, booking, "other", null, note, 0);
+            preparePageData(request, bookingDAO, booking, REQUEST_TYPE_OTHER, null, note, DEFAULT_INT_VALUE);
             forwardBack(request, response);
             return false;
         }
@@ -285,7 +315,7 @@ public class CounterRequestController extends HttpServlet {
         int numRooms = asInt(booking.get("numRooms"));
         int totalNights = asInt(booking.get("totalNights"));
 
-        if (totalNights <= 0) {
+        if (totalNights <= DEFAULT_INT_VALUE) {
             LocalDate checkin = parseDate(String.valueOf(booking.get("checkinDateSql")));
             LocalDate checkout = parseDate(String.valueOf(booking.get("checkoutDateSql")));
 
@@ -346,7 +376,7 @@ public class CounterRequestController extends HttpServlet {
 
         request.setAttribute("defaultNewCheckoutDate", defaultNewCheckoutDate);
 
-        long extraNights = 0;
+        long extraNights = DEFAULT_INT_VALUE;
 
         if (currentCheckoutDate != null
                 && displayCheckoutDate != null
@@ -375,65 +405,60 @@ public class CounterRequestController extends HttpServlet {
 
         int displayCancelRooms = selectedCancelRooms;
 
-        if (displayCancelRooms <= 0) {
-            displayCancelRooms = 1;
+        if (displayCancelRooms <= DEFAULT_INT_VALUE) {
+            displayCancelRooms = DEFAULT_CANCEL_ROOMS;
         }
 
-        if (numRooms > 0 && displayCancelRooms > numRooms) {
+        if (numRooms > DEFAULT_INT_VALUE && displayCancelRooms > numRooms) {
             displayCancelRooms = numRooms;
         }
 
-        if (numRooms <= 0) {
-            displayCancelRooms = 0;
+        if (numRooms <= DEFAULT_INT_VALUE) {
+            displayCancelRooms = EMPTY_CANCEL_ROOMS;
         }
 
         LocalDate checkinDate = parseDate(String.valueOf(booking.get("checkinDateSql")));
         LocalDateTime checkinDeadline = null;
 
         if (checkinDate != null) {
-            checkinDeadline = checkinDate.atTime(14, 0);
+            checkinDeadline = checkinDate.atTime(STANDARD_CHECKIN_HOUR, STANDARD_CHECKIN_MINUTE);
         }
 
-        long hoursBeforeCheckin = 0;
+        long hoursBeforeCheckin = DEFAULT_INT_VALUE;
 
         if (checkinDeadline != null) {
             hoursBeforeCheckin = ChronoUnit.HOURS.between(LocalDateTime.now(), checkinDeadline);
 
-            if (hoursBeforeCheckin < 0) {
-                hoursBeforeCheckin = 0;
+            if (hoursBeforeCheckin < DEFAULT_INT_VALUE) {
+                hoursBeforeCheckin = DEFAULT_INT_VALUE;
             }
         }
 
-        BigDecimal feeRate;
-        String policyText;
-
-        if (hoursBeforeCheckin >= 72) {
-            feeRate = BigDecimal.ZERO;
-            policyText = "Miễn phí hủy vì còn ít nhất 72 giờ trước 14:00 ngày check-in.";
-        } else if (hoursBeforeCheckin >= 48) {
-            feeRate = new BigDecimal("0.30");
-            policyText = "Hủy trước ít nhất 48 giờ: phí hủy 30% tiền cọc phần phòng hủy.";
-        } else if (hoursBeforeCheckin >= 24) {
-            feeRate = new BigDecimal("0.50");
-            policyText = "Hủy trước ít nhất 24 giờ: phí hủy 50% tiền cọc phần phòng hủy.";
-        } else {
-            feeRate = new BigDecimal("0.70");
-            policyText = "Hủy dưới 24 giờ: phí hủy 70% tiền cọc phần phòng hủy.";
-        }
+        BigDecimal feeRate = getCancelFeeRate(hoursBeforeCheckin);
+        String policyText = getCancelPolicyText(hoursBeforeCheckin);
 
         BigDecimal refundRate = BigDecimal.ONE.subtract(feeRate);
 
         BigDecimal depositPerRoom = BigDecimal.ZERO;
 
-        if (numRooms > 0) {
-            depositPerRoom = deposit.divide(BigDecimal.valueOf(numRooms), 2, RoundingMode.HALF_UP);
+        if (numRooms > DEFAULT_INT_VALUE) {
+            depositPerRoom = deposit.divide(
+                    BigDecimal.valueOf(numRooms),
+                    MONEY_SCALE,
+                    MONEY_ROUNDING_MODE
+            );
         }
 
         BigDecimal cancelRoomsValue = BigDecimal.valueOf(displayCancelRooms);
-
         BigDecimal defaultCancelDeposit = depositPerRoom.multiply(cancelRoomsValue);
-        BigDecimal defaultCancelFee = defaultCancelDeposit.multiply(feeRate).setScale(2, RoundingMode.HALF_UP);
-        BigDecimal defaultRefundAmount = defaultCancelDeposit.subtract(defaultCancelFee).setScale(2, RoundingMode.HALF_UP);
+
+        BigDecimal defaultCancelFee = defaultCancelDeposit
+                .multiply(feeRate)
+                .setScale(MONEY_SCALE, MONEY_ROUNDING_MODE);
+
+        BigDecimal defaultRefundAmount = defaultCancelDeposit
+                .subtract(defaultCancelFee)
+                .setScale(MONEY_SCALE, MONEY_ROUNDING_MODE);
 
         request.setAttribute("selectedCancelRooms", displayCancelRooms);
         request.setAttribute("hoursBeforeCheckin", hoursBeforeCheckin);
@@ -446,22 +471,77 @@ public class CounterRequestController extends HttpServlet {
         request.setAttribute("defaultRefundAmount", defaultRefundAmount);
     }
 
+    private BigDecimal getCancelFeeRate(long hoursBeforeCheckin) {
+        if (hoursBeforeCheckin >= FREE_CANCEL_HOURS) {
+            return FREE_CANCEL_FEE_RATE;
+        }
+
+        if (hoursBeforeCheckin >= LOW_FEE_CANCEL_HOURS) {
+            return LOW_CANCEL_FEE_RATE;
+        }
+
+        if (hoursBeforeCheckin >= MEDIUM_FEE_CANCEL_HOURS) {
+            return MEDIUM_CANCEL_FEE_RATE;
+        }
+
+        return HIGH_CANCEL_FEE_RATE;
+    }
+
+    private String getCancelPolicyText(long hoursBeforeCheckin) {
+        if (hoursBeforeCheckin >= FREE_CANCEL_HOURS) {
+            return "Miễn phí hủy vì còn ít nhất "
+                    + FREE_CANCEL_HOURS
+                    + " giờ trước "
+                    + STANDARD_CHECKIN_HOUR
+                    + ":00 ngày check-in.";
+        }
+
+        if (hoursBeforeCheckin >= LOW_FEE_CANCEL_HOURS) {
+            return "Hủy trước ít nhất "
+                    + LOW_FEE_CANCEL_HOURS
+                    + " giờ: phí hủy "
+                    + formatPercent(LOW_CANCEL_FEE_RATE)
+                    + " tiền cọc phần phòng hủy.";
+        }
+
+        if (hoursBeforeCheckin >= MEDIUM_FEE_CANCEL_HOURS) {
+            return "Hủy trước ít nhất "
+                    + MEDIUM_FEE_CANCEL_HOURS
+                    + " giờ: phí hủy "
+                    + formatPercent(MEDIUM_CANCEL_FEE_RATE)
+                    + " tiền cọc phần phòng hủy.";
+        }
+
+        return "Hủy dưới "
+                + MEDIUM_FEE_CANCEL_HOURS
+                + " giờ: phí hủy "
+                + formatPercent(HIGH_CANCEL_FEE_RATE)
+                + " tiền cọc phần phòng hủy.";
+    }
+
+    private String formatPercent(BigDecimal rate) {
+        return rate.multiply(BigDecimal.valueOf(100))
+                .stripTrailingZeros()
+                .toPlainString()
+                + "%";
+    }
+
     private void putRequestPermissionAttributes(
             HttpServletRequest request,
             Map<String, Object> booking) {
 
         String status = String.valueOf(booking.get("bookingStatus"));
 
-        boolean canCancel = "Chờ xử lý".equals(status)
-                || "Đã xác nhận".equals(status);
+        boolean canCancel = STATUS_PENDING.equals(status)
+                || STATUS_CONFIRMED.equals(status);
 
-        boolean canExtend = "Đã xác nhận".equals(status)
-                || "Đã nhận phòng".equals(status);
+        boolean canExtend = STATUS_CONFIRMED.equals(status)
+                || STATUS_CHECKED_IN.equals(status);
 
-        boolean canUpgrade = "Đã xác nhận".equals(status);
+        boolean canUpgrade = STATUS_CONFIRMED.equals(status);
 
-        boolean canOther = "Đã xác nhận".equals(status)
-                || "Đã nhận phòng".equals(status);
+        boolean canOther = STATUS_CONFIRMED.equals(status)
+                || STATUS_CHECKED_IN.equals(status);
 
         request.setAttribute("canCancelRequest", canCancel);
         request.setAttribute("canExtendRequest", canExtend);
@@ -504,16 +584,16 @@ public class CounterRequestController extends HttpServlet {
 
         String status = String.valueOf(booking.get("bookingStatus"));
 
-        if ("Chờ xử lý".equals(status)) {
-            return "cancel";
+        if (STATUS_PENDING.equals(status)) {
+            return REQUEST_TYPE_CANCEL;
         }
 
-        if ("Đã xác nhận".equals(status)) {
-            return "extend";
+        if (STATUS_CONFIRMED.equals(status)) {
+            return REQUEST_TYPE_EXTEND;
         }
 
-        if ("Đã nhận phòng".equals(status)) {
-            return "extend";
+        if (STATUS_CHECKED_IN.equals(status)) {
+            return REQUEST_TYPE_EXTEND;
         }
 
         return null;
@@ -526,10 +606,10 @@ public class CounterRequestController extends HttpServlet {
             return null;
         }
 
-        if ("extend".equals(value)
-                || "upgrade".equals(value)
-                || "cancel".equals(value)
-                || "other".equals(value)) {
+        if (REQUEST_TYPE_EXTEND.equals(value)
+                || REQUEST_TYPE_UPGRADE.equals(value)
+                || REQUEST_TYPE_CANCEL.equals(value)
+                || REQUEST_TYPE_OTHER.equals(value)) {
             return value;
         }
 
@@ -570,26 +650,26 @@ public class CounterRequestController extends HttpServlet {
             value = clean(value);
 
             if (value == null) {
-                return 0;
+                return DEFAULT_INT_VALUE;
             }
 
             return Integer.parseInt(value);
 
         } catch (Exception e) {
-            return 0;
+            return DEFAULT_INT_VALUE;
         }
     }
 
     private int asInt(Object value) {
         try {
             if (value == null) {
-                return 0;
+                return DEFAULT_INT_VALUE;
             }
 
             return Integer.parseInt(String.valueOf(value));
 
         } catch (Exception e) {
-            return 0;
+            return DEFAULT_INT_VALUE;
         }
     }
 
@@ -613,24 +693,24 @@ public class CounterRequestController extends HttpServlet {
     private boolean isRequestAllowed(Map<String, Object> booking, String requestType) {
         String status = String.valueOf(booking.get("bookingStatus"));
 
-        if ("Đã hủy".equals(status) || "Đã trả phòng".equals(status)) {
+        if (STATUS_CANCELLED.equals(status) || STATUS_CHECKED_OUT.equals(status)) {
             return false;
         }
 
-        if ("Chờ xử lý".equals(status)) {
-            return "cancel".equals(requestType);
+        if (STATUS_PENDING.equals(status)) {
+            return REQUEST_TYPE_CANCEL.equals(requestType);
         }
 
-        if ("Đã xác nhận".equals(status)) {
-            return "extend".equals(requestType)
-                    || "upgrade".equals(requestType)
-                    || "cancel".equals(requestType)
-                    || "other".equals(requestType);
+        if (STATUS_CONFIRMED.equals(status)) {
+            return REQUEST_TYPE_EXTEND.equals(requestType)
+                    || REQUEST_TYPE_UPGRADE.equals(requestType)
+                    || REQUEST_TYPE_CANCEL.equals(requestType)
+                    || REQUEST_TYPE_OTHER.equals(requestType);
         }
 
-        if ("Đã nhận phòng".equals(status)) {
-            return "extend".equals(requestType)
-                    || "other".equals(requestType);
+        if (STATUS_CHECKED_IN.equals(status)) {
+            return REQUEST_TYPE_EXTEND.equals(requestType)
+                    || REQUEST_TYPE_OTHER.equals(requestType);
         }
 
         return false;
@@ -639,8 +719,8 @@ public class CounterRequestController extends HttpServlet {
     private int calculateUpgradeChargeableNights(Map<String, Object> booking, int totalNights) {
         String status = String.valueOf(booking.get("bookingStatus"));
 
-        if (!"Đã xác nhận".equals(status)) {
-            return 0;
+        if (!STATUS_CONFIRMED.equals(status)) {
+            return DEFAULT_INT_VALUE;
         }
 
         LocalDate checkinDate = parseDate(String.valueOf(booking.get("checkinDateSql")));

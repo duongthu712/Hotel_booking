@@ -23,6 +23,14 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 public class BookingDAO extends DBContext {
+    
+    private static final int DEFAULT_PAGE = 1;
+    private static final int DEFAULT_PAGE_SIZE = 10;
+
+    private static final int SQL_DATE_TEXT_LENGTH = 10;
+    private static final int SQL_DATETIME_TEXT_LENGTH = 16;
+
+    private static final String UNASSIGNED_ROOM_TEXT = "Chưa gán";
 
     //Linh
     public Booking getBookingById(int bookingId) throws Exception {
@@ -1208,19 +1216,21 @@ public class BookingDAO extends DBContext {
     }
 
     //booking list - GiangTTT
-    public List<Map<String, Object>> getBookingList(String keyword, String status, String paymentStatus,
-            String source, Integer roomTypeId, Integer staffId, String roomNumber,
-            String dateFilter, String sort, int page, int pageSize) {
+    public List<Map<String, Object>> getBookingList(
+            String keyword, String status, String paymentStatus, String source,
+            Integer roomTypeId, Integer staffId,
+            String roomNumber, String dateFilter, String sort,
+            int page, int pageSize) {
 
         List<Map<String, Object>> list = new ArrayList<>();
         cancelExpiredBookings();
 
-        if (page < 1) {
-            page = 1;
+        if (page < DEFAULT_PAGE) {
+            page = DEFAULT_PAGE;
         }
 
         if (pageSize <= 0) {
-            pageSize = 10;
+            pageSize = DEFAULT_PAGE_SIZE;
         }
 
         StringBuilder sql = new StringBuilder();
@@ -1233,10 +1243,15 @@ public class BookingDAO extends DBContext {
         sql.append("     ISNULL(g.phone, '') AS guestPhone, ");
         sql.append("     rt.type_name AS roomTypeName, ");
         sql.append("     b.num_rooms AS numRooms, ");
-        sql.append("     ISNULL(rd.roomNumbers, N'Chưa gán') AS roomNumbers, ");
+        sql.append("     ISNULL(rd.roomNumbers, N'").append(UNASSIGNED_ROOM_TEXT).append("') AS roomNumbers, ");
         sql.append("     ISNULL(rd.assignedRoomCount, 0) AS assignedRoomCount, ");
-        sql.append("     CONVERT(VARCHAR(10), b.checkin_date, 103) AS checkinDateText, ");
-        sql.append("     CONVERT(VARCHAR(10), b.checkout_date, 103) AS checkoutDateText, ");
+
+        sql.append("     CONVERT(VARCHAR(").append(SQL_DATE_TEXT_LENGTH).append("), b.checkin_date, 103) AS checkinDateText, ");
+        sql.append("     CONVERT(VARCHAR(").append(SQL_DATE_TEXT_LENGTH).append("), b.checkout_date, 103) AS checkoutDateText, ");
+
+        sql.append("     CONVERT(VARCHAR(").append(SQL_DATETIME_TEXT_LENGTH).append("), b.actual_checkin_time, 120) AS actualCheckinTime, ");
+        sql.append("     CONVERT(VARCHAR(").append(SQL_DATETIME_TEXT_LENGTH).append("), b.actual_checkout_time, 120) AS actualCheckoutTime, ");
+
         sql.append("     b.[source] AS source, ");
         sql.append("     b.[status] AS bookingStatus, ");
         sql.append("     b.payment_status AS paymentStatus, ");
@@ -1310,14 +1325,17 @@ public class BookingDAO extends DBContext {
 
         List<Object> params = new ArrayList<>();
 
-        appendBookingListFilters(sql, params, keyword, status, paymentStatus, source,
-                roomTypeId, staffId, roomNumber, dateFilter);
+        appendBookingListFilters(
+                sql, params,
+                keyword, status, paymentStatus, source,
+                roomTypeId, staffId, roomNumber, dateFilter
+        );
 
         sql.append(" ORDER BY ");
         sql.append(getBookingListSortSql(sort));
         sql.append(" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY ");
 
-        params.add((page - 1) * pageSize);
+        params.add((page - DEFAULT_PAGE) * pageSize);
         params.add(pageSize);
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
@@ -1537,6 +1555,7 @@ public class BookingDAO extends DBContext {
 // STAFF BOOKING DETAIL POPUP
     public Map<String, Object> getStaffBookingDetailForPopup(int bookingId) {
         cancelExpiredBookings();
+
         StringBuilder sql = new StringBuilder();
 
         sql.append(" SELECT ");
@@ -1545,18 +1564,26 @@ public class BookingDAO extends DBContext {
         sql.append("     b.[status] AS bookingStatus, ");
         sql.append("     b.payment_status AS paymentStatus, ");
         sql.append("     b.[source] AS source, ");
+
         sql.append("     ISNULL(g.full_name, N'Khách vãng lai') AS guestName, ");
         sql.append("     ISNULL(g.phone, '') AS guestPhone, ");
         sql.append("     ISNULL(g.email, '') AS guestEmail, ");
+
         sql.append("     rt.type_name AS roomTypeName, ");
         sql.append("     b.num_rooms AS numRooms, ");
         sql.append("     b.num_guests AS numGuests, ");
         sql.append("     b.num_children AS numChildren, ");
-        sql.append("     ISNULL(roomData.roomNumbers, N'Chưa gán') AS roomNumbers, ");
-        sql.append("     CONVERT(VARCHAR(10), b.checkin_date, 103) AS checkinDateText, ");
-        sql.append("     CONVERT(VARCHAR(10), b.checkout_date, 103) AS checkoutDateText, ");
+        sql.append("     ISNULL(roomData.roomNumbers, N'").append(UNASSIGNED_ROOM_TEXT).append("') AS roomNumbers, ");
+
+        sql.append("     CONVERT(VARCHAR(").append(SQL_DATE_TEXT_LENGTH).append("), b.checkin_date, 103) AS checkinDateText, ");
+        sql.append("     CONVERT(VARCHAR(").append(SQL_DATE_TEXT_LENGTH).append("), b.checkout_date, 103) AS checkoutDateText, ");
+
+        sql.append("     CONVERT(VARCHAR(").append(SQL_DATETIME_TEXT_LENGTH).append("), b.actual_checkin_time, 120) AS actualCheckinTime, ");
+        sql.append("     CONVERT(VARCHAR(").append(SQL_DATETIME_TEXT_LENGTH).append("), b.actual_checkout_time, 120) AS actualCheckoutTime, ");
+
         sql.append("     b.booked_price_per_night AS bookedPricePerNight, ");
         sql.append("     ISNULL(b.deposit_amount, 0) AS depositAmount, ");
+
         sql.append("     CAST((b.booked_price_per_night * b.num_rooms * ");
         sql.append("         CASE ");
         sql.append("             WHEN DATEDIFF(DAY, b.checkin_date, b.checkout_date) <= 0 ");
@@ -1564,7 +1591,9 @@ public class BookingDAO extends DBContext {
         sql.append("             ELSE DATEDIFF(DAY, b.checkin_date, b.checkout_date) ");
         sql.append("         END ");
         sql.append("     ) AS DECIMAL(15,2)) AS estimatedTotal, ");
+
         sql.append("     ISNULL(s.full_name, N'Chưa có') AS staffName ");
+
         sql.append(" FROM Bookings b ");
         sql.append(" LEFT JOIN Guests g ON b.guest_id = g.guest_id ");
         sql.append(" INNER JOIN RoomTypes rt ON b.room_type_id = rt.room_type_id ");

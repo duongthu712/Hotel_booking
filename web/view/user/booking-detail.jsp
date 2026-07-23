@@ -703,16 +703,26 @@
 
                                         <strong>Nhận phòng</strong>
 
-                                        <span>
-                                            <c:choose>
-                                                <c:when test="${not empty booking.actualCheckinTime}">
-                                                    Thực tế: ${timelineCheckInText}
-                                                </c:when>
+                                        <span class="timeline-date-lines">
+                                            <span>
+                                                Dự kiến:
+                                                <c:choose>
+                                                    <c:when test="${not empty plannedCheckInText}">
+                                                        ${plannedCheckInText}
+                                                    </c:when>
+                                                    <c:otherwise>-</c:otherwise>
+                                                </c:choose>
+                                            </span>
 
-                                                <c:otherwise>
-                                                    Dự kiến: ${timelineCheckInText}
-                                                </c:otherwise>
-                                            </c:choose>
+                                            <span>
+                                                Thực tế:
+                                                <c:choose>
+                                                    <c:when test="${not empty actualCheckInText}">
+                                                        ${actualCheckInText}
+                                                    </c:when>
+                                                    <c:otherwise>-</c:otherwise>
+                                                </c:choose>
+                                            </span>
                                         </span>
                                     </div>
 
@@ -732,16 +742,26 @@
 
                                         <strong>Trả phòng</strong>
 
-                                        <span>
-                                            <c:choose>
-                                                <c:when test="${not empty booking.actualCheckoutTime}">
-                                                    Thực tế: ${timelineCheckOutText}
-                                                </c:when>
+                                        <span class="timeline-date-lines">
+                                            <span>
+                                                Dự kiến:
+                                                <c:choose>
+                                                    <c:when test="${not empty plannedCheckOutText}">
+                                                        ${plannedCheckOutText}
+                                                    </c:when>
+                                                    <c:otherwise>-</c:otherwise>
+                                                </c:choose>
+                                            </span>
 
-                                                <c:otherwise>
-                                                    Dự kiến: ${timelineCheckOutText}
-                                                </c:otherwise>
-                                            </c:choose>
+                                            <span>
+                                                Thực tế:
+                                                <c:choose>
+                                                    <c:when test="${not empty actualCheckOutText}">
+                                                        ${actualCheckOutText}
+                                                    </c:when>
+                                                    <c:otherwise>-</c:otherwise>
+                                                </c:choose>
+                                            </span>
                                         </span>
                                     </div>
                                 </div>
