@@ -25,6 +25,7 @@ public class ProcessRequestController extends HttpServlet {
         String action = request.getParameter("action");
         String type = request.getParameter("type") != null ? request.getParameter("type") : "Tất cả";
         String status = request.getParameter("status") != null ? request.getParameter("status") : "Tất cả";
+        String searchBookingCode = request.getParameter("searchBookingCode");
 
         if ("detail".equals(action)) {
             String reqIdStr = request.getParameter("requestId");
@@ -58,50 +59,31 @@ public class ProcessRequestController extends HttpServlet {
                     // 2. Đối soát khung thời gian và giá tiền hủy đặt phòng
                     if ("Hủy đặt phòng".equals(detail.getRequestType())) {
                         try {
-                            LocalDateTime checkInDeadline = detail.getCheckInDate().atTime(14, 0, 0);
-                            LocalDateTime submittedAt = detail.getSubmittedAt();
+                            double[] financials = calculateFinancials(detail);
+                            double totalBookingValue = financials[0];
+                            double depositPaid = financials[1];
+                            double refundPercent = financials[2];
+                            double finalRefund = financials[3];
+                            double penaltyFee = financials[4];
+                            long totalHoursLeft = (long) financials[5];
+                            long totalMinutesLeft = (long) financials[6];
 
-                            if (submittedAt != null) {
-                                Duration duration = Duration.between(submittedAt, checkInDeadline);
-                                long totalHoursLeft = duration.toHours();
-                                long totalMinutesLeft = duration.toMinutes() % 60;
+                            String durationText;
+                            String feePercentText = ((int)((1 - refundPercent) * 100)) + "%";
 
-                                String durationText;
-                                double currentRefundRate = 1.0;
-                                String feePercentText = "0%";
-
-                                if (totalHoursLeft < 0) {
-                                    durationText = "Đã quá mốc giờ Check-in";
-                                    currentRefundRate = 0.3;
-                                    feePercentText = "70%";
-                                } else {
-                                    durationText = "~ " + totalHoursLeft + " giờ " + Math.abs(totalMinutesLeft) + " phút";
-
-                                    if (totalHoursLeft >= 72) {
-                                        currentRefundRate = 1.0;
-                                        feePercentText = "0%";
-                                    } else if (totalHoursLeft >= 48) {
-                                        currentRefundRate = 0.7; 
-                                        feePercentText = "30%";
-                                    } else if (totalHoursLeft >= 24) {
-                                        currentRefundRate = 0.5;
-                                        feePercentText = "50%";
-                                    } else {
-                                        currentRefundRate = 0.3;
-                                        feePercentText = "70%";
-                                    }
-                                }
-
-                                BigDecimal currentPrice = detail.getCurrentPrice() != null ? detail.getCurrentPrice() : BigDecimal.ZERO;
-                                BigDecimal refundAmount = currentPrice.multiply(BigDecimal.valueOf(currentRefundRate));
-                                BigDecimal feeAmount = currentPrice.subtract(refundAmount);
-
-                                request.setAttribute("cancelDurationText", durationText);
-                                request.setAttribute("cancelFeePercentText", feePercentText);
-                                request.setAttribute("cancelRefundAmount", refundAmount);
-                                request.setAttribute("cancelFeeAmount", feeAmount);
-                                request.setAttribute("hoursLeft", totalHoursLeft);
+                            if (totalHoursLeft < 0) {
+                                durationText = "Đã quá mốc giờ Check-in";
+                            } else {
+                                durationText = "~ " + totalHoursLeft + " giờ " + Math.abs(totalMinutesLeft) + " phút";
                             }
+
+                            request.setAttribute("cancelDurationText", durationText);
+                            request.setAttribute("cancelFeePercentText", feePercentText);
+                            request.setAttribute("cancelRefundAmount", BigDecimal.valueOf(finalRefund));
+                            request.setAttribute("cancelFeeAmount", BigDecimal.valueOf(penaltyFee));
+                            request.setAttribute("hoursLeft", totalHoursLeft);
+                            request.setAttribute("totalBookingValue", BigDecimal.valueOf(totalBookingValue));
+                            request.setAttribute("depositPaid", BigDecimal.valueOf(depositPaid));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -113,9 +95,10 @@ public class ProcessRequestController extends HttpServlet {
             }
         }
 
-        request.setAttribute("requestList", requestDAO.getRequestsByFilters(type, status));
+        request.setAttribute("requestList", requestDAO.getRequestsByFilters(type, status, searchBookingCode));
         request.setAttribute("currentType", type);
         request.setAttribute("currentStatus", status);
+        request.setAttribute("searchBookingCode", searchBookingCode);
 
         request.getRequestDispatcher("/view/receptionist/request-processing.jsp").forward(request, response);
     }
@@ -129,12 +112,15 @@ public class ProcessRequestController extends HttpServlet {
         String notes = request.getParameter("response_notes");
         String type = request.getParameter("type") != null ? request.getParameter("type") : "Tất cả";
         String status = request.getParameter("status") != null ? request.getParameter("status") : "Tất cả";
+        String searchBookingCode = request.getParameter("searchBookingCode");
 
         String encType = java.net.URLEncoder.encode(type, "UTF-8");
         String encStatus = java.net.URLEncoder.encode(status, "UTF-8");
+        String extraParams = "&type=" + encType + "&status=" + encStatus 
+                           + (searchBookingCode != null && !searchBookingCode.isEmpty() ? "&searchBookingCode=" + searchBookingCode : "");
 
         if (reqIdStr == null || reqIdStr.isEmpty()) {
-            response.sendRedirect("process-request?type=" + encType + "&status=" + encStatus + "&status_msg=error");
+            response.sendRedirect("process-request?status_msg=error" + extraParams);
             return;
         }
 
@@ -142,7 +128,7 @@ public class ProcessRequestController extends HttpServlet {
         GuestRequestDTO dto = requestDAO.getRequestForProcessing(requestId);
 
         if (dto == null) {
-            response.sendRedirect("process-request?type=" + encType + "&status=" + encStatus + "&status_msg=not_found");
+            response.sendRedirect("process-request?status_msg=not_found" + extraParams);
             return;
         }
 
@@ -173,7 +159,13 @@ public class ProcessRequestController extends HttpServlet {
             }
             if (isAvailable) {
 
-                boolean success = requestDAO.approveRequest(dto, notes);
+                double penaltyFee = 0;
+                if ("Hủy đặt phòng".equals(dto.getRequestType())) {
+                    double[] financials = calculateFinancials(dto);
+                    penaltyFee = financials[4];
+                }
+
+                boolean success = requestDAO.approveRequest(dto, notes, penaltyFee);
                 
                 if (success) {
                     try {
@@ -200,15 +192,11 @@ public class ProcessRequestController extends HttpServlet {
                     }
                 }
 
-                response.sendRedirect(
-                        "process-request?type=" + encType
-                        + "&status=" + encStatus
-                        + "&status_msg="
-                        + (success ? "approve_success" : "error"));
+                response.sendRedirect("process-request?status_msg=" + (success ? "approve_success" : "error") + extraParams);
 
                 System.out.println("Redirect sent.");
             } else {
-                response.sendRedirect("process-request?action=detail&requestId=" + requestId + "&type=" + encType + "&status=" + encStatus + "&status_msg=no_room");
+                response.sendRedirect("process-request?action=detail&requestId=" + requestId + extraParams + "&status_msg=no_room");
             }
         } else {
             boolean success = requestDAO.rejectRequest(requestId, notes);
@@ -238,7 +226,46 @@ public class ProcessRequestController extends HttpServlet {
                 }
             }
 
-            response.sendRedirect("process-request?type=" + encType + "&status=" + encStatus + "&status_msg=reject_success");
+            response.sendRedirect("process-request?status_msg=reject_success" + extraParams);
+        }
+    }
+
+    private double[] calculateFinancials(dto.GuestRequestDTO detail) {
+        try {
+            double pricePerNight = detail.getCurrentPrice() != null ? detail.getCurrentPrice().doubleValue() : 0;
+            long totalNights = java.time.temporal.ChronoUnit.DAYS.between(detail.getCheckInDate(), detail.getCheckOutDate());
+            if (totalNights <= 0) {
+                totalNights = 1;
+            }
+
+            double totalBookingValue = pricePerNight * totalNights * detail.getNumRooms();
+            double depositPaid = totalBookingValue * 0.30; 
+
+            java.time.LocalDateTime checkInDateTime = detail.getCheckInDate().atTime(14, 0, 0);
+            java.time.LocalDateTime requestTime = detail.getSubmittedAt();
+            if (requestTime == null) {
+                requestTime = java.time.LocalDateTime.now();
+            }
+            
+            java.time.Duration duration = java.time.Duration.between(requestTime, checkInDateTime);
+            long totalHoursLeft = duration.toHours();
+
+            double refundPercent = 0.30; 
+            if (totalHoursLeft >= 72) {
+                refundPercent = 1.00;   
+            } else if (totalHoursLeft >= 48) {
+                refundPercent = 0.70;   
+            } else if (totalHoursLeft >= 24) {
+                refundPercent = 0.50;   
+            }
+
+            double finalRefund = depositPaid * refundPercent; 
+            double penaltyFee = depositPaid - finalRefund;     
+            
+            return new double[]{totalBookingValue, depositPaid, refundPercent, finalRefund, penaltyFee, totalHoursLeft, duration.toMinutes() % 60};
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new double[]{0, 0, 0, 0, 0, 0, 0};
         }
     }
 }

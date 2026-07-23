@@ -41,28 +41,8 @@ document.addEventListener("DOMContentLoaded", function() {
     let currentBasePrice = 0;
     let currentTypeId = "";
 
-    // 2. Tính toán số đêm lưu trú chuẩn nghiệp vụ
-    let nights = 1;
-    if (checkInStr && checkOutStr) {
-        const date1 = new Date(checkInStr);
-        const date2 = new Date(checkOutStr);
-        const diffTime = Math.abs(date2 - date1);
-        nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    }
-    if (summaryNights) {
-        summaryNights.textContent = nights;
-    }
-
-    // 3. Phân luồng kiểm tra khách ở luôn hôm nay hay đặt tương lai
-    const todayObj = new Date();
-    const yyyy = todayObj.getFullYear();
-    const mm = String(todayObj.getMonth() + 1).padStart(2, '0');
-    const dd = String(todayObj.getDate()).padStart(2, '0');
-    const todayStr = `${yyyy}-${mm}-${dd}`;
-    const isStayNow = (checkInStr === todayStr);
-
     // Hàm tính toán lại tiền và validate sức chứa theo thời gian thực
-    function validateCapacityAndRecalculate() {
+    async function validateCapacityAndRecalculate() {
         const numRooms = formNumRoomsInput ? (parseInt(formNumRoomsInput.value) || 1) : 1;
         const numGuests = numGuestsInput ? (parseInt(numGuestsInput.value) || 0) : 0;
         const numChildren = numChildrenInput ? (parseInt(numChildrenInput.value) || 0) : 0;
@@ -107,41 +87,51 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
 
-        // Tính toán lại các mốc hóa đơn tổng tiền
-        const calculatedTotal = currentBasePrice * numRooms * nights;
-        const roomsAndNightsSpan = document.getElementById("summaryRoomsAndNights");
-        if (roomsAndNightsSpan) {
-            roomsAndNightsSpan.textContent = `${numRooms} phòng x ${nights} đêm`;
-        }
-        if (summaryTotalAmount) {
-            summaryTotalAmount.textContent = calculatedTotal.toLocaleString('vi-VN') + " đ";
-        }
+        // Gọi API backend để tính toán tài chính
+        try {
+            const url = `${window.location.origin}${window.location.pathname}?action=calculate&checkInDate=${checkInStr}&checkOutDate=${checkOutStr}&basePrice=${currentBasePrice}&numRooms=${numRooms}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("Lỗi gọi API tính toán");
+            const data = await response.json();
 
-        // Rẽ nhánh giao diện hiển thị tài chính cọc/ở ngay hôm nay
-        if (isStayNow) {
-            if (financialSection) financialSection.style.display = "none";
-            if (depositSummaryRow) depositSummaryRow.style.display = "none";
-            if (stayNowNotice) stayNowNotice.style.display = "block";
-        } else {
-            if (financialSection) financialSection.style.display = "block";
-            if (depositSummaryRow) depositSummaryRow.style.display = "flex";
-            if (stayNowNotice) stayNowNotice.style.display = "none";
-
-            const calculatedDeposit = Math.round(calculatedTotal * 0.3);
-            if (summaryDepositAmount) {
-                summaryDepositAmount.textContent = calculatedDeposit.toLocaleString('vi-VN') + " đ";
+            if (summaryNights) {
+                summaryNights.textContent = data.nights;
+            }
+            const roomsAndNightsSpan = document.getElementById("summaryRoomsAndNights");
+            if (roomsAndNightsSpan) {
+                roomsAndNightsSpan.textContent = `${numRooms} phòng x ${data.nights} đêm`;
+            }
+            if (summaryTotalAmount) {
+                summaryTotalAmount.textContent = parseFloat(data.roomCharges).toLocaleString('vi-VN') + " đ";
             }
 
-            // Đồng bộ số tiền đặt cọc vào bảng thông tin ngân hàng hiển thị công khai
-            if (qrDepositAmount) {
-                qrDepositAmount.textContent = calculatedDeposit.toLocaleString('vi-VN') + " đ";
-            }
+            // Rẽ nhánh giao diện hiển thị tài chính cọc/ở ngay hôm nay
+            if (data.isStayNow) {
+                if (financialSection) financialSection.style.display = "none";
+                if (depositSummaryRow) depositSummaryRow.style.display = "none";
+                if (stayNowNotice) stayNowNotice.style.display = "block";
+            } else {
+                if (financialSection) financialSection.style.display = "block";
+                if (depositSummaryRow) depositSummaryRow.style.display = "flex";
+                if (stayNowNotice) stayNowNotice.style.display = "none";
 
-            // Lấy mã đơn hàng tạm thời gán lên khung nội dung chuyển khoản
-            const generatedCode = document.getElementById("walkInForm").querySelector("input[name='bookingCode']")?.value || "LAMER";
-            if (qrMemoSpan) {
-                qrMemoSpan.textContent = generatedCode;
+                if (summaryDepositAmount) {
+                    summaryDepositAmount.textContent = parseFloat(data.depositAmount).toLocaleString('vi-VN') + " đ";
+                }
+
+                // Đồng bộ số tiền đặt cọc vào bảng thông tin ngân hàng hiển thị công khai
+                if (qrDepositAmount) {
+                    qrDepositAmount.textContent = parseFloat(data.depositAmount).toLocaleString('vi-VN') + " đ";
+                }
+
+                // Lấy mã đơn hàng tạm thời gán lên khung nội dung chuyển khoản
+                const generatedCode = document.getElementById("walkInForm").querySelector("input[name='bookingCode']")?.value || "LAMER";
+                if (qrMemoSpan) {
+                    qrMemoSpan.textContent = generatedCode;
+                }
             }
+        } catch (error) {
+            console.error("Lỗi khi fetch dữ liệu tính toán:", error);
         }
     }
 

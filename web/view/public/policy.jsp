@@ -26,77 +26,17 @@
 
 
                 <div class="policy-groups">
-
-                    <!-- NHẬN / TRẢ PHÒNG -->
-                    <div class="policy-group">
-                        <h3 class="policy-group-title">Nhận / Trả phòng</h3>
-
-                        <c:forEach var="policy" items="${fullPoliciesList}">
-                            <c:if test="${policy.policyType eq 'Nhận/Trả phòng'}">
+                    <c:forEach var="entry" items="${groupedPolicies}">
+                        <div class="policy-group">
+                            <h3 class="policy-group-title">${entry.key}</h3>
+                            <c:forEach var="policy" items="${entry.value}">
                                 <div class="policy-item">
                                     <h4>${policy.policyName}</h4>
                                     <p>${policy.description}</p>
                                 </div>
-                            </c:if>
-                        </c:forEach>
-                    </div>
-
-                    <!-- THANH TOÁN -->
-                    <div class="policy-group">
-                        <h3 class="policy-group-title">Thanh toán</h3>
-
-                        <c:forEach var="policy" items="${fullPoliciesList}">
-                            <c:if test="${policy.policyType eq 'Thanh toán'}">
-                                <div class="policy-item">
-                                    <h4>${policy.policyName}</h4>
-                                    <p>${policy.description}</p>
-                                </div>
-                            </c:if>
-                        </c:forEach>
-                    </div>
-
-                    <!-- HỦY ĐẶT PHÒNG -->
-                    <div class="policy-group">
-                        <h3 class="policy-group-title">Hủy đặt phòng</h3>
-
-                        <c:forEach var="policy" items="${fullPoliciesList}">
-                            <c:if test="${policy.policyType eq 'Hủy đặt phòng'}">
-                                <div class="policy-item">
-                                    <h4>${policy.policyName}</h4>
-                                    <p>${policy.description}</p>
-                                </div>
-                            </c:if>
-                        </c:forEach>
-                    </div>
-
-                    <!-- VẬT NUÔI & HÚT THUỐC -->
-                    <div class="policy-group">
-                        <h3 class="policy-group-title">Vật nuôi & Hút thuốc</h3>
-
-                        <c:forEach var="policy" items="${fullPoliciesList}">
-                            <c:if test="${policy.policyType eq 'Vật nuôi' || policy.policyType eq 'Hút thuốc'}">
-                                <div class="policy-item">
-                                    <h4>${policy.policyName}</h4>
-                                    <p>${policy.description}</p>
-                                </div>
-                            </c:if>
-                        </c:forEach>
-                    </div>
-
-                    <!-- QUY ĐỊNH CHUNG -->
-                    <div class="policy-group">
-                        <h3 class="policy-group-title">Quy định chung</h3>
-
-                        <c:forEach var="policy" items="${fullPoliciesList}">
-                            <c:if test="${policy.policyType eq 'Khác'}">
-                                <div class="policy-item">
-                                    <h4>${policy.policyName}</h4>
-                                    <p>${policy.description}</p>
-                                </div>
-                            </c:if>
-                        </c:forEach>
-                    </div>
-
+                            </c:forEach>
+                        </div>
+                    </c:forEach>
                 </div>
 
             </section>

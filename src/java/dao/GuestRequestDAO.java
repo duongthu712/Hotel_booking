@@ -242,7 +242,7 @@ public class GuestRequestDAO extends DBContext {
     }
 
     // 7. Duyệt phê duyệt yêu cầu (Chạy Transaction bọc an toàn)
-    public boolean approveRequest(dto.GuestRequestDTO dto, String notes) {
+    public boolean approveRequest(dto.GuestRequestDTO dto, String notes, double penaltyFee) {
         String updateReq = "UPDATE GuestRequests SET [status] = N'Đã phê duyệt', response_notes = ?, processed_at = GETDATE() WHERE request_id = ?";
 
         try {
@@ -281,34 +281,7 @@ public class GuestRequestDAO extends DBContext {
                     ps.executeUpdate();
                 }
 
-                // 2.b. Tính toán dòng tiền dựa trên quy định % phạt cọc
-                double pricePerNight = dto.getCurrentPrice() != null ? dto.getCurrentPrice().doubleValue() : 0;
-                long totalNights = java.time.temporal.ChronoUnit.DAYS.between(dto.getCheckInDate(), dto.getCheckOutDate());
-                if (totalNights <= 0) {
-                    totalNights = 1;
-                }
-
-                double totalBookingValue = pricePerNight * totalNights * dto.getNumRooms();
-                double depositPaid = totalBookingValue * 0.30; // 30% tiền cọc khách đã đóng
-
-                // Tính số giờ chênh lệch thực tế từ lúc khách gửi đơn submitted_at đến mốc 14:00 ngày check-in
-                java.time.LocalDateTime checkInDateTime = java.time.LocalDateTime.parse(dto.getCheckInDate() + "T14:00:00");
-                java.time.LocalDateTime requestTime = dto.getSubmittedAt();
-                long diffHours = java.time.Duration.between(requestTime, checkInDateTime).toHours();
-
-                double refundPercent = 0.30; // Mặc định < 24h hoàn 30% cọc
-                if (diffHours >= 72) {
-                    refundPercent = 1.00;   // Hoàn 100% cọc
-                } else if (diffHours >= 48) {
-                    refundPercent = 0.70;   // Hoàn 70% cọc
-                } else if (diffHours >= 24) {
-                    refundPercent = 0.50;   // Hoàn 50% cọc
-                }
-
-                double finalRefund = depositPaid * refundPercent; // Tiền cọc hoàn trả thực tế
-                double penaltyFee = depositPaid - finalRefund;     // Phí phạt giữ lại cho khách sạn
-
-                // 2.c. Cập nhật khớp cấu trúc bảng Invoices trong DB của bạn
+                // 2.b. Cập nhật khớp cấu trúc bảng Invoices trong DB của bạn (penaltyFee tính từ Controller)
                 String sqlUpdateInvoice = "UPDATE Invoices "
                         + "SET room_charges = 0, "
                         + "    consumable_charges = 0, "
@@ -344,7 +317,7 @@ public class GuestRequestDAO extends DBContext {
     }
 
     // 8. Lấy danh sách yêu cầu lọc theo Bộ lọc (Dùng hiển thị dữ liệu lên Bảng bên trái)
-    public List<dto.GuestRequestDTO> getRequestsByFilters(String type, String status) {
+    public List<dto.GuestRequestDTO> getRequestsByFilters(String type, String status, String searchBookingCode) {
         List<dto.GuestRequestDTO> list = new ArrayList<>();
 
         String sql = "SELECT gr.*, b.booking_code, g.full_name, rt.type_name "
@@ -354,6 +327,7 @@ public class GuestRequestDAO extends DBContext {
                 + "LEFT JOIN RoomTypes rt ON gr.target_room_type_id = rt.room_type_id "
                 + ("Tất cả".equals(type) ? " WHERE 1=1 " : " WHERE gr.request_type = ? ")
                 + ("Tất cả".equals(status) ? "" : " AND gr.[status] = ? ")
+                + ((searchBookingCode != null && !searchBookingCode.trim().isEmpty()) ? " AND b.booking_code LIKE ? " : "")
                 + "ORDER BY gr.submitted_at DESC";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -363,6 +337,9 @@ public class GuestRequestDAO extends DBContext {
             }
             if (!"Tất cả".equals(status)) {
                 ps.setNString(idx++, status);
+            }
+            if (searchBookingCode != null && !searchBookingCode.trim().isEmpty()) {
+                ps.setString(idx++, "%" + searchBookingCode.trim() + "%");
             }
 
             try (ResultSet rs = ps.executeQuery()) {
