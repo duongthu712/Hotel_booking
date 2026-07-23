@@ -31,13 +31,9 @@
 }
 
 .srvType {
-    text-align: center;
-    font-size: 0.8em;
-    border-radius: var(--radius-custom);
+    text-align: left;
     padding: 6px 10px;
-    background-color: #fff4d8;
-    color: var(--text-muted);
-    border: 1px solid var(--text-muted);
+    color: var(--text-main);
 }
 
 .srvAct {
