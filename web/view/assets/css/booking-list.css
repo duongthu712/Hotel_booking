@@ -108,6 +108,42 @@ body {
    TABLE
 ========================= */
 
+/* =========================
+   SEARCH NOTE
+========================= */
+
+.filter-note-panel {
+    margin-top: 8px;
+    padding: 12px 14px;
+    border: 1px solid #e2d6c3;
+    border-radius: 8px;
+    background: #fffaf2;
+    color: #003b70;
+}
+
+.filter-note-title {
+    font-size: 15px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.filter-note-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 18px;
+    font-size: 14px;
+    line-height: 1.35;
+}
+
+.filter-note-grid span {
+    display: block;
+}
+
+
+/* =========================
+   TABLE
+========================= */
+
 .booking-table-wrap {
     width: 100%;
     max-width: 100%;
@@ -121,7 +157,7 @@ body {
 
 .booking-table {
     width: 100%;
-    min-width: 1480px;
+    min-width: 1650px;
     border-collapse: collapse;
     background: transparent;
     table-layout: fixed;
@@ -129,7 +165,7 @@ body {
 }
 
 .booking-table th {
-    padding: 10px 7px 12px;
+    padding: 10px 8px 12px;
     border-bottom: 2px solid #d8d2c5;
     color: #003b70;
     font-size: 14px;
@@ -137,89 +173,107 @@ body {
     text-align: left;
     white-space: normal;
     line-height: 1.18;
+    vertical-align: middle;
 }
 
 .booking-table td {
-    padding: 10px 7px;
+    padding: 10px 8px;
     border-bottom: 1px solid #ddd7cb;
     color: #001f3f;
     font-size: 14px;
     vertical-align: middle;
     white-space: normal;
-    line-height: 1.22;
+    line-height: 1.28;
 }
 
 .booking-table tr:last-child td {
     border-bottom: none;
 }
 
+/* STT */
 .booking-table th:nth-child(1),
 .booking-table td:nth-child(1) {
-    width: 44px;
+    width: 48px;
     text-align: center;
 }
 
+/* Mã booking */
 .booking-table th:nth-child(2),
 .booking-table td:nth-child(2) {
-    width: 112px;
+    width: 145px;
 }
 
+/* Khách hàng */
 .booking-table th:nth-child(3),
 .booking-table td:nth-child(3) {
-    width: 150px;
-}
-
-.booking-table th:nth-child(4),
-.booking-table td:nth-child(4) {
     width: 190px;
 }
 
+/* Hạng phòng */
+.booking-table th:nth-child(4),
+.booking-table td:nth-child(4) {
+    width: 245px;
+}
+
+/* Phòng */
 .booking-table th:nth-child(5),
 .booking-table td:nth-child(5) {
-    width: 88px;
+    width: 105px;
     text-align: center;
 }
 
-.booking-table th:nth-child(6),
-.booking-table td:nth-child(6),
-.booking-table th:nth-child(7),
-.booking-table td:nth-child(7) {
-    width: 94px;
-    text-align: center;
+/* Thời gian theo đơn */
+.booking-table th:nth-child(5),
+.booking-table td:nth-child(5) {
+    width: 230px;
+    text-align: left;
     white-space: nowrap;
 }
 
+/* Thời gian thực tế */
+.booking-table th:nth-child(6),
+.booking-table td:nth-child(6) {
+    width: 230px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.time-cell {
+    white-space: nowrap;
+}
+
+.time-line {
+    display: block;
+    line-height: 1.35;
+    margin-bottom: 3px;
+    white-space: nowrap;
+}
+
+/* Trạng thái */
 .booking-table th:nth-child(8),
 .booking-table td:nth-child(8) {
-    width: 94px;
+    width: 145px;
     text-align: center;
 }
 
+/* Thanh toán */
 .booking-table th:nth-child(9),
 .booking-table td:nth-child(9) {
-    width: 118px;
+    width: 150px;
     text-align: center;
 }
 
+/* Lễ tân phụ trách */
 .booking-table th:nth-child(10),
 .booking-table td:nth-child(10) {
-    width: 126px;
+    width: 160px;
     text-align: center;
 }
 
+/* Hành động */
 .booking-table th:nth-child(11),
 .booking-table td:nth-child(11) {
-    width: 138px;
-}
-
-.booking-table th:nth-child(12),
-.booking-table td:nth-child(12) {
-    width: 132px;
-}
-
-.booking-table th:nth-child(13),
-.booking-table td:nth-child(13) {
-    width: 152px;
+    width: 160px;
     text-align: center;
 }
 
@@ -245,15 +299,25 @@ body {
     line-height: 1.28;
 }
 
+.booking-table td:nth-child(6) div,
+.booking-table td:nth-child(7) div {
+    line-height: 1.35;
+    margin-bottom: 2px;
+}
+
+.booking-table td small {
+    display: block;
+    margin-top: 3px;
+    color: #003b70;
+    font-size: 13px;
+    line-height: 1.25;
+}
+
 .empty-row {
     text-align: center;
     padding: 26px !important;
     color: #666666;
 }
-
-/* =========================
-   BADGE
-========================= */
 
 /* =========================
    BADGE

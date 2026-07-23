@@ -107,22 +107,54 @@
                         </div>
 
                         <div class="info-item">
-                            <span>Check-in</span>
-                            <strong>${bookingDetail.checkinDateText}</strong>
-                        </div>
-
-                        <div class="info-item">
-                            <span>Check-out</span>
-                            <strong>${bookingDetail.checkoutDateText}</strong>
-                        </div>
-
-                        <div class="info-item">
                             <span>Số khách</span>
                             <strong>
                                 ${bookingDetail.numGuests} người
                                 <c:if test="${bookingDetail.numChildren > 0}">
                                     , ${bookingDetail.numChildren} trẻ em
                                 </c:if>
+                            </strong>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="detail-section">
+                    <div class="section-title">
+                        THỜI GIAN LƯU TRÚ
+                    </div>
+
+                    <div class="info-box stay-grid">
+                        <div class="info-item">
+                            <span>Check-in dự kiến theo đơn</span>
+                            <strong>${bookingDetail.checkinDateText}</strong>
+                        </div>
+
+                        <div class="info-item">
+                            <span>Check-out dự kiến theo đơn</span>
+                            <strong>${bookingDetail.checkoutDateText}</strong>
+                        </div>
+
+                        <div class="info-item">
+                            <span>Check-in thực tế</span>
+                            <strong>
+                                <c:choose>
+                                    <c:when test="${not empty bookingDetail.actualCheckinTime}">
+                                        ${bookingDetail.actualCheckinTime}
+                                    </c:when>
+                                    <c:otherwise>-</c:otherwise>
+                                </c:choose>
+                            </strong>
+                        </div>
+
+                        <div class="info-item">
+                            <span>Check-out thực tế</span>
+                            <strong>
+                                <c:choose>
+                                    <c:when test="${not empty bookingDetail.actualCheckoutTime}">
+                                        ${bookingDetail.actualCheckoutTime}
+                                    </c:when>
+                                    <c:otherwise>-</c:otherwise>
+                                </c:choose>
                             </strong>
                         </div>
                     </div>
