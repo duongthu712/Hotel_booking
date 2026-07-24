@@ -995,16 +995,28 @@
 
                             <div class="detail-management-grid">
                                 <c:choose>
+                                    <c:when test="${booking.status eq 'Chờ xử lý'}">
+                                        <button type="button"
+                                                class="detail-management-button request disabled"
+                                                disabled>
+                                            <span class="detail-management-icon">✎</span>
+
+                                            <span>
+                                                <strong>Tạo yêu cầu</strong>
+                                                <small>Đơn đặt phòng chưa được xác nhận</small>
+                                            </span>
+                                        </button>
+                                    </c:when>
+
                                     <c:when test="${hasPending}">
                                         <button type="button"
                                                 class="detail-management-button request disabled"
                                                 onclick="Swal.fire({
-                                                            title: 'Yêu cầu đang chờ duyệt',
-                                                            text: 'Đơn này hiện đang có yêu cầu ở trạng thái Chờ xử lý. Vui lòng đợi lễ tân duyệt xong.',
-                                                            icon: 'warning',
-                                                            confirmButtonColor: '#06213e'
-                                                        })">
-
+                                                    title: 'Yêu cầu đang chờ duyệt',
+                                                    text: 'Đơn này hiện đang có yêu cầu ở trạng thái Chờ xử lý. Vui lòng đợi lễ tân duyệt xong.',
+                                                    icon: 'warning',
+                                                    confirmButtonColor: '#06213e'
+                                                })">
                                             <span class="detail-management-icon">✎</span>
 
                                             <span>
@@ -1014,30 +1026,31 @@
                                         </button>
                                     </c:when>
 
-                                    <c:when test="${booking.status eq 'Chờ xử lý'
-                                                    or booking.status eq 'Đã xác nhận'
+                                    <c:when test="${booking.status eq 'Đã xác nhận'
                                                     or booking.status eq 'Đã nhận phòng'}">
-                                            <button type="button"
-                                                    class="detail-management-button request"
-                                                    onclick="window.location.href = '${pageContext.request.contextPath}/guest-request?bookingCode=${booking.bookingCode}&email=${email}'">
-                                                <span class="detail-management-icon">✎</span>
+                                        <button type="button"
+                                                class="detail-management-button request"
+                                                onclick="window.location.href = '${pageContext.request.contextPath}/guest-request?bookingCode=${booking.bookingCode}&email=${email}'">
+                                            <span class="detail-management-icon">✎</span>
 
-                                                <span>
-                                                    <strong>Tạo yêu cầu</strong>
-                                                    <small>Yêu cầu thay đổi đơn</small>
-                                                </span>
-                                            </button>
+                                            <span>
+                                                <strong>Tạo yêu cầu</strong>
+                                                <small>Yêu cầu thay đổi đơn</small>
+                                            </span>
+                                        </button>
                                     </c:when>
 
                                     <c:otherwise>
-                                        <div class="detail-management-button request disabled">
+                                        <button type="button"
+                                                class="detail-management-button request disabled"
+                                                disabled>
                                             <span class="detail-management-icon">✎</span>
 
                                             <span>
                                                 <strong>Tạo yêu cầu</strong>
                                                 <small>Không còn khả dụng</small>
                                             </span>
-                                        </div>
+                                        </button>
                                     </c:otherwise>
                                 </c:choose>
 
@@ -1045,7 +1058,6 @@
                                     <c:when test="${canWriteFeedback}">
                                         <a href="${pageContext.request.contextPath}/feedback-submission?bookingId=${booking.bookingId}"
                                            class="detail-management-button feedback">
-
                                             <span class="detail-management-icon">★</span>
 
                                             <span>

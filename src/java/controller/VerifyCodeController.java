@@ -19,11 +19,19 @@ public class VerifyCodeController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // Hiển thị trang nhập mã khi phiên xác minh còn tồn tại.
         HttpSession session = request.getSession(false);
 
         if (session == null || session.getAttribute("pendingResetEmail") == null) {
             response.sendRedirect(request.getContextPath() + "/forgot-password");
             return;
+        }
+
+        Object verifyMessage = session.getAttribute("verifyMessage");
+
+        if (verifyMessage != null) {
+            request.setAttribute("message", verifyMessage.toString());
+            session.removeAttribute("verifyMessage");
         }
 
         request.getRequestDispatcher("/view/auth/verify-code.jsp").forward(request, response);
@@ -33,7 +41,9 @@ public class VerifyCodeController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // Xác minh mã hoặc xử lý yêu cầu gửi lại mã.
         request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
 
         HttpSession session = request.getSession(false);
 
@@ -48,29 +58,8 @@ public class VerifyCodeController extends HttpServlet {
         StaffAccountDAO dao = new StaffAccountDAO();
 
         if ("resend".equalsIgnoreCase(action)) {
-            try {
-                String newCode = generateCode();
-                LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(RESET_CODE_EXPIRY_MINUTES);
-
-                dao.saveResetCode(email, newCode, expiryTime);
-
-                try {
-                    EmailUtil.sendResetCode(email, newCode);
-                    request.setAttribute("message", "Mã xác minh mới đã được gửi đến email của bạn.");
-                } catch (Exception mailError) {
-                    mailError.printStackTrace();
-                    request.setAttribute("error", "Không thể gửi email. Vui lòng thử lại sau.");
-                }
-
-                request.getRequestDispatcher("/view/auth/verify-code.jsp").forward(request, response);
-                return;
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                request.setAttribute("error", "Không thể gửi lại mã. Vui lòng thử lại.");
-                request.getRequestDispatcher("/view/auth/verify-code.jsp").forward(request, response);
-                return;
-            }
+            handleResendCode(request, response, session, dao, email);
+            return;
         }
 
         String code = request.getParameter("code");
@@ -83,28 +72,73 @@ public class VerifyCodeController extends HttpServlet {
 
         code = code.trim();
 
-        boolean valid = dao.isValidResetCode(email, code);
+        try {
+            boolean valid = dao.isValidResetCode(email, code);
 
-        if (!valid) {
-            request.setAttribute("error", "Mã xác minh không hợp lệ hoặc đã hết hạn.");
+            if (!valid) {
+                request.setAttribute("error", "Mã xác minh không hợp lệ hoặc đã hết hạn.");
+                request.getRequestDispatcher("/view/auth/verify-code.jsp").forward(request, response);
+                return;
+            }
+
+            session.setAttribute("resetEmail", email);
+            session.removeAttribute("pendingResetEmail");
+            session.removeAttribute("verifyMessage");
+
+            response.sendRedirect(request.getContextPath() + "/reset-password");
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
+
+            request.setAttribute("error", "Không thể xác minh mã. Vui lòng thử lại.");
             request.getRequestDispatcher("/view/auth/verify-code.jsp").forward(request, response);
-            return;
         }
+    }
 
-        session.setAttribute("resetEmail", email);
-        session.removeAttribute("pendingResetEmail");
+    private void handleResendCode(HttpServletRequest request, HttpServletResponse response,
+            HttpSession session, StaffAccountDAO dao, String email)
+            throws ServletException, IOException {
 
-        response.sendRedirect(request.getContextPath() + "/reset-password");
+        // Tạo mã mới, cập nhật thời gian hết hạn và gửi lại email.
+        try {
+            String newCode = generateCode();
+            LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(RESET_CODE_EXPIRY_MINUTES);
+
+            dao.saveResetCode(email, newCode, expiryTime);
+
+            try {
+                EmailUtil.sendResetCode(email, newCode);
+
+                session.setAttribute("verifyMessage",
+                        "Mã xác minh mới đã được gửi đến email của bạn.");
+
+                response.sendRedirect(request.getContextPath() + "/verify-code");
+
+            } catch (Exception mailError) {
+                mailError.printStackTrace();
+
+                request.setAttribute("error", "Không thể gửi email. Vui lòng thử lại sau.");
+                request.getRequestDispatcher("/view/auth/verify-code.jsp").forward(request, response);
+            }
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
+
+            request.setAttribute("error", "Không thể gửi lại mã. Vui lòng thử lại.");
+            request.getRequestDispatcher("/view/auth/verify-code.jsp").forward(request, response);
+        }
     }
 
     private String generateCode() {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        // Tạo mã xác minh gồm tiền tố LMH và 5 ký tự ngẫu nhiên.
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         SecureRandom random = new SecureRandom();
         StringBuilder code = new StringBuilder("LMH");
 
         for (int i = 0; i < 5; i++) {
-            int index = random.nextInt(chars.length());
-            code.append(chars.charAt(index));
+            int index = random.nextInt(characters.length());
+            code.append(characters.charAt(index));
         }
 
         return code.toString();
@@ -112,6 +146,8 @@ public class VerifyCodeController extends HttpServlet {
 
     @Override
     public String getServletInfo() {
+
+        // Trả về mô tả của servlet.
         return "Verify Code Controller";
     }
 }

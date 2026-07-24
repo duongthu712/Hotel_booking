@@ -1,7 +1,7 @@
 package controller;
 
-import dao.StaffAccountDAO;
 import dal.PasswordUtil;
+import dao.StaffAccountDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -15,6 +15,7 @@ public class ResetPasswordController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // Hiển thị trang đặt lại mật khẩu khi người dùng đã xác minh mã.
         HttpSession session = request.getSession(false);
 
         if (session == null || session.getAttribute("resetEmail") == null) {
@@ -29,7 +30,9 @@ public class ResetPasswordController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // Kiểm tra và cập nhật mật khẩu mới cho tài khoản.
         request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
 
         HttpSession session = request.getSession(false);
 
@@ -63,18 +66,32 @@ public class ResetPasswordController extends HttpServlet {
             return;
         }
 
-        String newPasswordHash = PasswordUtil.hashPassword(newPassword);
+        try {
+            String newPasswordHash = PasswordUtil.hashPassword(newPassword);
 
-        StaffAccountDAO dao = new StaffAccountDAO();
-        dao.updatePasswordAndClearReset(email, newPasswordHash);
+            StaffAccountDAO dao = new StaffAccountDAO();
+            dao.updatePasswordAndClearReset(email, newPasswordHash);
 
-        session.removeAttribute("resetEmail");
+            session.removeAttribute("resetEmail");
+            session.removeAttribute("pendingResetEmail");
 
-        response.sendRedirect(request.getContextPath() + "/login?reset=success");
+            session.setAttribute("loginSuccessMessage",
+                    "Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại.");
+
+            response.sendRedirect(request.getContextPath() + "/login");
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
+
+            request.setAttribute("error", "Không thể đặt lại mật khẩu. Vui lòng thử lại.");
+            request.getRequestDispatcher("/view/auth/reset-password.jsp").forward(request, response);
+        }
     }
 
     @Override
     public String getServletInfo() {
+
+        // Trả về mô tả của servlet.
         return "Reset Password Controller";
     }
 }

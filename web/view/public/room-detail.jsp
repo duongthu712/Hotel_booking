@@ -79,6 +79,8 @@
     String guestRoomWarning = (String) request.getAttribute("guestRoomWarning");
     String guestRoomError = (String) request.getAttribute("guestRoomError");
     String today = (String) request.getAttribute("today");
+    String minCheckInDate = (String) request.getAttribute("minCheckInDate");
+    String minCheckOutDate = (String) request.getAttribute("minCheckOutDate");
 
     if (checkIn == null) checkIn = "";
     if (checkOut == null) checkOut = "";
@@ -86,6 +88,8 @@
     if (guestRoomWarning == null) guestRoomWarning = "";
     if (guestRoomError == null) guestRoomError = "";
     if (today == null) today = "";
+    if (minCheckInDate == null || minCheckInDate.trim().isEmpty()) minCheckInDate = today;
+    if (minCheckOutDate == null || minCheckOutDate.trim().isEmpty()) minCheckOutDate = minCheckInDate;
 
     Integer numRoomsObj = (Integer) request.getAttribute("numRooms");
     Integer numGuestsObj = (Integer) request.getAttribute("numGuests");
@@ -96,6 +100,7 @@
     Integer maxChildrenByRoomsObj = (Integer) request.getAttribute("maxChildrenByRooms");
     Long nightsObj = (Long) request.getAttribute("nights");
     Boolean hasValidDateObj = (Boolean) request.getAttribute("hasValidDate");
+    Boolean clearQueryAfterLoadObj = (Boolean) request.getAttribute("clearQueryAfterLoad");
 
     int numRooms = numRoomsObj == null ? 1 : numRoomsObj;
     int numGuests = numGuestsObj == null ? 1 : numGuestsObj;
@@ -106,6 +111,7 @@
     int maxChildrenByRooms = maxChildrenByRoomsObj == null ? 0 : maxChildrenByRoomsObj;
     long nights = nightsObj == null ? 0 : nightsObj;
     boolean hasValidDate = hasValidDateObj != null && hasValidDateObj;
+    boolean clearQueryAfterLoad = clearQueryAfterLoadObj != null && clearQueryAfterLoadObj;
 
     String pageTitle = room == null ? "Chi tiết phòng - La Mer Hotel" : room.getTypeName() + " - La Mer Hotel";
     List<String> images = room == null ? null : room.getImageUrl();
@@ -237,7 +243,7 @@
                         </div>
                     </div>
 
-                    <form method="get" class="booking-panel" id="bookingPanel" novalidate>
+                    <form method="get" class="booking-panel" id="bookingPanel">
                         <input type="hidden" name="roomTypeId" value="<%= room.getRoomTypeId() %>">
                         <h2>Kiểm tra phòng & đặt phòng</h2>
 
@@ -249,7 +255,7 @@
                                            id="checkInInput"
                                            name="checkIn"
                                            value="<%= html(checkIn) %>"
-                                           min="<%= html(today) %>">
+                                           min="<%= html(minCheckInDate) %>" required>
                                 </div>
                             </div>
 
@@ -260,7 +266,7 @@
                                            id="checkOutInput"
                                            name="checkOut"
                                            value="<%= html(checkOut) %>"
-                                           min="<%= html(today) %>">
+                                           min="<%= html(minCheckOutDate) %>" required>
                                 </div>
                             </div>
                         </div>
@@ -275,7 +281,7 @@
                                        value="<%= numGuests %>"
                                        min="1"
                                        step="1"
-                                       inputmode="numeric">
+                                       inputmode="numeric" required>
                             </div>
 
                             <div class="booking-field booking-quantity-field">
@@ -287,7 +293,7 @@
                                        value="<%= numChildren %>"
                                        min="0"
                                        step="1"
-                                       inputmode="numeric">
+                                       inputmode="numeric" required>
                             </div>
 
                             <div class="booking-field booking-quantity-field">
@@ -299,7 +305,7 @@
                                        value="<%= numRooms %>"
                                        min="1"
                                        step="1"
-                                       inputmode="numeric">
+                                       inputmode="numeric" required>
                             </div>
                         </div>
 
@@ -502,6 +508,15 @@
         <jsp:include page="/view/common/footer.jsp" />
 
         <script>
+            const IMAGE_MOVE_PERCENT = 100;
+            const IMAGE_TRANSITION_DELAY_MS = 520;
+            const MINIMUM_QUANTITY = 1;
+            const INTEGER_RADIX = 10;
+            const CHECKOUT_MIN_OFFSET_DAYS = 1;
+            const DATE_PART_COUNT = 3;
+            const MONTH_INDEX_OFFSET = 1;
+            const DATE_PAD_LENGTH = 2;
+
             const imageList = [
             <% if (images != null && !images.isEmpty()) { %>
             <% for (int index = 0; index < images.size(); index++) { %>
@@ -519,31 +534,35 @@
             const capacityPerRoom = Number("<%= capacityPerRoom %>");
             const adultsPerRoom = Number("<%= adultsPerRoom %>");
             const childrenPerRoom = Number("<%= childrenPerRoom %>");
+            const minCheckInDate = "<%= js(minCheckInDate) %>";
+            const defaultMinCheckOutDate = "<%= js(minCheckOutDate) %>";
+            const clearQueryAfterLoad = <%= clearQueryAfterLoad ? "true" : "false" %>;
+            const cleanRoomDetailUrl = "<%= request.getContextPath() %>/room-detail?roomTypeId=<%= room == null ? "" : room.getRoomTypeId() %>";
 
             function updateSliderPosition() {
                 const track = document.getElementById("imageSliderTrack");
                 if (!track) return;
 
-                track.style.transform = "translateX(-" + (currentImageIndex * 100) + "%)";
+                track.style.transform = "translateX(-" + (currentImageIndex * IMAGE_MOVE_PERCENT) + "%)";
                 updateActiveThumbnail();
                 updateImageCount();
                 scrollThumbnailIntoView();
             }
 
             function moveImage(step) {
-                if (!imageList || imageList.length <= 1 || isSliding) return;
+                if (!imageList || imageList.length <= MINIMUM_QUANTITY || isSliding) return;
 
                 isSliding = true;
                 currentImageIndex += step;
 
-                if (currentImageIndex < 0) currentImageIndex = imageList.length - 1;
+                if (currentImageIndex < 0) currentImageIndex = imageList.length - MINIMUM_QUANTITY;
                 if (currentImageIndex >= imageList.length) currentImageIndex = 0;
 
                 updateSliderPosition();
 
                 window.setTimeout(function () {
                     isSliding = false;
-                }, 520);
+                }, IMAGE_TRANSITION_DELAY_MS);
             }
 
             function goToImage(index) {
@@ -556,7 +575,7 @@
 
                 window.setTimeout(function () {
                     isSliding = false;
-                }, 520);
+                }, IMAGE_TRANSITION_DELAY_MS);
             }
 
             function updateActiveThumbnail() {
@@ -564,22 +583,17 @@
                     thumbnail.classList.remove("active-thumb");
                 });
 
-                const activeThumbnail = document.querySelector(
-                        ".room-thumbnail[data-index='" + currentImageIndex + "']"
-                );
-
+                const activeThumbnail = document.querySelector(".room-thumbnail[data-index='" + currentImageIndex + "']");
                 if (activeThumbnail) activeThumbnail.classList.add("active-thumb");
             }
 
             function updateImageCount() {
                 const counter = document.getElementById("currentImageNumber");
-                if (counter) counter.textContent = String(currentImageIndex + 1);
+                if (counter) counter.textContent = String(currentImageIndex + MINIMUM_QUANTITY);
             }
 
             function scrollThumbnailIntoView() {
-                const activeThumbnail = document.querySelector(
-                        ".room-thumbnail[data-index='" + currentImageIndex + "']"
-                );
+                const activeThumbnail = document.querySelector(".room-thumbnail[data-index='" + currentImageIndex + "']");
 
                 if (activeThumbnail) {
                     activeThumbnail.scrollIntoView({
@@ -594,13 +608,12 @@
                 const input = document.getElementById(inputId);
                 if (!input) return defaultValue;
 
-                const value = Number.parseInt(input.value, 10);
+                const value = Number.parseInt(input.value, INTEGER_RADIX);
                 return Number.isNaN(value) ? defaultValue : value;
             }
 
             function updateCapacityText() {
-                const rooms = Math.max(readInteger("roomQuantity", 1), 1);
-
+                const rooms = Math.max(readInteger("roomQuantity", MINIMUM_QUANTITY), MINIMUM_QUANTITY);
                 const roomCountText = document.getElementById("roomCountText");
                 const maxAdultText = document.getElementById("maxAdultText");
                 const maxChildText = document.getElementById("maxChildText");
@@ -621,7 +634,7 @@
                     return;
                 }
 
-                const rooms = Math.max(readInteger("roomQuantity", 1), 1);
+                const rooms = Math.max(readInteger("roomQuantity", MINIMUM_QUANTITY), MINIMUM_QUANTITY);
                 const total = basePrice * rooms * nights;
                 totalPriceElement.textContent = total.toLocaleString("vi-VN") + " VND";
             }
@@ -642,9 +655,52 @@
                 updateTotalPrice();
             }
 
+            function addDays(dateValue, numberOfDays) {
+                if (!dateValue) return "";
+
+                const dateParts = dateValue.split("-");
+                if (dateParts.length !== DATE_PART_COUNT) return "";
+
+                const year = Number(dateParts[0]);
+                const month = Number(dateParts[1]) - MONTH_INDEX_OFFSET;
+                const day = Number(dateParts[2]);
+                const date = new Date(year, month, day);
+
+                date.setDate(date.getDate() + numberOfDays);
+
+                const resultYear = date.getFullYear();
+                const resultMonth = String(date.getMonth() + MONTH_INDEX_OFFSET).padStart(DATE_PAD_LENGTH, "0");
+                const resultDay = String(date.getDate()).padStart(DATE_PAD_LENGTH, "0");
+
+                return resultYear + "-" + resultMonth + "-" + resultDay;
+            }
+
+            function updateCheckOutMinimum() {
+                const checkInInput = document.getElementById("checkInInput");
+                const checkOutInput = document.getElementById("checkOutInput");
+
+                if (!checkInInput || !checkOutInput) return;
+
+                const minimumCheckOut = checkInInput.value
+                        ? addDays(checkInInput.value, CHECKOUT_MIN_OFFSET_DAYS)
+                        : defaultMinCheckOutDate;
+
+                checkOutInput.min = minimumCheckOut;
+
+                if (checkOutInput.value && checkOutInput.value < minimumCheckOut) {
+                    checkOutInput.value = "";
+                }
+            }
+
+            function cleanResultUrl() {
+                if (!clearQueryAfterLoad || !window.history.replaceState) return;
+                window.history.replaceState({}, document.title, cleanRoomDetailUrl);
+            }
+
             document.addEventListener("DOMContentLoaded", function () {
+                const checkInInput = document.getElementById("checkInInput");
                 const formInputs = [
-                    document.getElementById("checkInInput"),
+                    checkInInput,
                     document.getElementById("checkOutInput"),
                     document.getElementById("numGuests"),
                     document.getElementById("numChildren"),
@@ -658,8 +714,15 @@
                     input.addEventListener("change", markFormChanged);
                 });
 
+                if (checkInInput) {
+                    checkInInput.min = minCheckInDate;
+                    checkInInput.addEventListener("change", updateCheckOutMinimum);
+                }
+
+                updateCheckOutMinimum();
                 updateCapacityText();
                 updateTotalPrice();
+                cleanResultUrl();
             });
         </script>
     </body>

@@ -4,6 +4,13 @@ import dao.BookingDAO;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import jakarta.servlet.ServletException;
@@ -19,27 +26,15 @@ public class BookingListController extends HttpServlet {
     private static final int MIN_PAGE_SIZE = 5;
     private static final int MAX_PAGE_SIZE = 50;
     private static final int PAGINATION_WINDOW_SIZE = 2;
-
-    /*
-     * Sau khi gộp Hạng phòng + Phòng thành 1 cột:
-     * 1. STT
-     * 2. Mã booking
-     * 3. Khách hàng
-     * 4. Phòng / Hạng phòng
-     * 5. Thời gian theo đơn
-     * 6. Thời gian thực tế
-     * 7. Trạng thái
-     * 8. Thanh toán
-     * 9. Lễ tân
-     * 10. Hành động
-     */
     private static final int BOOKING_TABLE_COLUMN_COUNT = 10;
-
     private static final int POPUP_CLOSE_DELAY_MS = 150;
     private static final int REQUEST_MENU_SAFE_GAP_PX = 18;
 
     private static final String ALL_FILTER_VALUE = "all";
     private static final String DEFAULT_SORT = "newest";
+
+    private static final DateTimeFormatter DISPLAY_DATE_TIME_FORMAT
+            = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -53,14 +48,8 @@ public class BookingListController extends HttpServlet {
         String paymentStatus = clean(request.getParameter("paymentStatus"));
         String source = clean(request.getParameter("source"));
         String roomNumber = clean(request.getParameter("roomNumber"));
-
-        String sort = clean(request.getParameter("sort"));
-        if (sort == null) {
-            sort = DEFAULT_SORT;
-        }
-
-        String dateFilterRaw = clean(request.getParameter("dateFilter"));
-        String dateFilter = normalizeDate(dateFilterRaw);
+        String sort = normalizeSort(request.getParameter("sort"));
+        String dateFilter = normalizeDate(request.getParameter("dateFilter"));
 
         String filterRoomTypeId = normalizeAllFilter(request.getParameter("roomTypeId"));
         Integer roomTypeId = null;
@@ -94,14 +83,8 @@ public class BookingListController extends HttpServlet {
         BookingDAO bookingDAO = new BookingDAO();
 
         int totalBookings = bookingDAO.countBookingList(
-                keyword,
-                status,
-                paymentStatus,
-                source,
-                roomTypeId,
-                staffId,
-                roomNumber,
-                dateFilter
+                keyword, status, paymentStatus, source, roomTypeId,
+                staffId, roomNumber, dateFilter
         );
 
         int totalPages = (int) Math.ceil((double) totalBookings / pageSize);
@@ -115,18 +98,11 @@ public class BookingListController extends HttpServlet {
         }
 
         List<Map<String, Object>> bookingList = bookingDAO.getBookingList(
-                keyword,
-                status,
-                paymentStatus,
-                source,
-                roomTypeId,
-                staffId,
-                roomNumber,
-                dateFilter,
-                sort,
-                page,
-                pageSize
+                keyword, status, paymentStatus, source, roomTypeId,
+                staffId, roomNumber, dateFilter, sort, page, pageSize
         );
+
+        formatBookingDateTimes(bookingList);
 
         List<Map<String, Object>> roomTypes = bookingDAO.getRoomTypesForBookingFilter();
         List<Map<String, Object>> staffList = bookingDAO.getStaffForBookingFilter();
@@ -134,18 +110,7 @@ public class BookingListController extends HttpServlet {
         addStringKey(roomTypes, "roomTypeId", "roomTypeIdText");
         addStringKey(staffList, "staffId", "staffIdText");
 
-        String pagingQuery = buildPagingQuery(
-                pageSize,
-                keyword,
-                status,
-                paymentStatus,
-                source,
-                filterRoomTypeId,
-                filterStaffId,
-                roomNumber,
-                dateFilterRaw,
-                sort
-        );
+        String pagingQuery = buildPagingQuery(pageSize, keyword, status, paymentStatus, source, filterRoomTypeId, filterStaffId, roomNumber, dateFilter, sort);
 
         request.setAttribute("bookingList", bookingList);
         request.setAttribute("roomTypes", roomTypes);
@@ -160,12 +125,10 @@ public class BookingListController extends HttpServlet {
         request.setAttribute("status", status);
         request.setAttribute("paymentStatus", paymentStatus);
         request.setAttribute("source", source);
-
         request.setAttribute("filterRoomTypeId", filterRoomTypeId);
         request.setAttribute("filterStaffId", filterStaffId);
-
         request.setAttribute("roomNumber", roomNumber);
-        request.setAttribute("dateFilterDisplay", dateFilterRaw);
+        request.setAttribute("dateFilterDisplay", dateFilter);
         request.setAttribute("sort", sort);
         request.setAttribute("pagingQuery", pagingQuery);
 
@@ -174,8 +137,7 @@ public class BookingListController extends HttpServlet {
         request.setAttribute("popupCloseDelayMs", POPUP_CLOSE_DELAY_MS);
         request.setAttribute("requestMenuSafeGapPx", REQUEST_MENU_SAFE_GAP_PX);
 
-        request.getRequestDispatcher("/view/receptionist/booking-list.jsp")
-                .forward(request, response);
+        request.getRequestDispatcher("/view/receptionist/booking-list.jsp").forward(request, response);
     }
 
     private String normalizeAllFilter(String value) {
@@ -192,18 +154,25 @@ public class BookingListController extends HttpServlet {
         return value == null || value.equalsIgnoreCase(ALL_FILTER_VALUE);
     }
 
+    private String normalizeSort(String value) {
+        value = clean(value);
+
+        if ("oldest".equals(value)
+                || "checkinAsc".equals(value)
+                || "checkoutAsc".equals(value)) {
+            return value;
+        }
+
+        return DEFAULT_SORT;
+    }
+
     private String clean(String value) {
         if (value == null) {
             return null;
         }
 
         value = value.trim();
-
-        if (value.isEmpty()) {
-            return null;
-        }
-
-        return value;
+        return value.isEmpty() ? null : value;
     }
 
     private Integer parseInteger(String value) {
@@ -215,14 +184,9 @@ public class BookingListController extends HttpServlet {
             }
 
             int number = Integer.parseInt(value);
+            return number > 0 ? number : null;
 
-            if (number <= 0) {
-                return null;
-            }
-
-            return number;
-
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             return null;
         }
     }
@@ -236,53 +200,92 @@ public class BookingListController extends HttpServlet {
             }
 
             int result = Integer.parseInt(value);
+            return result > 0 ? result : defaultValue;
 
-            if (result <= 0) {
-                return defaultValue;
-            }
-
-            return result;
-
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             return defaultValue;
         }
     }
 
     private String normalizeDate(String value) {
-        try {
-            value = clean(value);
+        value = clean(value);
 
-            if (value == null) {
-                return null;
-            }
-
-            String[] parts = value.split("/");
-
-            if (parts.length != 3) {
-                return null;
-            }
-
-            String day = parts[0].trim();
-            String month = parts[1].trim();
-            String year = parts[2].trim();
-
-            if (day.length() == 1) {
-                day = "0" + day;
-            }
-
-            if (month.length() == 1) {
-                month = "0" + month;
-            }
-
-            if (year.length() != 4) {
-                return null;
-            }
-
-            return year + "-" + month + "-" + day;
-
-        } catch (Exception e) {
+        if (value == null) {
             return null;
         }
+
+        try {
+            return LocalDate.parse(value).toString();
+        } catch (DateTimeParseException e) {
+            return null;
+        }
+    }
+
+    private void formatBookingDateTimes(List<Map<String, Object>> bookingList) {
+        if (bookingList == null) {
+            return;
+        }
+
+        for (Map<String, Object> booking : bookingList) {
+            booking.put("actualCheckinTimeText", formatDateTime(booking.get("actualCheckinTime")));
+            booking.put("actualCheckoutTimeText", formatDateTime(booking.get("actualCheckoutTime")));
+        }
+    }
+
+    private String formatDateTime(Object value) {
+        if (value == null) {
+            return "-";
+        }
+
+        LocalDateTime dateTime = convertToLocalDateTime(value);
+
+        if (dateTime != null) {
+            return dateTime.format(DISPLAY_DATE_TIME_FORMAT);
+        }
+
+        String text = value.toString().trim();
+        return text.isEmpty() ? "-" : text;
+    }
+
+    private LocalDateTime convertToLocalDateTime(Object value) {
+        if (value instanceof Timestamp) {
+            return ((Timestamp) value).toLocalDateTime();
+        }
+
+        if (value instanceof LocalDateTime) {
+            return (LocalDateTime) value;
+        }
+
+        if (value instanceof OffsetDateTime) {
+            return ((OffsetDateTime) value).toLocalDateTime();
+        }
+
+        if (value instanceof Date) {
+            return new Timestamp(((Date) value).getTime()).toLocalDateTime();
+        }
+
+        String text = value.toString().trim();
+
+        if (text.isEmpty()) {
+            return null;
+        }
+
+        try {
+            return Timestamp.valueOf(text).toLocalDateTime();
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        try {
+            return LocalDateTime.parse(text);
+        } catch (DateTimeParseException ignored) {
+        }
+
+        try {
+            return LocalDateTime.parse(text, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        } catch (DateTimeParseException ignored) {
+        }
+
+        return null;
     }
 
     private void addStringKey(List<Map<String, Object>> list, String sourceKey, String targetKey) {
@@ -292,27 +295,11 @@ public class BookingListController extends HttpServlet {
 
         for (Map<String, Object> row : list) {
             Object value = row.get(sourceKey);
-
-            if (value == null) {
-                row.put(targetKey, "");
-            } else {
-                row.put(targetKey, String.valueOf(value));
-            }
+            row.put(targetKey, value == null ? "" : String.valueOf(value));
         }
     }
 
-    private String buildPagingQuery(
-            int pageSize,
-            String keyword,
-            String status,
-            String paymentStatus,
-            String source,
-            String filterRoomTypeId,
-            String filterStaffId,
-            String roomNumber,
-            String dateFilterDisplay,
-            String sort) {
-
+    private String buildPagingQuery(int pageSize, String keyword, String status, String paymentStatus, String source, String filterRoomTypeId, String filterStaffId, String roomNumber, String dateFilter, String sort) {
         StringBuilder query = new StringBuilder();
 
         appendQueryParam(query, "pageSize", String.valueOf(pageSize));
@@ -323,7 +310,7 @@ public class BookingListController extends HttpServlet {
         appendQueryParam(query, "roomTypeId", filterRoomTypeId);
         appendQueryParam(query, "filterStaffId", filterStaffId);
         appendQueryParam(query, "roomNumber", roomNumber);
-        appendQueryParam(query, "dateFilter", dateFilterDisplay);
+        appendQueryParam(query, "dateFilter", dateFilter);
         appendQueryParam(query, "sort", sort);
 
         return query.toString();

@@ -5,6 +5,7 @@
 <html lang="vi">
     <head>
         <jsp:include page="/view/staff/header.jsp" />
+
         <meta charset="UTF-8">
         <title>Quản lý đặt phòng | La Mer Hotel</title>
 
@@ -18,13 +19,9 @@
         <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
         <main class="booking-page">
-
             <form class="booking-filter" method="get" action="${ctx}/booking-list">
-
                 <div class="filter-row filter-row-1">
-                    <input class="filter-control search-control"
-                           type="text"
-                           name="keyword"
+                    <input class="filter-control search-control" type="text" name="keyword"
                            value="${keyword}"
                            placeholder="Tìm theo mã booking, tên khách, SĐT hoặc email">
 
@@ -53,13 +50,16 @@
                         <option value="" ${empty paymentStatus ? 'selected="selected"' : ''}>
                             Trạng thái thanh toán
                         </option>
-                        <option value="Chưa thanh toán" ${paymentStatus == 'Chưa thanh toán' ? 'selected="selected"' : ''}>
+                        <option value="Chưa thanh toán"
+                                ${paymentStatus == 'Chưa thanh toán' ? 'selected="selected"' : ''}>
                             Chưa thanh toán
                         </option>
-                        <option value="Đã đặt cọc" ${paymentStatus == 'Đã đặt cọc' ? 'selected="selected"' : ''}>
+                        <option value="Đã đặt cọc"
+                                ${paymentStatus == 'Đã đặt cọc' ? 'selected="selected"' : ''}>
                             Đã đặt cọc
                         </option>
-                        <option value="Đã thanh toán" ${paymentStatus == 'Đã thanh toán' ? 'selected="selected"' : ''}>
+                        <option value="Đã thanh toán"
+                                ${paymentStatus == 'Đã thanh toán' ? 'selected="selected"' : ''}>
                             Đã thanh toán
                         </option>
                     </select>
@@ -68,10 +68,12 @@
                         <option value="" ${empty source ? 'selected="selected"' : ''}>
                             Kênh đặt phòng
                         </option>
-                        <option value="Đặt phòng trực tuyến" ${source == 'Đặt phòng trực tuyến' ? 'selected="selected"' : ''}>
+                        <option value="Đặt phòng trực tuyến"
+                                ${source == 'Đặt phòng trực tuyến' ? 'selected="selected"' : ''}>
                             Đặt online
                         </option>
-                        <option value="Đặt phòng tại quầy" ${source == 'Đặt phòng tại quầy' ? 'selected="selected"' : ''}>
+                        <option value="Đặt phòng tại quầy"
+                                ${source == 'Đặt phòng tại quầy' ? 'selected="selected"' : ''}>
                             Đặt tại quầy
                         </option>
                     </select>
@@ -83,9 +85,10 @@
                             Hạng phòng đã đặt
                         </option>
 
-                        <c:forEach var="rt" items="${roomTypes}">
-                            <option value="${rt.roomTypeIdText}" ${filterRoomTypeId == rt.roomTypeIdText ? 'selected="selected"' : ''}>
-                                ${rt.typeName}
+                        <c:forEach var="roomType" items="${roomTypes}">
+                            <option value="${roomType.roomTypeIdText}"
+                                    ${filterRoomTypeId == roomType.roomTypeIdText ? 'selected="selected"' : ''}>
+                                ${roomType.typeName}
                             </option>
                         </c:forEach>
                     </select>
@@ -95,57 +98,49 @@
                             Lễ tân phụ trách
                         </option>
 
-                        <c:forEach var="s" items="${staffList}">
-                            <option value="${s.staffIdText}" ${filterStaffId == s.staffIdText ? 'selected="selected"' : ''}>
-                                ${s.fullName}
+                        <c:forEach var="staff" items="${staffList}">
+                            <option value="${staff.staffIdText}"
+                                    ${filterStaffId == staff.staffIdText ? 'selected="selected"' : ''}>
+                                ${staff.fullName}
                             </option>
                         </c:forEach>
                     </select>
 
-                    <input class="filter-control"
-                           type="text"
-                           name="roomNumber"
+                    <input class="filter-control" type="text" name="roomNumber"
                            value="${roomNumber}"
-                           placeholder="Tìm theo số phòng được gán hoặc Chưa gán">
+                           placeholder="Số phòng được gán hoặc Chưa gán">
 
-                    <input class="filter-control"
-                           type="text"
-                           name="dateFilter"
-                           value="${dateFilterDisplay}"
-                           placeholder="Ngày nhận/trả phòng dự kiến: dd/mm/yyyy">
+                    <input class="filter-control date-filter-control" type="date" name="dateFilter"
+                           value="${dateFilterDisplay}" lang="vi"
+                           title="Ngày nhận hoặc trả phòng dự kiến">
                 </div>
 
                 <div class="filter-row filter-row-3">
                     <select class="filter-control sort-control" name="sort">
-                        <option value="newest" ${sort == 'newest' || empty sort ? 'selected="selected"' : ''}>
-                            Sắp xếp theo ngày tạo: Mới nhất
+                        <option value="newest"
+                                ${sort == 'newest' || empty sort ? 'selected="selected"' : ''}>
+                            Ngày tạo mới nhất
                         </option>
                         <option value="oldest" ${sort == 'oldest' ? 'selected="selected"' : ''}>
-                            Sắp xếp theo ngày tạo: Cũ nhất
+                            Ngày tạo cũ nhất
                         </option>
                         <option value="checkinAsc" ${sort == 'checkinAsc' ? 'selected="selected"' : ''}>
-                            Sắp xếp theo ngày nhận phòng gần nhất
+                            Nhận phòng gần nhất
                         </option>
                         <option value="checkoutAsc" ${sort == 'checkoutAsc' ? 'selected="selected"' : ''}>
-                            Sắp xếp theo ngày trả phòng gần nhất
+                            Trả phòng gần nhất
                         </option>
                     </select>
 
                     <div class="filter-buttons">
-                        <button type="submit" class="blue-btn">
-                            Tìm kiếm
-                        </button>
-
-                        <a href="${ctx}/booking-list" class="blue-btn">
-                            Làm mới
-                        </a>
+                        <button type="submit" class="blue-btn">Tìm kiếm</button>
+                        <a href="${ctx}/booking-list" class="blue-btn">Làm mới</a>
                     </div>
 
                     <a href="${ctx}/walk-in-booking" class="add-booking-btn">
                         THÊM ĐẶT PHÒNG TẠI QUẦY
                     </a>
                 </div>
-
             </form>
 
             <div class="booking-table-wrap">
@@ -191,9 +186,7 @@
                                         <td>${b.guestName}</td>
 
                                         <td>
-                                            <div class="room-type-line">
-                                                ${b.roomTypeName}
-                                            </div>
+                                            <div class="room-type-line">${b.roomTypeName}</div>
 
                                             <div class="room-number-line">
                                                 ${b.numRooms} phòng -
@@ -201,37 +194,32 @@
                                                     <c:when test="${not empty b.roomNumbers && b.roomNumbers != 'Chưa gán'}">
                                                         ${b.roomNumbers}
                                                     </c:when>
-                                                    <c:otherwise>
-                                                        Chưa gán
-                                                    </c:otherwise>
+                                                    <c:otherwise>Chưa gán</c:otherwise>
                                                 </c:choose>
                                             </div>
                                         </td>
 
-                                        <td>
-                                            <div>CI dự kiến: ${b.checkinDateText}</div>
-                                            <div>CO dự kiến: ${b.checkoutDateText}</div>
-                                        </td>
-
-                                        <td>
-                                            <div>
-                                                CI thực tế:
-                                                <c:choose>
-                                                    <c:when test="${not empty b.actualCheckinTime}">
-                                                        ${b.actualCheckinTime}
-                                                    </c:when>
-                                                    <c:otherwise>-</c:otherwise>
-                                                </c:choose>
+                                        <td class="time-cell">
+                                            <div class="time-line">
+                                                <span class="time-label">Check-in:</span>
+                                                ${b.checkinDateText}
                                             </div>
 
-                                            <div>
-                                                CO thực tế:
-                                                <c:choose>
-                                                    <c:when test="${not empty b.actualCheckoutTime}">
-                                                        ${b.actualCheckoutTime}
-                                                    </c:when>
-                                                    <c:otherwise>-</c:otherwise>
-                                                </c:choose>
+                                            <div class="time-line">
+                                                <span class="time-label">Check-out:</span>
+                                                ${b.checkoutDateText}
+                                            </div>
+                                        </td>
+
+                                        <td class="time-cell">
+                                            <div class="time-line">
+                                                <span class="time-label">Check-in:</span>
+                                                ${b.actualCheckinTimeText}
+                                            </div>
+
+                                            <div class="time-line">
+                                                <span class="time-label">Check-out:</span>
+                                                ${b.actualCheckoutTimeText}
                                             </div>
                                         </td>
 
@@ -288,7 +276,7 @@
                                                 <c:when test="${not empty b.staffName}">
                                                     ${b.staffName}
                                                 </c:when>
-                                                <c:otherwise>-</c:otherwise>
+                                                <c:otherwise>Chưa có</c:otherwise>
                                             </c:choose>
                                         </td>
 
@@ -296,20 +284,21 @@
                                             <c:set var="isPending" value="${b.bookingStatus == 'Chờ xử lý'}" />
                                             <c:set var="isConfirmed" value="${b.bookingStatus == 'Đã xác nhận'}" />
                                             <c:set var="isCheckedIn" value="${b.bookingStatus == 'Đã nhận phòng'}" />
-                                            <c:set var="isCheckedOut" value="${b.bookingStatus == 'Đã trả phòng'}" />
-                                            <c:set var="isCancelled" value="${b.bookingStatus == 'Đã hủy'}" />
 
-                                            <c:set var="canAnyRequest" value="${!isCheckedOut && !isCancelled}" />
                                             <c:set var="canExtendRequest" value="${isConfirmed || isCheckedIn}" />
                                             <c:set var="canUpgradeRequest" value="${isConfirmed}" />
-                                            <c:set var="canCancelRequest" value="${isPending || isConfirmed}" />
+                                            <c:set var="canCancelRequest" value="${isConfirmed && b.canCancel == 1}" />
                                             <c:set var="canOtherRequest" value="${isConfirmed || isCheckedIn}" />
+
+                                            <c:set var="canAnyRequest"
+                                                   value="${canExtendRequest || canUpgradeRequest || canCancelRequest || canOtherRequest}" />
 
                                             <div class="action-buttons">
                                                 <c:choose>
                                                     <c:when test="${canAnyRequest}">
                                                         <div class="request-action-wrap">
-                                                            <button type="button" class="action-btn main-btn request-toggle">
+                                                            <button type="button"
+                                                                    class="action-btn main-btn request-toggle">
                                                                 Yêu cầu
                                                             </button>
 
@@ -350,7 +339,14 @@
                                                     </c:when>
 
                                                     <c:otherwise>
-                                                        <span class="action-btn disabled-btn">Yêu cầu</span>
+                                                        <button type="button"
+                                                                class="action-btn disabled-btn"
+                                                                title="${isPending
+                                                                        ? 'Booking chưa được xác nhận nên chưa thể tạo yêu cầu'
+                                                                        : 'Không có yêu cầu phù hợp'}"
+                                                                disabled>
+                                                            Yêu cầu
+                                                        </button>
                                                     </c:otherwise>
                                                 </c:choose>
                                             </div>
@@ -366,19 +362,21 @@
             <div class="table-footer">
                 <div>
                     Hiển thị
+
                     <c:choose>
                         <c:when test="${totalBookings == 0}">0</c:when>
                         <c:otherwise>${(currentPage - 1) * pageSize + 1}</c:otherwise>
                     </c:choose>
+
                     đến
+
                     <c:choose>
                         <c:when test="${currentPage * pageSize > totalBookings}">
                             ${totalBookings}
                         </c:when>
-                        <c:otherwise>
-                            ${currentPage * pageSize}
-                        </c:otherwise>
+                        <c:otherwise>${currentPage * pageSize}</c:otherwise>
                     </c:choose>
+
                     trong tổng số ${totalBookings} đặt phòng
                 </div>
 
@@ -418,14 +416,15 @@
                             </c:if>
                         </c:if>
 
-                        <c:forEach begin="${startPage}" end="${endPage}" var="p">
+                        <c:forEach begin="${startPage}" end="${endPage}" var="pageNumber">
                             <c:choose>
-                                <c:when test="${p == currentPage}">
-                                    <span class="page-btn active">${p}</span>
+                                <c:when test="${pageNumber == currentPage}">
+                                    <span class="page-btn active">${pageNumber}</span>
                                 </c:when>
                                 <c:otherwise>
-                                    <a class="page-btn" href="${ctx}/booking-list?${pagingQuery}&page=${p}">
-                                        ${p}
+                                    <a class="page-btn"
+                                       href="${ctx}/booking-list?${pagingQuery}&page=${pageNumber}">
+                                        ${pageNumber}
                                     </a>
                                 </c:otherwise>
                             </c:choose>
@@ -436,7 +435,8 @@
                                 <span class="page-dot">...</span>
                             </c:if>
 
-                            <a class="page-btn" href="${ctx}/booking-list?${pagingQuery}&page=${totalPages}">
+                            <a class="page-btn"
+                               href="${ctx}/booking-list?${pagingQuery}&page=${totalPages}">
                                 ${totalPages}
                             </a>
                         </c:if>
@@ -455,7 +455,6 @@
                     </div>
                 </c:if>
             </div>
-
         </main>
 
         <div id="bookingPopupModal" class="booking-detail-modal">
@@ -469,12 +468,12 @@
         </div>
 
         <script>
-            var POPUP_CLOSE_DELAY_MS = Number("${popupCloseDelayMs}");
-            var REQUEST_MENU_SAFE_GAP_PX = Number("${requestMenuSafeGapPx}");
+            const POPUP_CLOSE_DELAY_MS = Number("${popupCloseDelayMs}");
+            const REQUEST_MENU_SAFE_GAP_PX = Number("${requestMenuSafeGapPx}");
 
             function openBookingPopup(url) {
-                var modal = document.getElementById("bookingPopupModal");
-                var frame = document.getElementById("bookingPopupFrame");
+                const modal = document.getElementById("bookingPopupModal");
+                const frame = document.getElementById("bookingPopupFrame");
 
                 frame.src = url;
                 modal.classList.add("show");
@@ -482,13 +481,13 @@
             }
 
             function closeBookingPopup(reloadPage) {
-                var modal = document.getElementById("bookingPopupModal");
-                var frame = document.getElementById("bookingPopupFrame");
+                const modal = document.getElementById("bookingPopupModal");
+                const frame = document.getElementById("bookingPopupFrame");
 
                 modal.classList.remove("show");
                 document.body.classList.remove("modal-open");
 
-                setTimeout(function () {
+                window.setTimeout(function () {
                     frame.src = "";
 
                     if (reloadPage === true) {
@@ -506,73 +505,67 @@
             }
 
             document.addEventListener("DOMContentLoaded", function () {
-                var popupLinks = document.querySelectorAll(".js-booking-detail, .js-counter-request");
+                const popupLinks = document.querySelectorAll(
+                        ".js-booking-detail, .js-counter-request");
 
                 popupLinks.forEach(function (link) {
                     link.addEventListener("click", function (event) {
                         event.preventDefault();
-
-                        var url = this.getAttribute("data-url");
-                        openBookingPopup(url);
+                        openBookingPopup(this.getAttribute("data-url"));
                     });
                 });
 
-                var toggles = document.querySelectorAll(".request-toggle");
+                const requestButtons = document.querySelectorAll(".request-toggle");
 
-                toggles.forEach(function (button) {
+                requestButtons.forEach(function (button) {
                     button.addEventListener("click", function (event) {
                         event.stopPropagation();
 
-                        var wrap = this.closest(".request-action-wrap");
-                        var tableWrap = this.closest(".booking-table-wrap");
+                        const currentWrap = this.closest(".request-action-wrap");
+                        const tableWrap = this.closest(".booking-table-wrap");
 
-                        document.querySelectorAll(".request-action-wrap.open").forEach(function (item) {
-                            if (item !== wrap) {
-                                item.classList.remove("open");
-                                item.classList.remove("open-up");
+                        document.querySelectorAll(".request-action-wrap.open").forEach(function (wrap) {
+                            if (wrap !== currentWrap) {
+                                wrap.classList.remove("open");
+                                wrap.classList.remove("open-up");
                             }
                         });
 
-                        var willOpen = !wrap.classList.contains("open");
+                        const shouldOpen = !currentWrap.classList.contains("open");
 
-                        wrap.classList.remove("open");
-                        wrap.classList.remove("open-up");
+                        currentWrap.classList.remove("open");
+                        currentWrap.classList.remove("open-up");
 
-                        if (!willOpen) {
+                        if (!shouldOpen) {
                             return;
                         }
 
-                        wrap.classList.add("open");
+                        currentWrap.classList.add("open");
 
-                        var menu = wrap.querySelector(".request-action-menu");
+                        const menu = currentWrap.querySelector(".request-action-menu");
 
                         if (!menu) {
                             return;
                         }
 
-                        var menuHeight = menu.offsetHeight;
-                        var buttonRect = button.getBoundingClientRect();
+                        const menuHeight = menu.offsetHeight;
+                        const buttonPosition = button.getBoundingClientRect();
+                        const tableBottom = tableWrap
+                                ? tableWrap.getBoundingClientRect().bottom
+                                : window.innerHeight;
 
-                        var tableBottom;
+                        const spaceBelow = tableBottom - buttonPosition.bottom;
 
-                        if (tableWrap) {
-                            tableBottom = tableWrap.getBoundingClientRect().bottom;
-                        } else {
-                            tableBottom = window.innerHeight;
-                        }
-
-                        var spaceBelowInTable = tableBottom - buttonRect.bottom;
-
-                        if (spaceBelowInTable < menuHeight + REQUEST_MENU_SAFE_GAP_PX) {
-                            wrap.classList.add("open-up");
+                        if (spaceBelow < menuHeight + REQUEST_MENU_SAFE_GAP_PX) {
+                            currentWrap.classList.add("open-up");
                         }
                     });
                 });
 
                 document.addEventListener("click", function () {
-                    document.querySelectorAll(".request-action-wrap.open").forEach(function (item) {
-                        item.classList.remove("open");
-                        item.classList.remove("open-up");
+                    document.querySelectorAll(".request-action-wrap.open").forEach(function (wrap) {
+                        wrap.classList.remove("open");
+                        wrap.classList.remove("open-up");
                     });
                 });
             });
