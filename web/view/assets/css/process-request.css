@@ -161,15 +161,30 @@ body {
 
 /* === 6. BADGE TRẠNG THÁI === */
 .badge {
-    padding: 5px 10px;
+    padding: 6px 12px;
     border-radius: 20px;
-    font-size: 11px;
-    color: white;
+    font-size: 12px;
+    font-weight: 600;
     display: inline-block;
+    white-space: nowrap;
+    text-align: center;
+    min-width: 90px;
 }
-.status-pending { background-color: #d97706; }
-.status-success { background-color: #059669; }
-.status-danger  { background-color: #b91c1c; }
+.status-pending {
+    color: #c8750b;
+    background-color: #fff4df;
+    border: 1px solid #f2c978;
+}
+.status-success {
+    color: #14843b;
+    background-color: #e0f5e8;
+    border: 1px solid #b9e1c8;
+}
+.status-danger {
+    color: #d83d4a;
+    background-color: #ffe7ea;
+    border: 1px solid #f6b9c0;
+}
 
 /* === 7. CARD CHI TIẾT BÊN PHẢI === */
 .detail-view-card {
