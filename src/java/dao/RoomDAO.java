@@ -12,12 +12,9 @@ import model.GuestStay;
 import model.Room;
 
 /**
- * RoomDAO.java Data Processing Operator layer for rooms Provides CRUD with
- * Rooms table
- *
  * @author LinhLTHE200306
- * @version 2.0
- * @since 2026-06-10
+ * @version 3.0
+ * @since 2026-07-23
  */
 public class RoomDAO extends DBContext {
 
@@ -61,7 +58,8 @@ public class RoomDAO extends DBContext {
         String strSQL = """
                         select *
                         from Rooms
-                        where room_number = ?
+                        where room_number = ? 
+                        and is_active = 1
                         """;
 
         try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
@@ -126,7 +124,7 @@ public class RoomDAO extends DBContext {
     public Room updateRoom(int roomId, Room room) throws Exception {
         if (room.getRoomNumber() != 0) {
             String checkSql = """
-                select count(*) from Rooms where room_number = ? and room_id != ?
+                select count(*) from Rooms where room_number = ? and room_id != ? and is_active = 1 
                 """;
             try (PreparedStatement stm = connection.prepareStatement(checkSql)) {
                 stm.setInt(1, room.getRoomNumber());

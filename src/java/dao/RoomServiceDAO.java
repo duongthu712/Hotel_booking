@@ -11,8 +11,8 @@ import java.sql.SQLException;
 
 /**
  * @author LinhLTHE200306
- * @version 1.0
- * @since 2026-06-02
+ * @version 2.0
+ * @since 2026-07-21
  */
 public class RoomServiceDAO extends DBContext {
 
@@ -24,8 +24,7 @@ public class RoomServiceDAO extends DBContext {
                         order by service_id desc
                         """;
 
-        try (PreparedStatement stm = connection.prepareStatement(strSQL);
-             ResultSet rs = stm.executeQuery()) {
+        try (PreparedStatement stm = connection.prepareStatement(strSQL); ResultSet rs = stm.executeQuery()) {
             while (rs.next()) {
                 int id = rs.getInt("service_id");
                 String name = rs.getString("service_name");
@@ -99,7 +98,7 @@ public class RoomServiceDAO extends DBContext {
             throw new Exception("Lỗi hệ thống: Vui lòng thử lại sau.");
         }
     }
-    
+
     public List<RoomService> searchRoomServicesByName(String keyword) throws Exception {
         List<RoomService> list = new ArrayList<>();
         String strSQL = """
@@ -196,8 +195,30 @@ public class RoomServiceDAO extends DBContext {
         }
     }
 
+    public boolean isServiceUsedInRoomTypes(int serviceId) throws Exception {
+        String strSQL = """
+                        select 1 
+                        from RoomTypeServices 
+                        where service_id = ?
+                        """;
+
+        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
+            stm.setInt(1, serviceId);
+            try (ResultSet rs = stm.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể kiểm tra ràng buộc hạng phòng.");
+        }
+    }
+
     public RoomService delete(int serviceId) throws Exception {
         RoomService found = getRoomServicesById(serviceId);
+
+        if (isServiceUsedInRoomTypes(serviceId)) {
+            throw new Exception("Không thể xóa vì dịch vụ đang được sử dụng trong hạng phòng.");
+        }
+
         String strSQL = """
                         delete 
                         from RoomServices 
