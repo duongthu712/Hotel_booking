@@ -1,76 +1,107 @@
 package controller;
 
 import dao.FeedbackDAO;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.util.Locale;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class FeedbackListController extends HttpServlet {
+
+    private static final int DEFAULT_PAGE = 1;
+    private static final int PAGE_SIZE = 10;
+    private static final int MIN_TOTAL_PAGES = 1;
+
+    private static final int MIN_RATING = 1;
+    private static final int MAX_RATING = 5;
+    private static final int PERCENT_BASE = 100;
+
+    private static final String AVERAGE_RATING_FORMAT = "%.1f";
+    private static final String FEEDBACK_LIST_PAGE = "/view/public/feedback-list.jsp";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        FeedbackDAO dao = new FeedbackDAO();
+        // Lấy danh sách đánh giá, thống kê số sao và xử lý phân trang.
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
 
-        int pageSize = 10;
-        int page = 1;
+        FeedbackDAO feedbackDAO = new FeedbackDAO();
 
-        String pageParam = request.getParameter("page");
+        int currentPage = parsePage(request.getParameter("page"));
+        int totalFeedbacks = feedbackDAO.getTotalFeedbacks();
+        int totalPages = calculateTotalPages(totalFeedbacks);
 
-        if (pageParam != null) {
-            try {
-                page = Integer.parseInt(pageParam);
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
+        if (currentPage > totalPages) {
+            currentPage = totalPages;
         }
 
-        if (page < 1) {
-            page = 1;
-        }
+        double averageRating = feedbackDAO.getAverageRating();
 
-        int totalFeedbacks = dao.getTotalFeedbacks();
+        request.setAttribute("feedbacks",
+                feedbackDAO.getFeedbacksByPage(currentPage, PAGE_SIZE));
 
-        int totalPages = (int) Math.ceil((double) totalFeedbacks / pageSize);
+        request.setAttribute("averageRating",
+                String.format(Locale.US, AVERAGE_RATING_FORMAT, averageRating));
 
-        if (totalPages == 0) {
-            totalPages = 1;
-        }
-
-        if (page > totalPages) {
-            page = totalPages;
-        }
-
-        int rating5 = dao.countByRating(5);
-        int rating4 = dao.countByRating(4);
-        int rating3 = dao.countByRating(3);
-        int rating2 = dao.countByRating(2);
-        int rating1 = dao.countByRating(1);
-
-        double averageRating = dao.getAverageRating();
-
-        request.setAttribute("feedbacks", dao.getFeedbacksByPage(page, pageSize));
-        request.setAttribute("averageRating", String.format("%.1f", averageRating));
         request.setAttribute("totalFeedbacks", totalFeedbacks);
-
-        request.setAttribute("rating5", rating5);
-        request.setAttribute("rating4", rating4);
-        request.setAttribute("rating3", rating3);
-        request.setAttribute("rating2", rating2);
-        request.setAttribute("rating1", rating1);
-
-        request.setAttribute("rating5Percent", totalFeedbacks == 0 ? 0 : rating5 * 100 / totalFeedbacks);
-        request.setAttribute("rating4Percent", totalFeedbacks == 0 ? 0 : rating4 * 100 / totalFeedbacks);
-        request.setAttribute("rating3Percent", totalFeedbacks == 0 ? 0 : rating3 * 100 / totalFeedbacks);
-        request.setAttribute("rating2Percent", totalFeedbacks == 0 ? 0 : rating2 * 100 / totalFeedbacks);
-        request.setAttribute("rating1Percent", totalFeedbacks == 0 ? 0 : rating1 * 100 / totalFeedbacks);
-
-        request.setAttribute("currentPage", page);
+        request.setAttribute("currentPage", currentPage);
         request.setAttribute("totalPages", totalPages);
+        request.setAttribute("pageSize", PAGE_SIZE);
 
-        request.getRequestDispatcher("/view/public/feedback-list.jsp")
-                .forward(request, response);
+        setRatingStatistics(request, feedbackDAO, totalFeedbacks);
+
+        request.getRequestDispatcher(FEEDBACK_LIST_PAGE).forward(request, response);
+    }
+
+    private void setRatingStatistics(HttpServletRequest request,
+            FeedbackDAO feedbackDAO, int totalFeedbacks) {
+
+        // Tính số lượng và tỷ lệ phần trăm cho từng mức đánh giá.
+        for (int rating = MAX_RATING; rating >= MIN_RATING; rating--) {
+            int ratingCount = feedbackDAO.countByRating(rating);
+            int ratingPercent = calculatePercent(ratingCount, totalFeedbacks);
+
+            request.setAttribute("rating" + rating, ratingCount);
+            request.setAttribute("rating" + rating + "Percent", ratingPercent);
+        }
+    }
+
+    private int calculateTotalPages(int totalFeedbacks) {
+        // Tính tổng số trang dựa trên số đánh giá và kích thước trang.
+        int totalPages = (int) Math.ceil((double) totalFeedbacks / PAGE_SIZE);
+        return Math.max(totalPages, MIN_TOTAL_PAGES);
+    }
+
+    private int calculatePercent(int value, int total) {
+        // Tính tỷ lệ phần trăm và tránh phép chia cho không.
+        if (total <= 0) {
+            return 0;
+        }
+
+        return value * PERCENT_BASE / total;
+    }
+
+    private int parsePage(String pageValue) {
+        // Chuyển giá trị page thành số trang hợp lệ.
+        if (pageValue == null || pageValue.trim().isEmpty()) {
+            return DEFAULT_PAGE;
+        }
+
+        try {
+            int page = Integer.parseInt(pageValue.trim());
+            return Math.max(page, DEFAULT_PAGE);
+        } catch (NumberFormatException e) {
+            return DEFAULT_PAGE;
+        }
+    }
+
+    @Override
+    public String getServletInfo() {
+        // Trả về mô tả của servlet danh sách đánh giá.
+        return "Feedback List Controller";
     }
 }

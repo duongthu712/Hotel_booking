@@ -13,6 +13,9 @@ import java.util.List;
 public class RoomTypeDAO extends DBContext {
 
     private static final int HOLD_MINUTES = 15;
+    private static final int MIN_ROOM_QUANTITY = 1;
+    private static final int MIN_AVAILABLE_ROOMS = 0;
+    private static final String ALL_ROOM_TYPES = "all";
 
     // Lấy các loại phòng để hiện lên thanh search cho khách. Da thay doi SQL
     public List<RoomType> getAllRoomTypes() {
@@ -73,119 +76,137 @@ public class RoomTypeDAO extends DBContext {
     }
 
     // Kết quả sau khi khách thực hiện search tìm phòng trống
-    public List<RoomType> searchRoomTypesByQuantity(
-            String checkIn,
-            String checkOut,
-            int roomQuantity,
-            String roomTypeId) {
+    public List<RoomType> searchRoomTypesByQuantity(String checkIn, String checkOut, int roomQuantity, String roomTypeId) {
+        // Tìm các hạng phòng còn đủ số lượng trong khoảng thời gian khách chọn.
+        List<RoomType> roomTypes = new ArrayList<>();
 
-        List<RoomType> list = new ArrayList<>();
-
-        String sql
-                = "SELECT rt.room_type_id, rt.type_name, rt.description, "
-                + "rt.capacity,rt.num_guests, rt.num_children, rt.bed_type, rt.bed_count, rt.area_sqm, "
-                + "rt.base_price, rt.is_active, "
-                + "img.image_url AS firstImageUrl "
-                + "FROM RoomTypes rt "
-                + "OUTER APPLY ( "
-                + "    SELECT TOP 1 rti.image_url "
-                + "    FROM RoomTypeImages rti "
-                + "    WHERE rti.room_type_id = rt.room_type_id "
-                + "    ORDER BY rti.image_id ASC "
-                + ") img "
-                + "WHERE rt.is_active = 1 ";
-
-        if (roomTypeId != null && !roomTypeId.equals("all")) {
-            sql += "AND rt.room_type_id = ? ";
-        }
-
-        sql += "AND ( "
-                + "    (SELECT COUNT(*) "
-                + "     FROM Rooms r "
-                + "     WHERE r.room_type_id = rt.room_type_id "
-                + "     AND r.[status] != N'Đang bảo trì') "
-                + "    - "
-                + "    ISNULL(( "
-                + "        SELECT SUM(b.num_rooms) "
-                + "        FROM Bookings b "
-                + "        WHERE b.room_type_id = rt.room_type_id "
-                + "        AND b.[status] != N'Đã hủy' "
-                + "        AND NOT (b.checkout_date <= ? OR b.checkin_date >= ?) "
-                + "        AND ( "
-                + "            b.[status] != N'Chờ xử lý' "
-                + "            OR ISNULL(b.[source], '') != N'Đặt phòng trực tuyến' "
-                + "            OR DATEADD(MINUTE, ?, b.created_at) > GETDATE() "
-                + "            OR EXISTS ( "
-                + "                SELECT 1 "
-                + "                FROM DepositPayments dp "
-                + "                WHERE dp.booking_id = b.booking_id "
-                + "            ) "
-                + "        ) "
-                + "    ), 0) "
-                + ") >= ? "
-                + "ORDER BY rt.room_type_id ASC";
-
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        Date checkInDate;
+        Date checkOutDate;
 
         try {
-            ps = connection.prepareStatement(sql);
-            int index = 1;
+            checkInDate = Date.valueOf(checkIn);
+            checkOutDate = Date.valueOf(checkOut);
+        } catch (IllegalArgumentException e) {
+            return roomTypes;
+        }
 
-            if (roomTypeId != null && !roomTypeId.equals("all")) {
-                ps.setInt(index++, Integer.parseInt(roomTypeId));
-            }
+        if (!checkOutDate.after(checkInDate) || roomQuantity < MIN_ROOM_QUANTITY) {
+            return roomTypes;
+        }
 
-            ps.setString(index++, checkIn);
-            ps.setString(index++, checkOut);
-            ps.setInt(index++, 15);
-            ps.setInt(index++, roomQuantity);
+        Integer selectedRoomTypeId = null;
 
-            rs = ps.executeQuery();
-
-            while (rs.next()) {
-                RoomType rt = new RoomType();
-
-                rt.setRoomTypeId(rs.getInt("room_type_id"));
-                rt.setTypeName(rs.getString("type_name"));
-                rt.setDescription(rs.getString("description"));
-                rt.setCapacity(rs.getInt("capacity"));
-                rt.setNumGuests(rs.getInt("num_guests"));
-                rt.setNumChildren(rs.getInt("num_children"));
-                rt.setBedType(rs.getString("bed_type"));
-                rt.setBedCount(rs.getInt("bed_count"));
-                rt.setAreaSqm(rs.getBigDecimal("area_sqm"));
-                rt.setBasePrice(rs.getBigDecimal("base_price"));
-                rt.setActive(rs.getBoolean("is_active"));
-
-                String firstImage = rs.getString("firstImageUrl");
-
-                if (firstImage != null && !firstImage.trim().isEmpty()) {
-                    rt.addImage(firstImage, "");
-                }
-
-                list.add(rt);
-            }
-
-        } catch (Exception e) {
-            System.out.println("searchRoomTypesByQuantity: " + e.getMessage());
-            e.printStackTrace();
-
-        } finally {
+        if (roomTypeId != null && !roomTypeId.trim().isEmpty() && !ALL_ROOM_TYPES.equalsIgnoreCase(roomTypeId.trim())) {
             try {
-                if (rs != null) {
-                    rs.close();
-                }
-
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+                selectedRoomTypeId = Integer.valueOf(roomTypeId.trim());
+            } catch (NumberFormatException e) {
+                return roomTypes;
             }
         }
 
-        return list;
+        String sql = """
+            SELECT
+                rt.room_type_id,
+                rt.type_name,
+                rt.description,
+                rt.capacity,
+                rt.num_guests,
+                rt.num_children,
+                rt.bed_type,
+                rt.bed_count,
+                rt.area_sqm,
+                rt.base_price,
+                rt.is_active,
+                imageData.image_url AS firstImageUrl
+            FROM RoomTypes rt
+
+            OUTER APPLY (
+                SELECT TOP 1 rti.image_url
+                FROM RoomTypeImages rti
+                WHERE rti.room_type_id = rt.room_type_id
+                ORDER BY rti.image_id ASC
+            ) imageData
+
+            CROSS APPLY (
+                SELECT COUNT(*) AS totalRooms
+                FROM Rooms r
+                WHERE r.room_type_id = rt.room_type_id
+                  AND r.is_active = 1
+                  AND r.[status] <> N'Đang bảo trì'
+            ) roomData
+
+            OUTER APPLY (
+                SELECT ISNULL(SUM(b.num_rooms), 0) AS reservedRooms
+                FROM Bookings b
+                WHERE b.room_type_id = rt.room_type_id
+                  AND b.[status] IN (N'Chờ xử lý', N'Đã xác nhận', N'Đã nhận phòng')
+                  AND b.checkin_date < ?
+                  AND b.checkout_date > ?
+                  AND (
+                      b.[status] <> N'Chờ xử lý'
+                      OR b.[source] <> N'Đặt phòng trực tuyến'
+                      OR b.created_at IS NULL
+                      OR DATEADD(MINUTE, ?, b.created_at) > GETDATE()
+                      OR EXISTS (
+                          SELECT 1
+                          FROM DepositPayments dp
+                          WHERE dp.booking_id = b.booking_id
+                      )
+                  )
+            ) bookingData
+
+            WHERE rt.is_active = 1
+              AND (? IS NULL OR rt.room_type_id = ?)
+              AND roomData.totalRooms - bookingData.reservedRooms >= ?
+            ORDER BY rt.room_type_id ASC
+            """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setDate(1, checkOutDate);
+            statement.setDate(2, checkInDate);
+            statement.setInt(3, HOLD_MINUTES);
+
+            if (selectedRoomTypeId == null) {
+                statement.setNull(4, Types.INTEGER);
+                statement.setNull(5, Types.INTEGER);
+            } else {
+                statement.setInt(4, selectedRoomTypeId);
+                statement.setInt(5, selectedRoomTypeId);
+            }
+
+            statement.setInt(6, roomQuantity);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    RoomType roomType = new RoomType();
+
+                    roomType.setRoomTypeId(resultSet.getInt("room_type_id"));
+                    roomType.setTypeName(resultSet.getString("type_name"));
+                    roomType.setDescription(resultSet.getString("description"));
+                    roomType.setCapacity(resultSet.getInt("capacity"));
+                    roomType.setNumGuests(resultSet.getInt("num_guests"));
+                    roomType.setNumChildren(resultSet.getInt("num_children"));
+                    roomType.setBedType(resultSet.getString("bed_type"));
+                    roomType.setBedCount(resultSet.getInt("bed_count"));
+                    roomType.setAreaSqm(resultSet.getBigDecimal("area_sqm"));
+                    roomType.setBasePrice(resultSet.getBigDecimal("base_price"));
+                    roomType.setActive(resultSet.getBoolean("is_active"));
+
+                    String firstImage = resultSet.getString("firstImageUrl");
+
+                    if (firstImage != null && !firstImage.trim().isEmpty()) {
+                        roomType.addImage(firstImage, "");
+                    }
+
+                    roomTypes.add(roomType);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("searchRoomTypesByQuantity error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return roomTypes;
     }
 
     // 1. Lấy toàn bộ danh sách phòng phục vụ trang quản trị Manager 
@@ -914,76 +935,76 @@ public RoomType getRoomDetailById(int roomTypeId) {
 
 
     // 7. Đếm số phòng còn trống theo hạng phòng và khoảng ngày (phục vụ public Room Detail)
-    // Đếm số phòng còn trống theo hạng phòng và khoảng ngày
     public int getAvailableRoomCount(int roomTypeId, String checkIn, String checkOut) {
-        int availableRooms = 0;
-
-        String sql = "SELECT ( "
-                + "    (SELECT COUNT(*) "
-                + "     FROM Rooms r "
-                + "     WHERE r.room_type_id = ? "
-                + "     AND r.[status] != N'Đang bảo trì') "
-                + "    - "
-                + "    ISNULL(( "
-                + "        SELECT SUM(b.num_rooms) "
-                + "        FROM Bookings b "
-                + "        WHERE b.room_type_id = ? "
-                + "        AND b.[status] != N'Đã hủy' "
-                + "        AND NOT (b.checkout_date <= ? OR b.checkin_date >= ?) "
-                + "        AND ( "
-                + "            b.[status] != N'Chờ xử lý' "
-                + "            OR ISNULL(b.[source], '') != N'Đặt phòng trực tuyến' "
-                + "            OR DATEADD(MINUTE, ?, b.created_at) > GETDATE() "
-                + "            OR EXISTS ( "
-                + "                SELECT 1 "
-                + "                FROM DepositPayments dp "
-                + "                WHERE dp.booking_id = b.booking_id "
-                + "            ) "
-                + "        ) "
-                + "    ), 0) "
-                + ") AS available_rooms";
-
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        // Đếm số phòng còn lại sau khi trừ các booking đang giữ hoặc đã xác nhận.
+        Date checkInDate;
+        Date checkOutDate;
 
         try {
-            if (connection == null) {
-                System.out.println("getAvailableRoomCount: Connection đang bị null.");
-                return 0;
-            }
-
-            ps = connection.prepareStatement(sql);
-            ps.setInt(1, roomTypeId);
-            ps.setInt(2, roomTypeId);
-            ps.setString(3, checkIn);
-            ps.setString(4, checkOut);
-            ps.setInt(5, HOLD_MINUTES);
-
-            rs = ps.executeQuery();
-
-            if (rs.next()) {
-                availableRooms = rs.getInt("available_rooms");
-            }
-
-        } catch (Exception e) {
-            System.out.println("getAvailableRoomCount: " + e.getMessage());
-            e.printStackTrace();
-
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            checkInDate = Date.valueOf(checkIn);
+            checkOutDate = Date.valueOf(checkOut);
+        } catch (IllegalArgumentException e) {
+            return MIN_AVAILABLE_ROOMS;
         }
 
-        return Math.max(availableRooms, 0);
+        if (!checkOutDate.after(checkInDate)) {
+            return MIN_AVAILABLE_ROOMS;
+        }
+
+        String sql = """
+            SELECT roomData.totalRooms - bookingData.reservedRooms AS availableRooms
+            FROM RoomTypes rt
+
+            CROSS APPLY (
+                SELECT COUNT(*) AS totalRooms
+                FROM Rooms r
+                WHERE r.room_type_id = rt.room_type_id
+                  AND r.is_active = 1
+                  AND r.[status] <> N'Đang bảo trì'
+            ) roomData
+
+            OUTER APPLY (
+                SELECT ISNULL(SUM(b.num_rooms), 0) AS reservedRooms
+                FROM Bookings b
+                WHERE b.room_type_id = rt.room_type_id
+                  AND b.[status] IN (N'Chờ xử lý', N'Đã xác nhận', N'Đã nhận phòng')
+                  AND b.checkin_date < ?
+                  AND b.checkout_date > ?
+                  AND (
+                      b.[status] <> N'Chờ xử lý'
+                      OR b.[source] <> N'Đặt phòng trực tuyến'
+                      OR b.created_at IS NULL
+                      OR DATEADD(MINUTE, ?, b.created_at) > GETDATE()
+                      OR EXISTS (
+                          SELECT 1
+                          FROM DepositPayments dp
+                          WHERE dp.booking_id = b.booking_id
+                      )
+                  )
+            ) bookingData
+
+            WHERE rt.room_type_id = ?
+              AND rt.is_active = 1
+            """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setDate(1, checkOutDate);
+            statement.setDate(2, checkInDate);
+            statement.setInt(3, HOLD_MINUTES);
+            statement.setInt(4, roomTypeId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    int availableRooms = resultSet.getInt("availableRooms");
+                    return Math.max(availableRooms, MIN_AVAILABLE_ROOMS);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("getAvailableRoomCount error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return MIN_AVAILABLE_ROOMS;
     }
 
   

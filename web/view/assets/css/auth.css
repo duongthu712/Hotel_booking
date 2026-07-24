@@ -226,3 +226,23 @@ body {
         gap: 12px;
     }
 }
+
+.verify-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 22px;
+}
+
+.verify-actions a {
+    color: #003f4a;
+    font-family: inherit;
+    font-size: 16px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.verify-actions a:hover {
+    text-decoration: underline;
+}

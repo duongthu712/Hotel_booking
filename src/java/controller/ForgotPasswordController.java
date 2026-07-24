@@ -3,10 +3,8 @@ package controller;
 import dal.EmailUtil;
 import dao.StaffAccountDAO;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,47 +16,42 @@ public class ForgotPasswordController extends HttpServlet {
 
     private static final int RESET_CODE_EXPIRY_MINUTES = 10;
 
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        response.setContentType("text/html;charset=UTF-8");
-
-        try (PrintWriter out = response.getWriter()) {
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Forgot Password Controller</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Forgot Password Controller at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        RequestDispatcher rd = request.getRequestDispatcher("/view/auth/forgot-password.jsp");
-        rd.forward(request, response);
+        // Hiển thị trang quên mật khẩu.
+        request.getRequestDispatcher("/view/auth/forgot-password.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // Kiểm tra email, tạo mã xác minh và gửi mã cho nhân viên.
         request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
 
         String email = request.getParameter("email");
+
+        if (email == null || email.trim().isEmpty()) {
+            request.setAttribute("error", "Vui lòng nhập địa chỉ email.");
+            request.getRequestDispatcher("/view/auth/forgot-password.jsp").forward(request, response);
+            return;
+        }
+
+        email = email.trim();
+
         StaffAccountDAO dao = new StaffAccountDAO();
+        HttpSession session = request.getSession();
 
         try {
             StaffAccount staff = dao.getStaffByEmail(email);
-            HttpSession session = request.getSession();
 
             if (staff == null) {
                 session.removeAttribute("pendingResetEmail");
+                session.removeAttribute("verifyMessage");
+
                 request.setAttribute("error", "Email không tồn tại hoặc tài khoản đã bị khóa.");
                 request.getRequestDispatcher("/view/auth/forgot-password.jsp").forward(request, response);
                 return;
@@ -71,32 +64,44 @@ public class ForgotPasswordController extends HttpServlet {
 
             try {
                 EmailUtil.sendResetCode(email, code);
-                request.setAttribute("message", "Mã xác minh đã được gửi đến email của bạn.");
             } catch (Exception mailError) {
                 mailError.printStackTrace();
-                request.setAttribute("error", "Không thể gửi mã xác minh. Vui lòng thử lại.");
+
+                session.removeAttribute("pendingResetEmail");
+                session.removeAttribute("verifyMessage");
+
+                request.setAttribute("error",
+                        "Không thể gửi mã xác minh. Vui lòng kiểm tra cấu hình email và thử lại.");
                 request.getRequestDispatcher("/view/auth/forgot-password.jsp").forward(request, response);
                 return;
             }
 
             session.setAttribute("pendingResetEmail", email);
-            request.getRequestDispatcher("/view/auth/verify-code.jsp").forward(request, response);
+            session.setAttribute("verifyMessage", "Mã xác minh đã được gửi đến email của bạn.");
 
-        } catch (Exception e) {
-            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/verify-code");
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
+
+            session.removeAttribute("pendingResetEmail");
+            session.removeAttribute("verifyMessage");
+
             request.setAttribute("error", "Lỗi hệ thống. Vui lòng thử lại.");
             request.getRequestDispatcher("/view/auth/forgot-password.jsp").forward(request, response);
         }
     }
 
     private String generateCode() {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        // Tạo mã xác minh gồm tiền tố LMH và 5 ký tự ngẫu nhiên.
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         SecureRandom random = new SecureRandom();
         StringBuilder code = new StringBuilder("LMH");
 
         for (int i = 0; i < 5; i++) {
-            int index = random.nextInt(chars.length());
-            code.append(chars.charAt(index));
+            int index = random.nextInt(characters.length());
+            code.append(characters.charAt(index));
         }
 
         return code.toString();
@@ -104,6 +109,8 @@ public class ForgotPasswordController extends HttpServlet {
 
     @Override
     public String getServletInfo() {
+
+        // Trả về mô tả của servlet.
         return "Forgot Password Controller";
     }
 }

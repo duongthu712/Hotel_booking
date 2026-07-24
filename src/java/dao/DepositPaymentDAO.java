@@ -161,15 +161,24 @@ public class DepositPaymentDAO extends DBContext {
 
             // 2. Update Bookings
             String updateBookingSQL = """
-                update Bookings
-                set status = N'Đã xác nhận',
-                payment_status = N'Đã đặt cọc',
-                confirmed_at = GETDATE()
-                where booking_id = ?
-                """;
+        UPDATE Bookings
+        SET [status] = N'Đã xác nhận',
+            payment_status = N'Đã đặt cọc',
+            confirmed_at = GETDATE(),
+            staff_id = ?
+        WHERE booking_id = ?
+          AND [status] = N'Chờ xử lý'
+        """;
+
             try (PreparedStatement stm = connection.prepareStatement(updateBookingSQL)) {
-                stm.setInt(1, payment.getBookingId());
-                stm.executeUpdate();
+                stm.setInt(1, staffId);
+                stm.setInt(2, payment.getBookingId());
+
+                int updatedRows = stm.executeUpdate();
+
+                if (updatedRows == 0) {
+                    throw new SQLException("Không thể cập nhật booking sau khi duyệt cọc.");
+                }
             }
 
             // 3. Lấy thông tin booking để tính tiền phòng

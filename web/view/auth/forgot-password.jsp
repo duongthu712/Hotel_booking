@@ -4,14 +4,19 @@
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
         <title>Quên mật khẩu</title>
 
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/navbar.css">
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/footer.css">
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/view/assets/css/auth.css">
+        <link rel="stylesheet"
+              href="<%= request.getContextPath() %>/view/assets/css/navbar.css">
+        <link rel="stylesheet"
+              href="<%= request.getContextPath() %>/view/assets/css/footer.css">
+        <link rel="stylesheet"
+              href="<%= request.getContextPath() %>/view/assets/css/auth.css">
     </head>
-    <body>
 
+    <body>
         <jsp:include page="/view/common/navbar.jsp" />
 
         <main class="auth-page">
@@ -36,18 +41,25 @@
                 </p>
                 <% } %>
 
-                <form class="auth-form" action="<%= request.getContextPath() %>/forgot-password" method="post">
+                <form class="auth-form"
+                      action="<%= request.getContextPath() %>/forgot-password"
+                      method="post">
+
                     <div class="auth-form-group">
-                        <label>Email</label>
-                        <input
-                            type="email"
-                            name="email"
-                            value="<%= request.getParameter("email") != null ? request.getParameter("email") : "" %>"
-                            required
-                            >
+                        <label for="email">Email</label>
+
+                        <input id="email"
+                               type="email"
+                               name="email"
+                               placeholder="Nhập email nhân viên"
+                               value="<%= request.getParameter("email") != null
+                                       ? request.getParameter("email") : "" %>"
+                               required>
                     </div>
 
-                    <button type="submit" class="auth-btn">Gửi mã xác minh</button>
+                    <button type="submit" class="auth-btn">
+                        Gửi mã xác minh
+                    </button>
                 </form>
 
                 <div class="auth-link">
@@ -61,6 +73,5 @@
         </main>
 
         <jsp:include page="/view/common/footer.jsp" />
-
     </body>
 </html>
