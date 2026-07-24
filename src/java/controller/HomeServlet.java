@@ -1,6 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 03/06/2026
+ * Purpose: Controller logic for HomeServlet.
  */
 package controller;
 
@@ -49,6 +50,7 @@ public class HomeServlet extends HttpServlet {
 
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
         HotelInfoDAO hotelInfoDAO = new HotelInfoDAO();
         RoomTypeDAO roomtypeDAO = new RoomTypeDAO();
         HotelInfo hotelInfo = hotelInfoDAO.getHotelDetails(1);

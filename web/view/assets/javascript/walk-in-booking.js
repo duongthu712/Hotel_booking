@@ -1,6 +1,7 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Other/javascript.js to edit this template
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 16/06/2026
+ * Purpose: JavaScript logic for walk in booking.
  */
 document.addEventListener("DOMContentLoaded", function() {
     const buttons = document.querySelectorAll(".select-room-btn");

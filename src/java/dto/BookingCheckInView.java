@@ -1,9 +1,12 @@
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 12/06/2026
+ * Purpose: Used to display the list and details of bookings for the receptionist (used in Check-in and Assign Room pages).
+ */
 package dto;
 
 import java.math.BigDecimal;
 import java.sql.Date;
-
-// List đơn check in ngày hôm nay
 public class BookingCheckInView {
 
     private int bookingId;
@@ -36,9 +39,19 @@ public class BookingCheckInView {
     private String expectedCheckInTime; // Giờ khách hẹn đến (Dạng HH:mm:ss)
     private String autoCancelDeadline;  // Hạn chót tự động hủy phòng nếu khách ko đến
     private String callNote;            // Ghi chú cuộc gọi của lễ tân (Lấy từ cancellation_reason)
+    private String checkinDate;         // Ngày check-in gốc
 
     public BookingCheckInView() {
     }
+
+    public String getCheckinDate() {
+        return checkinDate;
+    }
+
+    public void setCheckinDate(String checkinDate) {
+        this.checkinDate = checkinDate;
+    }
+
     public String getExpectedCheckInTime() {
         return expectedCheckInTime;
     }

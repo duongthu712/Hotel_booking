@@ -1,8 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 04/06/2026
+ * Purpose: Controller logic for ReceptionistDashboardController.
  */
-
 package controller;
 
 import dao.ReceptionistDashboardDAO;

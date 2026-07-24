@@ -1,3 +1,9 @@
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 16/06/2026
+ * Purpose: JavaScript logic for check in.
+ */
+
 document.addEventListener("DOMContentLoaded", function () {
     const isDiffCheckbox = document.getElementById("isDifferentGuest");
     const checkInForm = document.getElementById("checkInForm");

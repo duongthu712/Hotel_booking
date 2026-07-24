@@ -355,6 +355,7 @@ public class EmailUtil {
         Transport.send(message);
     }
 
+    // Author: ThuDNM-HE204370
     public static void sendWalkInBookingConfirmed(String toEmail, String guestName, String phone, String idNumber,
             LocalDate dateOfBirth, String bookingCode, LocalDate checkinDate, LocalDate checkoutDate,
             int numRooms, int numGuests, int numChildren, BigDecimal depositAmount, boolean isStayNow) throws Exception {
@@ -426,6 +427,7 @@ public class EmailUtil {
         Transport.send(message);
     }
 
+    // Author: ThuDNM-HE204370
     public static void sendRequestSubmittedNotification(String toEmail,
             String guestName,
             String bookingCode,
@@ -476,6 +478,7 @@ public class EmailUtil {
         Transport.send(message);
     }
 
+    // Author: ThuDNM-HE204370
     public static void sendRequestVerificationResult(String toEmail,
             String guestName,
             String bookingCode,

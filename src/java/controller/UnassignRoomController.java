@@ -1,3 +1,8 @@
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 08/06/2026
+ * Purpose: Controller logic for UnassignRoomController.
+ */
 package controller;
 
 import dao.RoomDAO;
@@ -18,13 +23,11 @@ public class UnassignRoomController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         
         try {
-            // Lấy 2 tham số quan trọng từ nút [Hủy Gán] gửi lên
             int bookingId = Integer.parseInt(request.getParameter("bookingId"));
             int roomId = Integer.parseInt(request.getParameter("roomId"));
 
             RoomDAO roomDAO = new RoomDAO();
             
-            // Gọi hàm hủy gán phòng dưới DAO
             boolean isSuccess = roomDAO.unassignRoom(bookingId, roomId);
 
             if (isSuccess) {
@@ -35,7 +38,6 @@ public class UnassignRoomController extends HttpServlet {
                 request.getSession().setAttribute("notificationType", "error");
             }
 
-            // Hủy xong thì quay ngược lại đúng trang Chi tiết đơn đặt phòng đó
             response.sendRedirect(request.getContextPath() + "/assign-room?bookingId=" + bookingId);
 
         } catch (Exception e) {

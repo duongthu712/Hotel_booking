@@ -51,7 +51,7 @@ public class WalkinBookingDAO extends DBContext {
                 + "TotalActiveRooms AS ("
                 + "    SELECT room_type_id, COUNT(room_id) AS total_rooms "
                 + "    FROM Rooms "
-                + "    WHERE is_active = 1 "
+                + "    WHERE is_active = 1 AND [status] != N'Đang bảo trì' "
                 + "    GROUP BY room_type_id "
                 + "), "
                 + "FinalAvailable AS ("

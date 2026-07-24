@@ -1,3 +1,9 @@
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 16/06/2026
+ * Purpose: JavaScript logic for guest request.
+ */
+
 document.addEventListener("DOMContentLoaded", function () {
     // --- 1. XỬ LÝ THÔNG BÁO TỪ SERVER ---
     const urlParams = new URLSearchParams(window.location.search);
@@ -76,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
         radios.forEach(radio => {
             let isBlocked = false;
             if (status.includes("Chờ xử lý"))
-                isBlocked = (radio.value !== "Hủy đặt phòng");
+                isBlocked = true; // All options blocked if deposit not confirmed
             else if (status.includes("Đã nhận phòng"))
                 isBlocked = (radio.value !== "Gia hạn phòng");
             else if (status.includes("Đã trả phòng") || status.includes("Đã hủy"))
@@ -86,6 +92,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (container) {
                 container.classList.toggle("disabled-option", isBlocked);
             }
+            radio.disabled = isBlocked;
             if (isBlocked)
                 radio.checked = false;
         });
@@ -106,11 +113,24 @@ document.addEventListener("DOMContentLoaded", function () {
         const activeRadio = document.querySelector("input[name='requestType']:checked");
         const firstValid = document.querySelector(".type-card-option:not(.disabled-option) input[name='requestType']");
 
+        if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.style.opacity = "1";
+            btnSubmit.style.cursor = "pointer";
+        }
+
         if (activeRadio) {
             switchTab(activeRadio.value);
         } else if (firstValid) {
             firstValid.checked = true;
             switchTab(firstValid.value);
+        } else {
+            document.querySelectorAll(".tab-pane").forEach(pane => pane.style.display = "none");
+            if (btnSubmit) {
+                btnSubmit.disabled = true;
+                btnSubmit.style.opacity = "0.5";
+                btnSubmit.style.cursor = "not-allowed";
+            }
         }
     }
 

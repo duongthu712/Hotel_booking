@@ -839,14 +839,14 @@
                                                         <c:out value="${r.requestDetails}"/>
                                                     </p>
 
-                                                    <c:if test="${not empty r.requestedCheckinText}">
+                                                    <c:if test="${not empty r.requestedCheckinText and not fn:contains(r.requestedCheckinText, '1970')}">
                                                         <p>
                                                             Check-in yêu cầu:
                                                             <c:out value="${r.requestedCheckinText}"/>
                                                         </p>
                                                     </c:if>
 
-                                                    <c:if test="${not empty r.requestedCheckoutText}">
+                                                    <c:if test="${not empty r.requestedCheckoutText and not fn:contains(r.requestedCheckoutText, '1970')}">
                                                         <p>
                                                             Check-out yêu cầu:
                                                             <c:out value="${r.requestedCheckoutText}"/>

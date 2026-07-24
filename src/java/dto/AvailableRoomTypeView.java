@@ -1,15 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 05/06/2026
+ * Purpose: Used to display the list of available room types (used in Search Room and Walk-in Booking pages).
  */
 package dto;
 
 import java.math.BigDecimal;
-
-/**
- *
- * @author Minh Thu
- */
 public class AvailableRoomTypeView {
 
 private int roomTypeId;

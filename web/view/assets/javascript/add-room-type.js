@@ -1,3 +1,9 @@
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 16/06/2026
+ * Purpose: JavaScript logic for add room type.
+ */
+
 document.addEventListener("DOMContentLoaded", function () {
 
     const container = document.getElementById("imageFieldsContainer");

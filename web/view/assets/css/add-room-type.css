@@ -1,3 +1,8 @@
+/* 
+Author: ThuDNM-HE204370 
+Date created: 15/06/2026 
+Purpose: Styles for the add room type page. */
+
 /* === 1. ĐỊNH DẠNG CƠ BẢN === */
 * {
     margin: 0;
@@ -12,9 +17,9 @@ body {
 }
 
 .form-box {
-    background-color: transparent; 
-    border: none;                  
-    padding: 40px 40px;            
+    background-color: transparent;
+    border: none;
+    padding: 40px 0;
     width: 100%;
     box-sizing: border-box;
 }
@@ -26,6 +31,7 @@ body {
     color: #1a446c;
     letter-spacing: 0.5px;
 }
+
 .form-header p {
     font-family: 'Lora', serif;
     font-size: 14px;
@@ -55,7 +61,8 @@ body {
     display: block;
 }
 
-.input-field, .textarea-field {
+.input-field,
+.textarea-field {
     width: 100%;
     padding: 10px 14px;
     font-family: 'Lora', serif;
@@ -68,14 +75,24 @@ body {
     box-sizing: border-box;
     height: 43px;
 }
-.textarea-field { height: auto; }
-.input-field:focus, .textarea-field:focus {
+
+.textarea-field {
+    height: auto;
+}
+
+.input-field:focus,
+.textarea-field:focus {
     border-color: #1a446c;
     background-color: #ffffff;
 }
 
 /* === 2. BẢNG DỊCH VỤ === */
-.service-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+.service-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
 .service-table thead th {
     color: #1a446c;
     font-family: 'Lora', serif;
@@ -85,6 +102,7 @@ body {
     border-bottom: 1px solid #ebd9b4;
     background-color: rgba(26, 68, 108, 0.03);
 }
+
 .service-table tbody td {
     padding: 14px 12px;
     border-bottom: 1px solid #ebd9b4;
@@ -93,6 +111,7 @@ body {
     color: #1a446c;
     vertical-align: middle;
 }
+
 .qty-input {
     width: 70px;
     padding: 5px 8px;
@@ -118,7 +137,7 @@ body {
     padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 5px; /* Giảm gap chung để kiểm soát khoảng cách từng phần tử tốt hơn */
+    gap: 5px;
 }
 
 .input-section {
@@ -133,7 +152,6 @@ body {
     font-weight: 600;
 }
 
-/* Nút Xóa: Nhỏ gọn, cách xa Choose File */
 .btn-delete {
     background-color: #0f4c5c;
     color: white;
@@ -144,11 +162,13 @@ body {
     font-size: 12px;
     font-weight: 500;
     align-self: flex-start;
-    margin-top: 15px; /* Tăng margin-top để nút xóa không bị dính vào ảnh */
+    margin-top: 15px;
 }
-.btn-delete:hover { background-color: #0a3a47; }
 
-/* Tạo khoảng cách cho input file */
+.btn-delete:hover {
+    background-color: #0a3a47;
+}
+
 input[type="file"] {
     margin-bottom: 5px;
 }
@@ -171,8 +191,8 @@ input[type="file"] {
     border-radius: 8px;
     border: 1px solid #ddd;
     display: block;
-    margin-top: 15px;      /* Tăng khoảng cách từ ảnh lên khung input/link bên trên */
-    margin-bottom: 10px;   /* Tạo khoảng cách phía dưới ảnh */
+    margin-top: 15px;
+    margin-bottom: 10px;
 }
 
 /* === 4. KHỐI ĐIỀU HƯỚNG === */
@@ -185,6 +205,7 @@ input[type="file"] {
     margin-top: 30px;
     text-decoration: none;
 }
+
 .btn-submit {
     background-color: #1a446c;
     color: #ffffff;
@@ -193,16 +214,23 @@ input[type="file"] {
     cursor: pointer;
     border: none;
 }
-.required-star { color: #dc3545 !important; font-weight: bold; }
-.status-block { margin-top: 40px !important; }
-/* Nút Quay lại - Đã chuyển đổi thành phong cách Button */
+
+.required-star {
+    color: #dc3545 !important;
+    font-weight: bold;
+}
+
+.status-block {
+    margin-top: 40px !important;
+}
+
 .btn-link-back {
     font-family: 'Lora', serif;
     font-size: 14px;
     color: #1a446c;
     text-decoration: none;
     padding: 12px 24px;
-    border: 1px solid #1a446c; /* Viền để nhìn rõ hơn */
+    border: 1px solid #1a446c;
     border-radius: 4px;
     display: inline-flex;
     align-items: center;
@@ -210,12 +238,11 @@ input[type="file"] {
 }
 
 .btn-link-back:hover {
-    background-color: rgba(26, 68, 108, 0.05); /* Hiệu ứng hover nhẹ */
+    background-color: rgba(26, 68, 108, 0.05);
     text-decoration: none;
     color: #1a446c;
 }
 
-/* Nút Lưu - Giữ nguyên nhưng đảm bảo kích thước bằng nút Quay lại */
 .btn-submit {
     font-family: 'Lora', serif;
     font-size: 14px;
@@ -231,5 +258,5 @@ input[type="file"] {
 
 .btn-submit:hover {
     background-color: #0f2a40;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }

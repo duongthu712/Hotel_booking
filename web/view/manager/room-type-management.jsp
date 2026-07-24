@@ -1,7 +1,7 @@
 <%-- 
-    Document   : room-type-management
-    Created on : Jun 11, 2026, 2:15:52 PM
-    Author     : Minh Thu
+    Author: ThuDNM-HE204370 
+    Date created: 23/06/2026 
+    Purpose: Room type management page.
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -16,21 +16,18 @@
         <jsp:include page="/view/staff/header.jsp" />
 
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css"/>
-
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/common.css" type="text/css">
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/view/assets/css/room-type-list.css?v=<%= System.currentTimeMillis() %>">
     </head>
     <body>
         <jsp:include page="/view/staff/navbar.jsp" />
 
-        <div class="container-fluid">
-            <div class="row">
-                <main class="col-md-12 ms-sm-auto px-md-4">
+        <main class="content-container">
                     <div class="management-wrapper">
 
                         <div class="action-bar">
                             <a href="${pageContext.request.contextPath}/createroomtype"
                                class="btn btn-primary add-room-btn">
-                                <i class="fa-solid fa-plus me-2"></i>
                                 Thêm Loại Phòng Mới
                             </a>
                         </div>
@@ -148,14 +145,9 @@
                                                         </div>
                                                     </td>
                                                     <td class="col-status">
-                                                        <c:choose>
-                                                            <c:when test="${item.isActive()}">
-                                                                <span class="status-indicator active"><i class="fa-solid fa-circle me-1"></i> Hoạt động</span>
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <span class="status-indicator hidden"><i class="fa-solid fa-circle me-1"></i> Tạm dừng</span>
-                                                            </c:otherwise>
-                                                        </c:choose>
+                                                        <div class="srvAct ${item.isActive() ? 'status-active' : 'status-inactive'}">
+                                                            ${item.isActive() ? 'HOẠT ĐỘNG' : 'TẠM DỪNG'}
+                                                        </div>
                                                     </td>
                                                     <td class="col-actions">
                                                         <div class="btn-group-actions">
@@ -191,8 +183,6 @@
                         </div>
                     </div>
                 </main>
-            </div>
-        </div>
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

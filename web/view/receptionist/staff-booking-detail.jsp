@@ -224,13 +224,13 @@
                                                 ${r.requestDetails}
                                             </div>
 
-                                            <c:if test="${not empty r.requestedCheckinText}">
+                                            <c:if test="${not empty r.requestedCheckinText and not fn:contains(r.requestedCheckinText, '1970')}">
                                                 <div class="request-sub">
                                                     Check-in yêu cầu: ${r.requestedCheckinText}
                                                 </div>
                                             </c:if>
 
-                                            <c:if test="${not empty r.requestedCheckoutText}">
+                                            <c:if test="${not empty r.requestedCheckoutText and not fn:contains(r.requestedCheckoutText, '1970')}">
                                                 <div class="request-sub">
                                                     Check-out yêu cầu: ${r.requestedCheckoutText}
                                                 </div>

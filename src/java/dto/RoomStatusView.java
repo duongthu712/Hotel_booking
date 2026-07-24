@@ -1,3 +1,8 @@
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 10/06/2026
+ * Purpose: Used to display the status of each room (vacant, occupied, under maintenance, etc.) on the room matrix diagram for the receptionist.
+ */
 package dto;
 
 public class RoomStatusView {

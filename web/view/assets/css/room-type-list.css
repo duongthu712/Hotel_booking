@@ -1,12 +1,7 @@
-/*
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
-*/
 /* 
-    Created on : Jul 6, 2026, 9:20:58 AM
-    Author     : Minh Thu
-*/
-
+Author: ThuDNM-HE204370 
+Date created: 20/06/2026 
+Purpose: Styles for the room type list page. */
 /* === 1. RESET HỆ THỐNG VÀ ĐỒNG BỘ PHÔNG CHỮ === */
 * {
     margin: 0;
@@ -16,7 +11,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 }
 
 body {
-    background-color: #F9F5EB !important; /* Bắt buộc giữ important để đè nền mặc định Bootstrap */
+    background-color: #F9F5EB !important;
     color: #1a446c;
 }
 
@@ -27,7 +22,6 @@ h1, h2, h3, h4, .management-title {
 }
 
 .management-wrapper {
-    padding: 10px 50px;
     width: 100%;
 }
 
@@ -49,24 +43,22 @@ h1, h2, h3, h4, .management-title {
 }
 
 .management-wrapper .btn-primary {
-    padding: 10px 20px;
-    font-size: 0.7rem;
-    font-family: 'Lora', serif;
-    text-transform: uppercase;
-    text-decoration: none;
-
-    background: #1a446c;
-    color: #fff;
-    border: 1px solid #1a446c;
-    border-radius: 6px;
-
-    transition: all 0.3s ease;
+    background: #244769 !important;
+    color: #ffffff !important;
+    padding: 15px 20px !important;
+    border: none !important;
+    border-radius: 7px !important;
+    text-transform: uppercase !important;
+    font-size: 0.8rem !important;
+    letter-spacing: 0.1em !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
 }
 
 .management-wrapper .btn-primary:hover {
-    background: #112d47;
-    border-color: #112d47;
-    transform: translateY(-1px);
+    background: #333 !important;
 }
 
 /* === 3. ĐỊNH DẠNG BẢNG DỮ LIỆU TỐI GIẢN === */
@@ -100,7 +92,6 @@ h1, h2, h3, h4, .management-title {
     background-color: rgba(26, 68, 108, 0.03);
 }
 
-/* Các nhóm text đặc thù trong ô */
 .text-muted-id {
     font-size: 14px;
     color: #bfa15f;
@@ -167,36 +158,43 @@ h1, h2, h3, h4, .management-title {
     border: 1px solid #ffcdd2;
 }
 
+.srvAct {
+    text-align: center;
+    font-size: 0.75em;
+    border-radius: 7px;
+    padding: 5px 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
 /* === 5. CHỮ HÀNH ĐỘNG TRƠN (SỬA XÓA) === */
-/* Định nghĩa chung cho cả Sửa và Xóa - ép buộc màu sắc */
 .btn-action-edit, .btn-delete {
-    font-size: 14px;
-    font-weight: 600;
-    text-decoration: none !important; /* Xóa gạch chân mặc định */
-    color: #1a446c !important;        /* Ép màu Xanh Navy */
-    transition: color 0.2s ease;
-    cursor: pointer;
-    margin: 0 4px;
+    text-decoration: none !important;
+    border: none !important;
+    font-size: 1em !important;
+    font-weight: 700 !important;
+    color: #244769 !important;
+    margin-right: 10px !important;
+    transition: color 0.3s !important;
+    cursor: pointer !important;
 }
 
-/* Hiệu ứng khi di chuột vào */
 .btn-action-edit:hover, .btn-delete:hover {
-    color: #112d47 !important;        /* Xanh đậm hơn */
+    color: #333 !important;
 }
 
-/* Đảm bảo trạng thái đã thăm (visited) không bị đổi màu */
 .btn-action-edit:visited, .btn-delete:visited {
-    color: #1a446c !important;
+    color: #244769 !important;
 }
 .btn-action-disabled {
-    font-size: 14px;
-    font-weight: 600;
-    color: #b0c4de !important; /* Màu xám xanh nhạt */
+    font-size: 1em !important;
+    font-weight: 700 !important;
+    color: #b0c4de !important;
     text-decoration: none !important;
-    padding: 0 5px;
-    pointer-events: none;      /* Quan trọng: Ngăn không cho click */
-    cursor: default;           /* Con trỏ chuột không hiện hình bàn tay */
-    opacity: 0.5;              /* Làm mờ nút đi */
+    margin-right: 10px !important;
+    pointer-events: none !important;
+    cursor: default !important;
+    opacity: 0.5 !important;
     font-family: 'Lora', serif;
 }
 /* === 6. KHUNG CHỨA ẢNH FANCYBOX TRÊN BẢNG === */
@@ -296,7 +294,6 @@ h1, h2, h3, h4, .management-title {
     white-space: normal;
 }
 
-/* Chia lại độ rộng (Width) khóa cứng theo pixel để form phẳng đẹp mắt */
 .col-id { width: 45px; text-align: center; }
 .col-name { width: 125px; text-align: center; }
 .col-desc { width: 155px; text-align: center; }
@@ -304,11 +301,11 @@ h1, h2, h3, h4, .management-title {
 .col-config { width: 140px; text-align: center; }
 .col-price { width: 100px; text-align: center; }
 .col-services { width: 150px; text-align: left; }
-.col-amenities { width: 150px; text-align: left; } /* Phân bổ không gian cho cột Tiện nghi mới */
+.col-amenities { width: 150px; text-align: left; }
 .col-status { width: 110px; text-align: center; } 
 .col-actions { width: 95px; text-align: center; }
 
-/* === 9. GHI ĐÈ FANCYBOX NỀN VÀNG KEM LUXURY === */
+/* === 8. GHI ĐÈ FANCYBOX NỀN VÀNG KEM LUXURY === */
 .fancybox__container {
     --fancybox-bg: #F9F5EB !important;
     --fancybox-color: #1a446c !important;
@@ -367,7 +364,6 @@ h1, h2, h3, h4, .management-title {
     border-width: 2px;
 }
 
-/* ĐỔI MÀU KHỐI NÚT ĐÓNG (X) SANG XANH NAVBAR */
 .fancybox__toolbar .f-button[data-fancybox-close] {
     background-color: #1a446c !important; 
     color: #ffffff;
@@ -381,7 +377,7 @@ h1, h2, h3, h4, .management-title {
 .services-list-container, .amenities-list-container {
     display: flex;
     flex-direction: column;
-    gap: 6px; /* Co ngắn khoảng cách dòng một chút để bảng gọn gàng */
+    gap: 6px; 
     max-width: 320px;
 }
 
@@ -396,7 +392,6 @@ h1, h2, h3, h4, .management-title {
     display: inline-block;
 }
 
-/* Định dạng riêng màu chữ vàng kim sang trọng cho tên tiện nghi */
 .amenity-name-highlight {
     color: #bfa15f !important;
     font-weight: 600;
@@ -405,24 +400,9 @@ h1, h2, h3, h4, .management-title {
 .action-bar {
     display: flex;
     justify-content: flex-end;
-    margin-bottom: 35px;
+    margin-bottom: 20px;
+    margin-top: 25px;
 }
 
 .add-room-btn {
-    background: #1a446c !important;
-    color: #fff !important;
-    padding: 10px 15px !important;
-    min-height: 52px;
-    font-size: 12px !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.3px;
-    border-radius: 8px !important;
-    border: none !important;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.add-room-btn:hover {
-    background: #112d47 !important;
 }

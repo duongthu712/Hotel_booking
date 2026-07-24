@@ -1,13 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 22/06/2026
+ * Purpose: Used to return and display validation results (number of staying/future bookings) when the Manager wants to delete/deactivate a room type (used in the warning Pop-up on the Room Type Management page).
  */
 package dto;
-
-/**
- * Dùng để chứa kết quả kiểm tra trước khi ngừng kinh doanh (deactive) một hạng phòng.
- * @author Minh Thu
- */
 public class DeactiveValidationResult {
     private int stayingCount;
     private int futureCount;

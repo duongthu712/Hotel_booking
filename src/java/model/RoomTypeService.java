@@ -6,7 +6,7 @@ public class RoomTypeService {
     private int roomTypeId;
     private int serviceId;
     private int quantity;
-    private int isFree; // Đổi từ boolean sang int để lưu số lượng free
+    private int isFree; 
     
     private RoomService roomService; 
 
@@ -65,7 +65,6 @@ public class RoomTypeService {
         this.quantity = quantity;
     }
 
-    // Đổi tên từ isIsFree() thành getIsFree() cho chuẩn kiểu int
     public int getIsFree() {
         return isFree;
     }

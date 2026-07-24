@@ -1,4 +1,9 @@
-/* 1. KHUNG CHỨA BANNER THANH ĐIỀU HƯỚNG CỐ ĐỊNH */
+/* 
+Author: ThuDNM-HE204370 
+Date created: 20/06/2026 
+Purpose: Styles for the navigation bar. */
+
+/* === 1. KHUNG CHỨA BANNER THANH ĐIỀU HƯỚNG CỐ ĐỊNH === */
 .navbar {
     height: 90px;
     background: #2c3e46 ; 
@@ -12,7 +17,7 @@
   
 }
 
-/* 2. CHỮ LOGO HOTEL */
+/* === 2. CHỮ LOGO HOTEL === */
 .navbar-logo {
     font-family: 'Cormorant Garamond', 'Playfair Display', serif ; 
     font-size: 34px; 
@@ -26,7 +31,7 @@
     justify-content: flex-start;
 }
 
-/* 3. MENU ĐIỀU HƯỚNG CHỮ (CĂN CHÍNH GIỮA TUYỆT ĐỐI) */
+/* === 3. MENU ĐIỀU HƯỚNG CHỮ (CĂN CHÍNH GIỮA TUYỆT ĐỐI) === */
 .navbar-menu {
     display: flex;
     align-items: center;
@@ -38,7 +43,7 @@
     flex: 2; 
 }
 
-/* 4. CÁC THÀNH PHẦN HÀNH ĐỘNG (BÊN PHẢI VÀ ĐỨNG ĐỘC LẬP) */
+/* === 4. CÁC THÀNH PHẦN HÀNH ĐỘNG (BÊN PHẢI VÀ ĐỨNG ĐỘC LẬP) === */
 .navbar-actions {
     display: flex;
     align-items: center;
@@ -47,7 +52,7 @@
     flex: 1.2; 
 }
 
-/* 5. ĐỊNH DẠNG LINK MENU VÀ NÚT ĐĂNG NHẬP NHÂN VIÊN */
+/* === 5. ĐỊNH DẠNG LINK MENU VÀ NÚT ĐĂNG NHẬP NHÂN VIÊN === */
 .navbar-menu a, 
 .staff-login {
     text-decoration: none;
@@ -65,7 +70,7 @@
     color: #ffffff;
 }
 
-/* 6. NÚT ĐẶT PHÒNG NHANH CÓ VIỀN VÀNG PREMIUM */
+/* === 6. NÚT ĐẶT PHÒNG NHANH CÓ VIỀN VÀNG PREMIUM === */
 .booking-btn {
     display: inline-block;
     text-decoration: none;

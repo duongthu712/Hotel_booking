@@ -1,6 +1,9 @@
-/* ==========================================================================
-   1. RESET, PHÔNG CHỮ & NỀN CHỦ ĐẠO (ĐỒNG BỘ 100% PHÔNG CHỮ LORA)
-   ========================================================================== */
+/* 
+Author: ThuDNM-HE204370 
+Date created: 20/06/2026 
+Purpose: Styles for the walk in booking page. */
+
+/* === 1. RESET, PHÔNG CHỮ & NỀN CHỦ ĐẠO === */
 * {
     margin: 0;
     padding: 0;
@@ -10,10 +13,9 @@
 body {
     background-color: #F9F5EB !important; 
     color: #1a446c;
-    font-family: 'Lora', serif !important; /* Ép phông chủ đạo cho toàn bộ trang */
+    font-family: 'Lora', serif !important; 
 }
 
-/* Khung chứa chính rộng rãi */
 .walkin-container {
     padding: 20px 50px; 
     width: 100%;
@@ -35,9 +37,7 @@ body {
     margin-bottom: 20px;
 }
 
-/* ==========================================================================
-   2. KHUNG TÌM KIẾM (SEARCH CARD)
-   ========================================================================== */
+/* === 2. KHUNG TÌM KIẾM (SEARCH CARD) === */
 .walkin-search-card {
     background-color: transparent;
     border: 1px solid #ebd9b4;
@@ -86,7 +86,6 @@ body {
     color: #1a446c;
 }
 
-/* Các Input, Select đồng bộ chiều cao và phông chữ */
 .walkin-search-field input[type="date"],
 .walkin-search-field select,
 .walkin-search-field input[type="number"] {
@@ -114,9 +113,7 @@ body {
     box-shadow: 0 0 0 3px rgba(26, 68, 108, 0.05);
 }
 
-/* ==========================================================================
-   3. HÀNH ĐỘNG & NÚT BẤM (BUTTONS)
-   ========================================================================== */
+/* === 3. HÀNH ĐỘNG & NÚT BẤM (BUTTONS) === */
 .walkin-search-btn {
     font-family: 'Lora', serif !important;
     background-color: #1a446c;
@@ -157,9 +154,7 @@ body {
     background-color: #112d47 !important;
 }
 
-/* ==========================================================================
-   4. BẢNG KẾT QUẢ DANH SÁCH PHÒNG
-   ========================================================================== */
+/* === 4. BẢNG KẾT QUẢ DANH SÁCH PHÒNG === */
 .walkin-result-table {
     width: 100%;
     max-width: 1200px;
@@ -256,9 +251,7 @@ body {
     border: 1px solid #c8e6c9;  
 }
 
-/* ==========================================================================
-   5. LAYOUT PHẦN ĐẶT PHÒNG TẠI QUẦY & HOÁ ĐƠN TỔNG HỢP
-   ========================================================================== */
+/* === 5. LAYOUT PHẦN ĐẶT PHÒNG TẠI QUẦY & HOÁ ĐƠN TỔNG HỢP === */
 .booking-progress {
     width: 100%;
     margin-bottom: 25px;
@@ -381,9 +374,7 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* ==========================================================================
-   6. HÓA ĐƠN TÓM TẮT (ASIDE SUMMARY CARD)
-   ========================================================================== */
+/* === 6. HÓA ĐƠN TÓM TẮT (ASIDE SUMMARY CARD) === */
 .booking-summary {
     flex: 3;
     background: transparent !important; 
@@ -458,9 +449,7 @@ body {
     margin: 10px 0;
 }
 
-/* ==========================================================================
-   7. KHỐI THÔNG BÁO LUỒNG Ở LUÔN & THÔNG BÁO LỖI INLINE
-   ========================================================================== */
+/* === 7. KHỐI THÔNG BÁO LUỒNG Ở LUÔN & THÔNG BÁO LỖI INLINE === */
 #stayNowNotice {
     background-color: rgba(46, 125, 50, 0.06); 
     color: #2e7d32;
@@ -489,11 +478,9 @@ body {
     background-color: #fdf3f3 !important; 
 }
 
-/* ==========================================================================
-   8. SỬA ĐỒNG BỘ PHÔNG CHỮ CHO LỰA CHỌN PHƯƠNG THỨC THANH TOÁN (MỚI CẬP NHẬT)
-   ========================================================================== */
+/* === 8. SỬA ĐỒNG BỘ PHÔNG CHỮ CHO LỰA CHỌN PHƯƠNG THỨC THANH TOÁN === */
 .payment-method-label {
-    font-family: 'Lora', serif !important; /* Ép đồng bộ phông chữ Lora */
+    font-family: 'Lora', serif !important; 
     font-size: 14.5px !important;
     font-weight: 600 !important; 
     color: #1a446c !important;
@@ -514,13 +501,11 @@ body {
 .payment-method-label:hover {
     color: #112d47 !important;
 }
-/* ==========================================================================
-   10. KHỐI THÔNG BÁO THÀNH CÔNG ĐƠN TƯƠNG LAI (SUCCESS BANNER)
-   ========================================================================== */
+/* === 9. KHỐI THÔNG BÁO THÀNH CÔNG ĐƠN TƯƠNG LAI (SUCCESS BANNER) === */
 .walkin-success-banner {
     width: 100%;
     max-width: 1100px;
-    background-color: rgba(46, 125, 50, 0.06); /* Xanh lá nhạt dịu mắt chuẩn Lamer */
+    background-color: rgba(46, 125, 50, 0.06); 
     color: #2e7d32;
     padding: 15px 20px;
     border-radius: 8px;
@@ -537,16 +522,14 @@ body {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
 }
-/* ==========================================================================
-   11. GIAO DIỆN POP-UP THÔNG BÁO (MODAL POPUP)
-   ========================================================================== */
+/* === 10. GIAO DIỆN POP-UP THÔNG BÁO (MODAL POPUP) === */
 .walkin-popup-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(26, 68, 108, 0.4); /* Nền tối mờ nhẹ theo tông xanh đại dương */
+    background-color: rgba(26, 68, 108, 0.4); 
     display: flex;
     align-items: center;
     justify-content: center;
@@ -555,7 +538,7 @@ body {
 }
 
 .walkin-popup-content {
-    background-color: #F9F5EB; /* Nền kem chuẩn La Mer Hotel */
+    background-color: #F9F5EB; 
     border: 1px solid #ebd9b4;
     padding: 30px;
     border-radius: 12px;
@@ -624,7 +607,6 @@ body {
     background-color: #112d47;
 }
 
-/* Hiệu ứng chuyển động mượt mà */
 @keyframes fadeInBg {
     from { background-color: rgba(26, 68, 108, 0); }
     to { background-color: rgba(26, 68, 108, 0.4); }
@@ -634,10 +616,7 @@ body {
     from { transform: scale(0.9); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
 }
-/* ==========================================================================
-   12. ĐỊNH DẠNG BỔ SUNG CHO CÁC Ô NHẬP ĐỘNG KHỐI SỐ LƯỢNG (PHÒNG/KHÁCH)
-   ========================================================================== */
-/* Định dạng riêng cho thẻ input[type="number"] nằm trong Form nhập liệu */
+/* === 11. ĐỊNH DẠNG BỔ SUNG CHO CÁC Ô NHẬP ĐỘNG KHỐI SỐ LƯỢNG === */
 .form-grid .form-group input[type="number"] {
     width: 100%;
     padding: 10px 14px;
@@ -652,13 +631,11 @@ body {
     transition: all 0.2s ease;
 }
 
-/* Hiệu ứng focus đồng bộ cho ô nhập số lượng */
 .form-grid .form-group input[type="number"]:focus {
     border-color: #1a446c;
     box-shadow: 0 0 0 3px rgba(26, 68, 108, 0.04);
 }
 
-/* Đảm bảo các nhãn thông báo trạng thái của ô Số khách/Số phòng luôn hiển thị chuẩn */
 #rooms-error-msg,
 #guests-error-msg,
 #children-error-msg {
@@ -666,11 +643,10 @@ body {
     font-size: 12px;
     font-weight: 600;
     margin-top: 4px;
-    display: block; /* Chuyển thành block để hiển thị ngay dưới ô input */
+    display: block; 
     line-height: 1.4;
 }
 
-/* Lớp hỗ trợ đổi màu viền ô input khi bị trạng thái quá tải */
 .form-group input[type="number"].input-error-border {
     border-color: #c92a2a !important;
     background-color: #fdf3f3 !important;

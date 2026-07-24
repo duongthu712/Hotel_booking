@@ -1,10 +1,7 @@
-/* * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
- */
-
 /**
- * Hệ thống xử lý yêu cầu chỉnh sửa đơn (Lễ tân)
- * Thư mục: view/assets/javascript/request-processing.js
+ * Author: ThuDNM-HE204370
+ * Date created: 16/06/2026
+ * Purpose: JavaScript logic for request processing.
  */
 document.addEventListener("DOMContentLoaded", function () {
 

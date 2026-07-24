@@ -1,3 +1,8 @@
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 25/06/2026
+ * Purpose: Controller logic for RoomTypeDeleteServlet.
+ */
 package controller;
 
 import dao.RoomTypeDAO;
@@ -25,13 +30,10 @@ public class RoomTypeDeleteServlet extends HttpServlet {
             }
             int roomTypeId = Integer.parseInt(idStr);
 
-            // 1. Kiểm tra xem có tham số xác nhận xóa từ Pop-up gửi lên hay không
             String confirm = request.getParameter("confirm");
             
-            // 2. Lấy dữ liệu kiểm tra từ cơ sở dữ liệu
             DeactiveValidationResult result = roomTypeDAO.getDeactiveValidationResult(roomTypeId);
             
-            // 3. Nếu đã bấm nút "Đồng ý" từ Pop-up (confirm=true) HOẶC phòng hoàn toàn trống đơn
             if ("true".equals(confirm) || !result.isBlocked()) {
                 boolean isDeleted = roomTypeDAO.deleteRoomType(roomTypeId);
                 if (isDeleted) {

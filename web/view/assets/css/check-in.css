@@ -1,3 +1,9 @@
+/* 
+Author: ThuDNM-HE204370 
+Date created: 15/06/2026 
+Purpose: Styles for the check in page. */
+
+/* === 1. ĐỊNH DẠNG CƠ BẢN === */
 * {
     margin: 0;
     padding: 0;
@@ -428,7 +434,6 @@ h1, h2, h3, h4, h5, .management-title {
     letter-spacing: 0.5px;
 }
 
-/* Trả lại màu xanh lá cây chuẩn cho trạng thái Đã nhận phòng */
 .badge-success { 
     background-color: #e8f5e9; 
     color: #2e7d32; 
@@ -550,7 +555,6 @@ h1, h2, h3, h4, h5, .management-title {
     text-align: center; 
 }
 
-/* Thêm định dạng đồng bộ cho nút hủy trong form khi muốn gộp cấu trúc */
 .btn-danger-flat-navy {
     background-color: #1a446c !important;
     color: #ffffff !important;
@@ -562,7 +566,7 @@ h1, h2, h3, h4, h5, .management-title {
     box-shadow: 0 4px 12px rgba(26, 68, 108, 0.2);
     transform: translateY(-1px);
 }
-/* 1. Ép chung kết cấu kích thước, chiều cao và phông chữ 'Lora' đặc trưng */
+
 .table-actions-flex .btn-select,
 .table-actions-flex .btn-assign,
 .table-actions-flex a[href*="assign-room"],
@@ -588,7 +592,6 @@ h1, h2, h3, h4, h5, .management-title {
     vertical-align: middle;
 }
 
-/* 2. Đồng nhất một màu xanh Navy quý phái (#1a446c) giống nút Chọn đơn gốc */
 .table-actions-flex .btn-select,
 .table-actions-flex .btn-assign,
 .table-actions-flex a[href*="assign-room"],
@@ -597,7 +600,6 @@ h1, h2, h3, h4, h5, .management-title {
     color: #ffffff !important;
 }
 
-/* 3. Hiệu ứng Hover đồng bộ tối màu (#112d47) cho cả 3 nút */
 .table-actions-flex .btn-select:hover,
 .table-actions-flex .btn-assign:hover,
 .table-actions-flex a[href*="assign-room"]:hover,
@@ -608,7 +610,6 @@ h1, h2, h3, h4, h5, .management-title {
     transform: none;
 }
 
-/* 4. Khử lệch dòng tuyệt đối cho form chứa nút Hủy */
 .table-actions-flex .form-inline-table {
     display: inline-block !important;
     margin: 0 !important;
@@ -616,12 +617,11 @@ h1, h2, h3, h4, h5, .management-title {
     vertical-align: middle !important;
 }
 
-/* 5. Cân bằng padding nội bộ của riêng nút Hủy (thẻ button) tránh bị chữ co lệch */
 .table-actions-flex .btn-danger-table-click {
     padding-top: 6px !important;
     padding-bottom: 6px !important;
 }
-/* Nhãn hiển thị hạng phòng vật lý */
+
 .badge-room-type {
     background-color: #f8fafc;
     color: #475569;
@@ -631,31 +631,26 @@ h1, h2, h3, h4, h5, .management-title {
     font-size: 12.5px;
     font-weight: 500;
 }
-/* ==========================================================================
-   BỔ SUNG: ĐỊNH DẠNG Ô NHẬP SỐ KHÁCH THỰC TẾ (NGƯỜI LỚN & TRẺ EM XUỐNG DÒNG)
-   ========================================================================== */
 
-/* Cụm bao bọc ngoài cùng của nhóm số khách */
+/* === 2. BỔ SUNG: ĐỊNH DẠNG Ô NHẬP SỐ KHÁCH THỰC TẾ (NGƯỜI LỚN & TRẺ EM XUỐNG DÒNG) === */
+
 .guest-input-container {
     display: flex;
     flex-direction: column;
-    margin-bottom: 10px; /* Giảm khoảng cách phía dưới container */
+    margin-bottom: 10px; 
 }
 
-/* Từng nhóm dòng (Người lớn / Trẻ em) */
 .guest-input-group {
     display: flex;
     flex-direction: column; 
-    margin-top: 6px; /* ĐÃ SỬA: Thu hẹp khoảng cách giữa chữ và ô input phía trên */
+    margin-top: 6px; 
     width: 100%;
 }
 
-/* Thao tác riêng cho nhóm Trẻ em để nó khít hơn với nhóm Người lớn */
 .guest-input-group + .guest-input-group {
-    margin-top: -2px; /* ĐÃ SỬA: Giảm khoảng cách giữa ô Người lớn và ô Trẻ em */
+    margin-top: -2px; 
 }
 
-/* Đồng bộ nhãn chữ */
 .guest-input-wrapper label, 
 .guest-count-label,
 .guest-profile-group label,
@@ -665,12 +660,11 @@ h1, h2, h3, h4, h5, .management-title {
     font-family: 'Lora', serif;
     font-size: 13.5px;
     font-weight: 600;
-    margin-top: 4px !important; /* ĐÃ SỬA: Triệt tiêu margin-top lớn (14px) mặc định của form */
-    margin-bottom: 2px !important; /* Thu hẹp khoảng cách từ nhãn đến ô input của chính nó */
+    margin-top: 4px !important; 
+    margin-bottom: 2px !important; 
     color: #1a446c;
 }
 
-/* Ép ô nhập số kéo dài 100% màu trắng luxury */
 .guest-input-group input[type="number"] {
     width: 100% !important;
     max-width: none !important;
@@ -684,7 +678,6 @@ h1, h2, h3, h4, h5, .management-title {
     outline: none;
 }
 
-/* Hiệu ứng focus */
 .guest-input-group input[type="number"]:focus {
     border-color: #1a446c !important;
     box-shadow: 0 0 0 3px rgba(26, 68, 108, 0.05) !important;
@@ -710,7 +703,6 @@ h1, h2, h3, h4, h5, .management-title {
     color: #4f6f8f;
 }
 
-/* Badge hiển thị số lượng phòng đã gán */
 .room-progress-block .badge-assigned {
     color: #1a446c;
     border: 1px solid rgba(26, 68, 108, 0.2);
@@ -722,49 +714,42 @@ h1, h2, h3, h4, h5, .management-title {
     font-family: 'Lora', serif;
 }
 
-/* Danh sách số phòng cụ thể */
 .room-progress-block .assigned-room-list {
-    color: #bfa15f; /* Màu vàng Gold đặc trưng của web */
+    color: #bfa15f; 
     font-weight: 600;
 }
 
-/* Trạng thái: Còn thiếu phòng (Sử dụng màu đỏ gạch trầm Burgundy quý phái thay vì đỏ tươi) */
 .room-progress-block .status-missing {
     color: #1a446c; 
     font-weight: 600; 
     margin-left: 12px;
 }
 
-/* Trạng thái: Đã xếp đủ phòng (Sử dụng màu xanh lá thông sẫm nền nã) */
 .room-progress-block .status-full {
     color: #1a446c; 
     font-weight: 600; 
     margin-left: 12px;
 }
-/* ==========================================================================
-   BỔ SUNG: ĐỊNH DẠNG KHỐI GHI NHẬN CUỘC GỌI HẸN GIỜ ĐẾN (ĐỒNG BỘ LUXURY)
-   ========================================================================== */
 
-/* Khối bao ngoài tùy biến theo tông màu chung của web thay vì màu tím mặc định */
+/* === 3. BỔ SUNG: ĐỊNH DẠNG KHỐI GHI NHẬN CUỘC GỌI HẸN GIỜ ĐẾN (ĐỒNG BỘ LUXURY) === */
+
 .main-card .special-request-card[style*="background-color"] {
-    background-color: #FFFbf5 !important; /* Đổi sang màu kem nhạt đồng bộ body */
-    border: 1px solid #ebd9b4 !important; /* Viền màu vàng be sang trọng */
+    background-color: #FFFbf5 !important; 
+    border: 1px solid #ebd9b4 !important; 
     padding: 20px !important;
     border-radius: 6px !important;
     margin-bottom: 25px !important;
     box-shadow: 0 2px 10px rgba(191, 161, 95, 0.05) !important;
 }
 
-/* Tiêu đề khối cuộc gọi */
 .main-card .special-request-card .request-card-header .request-title-text[style*="color"] {
-    color: #1a446c !important; /* Đưa về màu xanh Navy chủ đạo */
+    color: #1a446c !important; 
     font-family: 'Cormorant Garamond', serif !important;
     font-size: 16px !important;
     font-weight: 600 !important;
     letter-spacing: 0.5px !important;
 }
 
-/* Form nội bộ bên trong khối hẹn giờ */
 .special-request-card form label b {
     font-family: 'Lora', serif !important;
     font-size: 13.5px !important;
@@ -772,7 +757,6 @@ h1, h2, h3, h4, h5, .management-title {
     color: #1a446c !important;
 }
 
-/* Ô chọn giờ input type="time" */
 .special-request-card form input[type="time"] {
     font-family: 'Lora', serif !important;
     font-size: 14px !important;
@@ -790,7 +774,6 @@ h1, h2, h3, h4, h5, .management-title {
     box-shadow: 0 0 0 3px rgba(26, 68, 108, 0.05) !important;
 }
 
-/* Ô nhập ghi chú text cuộc gọi */
 .special-request-card form input[type="text"] {
     font-family: 'Lora', serif !important;
     font-size: 14px !important;
@@ -808,14 +791,13 @@ h1, h2, h3, h4, h5, .management-title {
     box-shadow: 0 0 0 3px rgba(26, 68, 108, 0.05) !important;
 }
 
-/* Nút Đánh dấu lịch hẹn */
 .special-request-card form button[style*="background-color"] {
     font-family: 'Lora', serif !important;
     font-size: 13px !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
     letter-spacing: 1px !important;
-    background-color: #1a446c !important; /* Đổi sang màu xanh Navy quý phái */
+    background-color: #1a446c !important; 
     color: #ffffff !important;
     border: none !important;
     padding: 10px 24px !important;
@@ -826,17 +808,16 @@ h1, h2, h3, h4, h5, .management-title {
 }
 
 .special-request-card form button[style*="background-color"]:hover {
-    background-color: #112d47 !important; /* Hover tối màu đồng bộ */
+    background-color: #112d47 !important; 
     box-shadow: 0 4px 12px rgba(26, 68, 108, 0.2) !important;
 }
 
-/* Badge hiển thị "📞 Có lịch hẹn riêng" và Giờ Hẹn Đến tại bảng danh sách */
 .today-table .badge-success[style*="background-color: #f3e8ff"] {
-    background-color: #F9F5EB !important; /* Đồng bộ nền kem của web */
-    color: #bfa15f !important;        /* Chuyển sang màu vàng Gold sang trọng */
+    background-color: #F9F5EB !important; 
+    color: #bfa15f !important;        
     border: 1px solid #ebd9b4 !important;
 }
 
 .today-table td.time-col-text span[style*="color: #7c3aed"] {
-    color: #bfa15f !important; /* Đổi màu text giờ hẹn trong bảng sang vàng Gold nổi bật */
+    color: #bfa15f !important; 
 }

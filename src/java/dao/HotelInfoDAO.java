@@ -22,7 +22,10 @@ import java.time.LocalTime;
  * @author Minh Thu
  */
 public class HotelInfoDAO extends DBContext {
+    
+    // Author: ThuDNM-HE204370
 
+    // Author: ThuDNM-HE204370
     // Lấy các service còn hoạt động để hiện trên homepage 
     public List<HotelService> getActiveHotelServices() {
         List<HotelService> list = new ArrayList<>();
@@ -51,10 +54,12 @@ public class HotelInfoDAO extends DBContext {
         return list;
     }
 
-    // Lấy thông tin khách sạn để hiện trên homepage 
+    // Author: ThuDNM-HE204370
+    // Lấy thông tin khách sạn để hiện trên hompage
     public HotelInfo getHotelDetails(int hotelId) {
         HotelInfo info = null;
         try {
+            // Lấy thông tin cho footer
             String sqlHotel = "SELECT hotel_id, hotel_name, [description], "
                     + "CAST(checkin_time AS TIME(0)) AS checkin, "
                     + "CAST(checkout_time AS TIME(0)) AS checkout, "
@@ -103,6 +108,7 @@ public class HotelInfoDAO extends DBContext {
         return info;
     }
 
+    // Author: ThuDNM-HE204370
     // Lấy 3 bài báo mới nhất
     public List<HotelNews> getTop3LatestNews() {
         List<HotelNews> list = new ArrayList<>();
@@ -132,6 +138,7 @@ public class HotelInfoDAO extends DBContext {
         return list;
     }
 
+    // Author: ThuDNM-HE204370
     // Lấy 6 ảnh để hiển thị ở mục Không gian lưu trú
     public List<HotelImage> get6SmallImages(int hotelId) {
         List<HotelImage> list = new ArrayList<>();

@@ -1,7 +1,7 @@
 <%-- 
-    Document   : dashboard
-    Created on : May 27, 2026, 10:45:27 PM
-    Author     : Minh Thu
+    Author: ThuDNM-HE204370 
+    Date created: 23/06/2026 
+    Purpose: Receptionist dashboard.
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>

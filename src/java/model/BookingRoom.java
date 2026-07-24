@@ -11,7 +11,7 @@ public class BookingRoom {
 
     private int bookingRoomId;
     private int bookingId;
-    private int roomId; // CẬP NHẬT: Thay đổi từ roomNumber sang roomId
+    private int roomId;
     private LocalDateTime assignedAt;
     private String checkoutStatus;
     private LocalDateTime checkoutAt;
@@ -46,11 +46,11 @@ public class BookingRoom {
 
     public int getRoomId() {
         return roomId;
-    } // CẬP NHẬT
+    } 
 
     public void setRoomId(int roomId) {
         this.roomId = roomId;
-    } // CẬP NHẬT
+    } 
 
     public LocalDateTime getAssignedAt() {
         return assignedAt;

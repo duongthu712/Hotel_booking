@@ -1,7 +1,7 @@
 <%-- 
-    Document   : request-submission
-    Created on : May 27, 2026, 10:44:34 PM
-    Author     : Minh Thu
+    Author: ThuDNM-HE204370 
+    Date created: 12/06/2026 
+    Purpose: Request submission page.
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -94,19 +94,19 @@
                         <label class="section-label">Loại yêu cầu <span class="required">*</span></label>
                         <div class="request-type-options">
                             <label class="type-card-option ${booking.status != 'Đã xác nhận' ? 'disabled-option' : ''}">
-                                <input type="radio" name="requestType" value="Đổi hạng phòng"> <div class="card-content">
+                                <input type="radio" name="requestType" value="Đổi hạng phòng" ${booking.status != 'Đã xác nhận' ? 'disabled' : ''}> <div class="card-content">
                                     <strong>Thay đổi hạng phòng</strong>
                                 </div>
                             </label>
 
                             <label class="type-card-option ${booking.status == 'Đã trả phòng' || booking.status == 'Chờ xử lý' ? 'disabled-option' : ''}">
-                                <input type="radio" name="requestType" value="Gia hạn phòng"> <div class="card-content">
+                                <input type="radio" name="requestType" value="Gia hạn phòng" ${booking.status == 'Đã trả phòng' || booking.status == 'Chờ xử lý' ? 'disabled' : ''}> <div class="card-content">
                                     <strong>Gia hạn thời gian ở</strong>
                                 </div>
                             </label>
 
-                            <label class="type-card-option ${booking.status == 'Đã nhận phòng' || booking.status == 'Đã trả phòng' ? 'disabled-option' : ''}">
-                                <input type="radio" name="requestType" value="Hủy đặt phòng"> <div class="card-content">
+                            <label class="type-card-option ${booking.status != 'Đã xác nhận' ? 'disabled-option' : ''}">
+                                <input type="radio" name="requestType" value="Hủy đặt phòng" ${booking.status != 'Đã xác nhận' ? 'disabled' : ''}> <div class="card-content">
                                     <strong>Hủy đặt phòng</strong>
                                 </div>
                             </label>

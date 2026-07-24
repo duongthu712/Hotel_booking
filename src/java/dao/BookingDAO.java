@@ -197,7 +197,7 @@ public class BookingDAO extends DBContext {
         return booking;
     }
 
-    //Thư
+    // Author: ThuDNM-HE204370
     // Lấy đơn lên để cập nhật thêm thông tin lúc check in
     public boolean updateCheckInAdvance(int bookingId, int currentGuestId, String fullName, String phone, String email,
             String idNumber, String nationality, String dobStr, int numGuests, boolean isDifferentGuest) {
@@ -288,10 +288,11 @@ public class BookingDAO extends DBContext {
         return false;
     }
 
-    // Dùng cho thanh search của check in (Bổ sung giờ hẹn đến)
+    // Author: ThuDNM-HE204370
+    // Dùng cho thanh search của check in 
     public BookingCheckInView getBookingForCheckIn(String bookingCode) {
         String sql = "SELECT b.booking_id, b.booking_code, b.num_rooms, b.num_guests, b.num_children AS booking_num_children, b.payment_status, b.deposit_amount, "
-                + "b.[status], b.actual_checkin_time, "
+                + "b.[status], b.actual_checkin_time, CONVERT(VARCHAR(10), b.checkin_date, 120) AS checkin_date, "
                 + "CONVERT(VARCHAR(8), b.expected_checkin_time, 108) AS expected_checkin_time, "
                 + "CONVERT(VARCHAR(19), b.auto_cancel_deadline, 120) AS auto_cancel_deadline, "
                 + "b.cancellation_reason AS call_note, "
@@ -328,6 +329,7 @@ public class BookingDAO extends DBContext {
                     b.setDepositAmount(rs.getBigDecimal("deposit_amount"));
                     b.setStatus(rs.getString("status"));
                     b.setActualCheckInTime(rs.getString("actual_checkin_time"));
+                    b.setCheckinDate(rs.getString("checkin_date"));
 
                     // Điền dữ liệu vào 3 thuộc tính hẹn giờ mới
                     b.setExpectedCheckInTime(rs.getString("expected_checkin_time"));
@@ -364,7 +366,8 @@ public class BookingDAO extends DBContext {
         return null;
     }
 
-    // Hiện list check in ngày hôm nay (ĐÃ TÍCH HỢP HẸN GIỜ ĐẾN)
+    // Author: ThuDNM-HE204370
+    // Hiện list check in ngày hôm nay
     public List<BookingCheckInView> getBookingsToday() {
         List<BookingCheckInView> list = new ArrayList<>();
         java.time.LocalDate today = java.time.LocalDate.now();
@@ -430,19 +433,58 @@ public class BookingDAO extends DBContext {
         return list;
     }
 
-    // Hủy đơn trực tiếp nếu quá giờ check in
+    // Author: ThuDNM-HE204370
+    // Hủy đơn trực tiếp nếu quá giờ check in hoặc lễ tân hủy
     public boolean cancelBooking(int bookingId) {
-        String sql = "UPDATE Bookings SET [status] = N'Đã hủy' WHERE booking_id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, bookingId);
-            int rows = ps.executeUpdate();
-            return rows > 0;
+        String updateInvoiceSql = """
+                UPDATE Invoices
+                SET room_charges = 0,
+                    consumable_charges = 0,
+                    amenity_damages = 0,
+                    total_amount = (SELECT ISNULL(deposit_amount, 0) FROM Bookings WHERE booking_id = ?),
+                    remaining_amount = 0,
+                    payment_status = N'Đã thanh toán'
+                WHERE booking_id = ?
+                """;
+
+        String updateBookingSql = "UPDATE Bookings SET [status] = N'Đã hủy' WHERE booking_id = ?";
+
+        try {
+            connection.setAutoCommit(false);
+            
+            // Cập nhật hóa đơn
+            try (PreparedStatement ps1 = connection.prepareStatement(updateInvoiceSql)) {
+                ps1.setInt(1, bookingId);
+                ps1.setInt(2, bookingId);
+                ps1.executeUpdate();
+            }
+
+            // Cập nhật trạng thái booking
+            try (PreparedStatement ps2 = connection.prepareStatement(updateBookingSql)) {
+                ps2.setInt(1, bookingId);
+                int rows = ps2.executeUpdate();
+                
+                connection.commit();
+                return rows > 0;
+            }
         } catch (Exception e) {
+            try {
+                connection.rollback();
+            } catch (Exception rollbackEx) {
+                System.out.println("Lỗi rollback cancelBooking: " + rollbackEx.getMessage());
+            }
             System.out.println("Lỗi cancelBooking: " + e.getMessage());
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (Exception autoCommitEx) {
+                System.out.println("Lỗi reset autoCommit: " + autoCommitEx.getMessage());
+            }
         }
         return false;
     }
 
+    // Author: ThuDNM-HE204370
     // Cập nhật trạng thái booking
     public boolean updateStatus(int bookingId, String status) {
         String sql = """
@@ -480,6 +522,7 @@ public class BookingDAO extends DBContext {
         return false;
     }
 
+    // Author: ThuDNM-HE204370
     // Đếm số lượng phòng thực tế đã gán vào bảng BookingRooms
     public int countRoomsAssigned(int bookingId) {
         String sql = "SELECT COUNT(*) FROM BookingRooms WHERE booking_id = ?";
@@ -496,6 +539,7 @@ public class BookingDAO extends DBContext {
         return 0;
     }
 
+    // Author: ThuDNM-HE204370
     // Kiểm tra xem có phòng nào đã gán nhưng chưa được chia khách vào ở hay không
     public boolean hasEmptyRoomWithoutGuests(int bookingId) {
         String sql = "SELECT COUNT(*) FROM BookingRooms br "
@@ -517,6 +561,7 @@ public class BookingDAO extends DBContext {
         return false;
     }
 
+    // Author: ThuDNM-HE204370
     public boolean updateExpectedCheckInTime(int bookingId, String expectedTimeStr, String note) {
         String sql = """
         UPDATE Bookings
@@ -561,6 +606,7 @@ public class BookingDAO extends DBContext {
         return false;
     }
 
+    // Author: ThuDNM-HE204370
     //Hàm tự động hủy đơn No-show
     public int autoCancelExpiredBookings() {
         String updateInvoicesSql = """

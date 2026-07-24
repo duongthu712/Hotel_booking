@@ -1,14 +1,10 @@
-/* ==========================================================================
-   Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-   Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
-   ========================================================================== */
-/* Created on : May 31, 2026, 1:11:15 AM
-    Author     : Minh Thu
-*/
-
+/* 
+Author: ThuDNM-HE204370 
+Date created: 20/06/2026 
+Purpose: Styles for the search result page. */
 
 body {
-    background-color: #F9F5EB ; /* Ép đồng bộ nền vàng ngà giống hệt homepage */
+    background-color: #F9F5EB;
 }
 
 .room-list-page {
@@ -32,7 +28,6 @@ body {
 }
 
 
-/* Khu vực lưới hiển thị danh sách phòng */
 .room-list-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -40,7 +35,6 @@ body {
     margin-top: 30px;
 }
 
-/* Thẻ hạng phòng dạng ngang */
 .room-card-horizontal {
     display: flex;
     background: #ffffff;
@@ -48,7 +42,7 @@ body {
     overflow: hidden;
     box-shadow: 0 8px 25px rgba(44, 62, 70, 0.04);
     border: 1px solid #e2e8ea;
-    height: 340px; /* Tăng nhẹ chiều cao để chứa 2 dòng badge thoải mái */
+    height: 340px; 
 }
 
 .room-card-img-box {
@@ -109,10 +103,7 @@ body {
     text-align: justify;
 }
 
-/* ==========================================================================
-   BỐ CỤC BADGES (ĐỒNG BỘ KÍCH THƯỚC - MÀU SẮC BẮT MẮT)
-   ========================================================================== */
-
+/* === 1. BỐ CỤC BADGES === */
 .room-amenities-container {
     display: flex;
     flex-direction: column; 
@@ -127,26 +118,22 @@ body {
     gap: 10px;
 }
 
-/* 🟢 KHU VỰC GỒM CHUNG KÍCH THƯỚC, CHỮ, BO GÓC CHO TẤT CẢ CÁC BADGES */
 .badge-core-capacity,
 .badge-core-info,
 .badge-service-large {
     font-family: 'Montserrat', sans-serif;
-    font-size: 15px;           /* Cố định size chữ vừa vặn, rõ ràng */
-    padding: 8px 18px;         /* Khóa chung khoảng đệm trong */
-    border-radius: 6px;        /* Bo góc đồng bộ */
+    font-size: 15px;           
+    padding: 8px 18px;         
+    border-radius: 6px;        
     display: inline-block;
     white-space: nowrap;
-    background-color: #ffffff; /* Nền trắng sạch sẽ */
-    color: #666;            /* Chữ màu tối rõ ràng */
-    border: 2px solid #C8A96B; /* Viền vàng kim bắt mắt */
+    background-color: #ffffff; 
+    color: #666;            
+    border: 2px solid #C8A96B; 
 }
 
 
-/* ==========================================================================
-   HỆ THỐNG NÚT BẤM ĐIỀU HƯỚNG CHỨC NĂNG
-   ========================================================================== */
-
+/* === 2. HỆ THỐNG NÚT BẤM ĐIỀU HƯỚNG CHỨC NĂNG === */
 .room-card-footer-bar {
     margin-top: auto;
 }
@@ -156,7 +143,6 @@ body {
     gap: 15px;
 }
 
-/* Nút xem chi tiết dạng Outline */
 .btn-action-view {
     background: #FDFBF7;
     color: #C8A96B !important;
@@ -180,7 +166,6 @@ body {
     color: white !important;
 }
 
-/* Nút đặt phòng màu vàng kim */
 .btn-action-book {
     background: #C8A96B;
     color: white !important;
@@ -202,7 +187,6 @@ body {
     background: #b5955a;
 }
 
-/* Khung thông báo trống */
 .empty-result-box {
     text-align: center;
     padding: 60px;

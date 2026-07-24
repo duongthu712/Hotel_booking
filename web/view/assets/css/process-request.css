@@ -1,7 +1,9 @@
-/* ==========================================================================
-   STYLE CHỦ ĐẠO: TÔNG XANH NAVY SANG TRỌNG & KÈM SỮA 
-   Thư mục: view/assets/css/process-request.css
-   ========================================================================== */
+/* 
+Author: ThuDNM-HE204370 
+Date created: 20/06/2026 
+Purpose: Styles for the process request page. */
+
+/* === 1. ĐỊNH DẠNG CƠ BẢN === */
 * {
     margin: 0;
     padding: 0;
@@ -14,14 +16,13 @@ body {
     color: #333;
 }
 
-/* Layout tổng thể bao quanh toàn bộ trang */
+/* === 2. BỐ CỤC TỔNG THỂ === */
 .grid-container {
     padding: 20px 30px;
     max-width: 98%;
     margin: 0 auto; 
 }
 
-/* Tab wrapper cho bộ nút lọc phía trên */
 .tab-wrapper {
     display: flex;
     gap: 12px;
@@ -57,7 +58,7 @@ body {
     color: white !important; 
 }
 
-/* Khu vực lọc trạng thái dòng tiền */
+/* === 3. BỘ LỌC TRẠNG THÁI === */
 .sub-filter {
     margin-bottom: 25px;
     font-size: 14px;
@@ -99,13 +100,13 @@ body {
     border-radius: 20px;
     font-weight: 600;
     font-size: 13px;
-    margin-left: auto; /* Đẩy badge số lượng về góc bên phải màn hình cho thoáng */
+    margin-left: auto;
 }
 
-/* Layout chia hai phân vùng chính (Trái bảng - Phải chi tiết đối soát) */
+/* === 4. BỐ CỤC CHÍNH (TRÁI/PHẢI) === */
 .main-content {
     display: grid;
-    grid-template-columns: 1fr 1.3fr; /* Tăng tỉ lệ vàng giúp bên phải hiển thị bảng tính rộng rãi */
+    grid-template-columns: 1fr 1.3fr; 
     gap: 30px;
     align-items: start;
     width: 100%;
@@ -121,7 +122,7 @@ body {
     width: 100%;
 }
 
-/* Bảng danh sách yêu cầu bên trái */
+/* === 5. BẢNG DANH SÁCH YÊU CẦU === */
 .request-table {
     width: 100%;
     border-collapse: collapse;
@@ -158,19 +159,34 @@ body {
     border-left: 4px solid #1a446c; 
 }
 
-/* Badge trạng thái hiển thị trên bảng */
+/* === 6. BADGE TRẠNG THÁI === */
 .badge {
-    padding: 5px 10px;
+    padding: 6px 12px;
     border-radius: 20px;
-    font-size: 11px;
-    color: white;
+    font-size: 12px;
+    font-weight: 600;
     display: inline-block;
+    white-space: nowrap;
+    text-align: center;
+    min-width: 90px;
 }
-.status-pending { background-color: #d97706; }
-.status-success { background-color: #059669; }
-.status-danger  { background-color: #b91c1c; }
+.status-pending {
+    color: #c8750b;
+    background-color: #fff4df;
+    border: 1px solid #f2c978;
+}
+.status-success {
+    color: #14843b;
+    background-color: #e0f5e8;
+    border: 1px solid #b9e1c8;
+}
+.status-danger {
+    color: #d83d4a;
+    background-color: #ffe7ea;
+    border: 1px solid #f6b9c0;
+}
 
-/* Thẻ bọc card thông tin chi tiết bên phải */
+/* === 7. CARD CHI TIẾT BÊN PHẢI === */
 .detail-view-card {
     background: #ffffff;
     border: 1px solid #ebd9b4;
@@ -188,10 +204,10 @@ body {
     font-size: 20px;
 }
 
-/* CHUẨN HÓA LƯỚI THÔNG TIN: Tự động bẻ dòng linh hoạt, không lo kích thước màn hình */
+/* === 8. LƯỚI THÔNG TIN CHI TIẾT === */
 .info-grid-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Tự căn chỉnh co dãn cột cực đẹp */
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
     gap: 20px 15px;
     background-color: #fafafa;
     padding: 18px;
@@ -224,7 +240,6 @@ body {
     font-weight: bold;
 }
 
-/* Tiêu đề các mục con bên trong card */
 .section-sub-title {
     font-size: 14px;
     color: #1a446c;
@@ -236,7 +251,7 @@ body {
     font-weight: bold;
 }
 
-/* Bảng hiển thị chính sách hoàn hủy */
+/* === 9. BẢNG CHÍNH SÁCH HOÀN HỦY === */
 .policy-table {
     width: 100%;
     border-collapse: collapse;
@@ -265,7 +280,7 @@ body {
     font-weight: bold;
 }
 
-/* Khung tính toán dòng tiền đối soát */
+/* === 10. KHUNG TÍNH TOÁN DÒNG TIỀN === */
 .calculation-box {
     background-color: #f8fafc;
     border: 1px solid #ebd9b4;
@@ -281,7 +296,7 @@ body {
     font-weight: 600;
 }
 
-/* Bố cục Form xử lý của Lễ tân phía dưới */
+/* === 11. FORM XỬ LÝ (LỄ TÂN) === */
 .action-form-layout {
     display: flex;
     gap: 20px;
@@ -336,7 +351,6 @@ body {
     height: 42px;
 }
 
-/* Nút Submit */
 .btn-block-submit {
     width: 100%;
     padding: 12px !important;
