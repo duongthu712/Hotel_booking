@@ -262,10 +262,17 @@ public class GuestRequestDAO extends DBContext {
 
             // 2. Cập nhật bảng Booking và Invoice tương ứng theo từng loại nghiệp vụ
             if ("Đổi hạng phòng".equals(dto.getRequestType())) {
-                String sqlUpdateBooking = "UPDATE Bookings SET room_type_id = ? WHERE booking_id = ?";
+                String sqlUpdateBooking = "UPDATE Bookings SET room_type_id = ?, booked_price_per_night = ? WHERE booking_id = ?";
                 try (PreparedStatement ps = connection.prepareStatement(sqlUpdateBooking)) {
                     ps.setInt(1, dto.getTargetRoomTypeId());
-                    ps.setInt(2, dto.getBookingId());
+                    ps.setBigDecimal(2, dto.getTargetPrice());
+                    ps.setInt(3, dto.getBookingId());
+                    ps.executeUpdate();
+                }
+
+                String sqlDeleteAssignedRooms = "DELETE FROM BookingRooms WHERE booking_id = ?";
+                try (PreparedStatement ps = connection.prepareStatement(sqlDeleteAssignedRooms)) {
+                    ps.setInt(1, dto.getBookingId());
                     ps.executeUpdate();
                 }
             } else if ("Gia hạn phòng".equals(dto.getRequestType())) {
@@ -278,7 +285,23 @@ public class GuestRequestDAO extends DBContext {
                     ps.setInt(2, dto.getBookingId());
                     ps.executeUpdate();
                 }
-            } else if ("Hủy đặt phòng".equals(dto.getRequestType())) {
+            }
+
+            // Đồng bộ lại hóa đơn Invoices cho cả Đổi hạng phòng và Gia hạn phòng
+            if ("Đổi hạng phòng".equals(dto.getRequestType()) || "Gia hạn phòng".equals(dto.getRequestType())) {
+                String sqlSyncInvoice = "UPDATE Invoices "
+                        + "SET room_charges = (SELECT CASE WHEN DATEDIFF(day, checkin_date, checkout_date) <= 0 THEN 1 ELSE DATEDIFF(day, checkin_date, checkout_date) END * num_rooms * booked_price_per_night FROM Bookings WHERE booking_id = ?), "
+                        + "    total_amount = (SELECT CASE WHEN DATEDIFF(day, checkin_date, checkout_date) <= 0 THEN 1 ELSE DATEDIFF(day, checkin_date, checkout_date) END * num_rooms * booked_price_per_night FROM Bookings WHERE booking_id = ?) + ISNULL(consumable_charges, 0) + ISNULL(amenity_damages, 0) "
+                        + "WHERE booking_id = ?";
+                try (PreparedStatement ps = connection.prepareStatement(sqlSyncInvoice)) {
+                    ps.setInt(1, dto.getBookingId());
+                    ps.setInt(2, dto.getBookingId());
+                    ps.setInt(3, dto.getBookingId());
+                    ps.executeUpdate();
+                }
+            }
+
+            if ("Hủy đặt phòng".equals(dto.getRequestType())) {
                 // 2.a. Cập nhật trạng thái Booking gốc sang Đã hủy
                 String sqlUpdateBooking = "UPDATE Bookings SET [status] = N'Đã hủy', cancelled_at = GETDATE() WHERE booking_id = ?";
                 try (PreparedStatement ps = connection.prepareStatement(sqlUpdateBooking)) {
