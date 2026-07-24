@@ -95,6 +95,8 @@ public class GuestRequestController extends HttpServlet {
             return;
         }
 
+        bookingCode = bookingCode.trim();
+
         Booking booking = requestDAO.getBookingBasicInfoByCode(bookingCode);
 
         if (booking == null) {
@@ -139,6 +141,10 @@ public class GuestRequestController extends HttpServlet {
             String bookingCode = request.getParameter("bookingCode");
             String email = request.getParameter("email");
             String emailParam = (email != null && !email.trim().isEmpty()) ? "&email=" + email : "";
+
+            if (bookingCode != null) {
+                bookingCode = bookingCode.trim();
+            }
 
             // Lấy thông tin mới nhất từ DB
             Booking booking = requestDAO.getBookingBasicInfoByCode(bookingCode);
