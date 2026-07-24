@@ -1,3 +1,8 @@
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 07/06/2026
+ * Purpose: Used to aggregate and display statistical metrics on the Receptionist Dashboard.
+ */
 package dto;
 
 import java.util.List;

@@ -1,3 +1,8 @@
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 17/06/2026
+ * Purpose: Controller logic for WalkInBookingServlet.
+ */
 package controller;
 
 import dao.WalkinBookingDAO;
@@ -18,7 +23,6 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet(name = "WalkInBookingServlet", urlPatterns = {"/walk-in-booking"})
 public class WalkInBookingServlet extends HttpServlet {
 
-    // Xử lý yêu cầu hiển thị trang và tìm kiếm danh sách phòng trống dựa theo điều kiện lọc
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

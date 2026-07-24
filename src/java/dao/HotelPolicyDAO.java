@@ -17,6 +17,7 @@ import model.HotelPolicy;
  */
 public class HotelPolicyDAO extends DBContext {
 
+    // Author: ThuDNM-HE204370
     public List<HotelPolicy> getAllActivePolicies() {
         List<HotelPolicy> list = new ArrayList<>();
         String sql = "SELECT policy_id, policy_name, [description], policy_type, is_active "

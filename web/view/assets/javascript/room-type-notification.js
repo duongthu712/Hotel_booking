@@ -1,3 +1,9 @@
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 16/06/2026
+ * Purpose: JavaScript logic for room type notification.
+ */
+
 document.addEventListener("DOMContentLoaded", function () {
     const urlParams = new URLSearchParams(window.location.search);
     let status = urlParams.get('status');

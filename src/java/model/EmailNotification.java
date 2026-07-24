@@ -14,7 +14,7 @@ public class EmailNotification {
     private String recipientEmail;
     private String subject;
     private String notificationType;
-    private LocalDateTime sentAt; // Chuyển sang LocalDateTime
+    private LocalDateTime sentAt; 
     private String status;
 
     public EmailNotification() {

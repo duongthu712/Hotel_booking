@@ -1,3 +1,8 @@
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 20/06/2026
+ * Purpose: Controller logic for ProcessRequestController.
+ */
 package controller;
 
 import dao.GuestRequestDAO;
@@ -35,7 +40,6 @@ public class ProcessRequestController extends HttpServlet {
                 if (detail != null) {
                     boolean isAvailable = true;
 
-                    // 1. Kiểm tra phòng trống theo từng loại yêu cầu
                     if ("Đổi hạng phòng".equals(detail.getRequestType())) {
                         isAvailable = requestDAO.checkRoomAvailability(
                                 detail.getTargetRoomTypeId(), detail.getCheckInDate(),
@@ -56,7 +60,6 @@ public class ProcessRequestController extends HttpServlet {
                         );
                     }
 
-                    // 2. Đối soát khung thời gian và giá tiền hủy đặt phòng
                     if ("Hủy đặt phòng".equals(detail.getRequestType())) {
                         try {
                             double[] financials = calculateFinancials(detail);

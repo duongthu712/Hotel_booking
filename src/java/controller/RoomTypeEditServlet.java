@@ -1,6 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 13/06/2026
+ * Purpose: Controller logic for RoomTypeEditServlet.
  */
 package controller;
 
@@ -53,7 +54,6 @@ public class RoomTypeEditServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            //Lấy id hạng phòng cần edit
             String idStr = request.getParameter("id");
             if (idStr == null || idStr.trim().isEmpty()) {
                 response.sendRedirect(request.getContextPath() + "/roomtypelist");

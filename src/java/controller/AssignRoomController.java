@@ -1,3 +1,8 @@
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 07/06/2026
+ * Purpose: Controller logic for AssignRoomController.
+ */
 package controller;
 
 import dao.BookingDAO;
@@ -21,18 +26,12 @@ public class AssignRoomController extends HttpServlet {
 
         RoomDAO roomDAO = new RoomDAO();
         BookingDAO bookingDAO = new BookingDAO();
-        
-        // Biến này sẽ quyết định hạng phòng nào được hiển thị trên ma trận ô lưới
         int displayRoomTypeId = 0; 
 
         String filterRoomTypeName = request.getParameter("filterRoomTypeName");
         String filterFloor = request.getParameter("filterFloor");
         String bookingIdParam = request.getParameter("bookingId");
-        
-        // ĐỌC THÊM tham số ép đổi hạng phòng (khi phòng bị hỏng hoặc nâng cấp) từ request
         String overrideTypeParam = request.getParameter("overriddenRoomTypeId");
-
-        // TẬN DỤNG RoomStatusView: Lấy danh sách tất cả hạng phòng active đổ vào dropdown xử lý sự cố phòng hỏng
         List<RoomStatusView> allRoomTypes = roomDAO.getAllActiveRoomTypesForDropdown();
         request.setAttribute("allRoomTypes", allRoomTypes);
 
@@ -113,12 +112,10 @@ public class AssignRoomController extends HttpServlet {
 
             int roomId = Integer.parseInt(selectedRoomParam);
 
-            // ĐỌC THÔNG TIN SỐ LƯỢNG NGƯỜI LỚN & TRẺ EM ĐÃ PHÂN TÁCH
             int adultsCount = Integer.parseInt(request.getParameter("currentRoomAdults"));
             int childrenCount = Integer.parseInt(request.getParameter("currentRoomChildren"));
-            int totalGuestsInRoom = adultsCount + childrenCount; // Phục vụ nếu cần ghi log hoặc đối chiếu
+            int totalGuestsInRoom = adultsCount + childrenCount; 
 
-            // ĐỌC MẢNG THÔNG TIN KHÁCH LƯU TRÚ (ĐƯỢC ĐỒNG BỘ TUẦN TỰ THEO FORM TỰ SINH TỪ JS)
             String[] fullNames = request.getParameterValues("stayFullName");
             String[] phones = request.getParameterValues("stayPhone");
             String[] idNumbers = request.getParameterValues("stayIdNumber");

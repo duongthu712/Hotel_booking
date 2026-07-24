@@ -1,7 +1,7 @@
 <%-- 
-    Document   : footer
-    Created on : May 27, 2026, 10:54:40 PM
-    Author     : Minh Thu
+    Author: ThuDNM-HE204370 
+    Date created: 23/06/2026 
+    Purpose: Footer component.
 --%>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>

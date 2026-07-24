@@ -1,3 +1,9 @@
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 16/06/2026
+ * Purpose: JavaScript logic for assign room.
+ */
+
 function confirmUnassign() {
     if (confirm("Bạn có chắc chắn?\n\nDữ liệu khách lưu trú ở phòng này sẽ bị xóa và phòng sẽ được trả về trạng thái Trống!")) {
         document.getElementById("unassignRoomForm").submit();

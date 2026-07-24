@@ -1,3 +1,9 @@
+/* 
+Author: ThuDNM-HE204370 
+Date created: 15/06/2026 
+Purpose: Styles for the assign room page. */
+
+/* === 1. ĐỊNH DẠNG CƠ BẢN === */
 .assign-room-wrapper {
     width: 100%;
     max-width: 1600px;
@@ -13,13 +19,11 @@
     width: 100%;
 }
 
-/* Trái */
 .split-left-panel {
     flex: 1;
     min-width: 0;
 }
 
-/* Phải */
 .split-right-panel {
     width: 420px;
     flex-shrink: 0;
@@ -37,9 +41,7 @@
     font-weight: 600;
 }
 
-/* ==========================================================================
-   2. THANH BỘ LỌC SEARCH ĐỘNG
-   ========================================================================== */
+/* === 2. THANH BỘ LỌC SEARCH ĐỘNG === */
 .filter-form-wrapper {
     margin-bottom: 20px;
 }
@@ -104,9 +106,7 @@
     background-color: #123250;
 }
 
-/* ==========================================================================
-   3. SƠ ĐỒ LƯỚI MA TRẬN PHÒNG (ROOM MATRIX)
-   ========================================================================== */
+/* === 3. SƠ ĐỒ LƯỚI MA TRẬN PHÒNG (ROOM MATRIX) === */
 .room-matrix-container {
     padding: 20px !important;
     margin-bottom: 0 !important;
@@ -167,7 +167,6 @@
     margin-top: 15px;
 }
 
-/* KHỐI PHÒNG CHUNG */
 .room-card {
     border: 1px solid #e2e8f0;
     border-radius: 6px;
@@ -211,7 +210,6 @@
     margin-bottom: 8px;
 }
 
-/* Màu sắc theo từng trạng thái phòng */
 .status-available { border-top: 4px solid #10b981; }
 .status-available .room-status-badge { background-color: #d1fae5; color: #065f46; }
 .status-available:hover { box-shadow: 0 5px 12px rgba(16, 185, 129, 0.2); }
@@ -253,9 +251,7 @@
 .select-wrapper { margin-top: 5px; font-size: 12px; color: #1a446c; }
 .select-label { cursor: pointer; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
 
-/* ==========================================================================
-   4. KHỐI PANEL THÔNG TIN BÊN PHẢI (CHI TIẾT / GÁN PHÒNG)
-   ========================================================================== */
+/* === 4. KHỐI PANEL THÔNG TIN BÊN PHẢI (CHI TIẾT / GÁN PHÒNG) === */
 .guest-stay-card {
     border: 1px solid #ebd9b4;
     background-color: #fcfbf7;
@@ -299,7 +295,6 @@
     line-height: 1.4;
 }
 
-/* TỔ HỢP CSS MỚI CHO HÀNG NHẬP SỐ KHÁCH (ADULTS & CHILDREN) */
 .guest-count-wrapper .form-field-row {
     display: flex;
     gap: 15px;          
@@ -346,7 +341,6 @@
 
 .select-room-placeholder { text-align: center; color: #64748b; font-style: italic; padding: 30px 15px; font-size: 13.5px; }
 
-/* Các ô điền thông tin khách trú */
 .guest-profile-group { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #ebd9b4; }
 .profile-group-header { margin: 0 0 10px 0; color: #bfa15f; font-family: 'Lora', serif; font-size: 13.5px; font-weight: 600; }
 .form-field-block { margin-bottom: 8px; }
@@ -357,7 +351,6 @@
 .field-input-text { width: 100%; padding: 8px 12px; border: 1px solid #ebd9b4; border-radius: 4px; font-size: 13px; box-sizing: border-box; outline: none; }
 .field-input-text:focus { border-color: #1a446c; background-color: #fff; }
 
-/* Bảng hiển thị thông tin xem phòng */
 .table-detail-view { width: 100%; border-collapse: collapse; background: transparent; border: none; margin-bottom: 20px; }
 .table-detail-view tr { border-bottom: 1px dashed #ebd9b4; }
 .table-detail-view td { padding: 12px 5px; font-size: 13px; }
@@ -373,9 +366,7 @@
 .action-bar-submit-only { border: none; padding: 5px 0 0 0; margin: 0; }
 .btn-submit-full { width: 100%; padding: 12px; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; }
 
-/* ==========================================================================
-   5. FORM & NÚT HỦY GÁN PHÒNG (UNASSIGN)
-   ========================================================================== */
+/* === 5. FORM & NÚT HỦY GÁN PHÒNG (UNASSIGN) === */
 #unassignRoomForm {
     display: none;
     margin-top: 20px;

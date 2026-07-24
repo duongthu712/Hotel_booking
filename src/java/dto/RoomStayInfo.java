@@ -1,3 +1,8 @@
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 16/06/2026
+ * Purpose: Used to display a detailed list of guests staying in a specific room (used in the Check-in/Checkout management screen).
+ */
 package dto;
 
 import java.util.Date;

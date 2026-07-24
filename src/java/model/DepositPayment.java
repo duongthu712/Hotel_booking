@@ -18,7 +18,7 @@ public class DepositPayment {
     private String verificationStatus;
     private LocalDateTime verifiedAt;
     private String notes;
-    private Integer verifiedBy; // Đổi sang Integer để hỗ trợ giá trị null (DB cho phép null)
+    private Integer verifiedBy; 
 
     public DepositPayment() {
     }

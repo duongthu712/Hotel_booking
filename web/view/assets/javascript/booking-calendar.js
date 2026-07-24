@@ -1,7 +1,7 @@
 /**
  * Author: ThuDNM-HE204370
- * Date created: 26/05/2026
- * Purpose: Initialize and handle UI logic for the booking calendar.
+ * Date created: 16/06/2026
+ * Purpose: JavaScript logic for booking calendar.
  */
 
 window.addEventListener('DOMContentLoaded', () => {

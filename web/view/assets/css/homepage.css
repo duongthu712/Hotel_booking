@@ -1,3 +1,9 @@
+/* 
+Author: ThuDNM-HE204370 
+Date created: 20/06/2026 
+Purpose: Display the homepage UI, including the room search banner, news list, featured services, and hotel gallery. */
+
+/* === 1. ĐỊNH DẠNG CƠ BẢN === */
 * {
     margin: 0;
     padding: 0;
@@ -22,6 +28,7 @@ h1, h2, h3, h4, .navbar-logo {
     padding: 0 20px;
 }
 
+/* === 2. BANNER TÌM KIẾM (HERO SECTION) === */
 .hero {
     min-height: 100vh;
     width: 100%;
@@ -147,6 +154,7 @@ h1, h2, h3, h4, .navbar-logo {
     background: #b5955a;
 }
 
+/* === 3. KHỐI NỘI DUNG CHUNG (SECTIONS) === */
 .section {
     padding: 100px 0 20px 0;
 }
@@ -230,6 +238,7 @@ main.container .section:first-of-type {
     border: 1px solid rgba(200, 169, 107, 0.3);
 }
 
+/* === 4. TIN TỨC & TRẢI NGHIỆM ĐẶC SẮC === */
 .gallery-split-container {
     display: flex;
     flex-direction: column;
@@ -335,6 +344,7 @@ main.container .section:first-of-type {
     left: -8px;
 }
 
+/* === 5. THƯ VIỆN ẢNH KHÁCH SẠN (GALLERY) === */
 .luxury-gallery-section {
     padding: 100px 0;
 }

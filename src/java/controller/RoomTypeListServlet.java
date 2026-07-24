@@ -1,3 +1,8 @@
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 11/06/2026
+ * Purpose: Controller logic for RoomTypeListServlet.
+ */
 package controller;
 
 import dao.RoomTypeDAO;
@@ -19,7 +24,6 @@ public class RoomTypeListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // 1. Lấy dữ liệu từ DAO
         List<RoomType> list = roomTypeDAO.getAllRoomTypesForManager();
         
         
@@ -31,7 +35,6 @@ public class RoomTypeListServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Ép phương thức POST chạy chung luồng xử lý nạp dữ liệu với GET để tránh lỗi hỏng dữ liệu khi redirect/filter
         doGet(request, response);
     }
 

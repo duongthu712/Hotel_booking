@@ -1,8 +1,11 @@
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 18/06/2026
+ * Purpose: Used to display detailed overview information of a booking (used in the Booking Detail page).
+ */
 package dto;
 
 import java.util.Date;
-
-// Nội dung hiển thị chi tiết khi search
 public class BookingInfo {
 
     private String bookingCode;

@@ -1,6 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 26/06/2026
+ * Purpose: Controller logic for SearchRoomServlet.
  */
 package controller;
 
@@ -28,13 +29,11 @@ public class SearchRoomServlet extends HttpServlet {
 
         response.setContentType("text/html;charset=UTF-8");
 
-        // 1. Đón nhận thông tin tìm kiếm từ thanh search-bar gửi sang
         String checkIn = request.getParameter("checkIn");
         String checkOut = request.getParameter("checkOut");
         String roomQuantityStr = request.getParameter("roomQuantity");
         String roomTypeId = request.getParameter("roomTypeId");
 
-        // Hủy booking online đã quá thời gian giữ phòng
         BookingDAO bookingDAO = new BookingDAO();
         bookingDAO.cancelExpiredBookings();
 
@@ -45,7 +44,6 @@ public class SearchRoomServlet extends HttpServlet {
 
         List<RoomType> list;
 
-        // Lúc chưa nhập ngày checkin checkout
         if (checkIn == null || checkOut == null
                 || checkIn.trim().isEmpty()
                 || checkOut.trim().isEmpty()) {

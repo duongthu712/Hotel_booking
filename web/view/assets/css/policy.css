@@ -1,66 +1,85 @@
-/* ==========================================================================
-   MÃ NGUỒN CSS RIÊNG BIỆT CHO TRANG CHÍNH SÁCH & QUY ĐỊNH (POLICY)
-   ========================================================================== */
+/* 
+Author: ThuDNM-HE204370 
+Date created: 20/06/2026 
+Purpose: Styles for the policy page. */
 
-/* 1. KHUNG ĐỆM BAO QUANH PHÂN ĐOẠN */
+/* === 1. KHUNG ĐỆM BAO QUANH PHÂN ĐOẠN === */
 .policy-section {
     padding: 60px 0 100px 0;
 }
 
-/* Dòng giới thiệu phụ nằm dưới tiêu đề h2 */
-.policy-section .section-intro {
-    font-size: 16px;
-    font-family: 'Cormorant Garamond', 'Lora', serif ;
-    color: #7f786d;
+.container .section.policy-section > h2 {
+    margin: 0 0 18px;
+    color: #102A43;
+    font-family: 'Cormorant Garamond', 'Lora', serif;
+    font-size: 56px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 1px;
     text-align: center;
-    max-width: 670px;
-    margin: 20px auto 60px auto;
-    line-height: 1.6;
-    font-weight: 300;
+    text-transform: uppercase;
 }
 
-.policy-groups{
-    max-width:900px;
-    margin:0 auto;
+.container .section.policy-section > h2::after {
+    content: '';
+    display: block;
+    width: 56px;
+    height: 2px;
+    margin: 18px auto 0;
+    background: #C8A96B;
 }
 
-.policy-group{
-    margin-bottom:60px;
+.policy-section .section-intro {
+    font-size: 20px;
+    font-family: 'Cormorant Garamond', 'Lora', serif;
+    color: #5f6b73;
+    text-align: center;
+    margin: 0 auto 55px auto;
+    font-weight: 400;
 }
 
-.policy-group-title{
-    font-size:18px;
-    font-family: 'Cormorant Garamond' ;
-     color: #bfa15f;
-    font-weight:600;
-    margin-bottom:25px;
-    padding-bottom:10px;
-    border-bottom:1px solid rgba(200,169,107,.3);
+.policy-groups {
+    max-width: 900px;
+    margin: 0 auto;
 }
 
-.policy-item{
-    font-family: 'Cormorant Garamond' ;
-    padding:16px 0;
-    border-bottom:1px dashed rgba(44,62,70,.12);
+.policy-group {
+    margin-bottom: 60px;
 }
 
-.policy-item:last-child{
-    border-bottom:none;
+.policy-group-title {
+    font-size: 20px;
+    font-family: 'Cormorant Garamond';
+    color: #bfa15f;
+    font-weight: 600;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(200, 169, 107, .3);
 }
 
-.policy-item h4{
-     color: #bfa15f;
-    font-size:18px;
-    font-weight:400;
-    
-    margin-bottom:8px;
-    font-family: 'Cormorant Garamond'  ;
+.policy-item {
+    font-family: 'Cormorant Garamond';
+    padding: 16px 0;
+    border-bottom: 1px dashed rgba(44, 62, 70, .12);
 }
 
-.policy-item p{
-    color:#666;
-    font-size:15px;
-    line-height:1.8;
-    margin:0;
-     font-family: 'Cormorant Garamond' ;
+.policy-item:last-child {
+    border-bottom: none;
+}
+
+.policy-item h4 {
+    color: #bfa15f;
+    font-size: 20px;
+    font-weight: 400;
+
+    margin-bottom: 8px;
+    font-family: 'Cormorant Garamond';
+}
+
+.policy-item p {
+    color: #666;
+    font-size: 17px;
+    line-height: 1.8;
+    margin: 0;
+    font-family: 'Cormorant Garamond';
 }

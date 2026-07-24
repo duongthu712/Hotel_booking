@@ -14,8 +14,8 @@ public class HotelInfo {
     private int hotelId;
     private String hotelName;
     private String description;
-    private LocalTime checkinTime; // Chuyển từ String sang LocalTime
-    private LocalTime checkoutTime; // Chuyển từ String sang LocalTime
+    private LocalTime checkinTime; 
+    private LocalTime checkoutTime; 
     private String address;
     private String addressUrl;
     private String phone;

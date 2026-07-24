@@ -1,3 +1,8 @@
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 11/06/2026
+ * Purpose: Controller logic for CheckInController.
+ */
 package controller;
 
 import dao.BookingDAO;
@@ -43,6 +48,11 @@ public class CheckInController extends HttpServlet {
         if (searchBookingCode != null && !searchBookingCode.trim().isEmpty()) {
             BookingCheckInView booking = bookingDAO.getBookingForCheckIn(searchBookingCode.trim());
             if (booking != null) {
+                String today = java.time.LocalDate.now().toString();
+                if (!today.equals(booking.getCheckinDate())) {
+                    request.setAttribute("notTodayCheckIn", true);
+                    request.setAttribute("errorMsg", "Đơn này không thuộc danh sách check-in trong ngày hôm nay (" + booking.getCheckinDate() + ")!");
+                }
                 request.setAttribute("booking", booking);
             } else {
                 request.setAttribute("errorMsg", "Không tìm thấy mã đơn đặt phòng này!");
@@ -65,7 +75,6 @@ public class CheckInController extends HttpServlet {
             String bookingCode = request.getParameter("bookingCode");
             String action = request.getParameter("action");
 
-            // XỬ LÝ HÀNH ĐỘNG: HỦY ĐƠN ĐẶT PHÒNG
             if ("cancel".equals(action)) {
                 boolean cancelSuccess = bookingDAO.cancelBooking(bookingId);
                 if (cancelSuccess) {
@@ -79,7 +88,6 @@ public class CheckInController extends HttpServlet {
                 return;
             }
 
-            // XỬ LÝ HÀNH ĐỘNG THÊM MỚI: CẬP NHẬT GIỜ HẸN ĐẾN (SỚM/MUỘN)
             if ("updateExpectedTime".equals(action)) {
                 String expectedTime = request.getParameter("expectedTime"); // Định dạng "HH:mm" từ input type="time"
                 String note = request.getParameter("note");
@@ -95,7 +103,6 @@ public class CheckInController extends HttpServlet {
                 return;
             }
 
-            // XỬ LÝ CÁC HÀNH ĐỘNG CHECK-IN LƯU TRÚ VÀ GÁN PHÒNG PHÍA DƯỚI
             int numAdults = Integer.parseInt(request.getParameter("numAdults"));
             int numChildren = Integer.parseInt(request.getParameter("numChildren"));
 

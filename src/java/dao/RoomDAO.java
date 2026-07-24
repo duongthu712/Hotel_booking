@@ -282,7 +282,7 @@ public class RoomDAO extends DBContext {
         }
     }
 
-    //Thư
+    // Author: ThuDNM-HE204370
     // Gán phòng
    // Gán phòng linh hoạt 
     public boolean processRoomAssignment(int bookingId, int roomId, String[] fullNames, String[] phones, String[] idNumbers, int totalRequiredRooms) throws SQLException {
@@ -375,6 +375,7 @@ public class RoomDAO extends DBContext {
             }
         }
     }
+    // Author: ThuDNM-HE204370
     // 2. Lấy thông tin chi tiết đơn hàng để hiển thị lên Form Check-in
     public BookingCheckInView getBookingForCheckInById(int bookingId) {
         String sql = "SELECT b.booking_id, b.booking_code, b.num_rooms, b.num_guests, b.num_children, b.payment_status, b.deposit_amount, "
@@ -435,6 +436,7 @@ public class RoomDAO extends DBContext {
         return null;
     }
 
+    // Author: ThuDNM-HE204370
     // Lấy sơ đồ trạng thái phòng
     public List<RoomStatusView> getAllRoomStatusViews(int targetRoomTypeId, String filterRoomTypeName, String filterFloor) {
         List<RoomStatusView> list = new ArrayList<>();
@@ -500,6 +502,7 @@ public class RoomDAO extends DBContext {
         return list;
     }
 
+    // Author: ThuDNM-HE204370
     // Lấy danh sách tên tất cả các hạng phòng đang hoạt động
     public List<String> getAllActiveRoomTypeNames() {
         List<String> list = new ArrayList<>();
@@ -514,6 +517,7 @@ public class RoomDAO extends DBContext {
         return list;
     }
 
+    // Author: ThuDNM-HE204370
     // Lấy danh sách tất cả các tầng thực tế đang có trong bảng Rooms
     public List<Integer> getAllExistingFloors() {
         List<Integer> list = new ArrayList<>();
@@ -528,6 +532,7 @@ public class RoomDAO extends DBContext {
         return list;
     }
 
+    // Author: ThuDNM-HE204370
     // Lấy lại phòng đã gán
   public boolean unassignRoom(int bookingId, int roomId) throws SQLException {
         String getBookingRoomIdSql = "SELECT booking_room_id FROM BookingRooms WHERE booking_id = ? AND room_id = ?";
@@ -587,6 +592,7 @@ public class RoomDAO extends DBContext {
             }
         }
     }
+    // Author: ThuDNM-HE204370
     // BỔ SUNG: Lấy danh sách toàn bộ hạng phòng để phục vụ đổi hạng khi phòng hỏng
     public List<dto.RoomStatusView> getAllActiveRoomTypesForDropdown() {
         List<dto.RoomStatusView> list = new ArrayList<>();
@@ -606,6 +612,7 @@ public class RoomDAO extends DBContext {
         }
         return list;
     }
+    // Author: ThuDNM-HE204370
     // BỔ SUNG: Cập nhật lại sức chứa hiển thị (maxAdults/maxChildren) khi lễ tân chọn hạng phòng khác hạng gốc
     public void overrideBookingCapacityWithType(dto.BookingCheckInView booking, int overriddenRoomTypeId) {
         String sql = "SELECT num_guests, num_children, type_name FROM RoomTypes WHERE room_type_id = ?";

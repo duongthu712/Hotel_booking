@@ -12,7 +12,7 @@ public class BookingService {
 
     private int bookingServiceId;
     private int bookingId;
-    private int roomId; // CẬP NHẬT: Thay đổi từ roomNumber sang roomId
+    private int roomId; 
     private int roomTypeServiceId;
     private BigDecimal unitPrice;
     private int quantityUsed;
@@ -25,7 +25,7 @@ public class BookingService {
     public BookingService(int bookingServiceId, int bookingId, int roomId, int roomTypeServiceId, BigDecimal unitPrice, int quantityUsed, BigDecimal totalPrice, LocalDateTime addedAt) {
         this.bookingServiceId = bookingServiceId;
         this.bookingId = bookingId;
-        this.roomId = roomId; // CẬP NHẬT
+        this.roomId = roomId; 
         this.roomTypeServiceId = roomTypeServiceId;
         this.unitPrice = unitPrice;
         this.quantityUsed = quantityUsed;
@@ -51,11 +51,11 @@ public class BookingService {
 
     public int getRoomId() {
         return roomId;
-    } // CẬP NHẬT
+    } 
 
     public void setRoomId(int roomId) {
         this.roomId = roomId;
-    } // CẬP NHẬT
+    } 
 
     public int getRoomTypeServiceId() {
         return roomTypeServiceId;

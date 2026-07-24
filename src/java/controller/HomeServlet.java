@@ -1,6 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 03/06/2026
+ * Purpose: Controller logic for HomeServlet.
  */
 package controller;
 
@@ -52,13 +53,9 @@ public class HomeServlet extends HttpServlet {
         
         HotelInfoDAO hotelInfoDAO = new HotelInfoDAO();
         RoomTypeDAO roomtypeDAO = new RoomTypeDAO();
-        // Lấy thông tin cơ bản cho footer 
         HotelInfo hotelInfo = hotelInfoDAO.getHotelDetails(1);
-        // Lấy list dịch vụ 
         List<HotelService> servicesList = hotelInfoDAO.getActiveHotelServices();
-        // Lấy 3 bài báo mới nhất
         List<HotelNews> top3News = hotelInfoDAO.getTop3LatestNews();
-        // Lấy 6 ảnh nhỏ cho không gian lưu trú
         List<HotelImage> smallImages = hotelInfoDAO.get6SmallImages(1);
         List<RoomType> roomTypeList = roomtypeDAO.getAllRoomTypes();
         request.setAttribute("hotelInfo", hotelInfo);

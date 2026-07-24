@@ -23,8 +23,9 @@ import java.time.LocalTime;
  */
 public class HotelInfoDAO extends DBContext {
     
-    // ThuDNMHE204370
+    // Author: ThuDNM-HE204370
 
+    // Author: ThuDNM-HE204370
     // Lấy các service còn hoạt động để hiện trên homepage 
     public List<HotelService> getActiveHotelServices() {
         List<HotelService> list = new ArrayList<>();
@@ -53,6 +54,7 @@ public class HotelInfoDAO extends DBContext {
         return list;
     }
 
+    // Author: ThuDNM-HE204370
     // Lấy thông tin khách sạn để hiện trên hompage
     public HotelInfo getHotelDetails(int hotelId) {
         HotelInfo info = null;
@@ -106,6 +108,7 @@ public class HotelInfoDAO extends DBContext {
         return info;
     }
 
+    // Author: ThuDNM-HE204370
     // Lấy 3 bài báo mới nhất
     public List<HotelNews> getTop3LatestNews() {
         List<HotelNews> list = new ArrayList<>();
@@ -135,6 +138,7 @@ public class HotelInfoDAO extends DBContext {
         return list;
     }
 
+    // Author: ThuDNM-HE204370
     // Lấy 6 ảnh để hiển thị ở mục Không gian lưu trú
     public List<HotelImage> get6SmallImages(int hotelId) {
         List<HotelImage> list = new ArrayList<>();

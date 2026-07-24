@@ -1,6 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 09/06/2026
+ * Purpose: Controller logic for RoomTypeCreateServlet.
  */
 package controller;
 
@@ -51,12 +52,10 @@ public class RoomTypeCreateServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // Lấy đầy đủ dịch vụ hiện có để gán cho các phòng
             RoomServiceDAO serviceDAO = new RoomServiceDAO();
             List<RoomService> availableServices = serviceDAO.getAllRoomServices();
             request.setAttribute("availableServices", availableServices);
 
-            // Lấy đầy đủ tiện nghi hiện có để gán cho các phòng
             RoomAmenityDAO amenityDAO = new RoomAmenityDAO();
             List<RoomAmenity> availableAmenities = amenityDAO.getAllRoomAmenities();
             request.setAttribute("availableAmenities", availableAmenities);

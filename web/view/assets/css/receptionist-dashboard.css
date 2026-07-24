@@ -1,11 +1,15 @@
-/* Khử hoàn toàn khoảng cách thừa của body trình duyệt */
+/* 
+Author: ThuDNM-HE204370 
+Date created: 20/06/2026 
+Purpose: Styles for the receptionist dashboard. */
+
+/* === 1. ĐỊNH DẠNG CƠ BẢN === */
 body {
     margin: 0 ;
     padding: 0 ;
     background-color: #F9F5EB ;
 }
 
-/* Khung bao ngoài Dashboard - Đã ép tỉ lệ khít tuyệt đối với Navbar hệ thống */
 .dashboard-container {
     width: 100%;
     max-width: 100%;
@@ -13,7 +17,6 @@ body {
     box-sizing: border-box;
 }
 
-/* Điều phối khoảng cách đệm từ khối đầu tiên bên dưới Navbar để không bị dính chữ */
 .metrics-grid {
     display: flex;
     gap: 20px;
@@ -36,9 +39,7 @@ body {
     margin-top: 4px;
 }
 
-/* ==========================================================================
-   1. KHỐI Ô ĐẾM SỐ LIỆU TỔNG QUAN (METRIC CARDS)
-   ========================================================================== */
+/* === 2. KHỐI Ô ĐẾM SỐ LIỆU TỔNG QUAN (METRIC CARDS) === */
 .metric-card {
     flex: 1;
     background-color: #ffffff;
@@ -83,9 +84,7 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* ==========================================================================
-   2. KHỐI MA TRẬN TRẠNG THÁI PHÒNG VẬT LÝ (ROOM STATUS GRID)
-   ========================================================================== */
+/* === 3. KHỐI MA TRẬN TRẠNG THÁI PHÒNG VẬT LÝ (ROOM STATUS GRID) === */
 .room-status-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -118,9 +117,7 @@ body {
 .status-cleaning { background-color: #fff3e0; color: #fb8c00; border-color: #ffe0b2; }
 .status-maintenance { background-color: #f1f5f9; color: #475569; border-color: #e2e8f0; }
 
-/* ==========================================================================
-   3. KHỐI 3 BẢNG NẰM CẠNH NHAU (GRID ĐỔI TỪ ROW SANG COLUMN)
-   ========================================================================== */
+/* === 4. KHỐI 3 BẢNG NẰM CẠNH NHAU (GRID ĐỔI TỪ ROW SANG COLUMN) === */
 .lists-wrapper{
     display:grid;
     grid-template-columns: 1fr 1fr ;
@@ -130,18 +127,18 @@ body {
 
     background-color: #ffffff;
     border: 1px solid #ebd9b4;
-    padding: 16px; /* Thu hẹp padding bên trong để dồn diện tích hiển thị dữ liệu */
+    padding: 16px; 
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(26, 68, 108, 0.03);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 480px; /* Đảm bảo 3 khung bảng luôn cao bằng nhau nhìn cho đẹp */
+    min-height: 480px; 
 }
 
 .table-section h2 {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 12px; /* Hạ size chữ tiêu đề bảng xuống một chút để không bị vỡ dòng */
+    font-size: 12px; 
     font-weight: 700;
     color: #1a446c;
     letter-spacing: 0.3px;
@@ -154,7 +151,7 @@ body {
 .table-responsive {
     width: 100%;
     overflow-x: auto;
-    flex-grow: 1; /* Đẩy nội dung chiếm trọn không gian */
+    flex-grow: 1; 
 }
 
 table {
@@ -191,9 +188,7 @@ table tbody td.text-center {
     padding: 20px !important;
 }
 
-/* ==========================================================================
-   4. HỆ THỐNG BADGES MÀU SẮC LUXURY & MODERN PASTEL PILLS
-   ========================================================================== */
+/* === 5. HỆ THỐNG BADGES MÀU SẮC LUXURY & MODERN PASTEL PILLS === */
 .badge,
 .badge-approved,
 .badge-late,
@@ -214,7 +209,6 @@ table tbody td.text-center {
 .status-text { font-weight: 600; color: #dc2626; }
 .text-muted { color: #94a3b8; }
 
-/* Hệ thống nhãn yêu cầu đặc biệt Pastel Pill tinh gọn */
 .badge-req-custom {
     display: inline-flex;
     align-items: center;
@@ -244,7 +238,6 @@ table tbody td.text-center {
     font-weight: 500;
 }
 
-/* Khung chân bảng chứa nút bấm Xem tất cả */
 .view-all-footer {
     display: flex;
     justify-content: flex-end; 
@@ -279,9 +272,7 @@ table tbody td.text-center {
     transition: transform 0.2s ease;
 }
 
-/* ==========================================================================
-   5. ĐỒNG BỘ NÚT BẤM VÀ CÁC THÀNH PHẦN THAO TÁC KHÁC
-   ========================================================================== */
+/* === 6. ĐỒNG BỘ NÚT BẤM VÀ CÁC THÀNH PHẦN THAO TÁC KHÁC === */
 .table-actions-flex {
     display: flex; 
     gap: 4px; 

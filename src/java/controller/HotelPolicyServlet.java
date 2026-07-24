@@ -1,8 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 18/06/2026
+ * Purpose: Controller logic for HotelPolicyServlet.
  */
-
 package controller;
 
 import dao.HotelPolicyDAO;
@@ -47,7 +47,6 @@ public class HotelPolicyServlet extends HttpServlet {
         request.setAttribute("groupedPolicies", groupedPolicies);
         
 
-        // Chuyển tiếp sang trang giao diện chi tiết chính sách riêng
         request.getRequestDispatcher("/view/public/policy.jsp").forward(request, response);
     }
 

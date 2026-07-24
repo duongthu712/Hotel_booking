@@ -1,3 +1,8 @@
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 14/06/2026
+ * Purpose: Controller logic for GuestRequestController.
+ */
 package controller;
 
 import dao.GuestRequestDAO;
@@ -85,7 +90,6 @@ public class GuestRequestController extends HttpServlet {
 
         String bookingCode = request.getParameter("bookingCode");
 
-        // 1. Kiểm tra mã đặt phòng
         if (bookingCode == null || bookingCode.trim().isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/booking-detail?status=invalid_code");
             return;
@@ -93,13 +97,11 @@ public class GuestRequestController extends HttpServlet {
 
         Booking booking = requestDAO.getBookingBasicInfoByCode(bookingCode);
 
-        // 2. Xử lý trường hợp không tìm thấy booking
         if (booking == null) {
             response.sendRedirect(request.getContextPath() + "/booking-detail?status=not_found");
             return;
         }
 
-        // 3. Bảo mật: Chặn nếu đã có request "Chờ xử lý"
         if (requestDAO.hasPendingRequest(booking.getBookingId())) {
             Guest guest = bookingDAO.getGuestByBookingId(booking.getBookingId());
             RoomType roomType = roomTypeDAO.getRoomDetailById(booking.getRoomTypeId());
@@ -236,7 +238,7 @@ public class GuestRequestController extends HttpServlet {
     private boolean isAuthorized(String requestType, String status) {
         return switch (requestType) {
             case "Hủy đặt phòng" ->
-                status.equals("Chờ xử lý") || status.equals("Đã xác nhận");
+                status.equals("Đã xác nhận");
             case "Đổi hạng phòng" ->
                 status.equals("Đã xác nhận");
             case "Gia hạn phòng" ->

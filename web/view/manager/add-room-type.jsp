@@ -1,7 +1,7 @@
 <%-- 
-    Document   : add-room-type
-    Created on : May 27, 2026, 10:50:05 PM
-    Author     : Minh Thu
+    Author: ThuDNM-HE204370 
+    Date created: 23/06/2026 
+    Purpose: Add room type page.
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -15,14 +15,13 @@
 
         <jsp:include page="/view/staff/header.jsp" />
 
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/common.css" type="text/css">
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/view/assets/css/add-room-type.css?v=<%= System.currentTimeMillis() %>">
     </head>
     <body>
         <jsp:include page="/view/staff/navbar.jsp" />
 
-        <div class="container-fluid">
-            <div class="row">
-                <main class="col-md-12 ms-sm-auto px-md-4">
+        <main class="content-container">
                     <div class="form-box mt-4">
 
                         <div class="form-header mb-4 border-bottom-luxury pb-3">
@@ -266,8 +265,6 @@
                         </form>
                     </div>
                 </main>
-            </div>
-        </div>
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
         <script src="${pageContext.request.contextPath}/view/assets/javascript/add-room-type.js?v=<%= System.currentTimeMillis() %>"></script>

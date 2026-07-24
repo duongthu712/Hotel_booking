@@ -188,7 +188,7 @@ public class RoomTypeDAO extends DBContext {
         return list;
     }
 
-    // 1. Lấy toàn bộ danh sách phòng phục vụ trang quản trị Manager (Đã đồng bộ map vào List<RoomAmenity>)
+    // 1. Lấy toàn bộ danh sách phòng phục vụ trang quản trị Manager 
     public List<RoomType> getAllRoomTypesForManager() {
         List<RoomType> list = new ArrayList<>();
         if (connection == null) {

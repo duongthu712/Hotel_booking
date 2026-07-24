@@ -14,6 +14,7 @@ import java.util.List;
 
 public class GuestRequestDAO extends DBContext {
 
+    // Author: ThuDNM-HE204370
     // 1. Kiểm tra đơn hàng có yêu cầu đang chờ xử lý không
     public boolean hasPendingRequest(int bookingId) {
         String sql = "SELECT COUNT(*) AS total FROM GuestRequests WHERE booking_id = ? AND [status] = N'Chờ xử lý'";
@@ -30,6 +31,7 @@ public class GuestRequestDAO extends DBContext {
         return false;
     }
 
+    // Author: ThuDNM-HE204370
     // 2. Hàm kiểm tra phòng trống (Dùng chung cho Đổi hạng phòng và Gia hạn)
     public boolean checkRoomAvailability(int roomTypeId, LocalDate checkIn, LocalDate checkOut, int requiredRooms, Integer bookingIdToExclude) {
         String sql = """
@@ -45,7 +47,7 @@ public class GuestRequestDAO extends DBContext {
             TotalActiveRooms AS (
                 SELECT COUNT(room_id) AS total_rooms 
                 FROM Rooms 
-                WHERE room_type_id = ? AND is_active = 1
+                WHERE room_type_id = ? AND is_active = 1 AND [status] != N'Đang bảo trì'
             )
             SELECT (ISNULL(tar.total_rooms, 0) - ISNULL(br.total_booked_rooms, 0)) AS available_rooms
             FROM TotalActiveRooms tar, BookedRooms br
@@ -72,6 +74,7 @@ public class GuestRequestDAO extends DBContext {
         }
         return false;
     }
+    // Author: ThuDNM-HE204370
 // Thêm vào bảng request
     public boolean insertGuestRequest(int bookingId, int guestId, String requestType, String details,
             LocalDate reqCheckIn, LocalDate reqCheckOut, Integer targetRoomTypeId) {
@@ -89,10 +92,8 @@ public class GuestRequestDAO extends DBContext {
 
             // XỬ LÝ KIỂU DATETIME: Sử dụng java.sql.Timestamp thay cho java.sql.Date để khớp cấu trúc DATETIME của DB
             if ("Hủy đặt phòng".equals(requestType)) {
-                // Truyền mốc thời gian giả lập an toàn ở dạng Timestamp để thỏa mãn thuộc tính cột
-                java.sql.Timestamp defaultTs = java.sql.Timestamp.valueOf(java.time.LocalDateTime.of(1970, 1, 1, 0, 0, 0));
-                stm.setTimestamp(5, defaultTs);
-                stm.setTimestamp(6, defaultTs);
+                stm.setNull(5, java.sql.Types.TIMESTAMP);
+                stm.setNull(6, java.sql.Types.TIMESTAMP);
                 // Đơn hủy không có hạng phòng mong muốn, gán Types.INTEGER về NULL cho cột target_room_type_id (vì cột này trong DB của bạn cho phép NULL)
                 stm.setNull(7, java.sql.Types.INTEGER);
             } else {
@@ -113,6 +114,7 @@ public class GuestRequestDAO extends DBContext {
         return false;
     }
 
+    // Author: ThuDNM-HE204370
  // Lấy đơn booking cho receptionist xử lý
     public model.Booking getBookingBasicInfoByCode(String bookingCode) {
         String sql = "SELECT b.*, rt.type_name, g.full_name, g.phone FROM Bookings b "
@@ -146,6 +148,7 @@ public class GuestRequestDAO extends DBContext {
         return null;
     }
 
+    // Author: ThuDNM-HE204370
     // 5. Từ chối yêu cầu
     public boolean rejectRequest(int requestId, String notes) {
         String sql = "UPDATE GuestRequests SET [status] = N'Đã từ chối', response_notes = ?, processed_at = GETDATE() WHERE request_id = ?";
@@ -159,6 +162,7 @@ public class GuestRequestDAO extends DBContext {
         return false;
     }
 
+    // Author: ThuDNM-HE204370
     // 6. Lấy thông tin chi tiết một yêu cầu để xử lý (DÙNG CHO TRANG CHI TIẾT)
     public dto.GuestRequestDTO getRequestForProcessing(int requestId) {
         String sql = """
@@ -241,7 +245,8 @@ public class GuestRequestDAO extends DBContext {
         return null;
     }
 
-    // 7. Duyệt phê duyệt yêu cầu (Chạy Transaction bọc an toàn)
+    // Author: ThuDNM-HE204370
+    // 7. Duyệt phê duyệt yêu cầu 
     public boolean approveRequest(dto.GuestRequestDTO dto, String notes, double penaltyFee) {
         String updateReq = "UPDATE GuestRequests SET [status] = N'Đã phê duyệt', response_notes = ?, processed_at = GETDATE() WHERE request_id = ?";
 
@@ -316,7 +321,7 @@ public class GuestRequestDAO extends DBContext {
         return false;
     }
 
-    // 8. Lấy danh sách yêu cầu lọc theo Bộ lọc (Dùng hiển thị dữ liệu lên Bảng bên trái)
+    // 8. Lấy danh sách yêu cầu lọc theo Bộ lọc 
     public List<dto.GuestRequestDTO> getRequestsByFilters(String type, String status, String searchBookingCode) {
         List<dto.GuestRequestDTO> list = new ArrayList<>();
 

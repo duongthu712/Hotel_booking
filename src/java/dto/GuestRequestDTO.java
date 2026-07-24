@@ -1,3 +1,8 @@
+/**
+ * Author: ThuDNM-HE204370
+ * Date created: 25/06/2026
+ * Purpose: Used to display the list and details of guest requests (used in the Receptionist's Request Management page).
+ */
 package dto;
 
 import java.math.BigDecimal;
