@@ -27,8 +27,8 @@ import model.RoomType;
 
 /**
  * @author LinhLTHE200306
- * @version 5.0
- * @since 2026-07-12
+ * @version 6.0
+ * @since 2026-07-25
  */
 public class CheckoutDAO extends DBContext {
 
@@ -673,6 +673,25 @@ public class CheckoutDAO extends DBContext {
         return null;
     }
 
+    private Timestamp getDepositPaymentPaidAt(int invoiceId) throws Exception {
+        String sql = """
+            select top 1 paid_at from InvoicePayments
+            where invoice_id = ? and note = N'Tiền đặt cọc'
+            order by paid_at asc
+            """;
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, invoiceId);
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getTimestamp("paid_at");
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể lấy thời điểm đặt cọc.");
+        }
+        return null;
+    }
+
     // ========== INVOICE ==========
     public Invoice getInvoiceByBookingId(int bookingId) throws Exception {
         String sql = "select * from Invoices where booking_id = ?";
@@ -943,17 +962,16 @@ public class CheckoutDAO extends DBContext {
             try (PreparedStatement stm = connection.prepareStatement(checkSql)) {
                 stm.setInt(1, invoiceId);
                 try (ResultSet rs = stm.executeQuery()) {
-                    if (rs.next() && rs.getBigDecimal("remaining_amount").compareTo(BigDecimal.ZERO) <= 0) {
-                        String paidSql = """
-                                update Invoices set payment_status = N'Đã thanh toán' where invoice_id = ?
-                                """;
+                    if (rs.next()) {
+                        boolean fullyPaid = rs.getBigDecimal("remaining_amount").compareTo(BigDecimal.ZERO) <= 0;
+                        String invoiceStatus = fullyPaid ? "Đã thanh toán" : "Chưa thanh toán";
+                        String paidSql = "update Invoices set payment_status = N'" + invoiceStatus + "' where invoice_id = ?";
                         try (PreparedStatement ps = connection.prepareStatement(paidSql)) {
                             ps.setInt(1, invoiceId);
                             ps.executeUpdate();
                         }
-                        String bookingPaidSql = """
-                                update Bookings set payment_status = N'Đã thanh toán' where booking_id = ?
-                                """;
+                        String bookingStatus = fullyPaid ? "Đã thanh toán" : "Chưa thanh toán";
+                        String bookingPaidSql = "update Bookings set payment_status = N'" + bookingStatus + "' where booking_id = ?";
                         try (PreparedStatement ps = connection.prepareStatement(bookingPaidSql)) {
                             ps.setInt(1, bookingId);
                             ps.executeUpdate();
@@ -1099,15 +1117,25 @@ public class CheckoutDAO extends DBContext {
 
             // ========== 7. Ghi nhận cọc đã sử dụng ==========
             if (depositThisCheckout.compareTo(BigDecimal.ZERO) > 0) {
-                String insertPaymentSql = """
-                insert into InvoicePayments (invoice_id, amount, payment_method, collected_by, note)
-                values (?, ?, N'Chuyển khoản', ?, ?)
-                """;
+                Timestamp depositPaidAt = getDepositPaymentPaidAt(invoice.getInvoiceId());
+
+                String insertPaymentSql = depositPaidAt != null
+                        ? """
+                        insert into InvoicePayments (invoice_id, amount, payment_method, collected_by, note, paid_at)
+                        values (?, ?, N'Chuyển khoản', ?, ?, ?)
+                        """
+                        : """
+                        insert into InvoicePayments (invoice_id, amount, payment_method, collected_by, note)
+                        values (?, ?, N'Chuyển khoản', ?, ?)
+                        """;
                 try (PreparedStatement stm = connection.prepareStatement(insertPaymentSql)) {
                     stm.setInt(1, invoice.getInvoiceId());
                     stm.setBigDecimal(2, depositThisCheckout);
                     stm.setInt(3, staffId);
                     stm.setString(4, roomNote);
+                    if (depositPaidAt != null) {
+                        stm.setTimestamp(5, depositPaidAt);
+                    }
                     stm.executeUpdate();
                 }
 

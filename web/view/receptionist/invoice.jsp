@@ -302,6 +302,12 @@
                                 <c:if test="${remainingForThisRoom < 0}">
                                     <c:set var="remainingForThisRoom" value="0"/>
                                 </c:if>
+                                <c:if test="${remainingForThisRoom > totalBookingRemaining}">
+                                    <c:set var="remainingForThisRoom" value="${totalBookingRemaining}"/>
+                                </c:if>
+                                <c:if test="${remainingForThisRoom < 0}">
+                                    <c:set var="remainingForThisRoom" value="0"/>
+                                </c:if>
 
                                 <div class="summary-row final-row">
                                     <span class="summary-label">CÒN PHẢI THANH TOÁN <br/>(phòng này)</span>
@@ -328,13 +334,12 @@
                                     </span>
                                 </div>
                             </div>
-                                    
-                                    <!-- THU TIỀN THÊM (nếu còn nợ) -->
-                            <c:if test="${remainingForThisRoom > 0}">
+
+                            <!-- THU TIỀN THÊM (nếu còn nợ) -->
                                 <div class="payment-method">
                                     <h4 class="sub-title">THU TIỀN TẠI QUẦY (phòng này)</h4>
                                     <input type="number" name="collectAmount" id="collectAmount"
-                                           class="qty-input" style="width:100%;margin-bottom:8px"
+                                           class="form-input" style="width:100%;margin-bottom:8px"
                                            placeholder="Nhập số tiền thanh toán lần này"
                                            min="0" max="${remainingForThisRoom}">
                                     <select name="paymentMethod" class="payment-select">
@@ -344,7 +349,6 @@
                                         <option value="Chuyển khoản">Chuyển khoản</option>
                                     </select>
                                 </div>
-                            </c:if>
 
                             <!-- THÔNG TIN CỌC -->
                             <div class="deposit-info">
@@ -388,7 +392,7 @@
                                 </c:if>
                             </div>
 
-                            
+
 
                             <div class="invoice-actions">
                                 <button type="submit" class="btn-checkout-primary">CẬP NHẬT HÓA ĐƠN</button>
