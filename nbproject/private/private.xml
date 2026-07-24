@@ -7,12 +7,15 @@
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/CheckoutController.java</file>
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/receptionist/invoice.jsp</file>
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/assets/css/policy-management.css</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/dao/RoomDAO.java</file>
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/filter/AuthorizationFilter.java</file>
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/manager/dashboard.jsp</file>
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/dao/CheckoutDAO.java</file>
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/public/room-detail.jsp</file>
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/receptionist/billing.jsp</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/InvoicePDFController.java</file>
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/assets/css/invoice.css</file>
+            <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/dao/WalkinBookingDAO.java</file>
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/web/view/manager/policy-management.jsp</file>
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/dao/BookingDAO.java</file>
             <file>file:/D:/FPT/K5/SWP391/Gr6/Hotel_booking/src/java/controller/InvoiceCreateController.java</file>
