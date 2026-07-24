@@ -77,10 +77,10 @@ public class WalkinBookingDAO extends DBContext {
             ps.setString(2, checkIn);
             ps.setInt(3, numRooms);
 
-            ps.setInt(4, numRooms); 
-            ps.setInt(5, numGuests); 
-            ps.setInt(6, numRooms); 
-            ps.setInt(7, numChildren); 
+            ps.setInt(4, numRooms);
+            ps.setInt(5, numGuests);
+            ps.setInt(6, numRooms);
+            ps.setInt(7, numChildren);
 
             if (roomTypeId > 0) {
                 ps.setInt(8, roomTypeId);
@@ -238,7 +238,8 @@ public class WalkinBookingDAO extends DBContext {
                 }
             }
 
-            // BỔ SUNG BƯỚC 6.1: TỰ ĐỘNG TẠO HÓA ĐƠN NHÁP (INVOICES) CHO CẢ 2 LUỒNG
+            //LinhLTHE200306
+            // Bổ sung: tạo hoá đơn nháp cho tiền cọc
             if (bookingId != -1) {
                 String insertInvoiceSql = """
                     INSERT INTO Invoices 
@@ -249,11 +250,10 @@ public class WalkinBookingDAO extends DBContext {
                     psInvoice.setInt(1, bookingId);
                     psInvoice.setBigDecimal(2, roomCharges);
                     psInvoice.setBigDecimal(3, roomCharges); // total_amount ban đầu bằng tiền phòng
-                    
-                    // remaining_amount = tổng tiền phòng trừ đi tiền cọc giữ phòng (nếu có)
-                    java.math.BigDecimal remainingAmount = roomCharges.subtract(booking.getDepositAmount());
-                    psInvoice.setBigDecimal(4, remainingAmount);
-                    
+
+                    // remaining_amount TẠM = total_amount, sẽ recalculate lại sau khi ghi InvoicePayments
+                    psInvoice.setBigDecimal(4, roomCharges);
+
                     if (booking.getStaffId() == null) {
                         psInvoice.setNull(5, Types.INTEGER);
                     } else {
@@ -274,6 +274,42 @@ public class WalkinBookingDAO extends DBContext {
                     psDeposit.setBigDecimal(2, booking.getDepositAmount());
                     psDeposit.setInt(3, booking.getStaffId());
                     psDeposit.executeUpdate();
+                }
+                String getInvoiceIdSql = "select invoice_id from Invoices where booking_id = ?";
+                int invoiceId = -1;
+                try (PreparedStatement stm = connection.prepareStatement(getInvoiceIdSql)) {
+                    stm.setInt(1, bookingId);
+                    try (ResultSet rs = stm.executeQuery()) {
+                        if (rs.next()) {
+                            invoiceId = rs.getInt("invoice_id");
+                        }
+                    }
+                }
+
+                if (invoiceId != -1) {
+                    String insertInvoicePaymentSql = """
+        insert into InvoicePayments (invoice_id, amount, payment_method, collected_by, note)
+        values (?, ?, N'Tiền mặt', ?, N'Tiền đặt cọc')
+        """;
+                    try (PreparedStatement stm = connection.prepareStatement(insertInvoicePaymentSql)) {
+                        stm.setInt(1, invoiceId);
+                        stm.setBigDecimal(2, booking.getDepositAmount());
+                        stm.setInt(3, booking.getStaffId());
+                        stm.executeUpdate();
+                    }
+
+                    String updateRemainingSql = """
+        update Invoices
+        set remaining_amount = total_amount - (
+            select isnull(sum(amount), 0) from InvoicePayments where invoice_id = ?
+        )
+        where invoice_id = ?
+        """;
+                    try (PreparedStatement stm = connection.prepareStatement(updateRemainingSql)) {
+                        stm.setInt(1, invoiceId);
+                        stm.setInt(2, invoiceId);
+                        stm.executeUpdate();
+                    }
                 }
             }
 

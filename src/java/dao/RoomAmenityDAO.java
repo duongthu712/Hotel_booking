@@ -10,14 +10,11 @@ import model.RoomAmenity;
 import java.sql.SQLException;
 
 /**
- * RoomAmenityDAO.java Data Processing Operator layer for room amenitys Provides
- * CRUD with RoomAmenities table
- *
  * @author LinhLTHE200306
- * @version 1.0
- * @since 2026-06-10
+ * @version 2.0
+ * @since 2026-07-21
  */
-public class RoomAmenityDAO extends DBContext{
+public class RoomAmenityDAO extends DBContext {
 
     public List<RoomAmenity> getAllRoomAmenities() throws Exception {
         List<RoomAmenity> list = new ArrayList<>();
@@ -198,8 +195,31 @@ public class RoomAmenityDAO extends DBContext{
         }
     }
 
+    public boolean isAmenityUsedInRoomTypes(int amenityId) throws Exception {
+        String strSQL = """
+                        select 1 
+                        from RoomTypeAmenities 
+                        where amenity_id = ?
+                        """;
+
+        try (PreparedStatement stm = connection.prepareStatement(strSQL)) {
+            stm.setInt(1, amenityId);
+            try (ResultSet rs = stm.executeQuery()) {
+                return rs.next(); // true nếu có ít nhất 1 bản ghi
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể kiểm tra ràng buộc hạng phòng.");
+        }
+    }
+
     public RoomAmenity delete(int amenityId) throws Exception {
+
         RoomAmenity found = getRoomAmenityById(amenityId);
+
+        if (isAmenityUsedInRoomTypes(amenityId)) {
+            throw new Exception("Không thể xóa vì tiện nghi đang được sử dụng trong hạng phòng.");
+        }
+
         String strSQL = """
                         delete 
                         from RoomAmenities 

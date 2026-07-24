@@ -35,6 +35,7 @@ public class CheckoutDAO extends DBContext {
     public static final double LATE_CHECKOUT_BEFORE_RATE = 0.5;
     public static final double LATE_CHECKOUT_AFTER_RATE = 1.0;
     public static final int LATE_CHECKOUT_HOUR = 18;
+    public static final int LATE_CHECKOUT_GRACE_MINUTES = 60; // ân hạn 1 tiếng sau giờ checkout mới tính trễ
 
     // ========== BOOKING ==========
     public Booking getBookingById(int bookingId) throws Exception {
@@ -742,7 +743,7 @@ public class CheckoutDAO extends DBContext {
      */
     private BigDecimal recalcRoomChargesForBooking(int bookingId, Booking booking) throws Exception {
         List<Map<String, Object>> checkedOutRooms = getCheckedOutRoomDetails(bookingId);
-        LocalDateTime expectedCheckout = booking.getCheckoutDate().atTime(12, 0);
+        LocalDateTime expectedCheckout = booking.getCheckoutDate().atTime(getConfiguredCheckoutTime());
 
         BigDecimal total = BigDecimal.ZERO;
 
@@ -783,13 +784,31 @@ public class CheckoutDAO extends DBContext {
         if (actualCheckout == null || expectedCheckout == null) {
             return 0;
         }
-        if (!actualCheckout.isAfter(expectedCheckout)) {
+        LocalDateTime graceDeadline = expectedCheckout.plusMinutes(LATE_CHECKOUT_GRACE_MINUTES);
+        if (!actualCheckout.isAfter(graceDeadline)) {
             return 0;
         }
         int hour = actualCheckout.getHour();
         return hour < LATE_CHECKOUT_HOUR
                 ? roomPricePerNight * LATE_CHECKOUT_BEFORE_RATE
                 : roomPricePerNight * LATE_CHECKOUT_AFTER_RATE;
+    }
+
+    private java.time.LocalTime getConfiguredCheckoutTime() throws Exception {
+        String sql = "select top 1 checkout_time from HotelInfo";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    java.sql.Time t = rs.getTime("checkout_time");
+                    if (t != null) {
+                        return t.toLocalTime();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Lỗi hệ thống: Không thể lấy giờ checkout cấu hình.");
+        }
+        return java.time.LocalTime.of(12, 0); // fallback nếu chưa cấu hình
     }
 
     /**
@@ -1298,7 +1317,7 @@ public class CheckoutDAO extends DBContext {
         BigDecimal roomCharge = booking.getBookedPricePerNight().multiply(BigDecimal.valueOf(nights));
 
         // Late charge cho phòng này
-        LocalDateTime expectedCheckout = booking.getCheckoutDate().atTime(12, 0);
+        LocalDateTime expectedCheckout = booking.getCheckoutDate().atTime(getConfiguredCheckoutTime());
         double latePerRoom = lateCheckoutSurcharge(expectedCheckout, checkoutAt, booking.getBookedPricePerNight().doubleValue());
 
         return roomCharge.add(BigDecimal.valueOf(latePerRoom));
