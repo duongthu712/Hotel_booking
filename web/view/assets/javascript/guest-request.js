@@ -232,9 +232,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const numRooms = parseInt(requestForm.querySelector("input[name='numRooms']").value) || 1;
         const oldCheckoutDateStr = requestForm.querySelector("input[name='oldCheckoutDate']").value;
         const oldBasePrice = parseFloat(document.getElementById("oldBasePrice").value) || 0;
+        const depositAmountElement = document.getElementById("depositAmount");
+        const depositAmount = depositAmountElement ? parseFloat(depositAmountElement.value) || 0 : 0;
 
         try {
-            const url = `guest-request?action=calculate&checkInDate=${checkInDateStr}&oldCheckoutDate=${oldCheckoutDateStr}&numRooms=${numRooms}&oldBasePrice=${oldBasePrice}`;
+            const url = `guest-request?action=calculate&checkInDate=${checkInDateStr}&oldCheckoutDate=${oldCheckoutDateStr}&numRooms=${numRooms}&oldBasePrice=${oldBasePrice}&depositAmount=${depositAmount}`;
             const response = await fetch(url);
             if (!response.ok) return;
             const data = await response.json();
