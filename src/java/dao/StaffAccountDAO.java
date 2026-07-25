@@ -47,6 +47,7 @@ public class StaffAccountDAO extends DBContext {
                          FROM StaffAccounts
                          WHERE email = ?
                            AND is_active = 1
+                           AND deleted_at IS NULL
                          """;
 
             stm = connection.prepareStatement(sql);
@@ -72,6 +73,7 @@ public class StaffAccountDAO extends DBContext {
                          SELECT * 
                          FROM StaffAccounts 
                          WHERE username = ? 
+                           AND deleted_at IS NULL
                          """;
 
             stm = connection.prepareStatement(sql);
@@ -130,7 +132,8 @@ public class StaffAccountDAO extends DBContext {
             String sql = "SELECT staff_id "
                     + "FROM StaffAccounts "
                     + "WHERE " + column + " = ? "
-                    + "AND staff_id <> ?";
+                    + "AND staff_id <> ?"
+                    + "  AND deleted_at IS NULL";
 
             stm = connection.prepareStatement(sql);
             stm.setString(1, value.trim());
@@ -454,7 +457,57 @@ public class StaffAccountDAO extends DBContext {
         }
     }
 
-    public void createStaff(StaffAccount staff) {
+    /**
+     * Kiểm tra username đã tồn tại ở tài khoản CHƯA XÓA không. Tài khoản đã xóa
+     * (deleted_at != null) thì cho phép dùng lại.
+     */
+    public boolean isUsernameExists(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            return false;
+        }
+        try {
+            String sql = "SELECT 1 FROM StaffAccounts WHERE username = ? AND deleted_at IS NULL";
+            stm = connection.prepareStatement(sql);
+            stm.setString(1, username.trim());
+            rs = stm.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            System.out.println("isUsernameExists: " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Kiểm tra email đã tồn tại ở tài khoản CHƯA XÓA không. Tài khoản đã xóa
+     * thì cho phép dùng lại.
+     */
+    public boolean isEmailExists(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            return false;
+        }
+        try {
+            String sql = "SELECT 1 FROM StaffAccounts WHERE email = ? AND deleted_at IS NULL";
+            stm = connection.prepareStatement(sql);
+            stm.setString(1, email.trim());
+            rs = stm.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            System.out.println("isEmailExists: " + e.getMessage());
+        }
+        return false;
+    }
+
+    public void createStaff(StaffAccount staff) throws Exception {
+        // 1. Check trùng username (chỉ với tài khoản chưa xóa)
+        if (isUsernameExists(staff.getUsername())) {
+            throw new Exception("Tên đăng nhập này đã tồn tại.");
+        }
+
+        // 2. Check trùng email (chỉ với tài khoản chưa xóa)
+        if (isEmailExists(staff.getEmail())) {
+            throw new Exception("Email này đã được sử dụng.");
+        }
+
         try {
             String sql = """
                          INSERT INTO StaffAccounts 
