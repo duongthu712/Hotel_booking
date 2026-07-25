@@ -42,6 +42,15 @@ public class GuestRequestDTO {
     private String formattedTime;
     private String formattedDate;
     private Integer roomTypeId;
+    private BigDecimal depositAmount;
+
+    public BigDecimal getDepositAmount() {
+        return depositAmount;
+    }
+
+    public void setDepositAmount(BigDecimal depositAmount) {
+        this.depositAmount = depositAmount;
+    }
 
     public Integer getRoomTypeId() {
         return roomTypeId;

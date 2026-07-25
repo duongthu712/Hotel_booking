@@ -184,7 +184,7 @@
 
                                                         <p
                                                             style="margin-bottom: 12px; font-size: 13.5px; color: #475569;">
-                                                            Thời gian tính từ lúc gửi đơn đến mốc 14:00 ngày check-in
+                                                            Thời gian tính từ lúc gửi đơn đến mốc ${checkinTimeStr} ngày check-in
                                                             còn lại: <strong id="lblHoursRemaining"
                                                                 style="color: #0f172a;">${cancelDurationText}</strong>
                                                         </p>
@@ -206,7 +206,7 @@
                                                                 <tr id="policy-row-72"
                                                                     style="border-bottom: 1px solid #e2e8f0; ${hoursLeft >= 72 ? 'background-color: #f1f5f9; font-weight: bold; color: #0f172a;' : ''}">
                                                                     <td style="padding: 12px 10px;">&gt;= 72h trước
-                                                                        14:00 ngày check-in</td>
+                                                                        ${checkinTimeStr} ngày check-in</td>
                                                                     <td style="padding: 12px 10px; text-align: center;">
                                                                         0%</td>
                                                                     <td style="padding: 12px 10px; text-align: center;">
@@ -215,7 +215,7 @@
                                                                 <tr id="policy-row-48"
                                                                     style="border-bottom: 1px solid #e2e8f0; ${hoursLeft >= 48 && hoursLeft < 72 ? 'background-color: #f1f5f9; font-weight: bold; color: #0f172a;' : ''}">
                                                                     <td style="padding: 12px 10px;">&gt;= 48h - &lt; 72h
-                                                                        trước 14:00 ngày check-in</td>
+                                                                        trước ${checkinTimeStr} ngày check-in</td>
                                                                     <td style="padding: 12px 10px; text-align: center;">
                                                                         30%</td>
                                                                     <td style="padding: 12px 10px; text-align: center;">
@@ -224,7 +224,7 @@
                                                                 <tr id="policy-row-24"
                                                                     style="border-bottom: 1px solid #e2e8f0; ${hoursLeft >= 24 && hoursLeft < 48 ? 'background-color: #f1f5f9; font-weight: bold; color: #0f172a;' : ''}">
                                                                     <td style="padding: 12px 10px;">&gt;= 24h - &lt; 48h
-                                                                        trước 14:00 ngày check-in</td>
+                                                                        trước ${checkinTimeStr} ngày check-in</td>
                                                                     <td style="padding: 12px 10px; text-align: center;">
                                                                         50%</td>
                                                                     <td style="padding: 12px 10px; text-align: center;">
@@ -232,7 +232,7 @@
                                                                 </tr>
                                                                 <tr id="policy-row-0"
                                                                     style="border-bottom: 1px solid #e2e8f0; ${hoursLeft < 24 ? 'background-color: #f1f5f9; font-weight: bold; color: #0f172a;' : ''}">
-                                                                    <td style="padding: 12px 10px;">&lt; 24h trước 14:00
+                                                                    <td style="padding: 12px 10px;">&lt; 24h trước ${checkinTimeStr}
                                                                         ngày check-in</td>
                                                                     <td style="padding: 12px 10px; text-align: center;">
                                                                         70%</td>
@@ -373,40 +373,49 @@
                                             </c:choose>
 
                                             <h4 class="section-sub-title" style="margin-top: 25px;">Xử lý yêu cầu</h4>
-                                            <form action="process-request" method="POST" class="process-form">
-                                                <input type="hidden" name="requestId" value="${req.requestId}">
-                                                <input type="hidden" name="type" value="${currentType}">
-                                                <input type="hidden" name="status" value="${currentStatus}">
-                                                <input type="hidden" name="searchBookingCode"
-                                                    value="${searchBookingCode}">
+                                            <c:choose>
+                                                <c:when test="${req.status == 'Chờ xử lý'}">
+                                                    <form action="process-request" method="POST" class="process-form">
+                                                        <input type="hidden" name="requestId" value="${req.requestId}">
+                                                        <input type="hidden" name="type" value="${currentType}">
+                                                        <input type="hidden" name="status" value="${currentStatus}">
+                                                        <input type="hidden" name="searchBookingCode"
+                                                            value="${searchBookingCode}">
 
-                                                <div class="action-form-layout">
-                                                    <div class="form-group-textarea">
-                                                        <label for="response_notes" class="form-label">Ghi chú </label>
-                                                        <textarea id="response_notes" name="response_notes" rows="3"
-                                                            class="form-control"
-                                                            placeholder="Nhập lý do xử lý yêu cầu..."></textarea>
-                                                    </div>
+                                                        <div class="action-form-layout">
+                                                            <div class="form-group-textarea">
+                                                                <label for="response_notes" class="form-label">Ghi chú </label>
+                                                                <textarea id="response_notes" name="response_notes" rows="3"
+                                                                    class="form-control"
+                                                                    placeholder="Nhập lý do xử lý yêu cầu..."></textarea>
+                                                            </div>
 
-                                                    <div class="form-group-select">
-                                                        <label for="action_select" class="form-label">Hành động</label>
-                                                        <select id="action_select" name="action"
-                                                            class="form-select-control" required>
-                                                            <option value="" disabled selected>Chọn hành động</option>
-                                                            <option value="approve" ${(!isAvailable &&
-                                                                (req.requestType=='Đổi hạng phòng' ||
-                                                                req.requestType=='Gia hạn phòng' )) ? 'disabled' : '' }>
-                                                                Phê duyệt yêu cầu</option>
-                                                            <option value="reject">Từ chối yêu cầu</option>
-                                                        </select>
-                                                        <button type="submit" id="submit_btn"
-                                                            class="btn btn-primary btn-block-submit"
-                                                            style="margin-top: 15px;">
-                                                            Xác nhận xử lý
-                                                        </button>
+                                                            <div class="form-group-select">
+                                                                <label for="action_select" class="form-label">Hành động</label>
+                                                                <select id="action_select" name="action"
+                                                                    class="form-select-control" required>
+                                                                    <option value="" disabled selected>Chọn hành động</option>
+                                                                    <option value="approve" ${(!isAvailable &&
+                                                                        (req.requestType=='Đổi hạng phòng' ||
+                                                                        req.requestType=='Gia hạn phòng' )) ? 'disabled' : '' }>
+                                                                        Phê duyệt yêu cầu</option>
+                                                                    <option value="reject">Từ chối yêu cầu</option>
+                                                                </select>
+                                                                <button type="submit" id="submit_btn"
+                                                                    class="btn btn-primary btn-block-submit"
+                                                                    style="margin-top: 15px;">
+                                                                    Xác nhận xử lý
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; text-align: center; color: #475569; margin-top: 15px;">
+                                                        <p style="margin: 0; font-size: 15px;">Yêu cầu này đã được xử lý (Trạng thái: <strong style="color: ${req.status == 'Đã từ chối' ? '#ef4444' : '#10b981'};">${req.status}</strong>). Không thể thay đổi.</p>
                                                     </div>
-                                                </div>
-                                            </form>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </c:when>
 
                                         <c:otherwise>

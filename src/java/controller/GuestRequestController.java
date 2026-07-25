@@ -24,6 +24,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.time.format.DateTimeFormatter;
 
 @WebServlet(name = "GuestRequestController", urlPatterns = {"/guest-request"})
 public class GuestRequestController extends HttpServlet {
@@ -45,17 +46,26 @@ public class GuestRequestController extends HttpServlet {
                 String checkOutDateStr = request.getParameter("oldCheckoutDate");
                 int numRooms = Integer.parseInt(request.getParameter("numRooms"));
                 double pricePerNight = Double.parseDouble(request.getParameter("oldBasePrice"));
+                
+                String depositParam = request.getParameter("depositAmount");
+                double depositAmountPassed = (depositParam != null && !depositParam.isEmpty()) ? Double.parseDouble(depositParam) : 0;
 
-                LocalDate checkInDate = LocalDate.parse(checkInDateStr);
-                LocalDate checkOutDate = LocalDate.parse(checkOutDateStr);
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate checkIn = LocalDate.parse(checkInDateStr, dtf);
+                LocalDate checkOut = LocalDate.parse(checkOutDateStr, dtf);
 
-                long totalNights = java.time.temporal.ChronoUnit.DAYS.between(checkInDate, checkOutDate);
-                if (totalNights <= 0) totalNights = 1;
+                long totalNights = java.time.temporal.ChronoUnit.DAYS.between(checkIn, checkOut);
+                if (totalNights <= 0) {
+                    totalNights = 1;
+                }
 
                 double totalBookingValue = pricePerNight * totalNights * numRooms;
-                double depositPaid = totalBookingValue * 0.30;
+                double depositPaid = depositAmountPassed > 0 ? depositAmountPassed : (totalBookingValue * 0.30);
 
-                LocalDateTime checkInDateTime = checkInDate.atTime(14, 0, 0);
+                dao.HotelInfoDAO hotelInfoDAO = new dao.HotelInfoDAO();
+                model.HotelInfo hotelInfo = hotelInfoDAO.getHotelInfoById(1);
+                java.time.LocalTime checkinTime = hotelInfo != null ? hotelInfo.getCheckinTime() : java.time.LocalTime.of(14, 0);
+                LocalDateTime checkInDateTime = checkIn.atTime(checkinTime);
                 LocalDateTime now = LocalDateTime.now(); // Since guest is viewing, we use now()
                 
                 Duration duration = Duration.between(now, checkInDateTime);
@@ -125,6 +135,15 @@ public class GuestRequestController extends HttpServlet {
         List<RoomType> roomTypesList = roomTypeDAO.getAllRoomTypes();
         request.setAttribute("booking", booking);
         request.setAttribute("roomTypesList", roomTypesList);
+
+        try {
+            dao.HotelInfoDAO hotelInfoDAO = new dao.HotelInfoDAO();
+            model.HotelInfo hotelInfo = hotelInfoDAO.getHotelInfoById(1);
+            java.time.LocalTime checkinTime = hotelInfo != null ? hotelInfo.getCheckinTime() : java.time.LocalTime.of(14, 0);
+            request.setAttribute("checkinTimeStr", checkinTime.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm")));
+        } catch (Exception e) {
+            request.setAttribute("checkinTimeStr", "14:00");
+        }
 
         request.getRequestDispatcher("/view/user/request-submission.jsp").forward(request, response);
     }

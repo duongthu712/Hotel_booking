@@ -220,7 +220,7 @@ public class RoomTypeDAO extends DBContext {
         String sqlRoom = "SELECT * FROM RoomTypes ORDER BY is_active DESC, room_type_id ASC";
         String sqlImages = "SELECT image_url FROM RoomTypeImages WHERE room_type_id = ?";
         String sqlServices = "SELECT rts.room_type_service_id, rts.service_id, rts.quantity, rts.is_free, s.service_name, s.unit_price "
-                + "FROM RoomTypeServices rts LEFT JOIN RoomServices s ON rts.service_id = s.service_id WHERE rts.room_type_id = ?";
+                + "FROM RoomTypeServices rts LEFT JOIN RoomServices s ON rts.service_id = s.service_id WHERE rts.room_type_id = ? AND rts.quantity > 0";
         String sqlAmenities = "SELECT rta.quantity, ra.amenity_id, ra.amenity_name, ra.unit_price "
                 + "FROM RoomTypeAmenities rta INNER JOIN RoomAmenities ra ON rta.amenity_id = ra.amenity_id WHERE rta.room_type_id = ?";
 
@@ -389,7 +389,7 @@ public class RoomTypeDAO extends DBContext {
 
             // 2. Làm sạch dữ liệu cũ (Xóa theo thứ tự)
             connection.prepareStatement("DELETE FROM RoomTypeImages WHERE room_type_id = " + rt.getRoomTypeId()).executeUpdate();
-            connection.prepareStatement("DELETE FROM RoomTypeServices WHERE room_type_id = " + rt.getRoomTypeId()).executeUpdate();
+            connection.prepareStatement("UPDATE RoomTypeServices SET quantity = 0, is_free = 0 WHERE room_type_id = " + rt.getRoomTypeId()).executeUpdate();
             connection.prepareStatement("DELETE FROM RoomTypeAmenities WHERE room_type_id = " + rt.getRoomTypeId()).executeUpdate();
 
             // 3. Ghi đè danh sách mới (Check null cẩn thận)
@@ -407,12 +407,22 @@ public class RoomTypeDAO extends DBContext {
             }
 
             if (newServiceList != null) {
-                try (PreparedStatement ps = connection.prepareStatement("INSERT INTO RoomTypeServices (room_type_id, service_id, quantity, is_free) VALUES (?, ?, ?, ?)")) {
+                String mergeSql = "IF EXISTS (SELECT 1 FROM RoomTypeServices WHERE room_type_id = ? AND service_id = ?) " +
+                                  "UPDATE RoomTypeServices SET quantity = ?, is_free = ? WHERE room_type_id = ? AND service_id = ? " +
+                                  "ELSE " +
+                                  "INSERT INTO RoomTypeServices (room_type_id, service_id, quantity, is_free) VALUES (?, ?, ?, ?)";
+                try (PreparedStatement ps = connection.prepareStatement(mergeSql)) {
                     for (model.RoomTypeService rts : newServiceList) {
                         ps.setInt(1, rt.getRoomTypeId());
                         ps.setInt(2, rts.getServiceId());
                         ps.setInt(3, rts.getQuantity());
                         ps.setInt(4, rts.getIsFree());
+                        ps.setInt(5, rt.getRoomTypeId());
+                        ps.setInt(6, rts.getServiceId());
+                        ps.setInt(7, rt.getRoomTypeId());
+                        ps.setInt(8, rts.getServiceId());
+                        ps.setInt(9, rts.getQuantity());
+                        ps.setInt(10, rts.getIsFree());
                         ps.addBatch();
                     }
                     ps.executeBatch();
@@ -560,7 +570,7 @@ public class RoomTypeDAO extends DBContext {
     public RoomType getRoomTypeById(int roomTypeId) {
         String sqlRoom = "SELECT * FROM RoomTypes WHERE room_type_id = ?";
         String sqlImages = "SELECT image_url FROM RoomTypeImages WHERE room_type_id = ? ORDER BY image_id ASC";
-        String sqlServices = "SELECT rts.*, s.service_name, s.unit_price FROM RoomTypeServices rts LEFT JOIN RoomServices s ON rts.service_id = s.service_id WHERE rts.room_type_id = ?";
+        String sqlServices = "SELECT rts.*, s.service_name, s.unit_price FROM RoomTypeServices rts LEFT JOIN RoomServices s ON rts.service_id = s.service_id WHERE rts.room_type_id = ? AND rts.quantity > 0";
         String sqlAmenities = "SELECT rta.quantity, ra.* FROM RoomTypeAmenities rta INNER JOIN RoomAmenities ra ON rta.amenity_id = ra.amenity_id WHERE rta.room_type_id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sqlRoom)) {
@@ -736,7 +746,7 @@ public RoomType getRoomDetailById(int roomTypeId) {
                 + "FROM RoomTypeServices rts "
                 + "LEFT JOIN RoomServices s "
                 + "ON rts.service_id = s.service_id "
-                + "WHERE rts.room_type_id = ?";
+                + "WHERE rts.room_type_id = ? AND rts.quantity > 0";
 
         String sqlAmenities
                 = "SELECT rta.quantity, "

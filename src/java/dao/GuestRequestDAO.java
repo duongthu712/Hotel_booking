@@ -60,8 +60,8 @@ public class GuestRequestDAO extends DBContext {
             } else {
                 ps.setNull(2, Types.INTEGER);
             }
-            ps.setDate(3, Date.valueOf(checkIn));  // Khớp với b.checkin_date < ?
-            ps.setDate(4, Date.valueOf(checkOut)); // Khớp với b.checkout_date > ?
+            ps.setDate(3, Date.valueOf(checkOut)); // b.checkin_date < checkOut
+            ps.setDate(4, Date.valueOf(checkIn));  // b.checkout_date > checkIn
             ps.setInt(5, roomTypeId);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -138,6 +138,7 @@ public class GuestRequestDAO extends DBContext {
                     b.setCheckinDate(rs.getDate("checkin_date").toLocalDate());
                     b.setCheckoutDate(rs.getDate("checkout_date").toLocalDate());
                     b.setBookedPricePerNight(rs.getBigDecimal("booked_price_per_night"));
+                    b.setDepositAmount(rs.getBigDecimal("deposit_amount"));
                     b.setRoomTypeName(rs.getString("type_name"));
                     return b;
                 }
@@ -166,7 +167,7 @@ public class GuestRequestDAO extends DBContext {
     // 6. Lấy thông tin chi tiết một yêu cầu để xử lý (DÙNG CHO TRANG CHI TIẾT)
     public dto.GuestRequestDTO getRequestForProcessing(int requestId) {
         String sql = """
-    SELECT gr.*, b.booking_code, b.num_rooms, b.checkin_date, b.checkout_date, b.room_type_id,
+    SELECT gr.*, b.booking_code, b.num_rooms, b.checkin_date, b.checkout_date, b.room_type_id, b.deposit_amount,
            g.full_name, g.phone,
            rt_curr.type_name as curr_name, rt_curr.base_price as curr_price,
            rt_targ.type_name as targ_name, rt_targ.base_price as targ_price
@@ -188,6 +189,7 @@ public class GuestRequestDAO extends DBContext {
                     req.setRequestId(rs.getInt("request_id"));
                     req.setBookingId(rs.getInt("booking_id"));
                     req.setRequestType(rs.getString("request_type"));
+                    req.setStatus(rs.getString("status"));
                     req.setTargetRoomTypeId(rs.getObject("target_room_type_id") != null ? rs.getInt("target_room_type_id") : null);
                     req.setRequestDetails(rs.getString("request_details") != null ? rs.getString("request_details") : "");
                     // CHỐNG NULL: Kiểm tra requested_checkout
@@ -225,6 +227,7 @@ public class GuestRequestDAO extends DBContext {
                         req.setCheckOutDate(rs.getDate("checkout_date").toLocalDate());
                     }
                     req.setRoomTypeId(rs.getInt("room_type_id"));
+                    req.setDepositAmount(rs.getBigDecimal("deposit_amount"));
 
                     // 3. Dữ liệu từ Guests
                     req.setGuestName(rs.getString("full_name") != null ? rs.getString("full_name") : "Khách vãng lai");
@@ -247,7 +250,7 @@ public class GuestRequestDAO extends DBContext {
 
     // Author: ThuDNM-HE204370
     // 7. Duyệt phê duyệt yêu cầu 
-    public boolean approveRequest(dto.GuestRequestDTO dto, String notes, double penaltyFee) {
+    public boolean approveRequest(dto.GuestRequestDTO dto, String notes, double penaltyFee, int staffId) {
         String updateReq = "UPDATE GuestRequests SET [status] = N'Đã phê duyệt', response_notes = ?, processed_at = GETDATE() WHERE request_id = ?";
 
         try {
@@ -289,14 +292,26 @@ public class GuestRequestDAO extends DBContext {
 
             // Đồng bộ lại hóa đơn Invoices cho cả Đổi hạng phòng và Gia hạn phòng
             if ("Đổi hạng phòng".equals(dto.getRequestType()) || "Gia hạn phòng".equals(dto.getRequestType())) {
-                String sqlSyncInvoice = "UPDATE Invoices "
-                        + "SET room_charges = (SELECT CASE WHEN DATEDIFF(day, checkin_date, checkout_date) <= 0 THEN 1 ELSE DATEDIFF(day, checkin_date, checkout_date) END * num_rooms * booked_price_per_night FROM Bookings WHERE booking_id = ?), "
-                        + "    total_amount = (SELECT CASE WHEN DATEDIFF(day, checkin_date, checkout_date) <= 0 THEN 1 ELSE DATEDIFF(day, checkin_date, checkout_date) END * num_rooms * booked_price_per_night FROM Bookings WHERE booking_id = ?) + ISNULL(consumable_charges, 0) + ISNULL(amenity_damages, 0) "
-                        + "WHERE booking_id = ?";
+                String sqlSyncInvoice = "WITH BookingCTE AS ("
+                        + "  SELECT booking_id, "
+                        + "         (CASE WHEN DATEDIFF(day, checkin_date, checkout_date) <= 0 THEN 1 ELSE DATEDIFF(day, checkin_date, checkout_date) END) * num_rooms * booked_price_per_night AS new_room_charges "
+                        + "  FROM Bookings WHERE booking_id = ?"
+                        + "), "
+                        + "PaymentCTE AS ("
+                        + "  SELECT invoice_id, ISNULL(SUM(amount), 0) AS total_paid "
+                        + "  FROM InvoicePayments GROUP BY invoice_id"
+                        + ") "
+                        + "UPDATE i "
+                        + "SET room_charges = b.new_room_charges, "
+                        + "    total_amount = b.new_room_charges + ISNULL(i.consumable_charges, 0) + ISNULL(i.amenity_damages, 0), "
+                        + "    remaining_amount = b.new_room_charges + ISNULL(i.consumable_charges, 0) + ISNULL(i.amenity_damages, 0) - ISNULL(p.total_paid, 0) "
+                        + "FROM Invoices i "
+                        + "INNER JOIN BookingCTE b ON i.booking_id = b.booking_id "
+                        + "LEFT JOIN PaymentCTE p ON i.invoice_id = p.invoice_id "
+                        + "WHERE i.booking_id = ?";
                 try (PreparedStatement ps = connection.prepareStatement(sqlSyncInvoice)) {
                     ps.setInt(1, dto.getBookingId());
                     ps.setInt(2, dto.getBookingId());
-                    ps.setInt(3, dto.getBookingId());
                     ps.executeUpdate();
                 }
             }
@@ -322,6 +337,21 @@ public class GuestRequestDAO extends DBContext {
                     ps.setDouble(1, penaltyFee);
                     ps.setInt(2, dto.getBookingId());
                     ps.executeUpdate();
+                }
+
+                // 2.c. Thêm lịch sử giao dịch (hoàn tiền) vào InvoicePayments nếu có tiền hoàn
+                double depositAmt = dto.getDepositAmount() != null ? dto.getDepositAmount().doubleValue() : 0;
+                double refundAmount = depositAmt - penaltyFee;
+                if (refundAmount > 0) {
+                    String sqlInsertRefund = "INSERT INTO InvoicePayments (invoice_id, amount, payment_method, paid_at, note, collected_by) "
+                            + "SELECT invoice_id, ?, N'Chuyển khoản', GETDATE(), N'Hoàn tiền cọc sau khi hủy phòng', ? "
+                            + "FROM Invoices WHERE booking_id = ?";
+                    try (PreparedStatement ps = connection.prepareStatement(sqlInsertRefund)) {
+                        ps.setDouble(1, -refundAmount);
+                        ps.setInt(2, staffId);
+                        ps.setInt(3, dto.getBookingId());
+                        ps.executeUpdate();
+                    }
                 }
             }
 

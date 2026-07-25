@@ -462,13 +462,13 @@ public class BookingDAO extends DBContext {
                 SET room_charges = 0,
                     consumable_charges = 0,
                     amenity_damages = 0,
-                    total_amount = (SELECT ISNULL(deposit_amount, 0) FROM Bookings WHERE booking_id = ?),
+                    total_amount = (SELECT ISNULL(SUM(amount), 0) FROM InvoicePayments WHERE invoice_id = Invoices.invoice_id),
                     remaining_amount = 0,
                     payment_status = N'Đã thanh toán'
                 WHERE booking_id = ?
                 """;
 
-        String updateBookingSql = "UPDATE Bookings SET [status] = N'Đã hủy' WHERE booking_id = ?";
+        String updateBookingSql = "UPDATE Bookings SET [status] = N'Đã hủy', cancelled_at = GETDATE() WHERE booking_id = ?";
 
         try {
             connection.setAutoCommit(false);
@@ -476,7 +476,6 @@ public class BookingDAO extends DBContext {
             // Cập nhật hóa đơn
             try (PreparedStatement ps1 = connection.prepareStatement(updateInvoiceSql)) {
                 ps1.setInt(1, bookingId);
-                ps1.setInt(2, bookingId);
                 ps1.executeUpdate();
             }
 
@@ -635,7 +634,7 @@ public class BookingDAO extends DBContext {
                      SET i.room_charges = 0,
                          i.consumable_charges = 0,
                          i.amenity_damages = 0,
-                         i.total_amount = ISNULL(b.deposit_amount, 0),
+                         i.total_amount = (SELECT ISNULL(SUM(amount), 0) FROM InvoicePayments WHERE invoice_id = i.invoice_id),
                          i.remaining_amount = 0,
                          i.payment_status = N'Đã thanh toán'
                      FROM Invoices i
