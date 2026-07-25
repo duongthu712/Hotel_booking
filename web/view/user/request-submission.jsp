@@ -85,6 +85,7 @@
                 <input type="hidden" name="oldCheckoutDate" value="${booking.checkoutDate}">
                 <input type="hidden" name="bookingCode" value="${booking.bookingCode}">
                 <input type="hidden" id="oldBasePrice" value="${booking.bookedPricePerNight}">
+                <input type="hidden" id="depositAmount" value="${booking.depositAmount}">
                 <input type="hidden" name="checkOutDate" value="${booking.checkoutDate}">
                 <input type="hidden" id="bookingStatus" value="${booking.status}">
                 <input type="hidden" name="email" value="${param.email != null ? param.email : booking.guest.email}">
@@ -217,7 +218,7 @@
                                 <div class="pane-left">
                                     <!-- Dòng hiển thị số giờ còn lại minh bạch, tinh tế -->
                                     <p style="margin-bottom: 12px; font-size: 13.5px; color: #475569;">
-                                        Thời gian tính từ lúc gửi đơn đến mốc 14:00 ngày check-in còn lại: <strong id="lblHoursRemaining" style="color: #0f172a;">— giờ</strong>
+                                        Thời gian tính từ lúc gửi đơn đến mốc ${checkinTimeStr} ngày check-in còn lại: <strong id="lblHoursRemaining" style="color: #0f172a;">— giờ</strong>
                                     </p>
 
                                     <table class="policy-table" style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; color: #334155;">
@@ -231,22 +232,22 @@
                                             </thead>
                                             <tbody>
                                                 <tr id="policy-row-72" style="border-bottom: 1px solid #e2e8f0;">
-                                                    <td style="padding: 12px 10px;">&gt;= 72h trước 14:00 ngày check-in</td>
+                                                    <td style="padding: 12px 10px;">&gt;= 72h trước ${checkinTimeStr} ngày check-in</td>
                                                     <td style="padding: 12px 10px; text-align: center;">0%</td>
                                                     <td style="padding: 12px 10px; text-align: center;">Hoàn 100% tiền cọc</td>
                                                 </tr>
                                                 <tr id="policy-row-48" style="border-bottom: 1px solid #e2e8f0;">
-                                                    <td style="padding: 12px 10px;">&gt;= 48h - &lt; 72h trước 14:00 ngày check-in</td>
+                                                    <td style="padding: 12px 10px;">&gt;= 48h - &lt; 72h trước ${checkinTimeStr} ngày check-in</td>
                                                     <td style="padding: 12px 10px; text-align: center;">30%</td>
                                                     <td style="padding: 12px 10px; text-align: center;">Hoàn 70% tiền cọc</td>
                                                 </tr>
                                                 <tr id="policy-row-24" style="border-bottom: 1px solid #e2e8f0;">
-                                                    <td style="padding: 12px 10px;">&gt;= 24h - &lt; 48h trước 14:00 ngày check-in</td>
+                                                    <td style="padding: 12px 10px;">&gt;= 24h - &lt; 48h trước ${checkinTimeStr} ngày check-in</td>
                                                     <td style="padding: 12px 10px; text-align: center;">50%</td>
                                                     <td style="padding: 12px 10px; text-align: center;">Hoàn 50% tiền cọc</td>
                                                 </tr>
                                                 <tr id="policy-row-0" style="border-bottom: 1px solid #e2e8f0;">
-                                                    <td style="padding: 12px 10px;">&lt; 24h trước 14:00 ngày check-in</td>
+                                                    <td style="padding: 12px 10px;">&lt; 24h trước ${checkinTimeStr} ngày check-in</td>
                                                     <td style="padding: 12px 10px; text-align: center;">70%</td>
                                                     <td style="padding: 12px 10px; text-align: center;">Hoàn 30% tiền cọc</td>
                                                 </tr>

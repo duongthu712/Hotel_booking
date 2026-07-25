@@ -365,6 +365,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 
                 return false;
             }
+            
+            // Khóa nút submit để tránh spam gửi nhiều đơn
+            const submitBtn = walkInForm.querySelector("button[type='submit']");
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = "ĐANG XỬ LÝ... VUI LÒNG ĐỢI";
+                submitBtn.style.opacity = "0.7";
+                submitBtn.style.cursor = "not-allowed";
+            }
         });
     }
 });

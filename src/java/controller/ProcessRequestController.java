@@ -94,6 +94,15 @@ public class ProcessRequestController extends HttpServlet {
 
                     request.setAttribute("req", detail);
                     request.setAttribute("isAvailable", isAvailable);
+
+                    try {
+                        dao.HotelInfoDAO hotelInfoDAO = new dao.HotelInfoDAO();
+                        model.HotelInfo hotelInfo = hotelInfoDAO.getHotelInfoById(1);
+                        java.time.LocalTime checkinTime = hotelInfo != null ? hotelInfo.getCheckinTime() : java.time.LocalTime.of(14, 0);
+                        request.setAttribute("checkinTimeStr", checkinTime.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm")));
+                    } catch (Exception e) {
+                        request.setAttribute("checkinTimeStr", "14:00");
+                    }
                 }
             }
         }
@@ -138,6 +147,11 @@ public class ProcessRequestController extends HttpServlet {
         // Khởi tạo DAO phục vụ cho việc lấy Email chuẩn từ bảng liên kết hệ thống
         dao.BookingDAO bookingDAO = new dao.BookingDAO();
 
+        if (!"Chờ xử lý".equals(dto.getStatus())) {
+            response.sendRedirect("process-request?status_msg=error" + extraParams);
+            return;
+        }
+
         if ("approve".equals(action)) {
             boolean isAvailable = true;
 
@@ -168,7 +182,14 @@ public class ProcessRequestController extends HttpServlet {
                     penaltyFee = financials[4];
                 }
 
-                boolean success = requestDAO.approveRequest(dto, notes, penaltyFee);
+                boolean success = false;
+                try {
+                    Object staffObj = request.getSession().getAttribute("staffId");
+                    int staffId = staffObj != null ? (Integer) staffObj : 1; // Default to 1 if session expired or missing
+                    success = requestDAO.approveRequest(dto, notes, penaltyFee, staffId);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 
                 if (success) {
                     try {
@@ -242,9 +263,12 @@ public class ProcessRequestController extends HttpServlet {
             }
 
             double totalBookingValue = pricePerNight * totalNights * detail.getNumRooms();
-            double depositPaid = totalBookingValue * 0.30; 
+            double depositPaid = detail.getDepositAmount() != null ? detail.getDepositAmount().doubleValue() : (totalBookingValue * 0.30);
 
-            java.time.LocalDateTime checkInDateTime = detail.getCheckInDate().atTime(14, 0, 0);
+            dao.HotelInfoDAO hotelInfoDAO = new dao.HotelInfoDAO();
+            model.HotelInfo hotelInfo = hotelInfoDAO.getHotelInfoById(1);
+            java.time.LocalTime checkinTime = hotelInfo != null ? hotelInfo.getCheckinTime() : java.time.LocalTime.of(14, 0);
+            java.time.LocalDateTime checkInDateTime = detail.getCheckInDate().atTime(checkinTime);
             java.time.LocalDateTime requestTime = detail.getSubmittedAt();
             if (requestTime == null) {
                 requestTime = java.time.LocalDateTime.now();
