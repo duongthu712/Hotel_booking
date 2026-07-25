@@ -1,5 +1,11 @@
 package filter;
 
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -10,18 +16,21 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
-
 public class AuthorizationFilter implements Filter {
 
     private static final String ROLE_ADMIN = "ADMIN";
     private static final String ROLE_MANAGER = "MANAGER";
     private static final String ROLE_RECEPTIONIST = "RECEPTIONIST";
+    private static final String ROLE_PREFIX = "ROLE_";
+
+    private static final String ROOT_PATH = "/";
+    private static final String SESSION_ID_PARAMETER = ";jsessionid=";
+    private static final String LOGIN_PATH = "/login";
+    private static final String ACCESS_DENIED_PATH = "/access-denied";
+
+    private static final String CACHE_CONTROL_VALUE = "no-cache, no-store, must-revalidate, max-age=0";
+    private static final String PRAGMA_VALUE = "no-cache";
+    private static final long EXPIRED_DATE = 0L;
 
     private final Set<String> publicUrls = new HashSet<>();
     private final Set<String> adminUrls = new HashSet<>();
@@ -31,6 +40,7 @@ public class AuthorizationFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        // Khởi tạo danh sách URL theo từng nhóm quyền.
         initPublicUrls();
         initAdminUrls();
         initManagerUrls();
@@ -38,31 +48,21 @@ public class AuthorizationFilter implements Filter {
         initSharedUrls();
     }
 
-    /**
-     * Các URL không yêu cầu đăng nhập.
-     * Tất cả URL trong filter đều viết chữ thường vì request path sẽ được
-     * chuẩn hóa bằng toLowerCase().
-     */
     private void initPublicUrls() {
+        // Khai báo các URL không yêu cầu đăng nhập.
         Collections.addAll(
                 publicUrls,
                 "/",
                 "/home",
-
-                // Authentication
                 "/login",
                 "/logout",
                 "/forgot-password",
                 "/verify-code",
                 "/reset-password",
                 "/access-denied",
-
-                // Authentication JSP
                 "/view/auth/login.jsp",
                 "/view/auth/forgot-password.jsp",
                 "/view/auth/reset-password.jsp",
-
-                // Public room and booking flow
                 "/room-list",
                 "/room-detail",
                 "/booking",
@@ -73,8 +73,6 @@ public class AuthorizationFilter implements Filter {
                 "/booking-success",
                 "/deposit-payment",
                 "/booking-detail",
-
-                // Public feedback and policy pages
                 "/feedback-list",
                 "/feedback-submission",
                 "/submit-feedback",
@@ -83,29 +81,21 @@ public class AuthorizationFilter implements Filter {
         );
     }
 
-    /**
-     * Chỉ Administrator/Admin/Quản trị viên được truy cập.
-     */
     private void initAdminUrls() {
+        // Khai báo các URL chỉ dành cho quản trị viên.
         Collections.addAll(
                 adminUrls,
                 "/admin-dashboard",
-
-                // Các mapping thật trong web.xml
                 "/staffaccountlist",
                 "/staffaccountdetail",
                 "/staffaccountedit",
                 "/staffaccountcreate",
                 "/staffaccountdelete",
-
-                // Các tên cũ nếu trong project vẫn còn link tới
                 "/staff-list",
                 "/staff-create",
                 "/staff-edit",
                 "/staff-delete",
                 "/staff-detail",
-
-                // JSP nội bộ
                 "/view/admin/staff-management.jsp",
                 "/view/admin/dashboard.jsp",
                 "/view/admin/staff-list.jsp",
@@ -114,41 +104,30 @@ public class AuthorizationFilter implements Filter {
         );
     }
 
-    /**
-     * Chỉ Manager/Quản lý được truy cập.
-     */
     private void initManagerUrls() {
+        // Khai báo các URL chỉ dành cho quản lý.
         Collections.addAll(
                 managerUrls,
-                // Dashboard and report
                 "/managerdashboard",
                 "/manager-dashboard",
                 "/mdashboardpdf",
                 "/report",
                 "/revenue-report",
-
-                // Room management
                 "/roomlist",
                 "/roomedit",
                 "/roomcreate",
                 "/roomdelete",
                 "/room-management",
-
-                // Room type management
                 "/roomtypelist",
                 "/create-roomtype",
                 "/add-room-type",
                 "/edit-room-type",
                 "/room-type-management",
-
-                // Room service management
                 "/roomservicelist",
                 "/roomservicecreate",
                 "/roomserviceedit",
                 "/roomservicedelete",
                 "/room-service-management",
-
-                // Hotel service management
                 "/servicelist",
                 "/servicecreate",
                 "/serviceedit",
@@ -159,15 +138,11 @@ public class AuthorizationFilter implements Filter {
                 "/hotelservicedelete",
                 "/service-management",
                 "/hotel-service-management",
-
-                // Amenity management
                 "/roomamenitylist",
                 "/roomamenitycreate",
                 "/roomamenityedit",
                 "/roomamenitydelete",
                 "/room-amenity-management",
-
-                // Hotel information
                 "/hotelinfo",
                 "/hotelinfoupdate",
                 "/hotelimageupdate",
@@ -175,19 +150,13 @@ public class AuthorizationFilter implements Filter {
                 "/hotelnewsedit",
                 "/hotelnewsdelete",
                 "/hotel-info-management",
-
-                // Policy management
                 "/policylist",
                 "/policycreate",
                 "/policyedit",
                 "/policydelete",
                 "/policy-management",
-
-                // Feedback management
                 "/feedback-management",
                 "/report-feedback",
-
-                // JSP nội bộ
                 "/view/manager/dashboard.jsp",
                 "/view/manager/add-room-type.jsp",
                 "/view/manager/edit-room-type.jsp",
@@ -204,28 +173,20 @@ public class AuthorizationFilter implements Filter {
         );
     }
 
-    /**
-     * Chỉ Receptionist/Lễ tân được truy cập.
-     */
     private void initReceptionistUrls() {
+        // Khai báo các URL chỉ dành cho lễ tân.
         Collections.addAll(
                 receptionistUrls,
                 "/receptionist-dashboard",
-
-                // Check-in, check-out and room assignment
                 "/assign-room",
                 "/unassign-room",
                 "/check-in",
                 "/check-out",
-
-                // Counter and walk-in workflows
                 "/counter-request",
                 "/walk-in-booking",
                 "/processrequest",
                 "/process-request",
                 "/request-processing",
-
-                // Payment, billing and invoice
                 "/depositpaymentlist",
                 "/depositpaymentverify",
                 "/depositpaymentreject",
@@ -236,8 +197,6 @@ public class AuthorizationFilter implements Filter {
                 "/billinglist",
                 "/billing",
                 "/invoice",
-
-                // JSP nội bộ
                 "/view/receptionist/dashboard.jsp",
                 "/view/receptionist/assign-room.jsp",
                 "/view/receptionist/billing.jsp",
@@ -251,53 +210,41 @@ public class AuthorizationFilter implements Filter {
         );
     }
 
-    /**
-     * Manager và Receptionist đều được truy cập.
-     */
     private void initSharedUrls() {
+        // Khai báo các URL dùng chung cho quản lý và lễ tân.
         Collections.addAll(
                 managerReceptionistUrls,
                 "/booking-list",
                 "/staff-booking-detail",
-
                 "/view/receptionist/booking-list.jsp",
                 "/view/receptionist/staff-booking-detail.jsp"
         );
     }
 
     @Override
-    public void doFilter(
-            ServletRequest servletRequest,
-            ServletResponse servletResponse,
-            FilterChain chain)
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain)
             throws IOException, ServletException {
 
+        // Kiểm tra session, quyền truy cập và ngăn cache đối với trang nội bộ.
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-//        request.setCharacterEncoding("UTF-8");
-//        response.setCharacterEncoding("UTF-8");
-
         String path = getNormalizedRequestPath(request);
 
-        // CSS, JavaScript, ảnh, font... luôn được tải.
         if (isStaticResource(path)) {
             chain.doFilter(servletRequest, servletResponse);
             return;
         }
 
-        // Trang công khai không cần kiểm tra session.
         if (isPublicUrl(path)) {
             chain.doFilter(servletRequest, servletResponse);
             return;
         }
 
+        disableCache(response);
+
         Set<String> allowedRoles = getAllowedRoles(path);
 
-        /*
-         * URL chưa được khai báo trong filter thì cho servlet xử lý tiếp.
-         * Cách này tránh làm hỏng các chức năng khác của project.
-         */
         if (allowedRoles.isEmpty()) {
             chain.doFilter(servletRequest, servletResponse);
             return;
@@ -326,40 +273,45 @@ public class AuthorizationFilter implements Filter {
         chain.doFilter(servletRequest, servletResponse);
     }
 
-    /**
-     * Lấy URI, bỏ context path, bỏ jsessionid và chuyển thành chữ thường.
-     */
+    private void disableCache(HttpServletResponse response) {
+        // Ngăn trình duyệt lưu lại các trang yêu cầu đăng nhập.
+        response.setHeader("Cache-Control", CACHE_CONTROL_VALUE);
+        response.setHeader("Pragma", PRAGMA_VALUE);
+        response.setDateHeader("Expires", EXPIRED_DATE);
+    }
+
     private String getNormalizedRequestPath(HttpServletRequest request) {
+        // Chuẩn hóa URI để so sánh với danh sách URL trong filter.
         String contextPath = request.getContextPath();
         String requestUri = request.getRequestURI();
 
         if (requestUri == null || requestUri.trim().isEmpty()) {
-            return "/";
+            return ROOT_PATH;
         }
 
-        if (contextPath != null
-                && !contextPath.isEmpty()
-                && requestUri.startsWith(contextPath)) {
+        if (contextPath != null && !contextPath.isEmpty() && requestUri.startsWith(contextPath)) {
             requestUri = requestUri.substring(contextPath.length());
         }
 
-        int sessionIdIndex = requestUri.indexOf(";jsessionid=");
+        int sessionIdIndex = requestUri.indexOf(SESSION_ID_PARAMETER);
+
         if (sessionIdIndex >= 0) {
             requestUri = requestUri.substring(0, sessionIdIndex);
         }
 
         if (requestUri.isEmpty()) {
-            requestUri = "/";
+            requestUri = ROOT_PATH;
         }
 
-        if (requestUri.length() > 1 && requestUri.endsWith("/")) {
-            requestUri = requestUri.substring(0, requestUri.length() - 1);
+        if (requestUri.length() > ROOT_PATH.length() && requestUri.endsWith(ROOT_PATH)) {
+            requestUri = requestUri.substring(0, requestUri.length() - ROOT_PATH.length());
         }
 
         return requestUri.toLowerCase(Locale.ROOT);
     }
 
     private boolean isStaticResource(String path) {
+        // Kiểm tra request có phải tài nguyên tĩnh hay không.
         return path.startsWith("/view/assets/")
                 || path.startsWith("/assets/")
                 || path.startsWith("/css/")
@@ -385,17 +337,18 @@ public class AuthorizationFilter implements Filter {
     }
 
     private boolean isPublicUrl(String path) {
+        // Kiểm tra URL có thuộc khu vực công khai hay không.
         if (publicUrls.contains(path)) {
             return true;
         }
 
-        // Các JSP thuộc khu vực công khai.
         return path.startsWith("/view/public/")
                 || path.startsWith("/view/user/")
                 || path.startsWith("/view/common/");
     }
 
     private Set<String> getAllowedRoles(String path) {
+        // Lấy danh sách role được phép truy cập URL hiện tại.
         Set<String> roles = new HashSet<>();
 
         if (adminUrls.contains(path) || path.startsWith("/view/admin/")) {
@@ -418,12 +371,8 @@ public class AuthorizationFilter implements Filter {
         return roles;
     }
 
-    /**
-     * LoginController hiện lưu:
-     * session.setAttribute("staff", staff);
-     * session.setAttribute("staffRole", staff.getRole());
-     */
     private String getUserRoleFromSession(HttpSession session) {
+        // Lấy role từ các session attribute đang được sử dụng trong hệ thống.
         Object roleObject = session.getAttribute("staffRole");
 
         if (roleObject == null) {
@@ -480,27 +429,27 @@ public class AuthorizationFilter implements Filter {
     }
 
     private String getValueByGetter(Object object, String getterName) {
+        // Gọi getter của object bằng reflection.
         try {
             Method method = object.getClass().getMethod(getterName);
             Object value = method.invoke(object);
+
             return value == null ? null : String.valueOf(value);
         } catch (Exception exception) {
             return null;
         }
     }
 
-    /**
-     * Chuẩn hóa các tên role trong database về ba role dùng trong filter.
-     */
     private String normalizeRole(String role) {
+        // Chuẩn hóa tên role trong database về role dùng trong filter.
         if (role == null) {
             return "";
         }
 
         String normalized = role.trim().toUpperCase(Locale.ROOT);
 
-        if (normalized.startsWith("ROLE_")) {
-            normalized = normalized.substring(5).trim();
+        if (normalized.startsWith(ROLE_PREFIX)) {
+            normalized = normalized.substring(ROLE_PREFIX.length()).trim();
         }
 
         switch (normalized) {
@@ -525,24 +474,19 @@ public class AuthorizationFilter implements Filter {
         }
     }
 
-    private void redirectToLogin(
-            HttpServletRequest request,
-            HttpServletResponse response)
-            throws IOException {
-
-        response.sendRedirect(request.getContextPath() + "/login");
+    private void redirectToLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // Chuyển người dùng chưa đăng nhập về trang login.
+        response.sendRedirect(request.getContextPath() + LOGIN_PATH);
     }
 
-    private void redirectToAccessDenied(
-            HttpServletRequest request,
-            HttpServletResponse response)
-            throws IOException {
-
-        response.sendRedirect(request.getContextPath() + "/access-denied");
+    private void redirectToAccessDenied(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // Chuyển người dùng không đủ quyền về trang từ chối truy cập.
+        response.sendRedirect(request.getContextPath() + ACCESS_DENIED_PATH);
     }
 
     @Override
     public void destroy() {
+        // Giải phóng dữ liệu URL khi filter bị hủy.
         publicUrls.clear();
         adminUrls.clear();
         managerUrls.clear();

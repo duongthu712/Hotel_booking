@@ -26,64 +26,31 @@
                            placeholder="Tìm theo mã booking, tên khách, SĐT hoặc email">
 
                     <select class="filter-control" name="status">
-                        <option value="" ${empty status ? 'selected="selected"' : ''}>
-                            Trạng thái booking
-                        </option>
-                        <option value="Chờ xử lý" ${status == 'Chờ xử lý' ? 'selected="selected"' : ''}>
-                            Chờ xử lý
-                        </option>
-                        <option value="Đã xác nhận" ${status == 'Đã xác nhận' ? 'selected="selected"' : ''}>
-                            Đã xác nhận
-                        </option>
-                        <option value="Đã nhận phòng" ${status == 'Đã nhận phòng' ? 'selected="selected"' : ''}>
-                            Đã nhận phòng
-                        </option>
-                        <option value="Đã trả phòng" ${status == 'Đã trả phòng' ? 'selected="selected"' : ''}>
-                            Đã trả phòng
-                        </option>
-                        <option value="Đã hủy" ${status == 'Đã hủy' ? 'selected="selected"' : ''}>
-                            Đã hủy
-                        </option>
+                        <option value="" ${empty status ? 'selected="selected"' : ''}>Trạng thái booking</option>
+                        <option value="Chờ xử lý" ${status == 'Chờ xử lý' ? 'selected="selected"' : ''}>Chờ xử lý</option>
+                        <option value="Đã xác nhận" ${status == 'Đã xác nhận' ? 'selected="selected"' : ''}>Đã xác nhận</option>
+                        <option value="Đã nhận phòng" ${status == 'Đã nhận phòng' ? 'selected="selected"' : ''}>Đã nhận phòng</option>
+                        <option value="Đã trả phòng" ${status == 'Đã trả phòng' ? 'selected="selected"' : ''}>Đã trả phòng</option>
+                        <option value="Đã hủy" ${status == 'Đã hủy' ? 'selected="selected"' : ''}>Đã hủy</option>
                     </select>
 
                     <select class="filter-control" name="paymentStatus">
-                        <option value="" ${empty paymentStatus ? 'selected="selected"' : ''}>
-                            Trạng thái thanh toán
-                        </option>
-                        <option value="Chưa thanh toán"
-                                ${paymentStatus == 'Chưa thanh toán' ? 'selected="selected"' : ''}>
-                            Chưa thanh toán
-                        </option>
-                        <option value="Đã đặt cọc"
-                                ${paymentStatus == 'Đã đặt cọc' ? 'selected="selected"' : ''}>
-                            Đã đặt cọc
-                        </option>
-                        <option value="Đã thanh toán"
-                                ${paymentStatus == 'Đã thanh toán' ? 'selected="selected"' : ''}>
-                            Đã thanh toán
-                        </option>
+                        <option value="" ${empty paymentStatus ? 'selected="selected"' : ''}>Trạng thái thanh toán</option>
+                        <option value="Chưa thanh toán" ${paymentStatus == 'Chưa thanh toán' ? 'selected="selected"' : ''}>Chưa thanh toán</option>
+                        <option value="Đã đặt cọc" ${paymentStatus == 'Đã đặt cọc' ? 'selected="selected"' : ''}>Đã đặt cọc</option>
+                        <option value="Đã thanh toán" ${paymentStatus == 'Đã thanh toán' ? 'selected="selected"' : ''}>Đã thanh toán</option>
                     </select>
 
                     <select class="filter-control" name="source">
-                        <option value="" ${empty source ? 'selected="selected"' : ''}>
-                            Kênh đặt phòng
-                        </option>
-                        <option value="Đặt phòng trực tuyến"
-                                ${source == 'Đặt phòng trực tuyến' ? 'selected="selected"' : ''}>
-                            Đặt online
-                        </option>
-                        <option value="Đặt phòng tại quầy"
-                                ${source == 'Đặt phòng tại quầy' ? 'selected="selected"' : ''}>
-                            Đặt tại quầy
-                        </option>
+                        <option value="" ${empty source ? 'selected="selected"' : ''}>Kênh đặt phòng</option>
+                        <option value="Đặt phòng trực tuyến" ${source == 'Đặt phòng trực tuyến' ? 'selected="selected"' : ''}>Đặt online</option>
+                        <option value="Đặt phòng tại quầy" ${source == 'Đặt phòng tại quầy' ? 'selected="selected"' : ''}>Đặt tại quầy</option>
                     </select>
                 </div>
 
                 <div class="filter-row filter-row-2">
                     <select class="filter-control" name="roomTypeId">
-                        <option value="all" ${filterRoomTypeId == 'all' ? 'selected="selected"' : ''}>
-                            Hạng phòng đã đặt
-                        </option>
+                        <option value="all" ${filterRoomTypeId == 'all' ? 'selected="selected"' : ''}>Hạng phòng đã đặt</option>
 
                         <c:forEach var="roomType" items="${roomTypes}">
                             <option value="${roomType.roomTypeIdText}"
@@ -94,9 +61,7 @@
                     </select>
 
                     <select class="filter-control" name="filterStaffId">
-                        <option value="all" ${filterStaffId == 'all' ? 'selected="selected"' : ''}>
-                            Lễ tân phụ trách
-                        </option>
+                        <option value="all" ${filterStaffId == 'all' ? 'selected="selected"' : ''}>Lễ tân xác nhận đơn</option>
 
                         <c:forEach var="staff" items="${staffList}">
                             <option value="${staff.staffIdText}"
@@ -110,27 +75,16 @@
                            value="${roomNumber}"
                            placeholder="Số phòng được gán hoặc Chưa gán">
 
-                    <input class="filter-control date-filter-control" type="date" name="dateFilter"
-                           value="${dateFilterDisplay}" lang="vi"
-                           title="Ngày nhận hoặc trả phòng dự kiến">
+                    <select class="filter-control sort-control" name="sort">
+                        <option value="newest" ${sort == 'newest' || empty sort ? 'selected="selected"' : ''}>Ngày tạo mới nhất</option>
+                        <option value="oldest" ${sort == 'oldest' ? 'selected="selected"' : ''}>Ngày tạo cũ nhất</option>
+                        <option value="checkinAsc" ${sort == 'checkinAsc' ? 'selected="selected"' : ''}>Nhận phòng gần nhất</option>
+                        <option value="checkoutAsc" ${sort == 'checkoutAsc' ? 'selected="selected"' : ''}>Trả phòng gần nhất</option>
+                    </select>
                 </div>
 
                 <div class="filter-row filter-row-3">
-                    <select class="filter-control sort-control" name="sort">
-                        <option value="newest"
-                                ${sort == 'newest' || empty sort ? 'selected="selected"' : ''}>
-                            Ngày tạo mới nhất
-                        </option>
-                        <option value="oldest" ${sort == 'oldest' ? 'selected="selected"' : ''}>
-                            Ngày tạo cũ nhất
-                        </option>
-                        <option value="checkinAsc" ${sort == 'checkinAsc' ? 'selected="selected"' : ''}>
-                            Nhận phòng gần nhất
-                        </option>
-                        <option value="checkoutAsc" ${sort == 'checkoutAsc' ? 'selected="selected"' : ''}>
-                            Trả phòng gần nhất
-                        </option>
-                    </select>
+                    <div class="filter-spacer"></div>
 
                     <div class="filter-buttons">
                         <button type="submit" class="blue-btn">Tìm kiếm</button>
