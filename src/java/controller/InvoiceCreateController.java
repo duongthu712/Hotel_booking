@@ -152,10 +152,20 @@ public class InvoiceCreateController extends HttpServlet {
             // Tổng tiền phòng này = phòng + late + service đã có
             BigDecimal thisRoomGrandTotal = thisRoomTotalCharge.add(thisRoomServicesTotal);
 
-            // Số tiền còn phải trả = tổng - cọc
+            // Số tiền còn phải trả (ước tính riêng cho phòng này) = tổng - cọc
             BigDecimal remainingForThisRoom = thisRoomGrandTotal.subtract(depositThisRoom);
             if (remainingForThisRoom.compareTo(BigDecimal.ZERO) < 0) {
                 remainingForThisRoom = BigDecimal.ZERO;
+            }
+
+            // Chặn trần: không cho vượt quá số tiền THỰC SỰ còn nợ của CẢ booking
+            BigDecimal totalBookingRemainingCap = invoice.getRemainingAmount() != null
+                    ? invoice.getRemainingAmount() : BigDecimal.ZERO;
+            if (totalBookingRemainingCap.compareTo(BigDecimal.ZERO) < 0) {
+                totalBookingRemainingCap = BigDecimal.ZERO;
+            }
+            if (remainingForThisRoom.compareTo(totalBookingRemainingCap) > 0) {
+                remainingForThisRoom = totalBookingRemainingCap;
             }
 
             LocalDateTime depositVerifiedAt = dao.getDepositVerifiedAt(bookingId);
@@ -287,9 +297,20 @@ public class InvoiceCreateController extends HttpServlet {
             if (collectAmountStr != null && !collectAmountStr.isEmpty()) {
                 BigDecimal collectAmount = new BigDecimal(collectAmountStr);
                 if (collectAmount.compareTo(BigDecimal.ZERO) > 0) {
-                    String paymentMethod = request.getParameter("paymentMethod");
-                    dao.addInvoicePayment(invoice.getInvoiceId(), bookingId, collectAmount,
-                            paymentMethod, "Thanh toán tại quầy", staff.getStaffId());
+                    Invoice currentInvoice = dao.getInvoiceByBookingId(bookingId);
+                    BigDecimal actualRemaining = (currentInvoice != null && currentInvoice.getRemainingAmount() != null)
+                            ? currentInvoice.getRemainingAmount() : BigDecimal.ZERO;
+                    if (actualRemaining.compareTo(BigDecimal.ZERO) < 0) {
+                        actualRemaining = BigDecimal.ZERO;
+                    }
+                    if (collectAmount.compareTo(actualRemaining) > 0) {
+                        collectAmount = actualRemaining;
+                    }
+                    if (collectAmount.compareTo(BigDecimal.ZERO) > 0) {
+                        String paymentMethod = request.getParameter("paymentMethod");
+                        dao.addInvoicePayment(invoice.getInvoiceId(), bookingId, collectAmount,
+                                paymentMethod, "Thanh toán tại quầy", staff.getStaffId());
+                    }
                 }
             }
 
@@ -307,4 +328,3 @@ public class InvoiceCreateController extends HttpServlet {
         }
     }
 }
-
