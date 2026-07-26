@@ -17,7 +17,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Kết Quả Tìm Kiếm Phòng - La Mer Hotel</title>
+        <title>Kết Quả Tìm Kiếm Phòng</title>
 
         <link rel="stylesheet" href="${ctx}/view/assets/css/search-result.css?v=<%= System.currentTimeMillis() %>">
         <link rel="stylesheet" href="${ctx}/view/assets/css/navbar.css?v=<%= System.currentTimeMillis() %>">

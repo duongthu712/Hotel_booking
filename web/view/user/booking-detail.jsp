@@ -9,7 +9,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <title>Tra cứu đơn đặt phòng - La Mer Hotel</title>
+        <title>Tra cứu đơn đặt phòng</title>
 
         <link rel="stylesheet"
               href="${pageContext.request.contextPath}/view/assets/css/navbar.css?v=<%= System.currentTimeMillis() %>">

@@ -10,7 +10,7 @@
 <html>
     <head>
         <jsp:include page="/view/staff/header.jsp" />
-        <title>Đặt Phòng Tại Quầy - La Mer Hotel</title>
+        <title>Đặt Phòng Tại Quầy</title>
         <link href="${pageContext.request.contextPath}/view/assets/css/walk-in-booking.css?v=<%=System.currentTimeMillis()%>" rel="stylesheet" type="text/css">
         <script src="${pageContext.request.contextPath}/view/assets/javascript/booking-calendar.js" defer></script>
         <script src="${pageContext.request.contextPath}/view/assets/javascript/walk-in-booking.js" defer></script>
