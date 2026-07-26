@@ -11,7 +11,7 @@
         <meta name="viewport"
               content="width=device-width, initial-scale=1.0">
 
-        <title>Gửi thông tin đặt cọc - La Mer Hotel</title>
+        <title>Gửi thông tin đặt cọc</title>
 
         <link rel="stylesheet"
               href="${pageContext.request.contextPath}/view/assets/css/navbar.css?v=<%= System.currentTimeMillis() %>">
