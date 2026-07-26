@@ -449,7 +449,7 @@ public class RoomDAO extends DBContext {
                 + "LEFT JOIN BookingRooms br ON r.room_id = br.room_id "
                 + "LEFT JOIN Bookings b ON br.booking_id = b.booking_id AND b.[status] IN (N'Đã xác nhận', N'Đã nhận phòng') "
                 + "LEFT JOIN GuestStays g ON br.booking_room_id = g.booking_room_id AND b.booking_id IS NOT NULL "
-                + "WHERE 1=1 ";
+                + "WHERE r.is_active = 1 ";
 
         if (targetRoomTypeId > 0) {
             sql += " AND r.room_type_id = ? ";
@@ -519,7 +519,7 @@ public class RoomDAO extends DBContext {
     // Lấy danh sách tất cả các tầng thực tế đang có trong bảng Rooms
     public List<Integer> getAllExistingFloors() {
         List<Integer> list = new ArrayList<>();
-        String sql = "SELECT DISTINCT floor FROM Rooms ORDER BY floor ASC";
+        String sql = "SELECT DISTINCT floor FROM Rooms WHERE is_active = 1 ORDER BY floor ASC";
         try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 list.add(rs.getInt("floor"));
