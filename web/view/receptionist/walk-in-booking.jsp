@@ -34,12 +34,12 @@
 
                     <div class="walkin-search-field">
                         <label for="checkIn">Ngày đến</label>
-                        <input type="date" id="checkIn" name="checkInDate" value="${param.checkInDate}" required>
+                        <input type="date" id="checkIn" name="checkInDate" value="${validatedCheckIn}" required>
                     </div>
 
                     <div class="walkin-search-field">
                         <label for="checkOut">Ngày đi</label>
-                        <input type="date" id="checkOut" name="checkOutDate" value="${param.checkOutDate}" required>
+                        <input type="date" id="checkOut" name="checkOutDate" value="${validatedCheckOut}" required>
                     </div>
 
                     <div class="walkin-search-field">
@@ -47,7 +47,7 @@
                         <select id="roomTypeId" name="roomTypeId">
                             <option value="0">Tất cả loại phòng</option>
                             <c:forEach items="${dropdownRoomTypes}" var="type">
-                                <option value="${type.roomTypeId}" ${param.roomTypeId == type.roomTypeId ? 'selected' : ''}>
+                                <option value="${type.roomTypeId}" ${validatedRoomTypeId == type.roomTypeId ? 'selected' : ''}>
                                     ${type.roomTypeName}
                                 </option>
                             </c:forEach>
@@ -56,7 +56,7 @@
 
                     <div class="walkin-search-field">
                         <label for="numRooms">Số phòng cần thuê</label>
-                        <input type="number" id="searchNumRooms" name="numRooms" value="${param.numRooms != null ? param.numRooms : 1}" min="1" max="20" required>
+                        <input type="number" id="searchNumRooms" name="numRooms" value="${validatedNumRooms != null ? validatedNumRooms : 1}" min="1" max="20" required>
                     </div>
 
                     <button type="submit" class="walkin-search-btn">Tìm kiếm</button>
@@ -142,8 +142,8 @@
                     <!-- Dữ liệu nguồn động ẩn chuyển giao cho Servlet xử lý Backend -->
                     <input type="hidden" id="formRoomTypeId" name="roomTypeId">
                     <input type="hidden" id="formBasePrice" name="basePrice">
-                    <input type="hidden" name="checkInDate" value="${param.checkInDate}">
-                    <input type="hidden" name="checkOutDate" value="${param.checkOutDate}">
+                    <input type="hidden" name="checkInDate" value="${validatedCheckIn}">
+                    <input type="hidden" name="checkOutDate" value="${validatedCheckOut}">
 
                     <div class="booking-layout">
 
