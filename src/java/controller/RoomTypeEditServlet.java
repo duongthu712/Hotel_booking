@@ -54,6 +54,7 @@ public class RoomTypeEditServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
+            //Lấy id hạng phòng cần edit
             String idStr = request.getParameter("id");
             if (idStr == null || idStr.trim().isEmpty()) {
                 response.sendRedirect(request.getContextPath() + "/roomtypelist");

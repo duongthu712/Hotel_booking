@@ -448,7 +448,7 @@ public class RoomDAO extends DBContext {
                 + "INNER JOIN RoomTypes rt ON r.room_type_id = rt.room_type_id "
                 + "LEFT JOIN BookingRooms br ON r.room_id = br.room_id "
                 + "LEFT JOIN Bookings b ON br.booking_id = b.booking_id AND b.[status] IN (N'Đã xác nhận', N'Đã nhận phòng') "
-                + "LEFT JOIN GuestStays g ON br.booking_room_id = g.booking_room_id "
+                + "LEFT JOIN GuestStays g ON br.booking_room_id = g.booking_room_id AND b.booking_id IS NOT NULL "
                 + "WHERE 1=1 ";
 
         if (targetRoomTypeId > 0) {
