@@ -25,11 +25,18 @@
         <main class="content-container">
                     <div class="management-wrapper">
 
-                        <div class="action-bar">
-                            <a href="${pageContext.request.contextPath}/createroomtype"
-                               class="btn btn-primary add-room-btn">
-                                Thêm Loại Phòng Mới
-                            </a>
+                        <div class="search-container" style="margin-bottom: 20px;">
+                            <form action="${pageContext.request.contextPath}/roomtypelist" method="GET" class="search-form">
+                                <input type="text" name="searchQuery" class="search-input" placeholder="Tìm kiếm theo tên hạng phòng..." value="${searchQuery}">
+                                <button type="submit" class="search-btn">Tìm kiếm</button>
+                                <a href="${pageContext.request.contextPath}/roomtypelist" class="reset-btn">Làm mới</a>
+                            </form>
+                            <div class="header-action">
+                                <a href="${pageContext.request.contextPath}/createroomtype"
+                                   class="btn-primary" style="padding: 10px 20px; text-decoration: none; border-radius: 7px; text-transform: uppercase; font-size: 14px; letter-spacing: 0.05em; display: inline-block;">
+                                    Thêm Loại Phòng Mới
+                                </a>
+                            </div>
                         </div>
 
                         <div class="table-responsive">
