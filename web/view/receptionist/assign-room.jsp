@@ -98,16 +98,18 @@
                                         </div>
 
                                         <!-- HỘP CHỌN ĐỔI HẠNG LINH HOẠT KHI PHÒNG HỎNG -->
-                                        <div style="background-color: #f0f4f8; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px; display: flex; align-items: center; gap: 8px;">
-                                            <span style="font-size: 13px; font-weight: 600; color: #475569;">Phòng hỏng / Đổi hạng:</span>
-                                            <select onchange="switchAssignRoomType('${targetBookingId}', this.value)" style="padding: 4px 8px; border: 1px solid #94a3b8; border-radius: 4px; font-size: 13px; font-weight: 600; color: #1e293b; background-color: #ffffff; cursor: pointer; outline: none;">
-                                                <c:forEach items="${allRoomTypes}" var="type">
-                                                    <option value="${type.roomTypeId}" ${currentDisplayTypeId == type.roomTypeId ? 'selected' : ''}>
-                                                        ${type.roomTypeName}
-                                                    </option>
-                                                </c:forEach>
-                                            </select>
-                                        </div>
+                                        <c:if test="${canOverride}">
+                                            <div style="background-color: #f0f4f8; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px; display: flex; align-items: center; gap: 8px;">
+                                                <span style="font-size: 13px; font-weight: 600; color: #475569;">Phòng hỏng / Đổi hạng:</span>
+                                                <select onchange="switchAssignRoomType('${targetBookingId}', this.value)" style="padding: 4px 8px; border: 1px solid #94a3b8; border-radius: 4px; font-size: 13px; font-weight: 600; color: #1e293b; background-color: #ffffff; cursor: pointer; outline: none;">
+                                                    <c:forEach items="${allRoomTypes}" var="type">
+                                                        <option value="${type.roomTypeId}" ${currentDisplayTypeId == type.roomTypeId ? 'selected' : ''}>
+                                                            ${type.roomTypeName}
+                                                        </option>
+                                                    </c:forEach>
+                                                </select>
+                                            </div>
+                                        </c:if>
                                     </div>
                                     <a href="${pageContext.request.contextPath}/checkin" class="btn-close-view">Hủy luồng</a>
                                 </c:when>
