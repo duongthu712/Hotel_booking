@@ -210,23 +210,31 @@ public class RoomTypeDAO extends DBContext {
     }
 
     // 1. Lấy toàn bộ danh sách phòng phục vụ trang quản trị Manager 
-    public List<RoomType> getAllRoomTypesForManager() {
+    public List<RoomType> getAllRoomTypesForManager(String searchKeyword) {
         List<RoomType> list = new ArrayList<>();
         if (connection == null) {
             System.out.println(" DAO ERROR: Connection dang bi NULL!");
             return list;
         }
 
-        String sqlRoom = "SELECT * FROM RoomTypes ORDER BY is_active DESC, room_type_id ASC";
+        String sqlRoom = "SELECT * FROM RoomTypes ";
+        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+            sqlRoom += "WHERE type_name LIKE ? ";
+        }
+        sqlRoom += "ORDER BY is_active DESC, room_type_id ASC";
+
         String sqlImages = "SELECT image_url FROM RoomTypeImages WHERE room_type_id = ?";
         String sqlServices = "SELECT rts.room_type_service_id, rts.service_id, rts.quantity, rts.is_free, s.service_name, s.unit_price "
                 + "FROM RoomTypeServices rts LEFT JOIN RoomServices s ON rts.service_id = s.service_id WHERE rts.room_type_id = ? AND rts.quantity > 0";
         String sqlAmenities = "SELECT rta.quantity, ra.amenity_id, ra.amenity_name, ra.unit_price "
                 + "FROM RoomTypeAmenities rta INNER JOIN RoomAmenities ra ON rta.amenity_id = ra.amenity_id WHERE rta.room_type_id = ?";
 
-        try (PreparedStatement psRoom = connection.prepareStatement(sqlRoom); ResultSet rsRoom = psRoom.executeQuery()) {
-
-            while (rsRoom.next()) {
+        try (PreparedStatement psRoom = connection.prepareStatement(sqlRoom)) {
+            if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
+                psRoom.setNString(1, "%" + searchKeyword.trim() + "%");
+            }
+            try (ResultSet rsRoom = psRoom.executeQuery()) {
+                while (rsRoom.next()) {
                 RoomType rt = new RoomType();
                 int roomTypeId = rsRoom.getInt("room_type_id");
 
@@ -293,6 +301,7 @@ public class RoomTypeDAO extends DBContext {
                 }
                 rt.setRoomAmenities(amenitiesList);
                 list.add(rt);
+            }
             }
         } catch (SQLException e) {
             System.out.println(">>> LỖI LOGIC TẠI getAllRoomTypesForManager: " + e.getMessage());
