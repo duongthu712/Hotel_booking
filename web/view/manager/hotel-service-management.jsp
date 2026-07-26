@@ -97,8 +97,13 @@
                 </table>
 
                 <div class="pagination">
-                    <c:forEach begin="1" end="${totalPages}" var="i">
-                        <a href="HotelServiceList?page=${i}&keyword=${keyword}" class="${currentPage == i ? 'active' : ''}">${i}</a>
+                    <c:forEach var="p" items="${pageNumbers}">
+                        <c:choose>
+                            <c:when test="${p == 0}"><span>...</span></c:when>
+                            <c:otherwise>
+                                <a href="HotelServiceList?page=${p}&keyword=${keyword}" class="${currentPage == p ? 'active' : ''}">${p}</a>
+                            </c:otherwise>
+                        </c:choose>
                     </c:forEach>
                 </div>
             </div>
@@ -145,9 +150,9 @@
                     <div class="form-group">
                         <label class="input-label">Link ảnh</label>
                         <input class="service-popup-input-field" type="text" name="imageUrl" id="imageUrl"
-                           value="${not empty serviceToEdit ? serviceToEdit.getImageUrl() : keepImageUrl}">
+                               value="${not empty serviceToEdit ? serviceToEdit.getImageUrl() : keepImageUrl}">
                     </div>
-                    
+
                 </div>
 
                 <div class="form-group">

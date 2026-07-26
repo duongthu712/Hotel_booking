@@ -113,8 +113,13 @@
                 </table>
 
                 <div class="pagination">
-                    <c:forEach begin="1" end="${totalPages}" var="i">
-                        <a href="PolicyList?page=${i}&keyword=${keyword}&filterType=${filterType}" class="${currentPage == i ? 'active' : ''}">${i}</a>
+                    <c:forEach var="p" items="${pageNumbers}">
+                        <c:choose>
+                            <c:when test="${p == 0}"><span>...</span></c:when>
+                            <c:otherwise>
+                                <a href="PolicyList?page=${p}&keyword=${keyword}&filterType=${filterType}" class="${currentPage == p ? 'active' : ''}">${p}</a>
+                            </c:otherwise>
+                        </c:choose>
                     </c:forEach>
                 </div>
             </div>

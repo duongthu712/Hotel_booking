@@ -26,6 +26,7 @@ import model.Invoice;
 import model.InvoicePayment;
 import model.RoomType;
 import model.StaffAccount;
+import dao.HotelInfoDAO;
 
 /**
  * @author LinhLTHE200306
@@ -88,7 +89,8 @@ public class InvoicePDFController extends HttpServlet {
             Font titleFont = new Font(Font.HELVETICA, 18, Font.BOLD);
             Font normalFont = new Font(Font.HELVETICA, 12);
 
-            document.add(new Paragraph("LA MER HOTEL - Hoá đơn thanh toán".toUpperCase(), titleFont));
+            String hotelName = new HotelInfoDAO().getHotelName();
+            document.add(new Paragraph((hotelName + " - Hoá đơn thanh toán").toUpperCase(), titleFont));
             document.add(new Paragraph(" "));
 
             document.add(new Paragraph("Mã hoá đơn: INV-" + invoice.getInvoiceId(), normalFont));
@@ -170,8 +172,7 @@ public class InvoicePDFController extends HttpServlet {
             document.add(new Paragraph("Nhân viên: " + staff.getFullName(), normalFont));
 
             document.add(new Paragraph(" "));
-            document.add(new Paragraph("Cảm ơn quý khách đã lựa chọn La Mer Hotel!", normalFont));
-
+            document.add(new Paragraph("Cảm ơn quý khách đã lựa chọn " + hotelName + "!", normalFont));
             document.close();
 
         } catch (DocumentException e) {

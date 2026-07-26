@@ -95,6 +95,8 @@ public class BillingListController extends HttpServlet {
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("totalRecords", totalRecords);
             request.setAttribute("pageSize", RECORDS_PER_PAGE);
+            request.setAttribute("pageNumbers", dal.PaginationUtil.buildPageNumbers(page, totalPages));
+
 
             request.getRequestDispatcher("/view/receptionist/billing.jsp").forward(request, response);
 

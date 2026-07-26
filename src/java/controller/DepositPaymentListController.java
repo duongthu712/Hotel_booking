@@ -125,6 +125,8 @@ public class DepositPaymentListController extends HttpServlet {
             request.setAttribute("guestNameMap", guestNameMap);
             request.setAttribute("currentPage", page);
             request.setAttribute("totalPages", totalPages);
+            request.setAttribute("pageNumbers", dal.PaginationUtil.buildPageNumbers(page, totalPages));
+
             request.setAttribute("keyword", keyword);
             request.setAttribute("status", status);
 
