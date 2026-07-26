@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -19,6 +20,9 @@ public class CounterRequestController extends HttpServlet {
 
     private static final DateTimeFormatter DATE_FORMATTER
             = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    private static final DateTimeFormatter TIME_DISPLAY_FORMATTER
+            = DateTimeFormatter.ofPattern("HH:mm");
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -319,7 +323,7 @@ public class CounterRequestController extends HttpServlet {
         request.setAttribute("availableRoomTypes", roomTypes);
 
         prepareExtendData(request, booking, selectedCheckoutDate);
-        prepareCancelData(request, booking, selectedCancelRooms);
+        prepareCancelData(request, bookingDAO, booking, selectedCancelRooms);
     }
 
     private void prepareExtendData(
@@ -367,6 +371,7 @@ public class CounterRequestController extends HttpServlet {
 
     private void prepareCancelData(
             HttpServletRequest request,
+            BookingDAO bookingDAO,
             Map<String, Object> booking,
             int selectedCancelRooms) {
 
@@ -388,28 +393,38 @@ public class CounterRequestController extends HttpServlet {
         }
 
         LocalDate checkinDate = parseDate(String.valueOf(booking.get("checkinDateSql")));
+        LocalTime hotelCheckinTime = bookingDAO.getHotelCheckinTime();
         LocalDateTime checkinDeadline = null;
 
-        if (checkinDate != null) {
-            checkinDeadline = checkinDate.atTime(14, 0);
+        if (checkinDate != null && hotelCheckinTime != null) {
+            checkinDeadline = LocalDateTime.of(checkinDate, hotelCheckinTime);
         }
 
         long hoursBeforeCheckin = 0;
 
         if (checkinDeadline != null) {
-            hoursBeforeCheckin = ChronoUnit.HOURS.between(LocalDateTime.now(), checkinDeadline);
+            hoursBeforeCheckin = ChronoUnit.HOURS.between(
+                    LocalDateTime.now(),
+                    checkinDeadline
+            );
 
             if (hoursBeforeCheckin < 0) {
                 hoursBeforeCheckin = 0;
             }
         }
 
+        String hotelCheckinTimeText = hotelCheckinTime == null
+                ? "Không xác định"
+                : hotelCheckinTime.format(TIME_DISPLAY_FORMATTER);
+
         BigDecimal feeRate;
         String policyText;
 
         if (hoursBeforeCheckin >= 72) {
             feeRate = BigDecimal.ZERO;
-            policyText = "Miễn phí hủy vì còn ít nhất 72 giờ trước 14:00 ngày check-in.";
+            policyText = "Miễn phí hủy vì còn ít nhất 72 giờ trước "
+                    + hotelCheckinTimeText
+                    + " ngày check-in.";
         } else if (hoursBeforeCheckin >= 48) {
             feeRate = new BigDecimal("0.30");
             policyText = "Hủy trước ít nhất 48 giờ: phí hủy 30% tiền cọc phần phòng hủy.";
@@ -422,20 +437,27 @@ public class CounterRequestController extends HttpServlet {
         }
 
         BigDecimal refundRate = BigDecimal.ONE.subtract(feeRate);
-
         BigDecimal depositPerRoom = BigDecimal.ZERO;
 
         if (numRooms > 0) {
-            depositPerRoom = deposit.divide(BigDecimal.valueOf(numRooms), 2, RoundingMode.HALF_UP);
+            depositPerRoom = deposit.divide(
+                    BigDecimal.valueOf(numRooms),
+                    2,
+                    RoundingMode.HALF_UP
+            );
         }
 
         BigDecimal cancelRoomsValue = BigDecimal.valueOf(displayCancelRooms);
-
         BigDecimal defaultCancelDeposit = depositPerRoom.multiply(cancelRoomsValue);
-        BigDecimal defaultCancelFee = defaultCancelDeposit.multiply(feeRate).setScale(2, RoundingMode.HALF_UP);
-        BigDecimal defaultRefundAmount = defaultCancelDeposit.subtract(defaultCancelFee).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal defaultCancelFee = defaultCancelDeposit
+                .multiply(feeRate)
+                .setScale(2, RoundingMode.HALF_UP);
+        BigDecimal defaultRefundAmount = defaultCancelDeposit
+                .subtract(defaultCancelFee)
+                .setScale(2, RoundingMode.HALF_UP);
 
         request.setAttribute("selectedCancelRooms", displayCancelRooms);
+        request.setAttribute("hotelCheckinTimeText", hotelCheckinTimeText);
         request.setAttribute("hoursBeforeCheckin", hoursBeforeCheckin);
         request.setAttribute("cancelFeeRate", feeRate);
         request.setAttribute("cancelRefundRate", refundRate);

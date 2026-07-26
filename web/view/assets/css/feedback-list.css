@@ -278,3 +278,104 @@ body {
     font-size: 22px;
 
 }
+
+.feedback-success-message {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 760px;
+    margin: 0 auto 28px;
+    padding: 15px 50px 15px 18px;
+    border: 1px solid #acd9b8;
+    border-radius: 8px;
+    background: #eaf8ee;
+    color: #176b35;
+    font-family: 'Cormorant Garamond', 'Lora', serif;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.4;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.feedback-success-message.hide {
+    opacity: 0;
+    transform: translateY(-8px);
+}
+
+.feedback-success-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 26px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #2f9d50;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.feedback-success-text {
+    flex: 1;
+}
+
+.feedback-message-close {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #477653;
+    font-family: Arial, sans-serif;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    transform: translateY(-50%);
+}
+
+.feedback-message-close:hover {
+    color: #175b2c;
+}
+
+.simple-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    margin: 34px 0 12px;
+}
+
+.simple-page-link {
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #9a8c78;
+    font-family: 'Cormorant Garamond', 'Lora', serif;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1;
+    text-decoration: none;
+}
+
+.simple-page-link:hover {
+    color: #102a43;
+}
+
+.simple-page-link.active {
+    color: #102a43;
+    font-weight: 700;
+    pointer-events: none;
+}
+
+.simple-page-ellipsis {
+    color: #9a8c78;
+    font-family: 'Cormorant Garamond', 'Lora', serif;
+    font-size: 19px;
+    line-height: 1;
+}
