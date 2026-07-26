@@ -290,7 +290,7 @@ public class InvoiceCreateController extends HttpServlet {
             }
 
             if (checkoutRoomId != null) {
-                dao.updateRoomStatusAfterCheckout(bookingId, List.of(checkoutRoomId));
+                dao.processCheckout(bookingId, List.of(checkoutRoomId), staff.getStaffId());
             }
 
             String collectAmountStr = request.getParameter("collectAmount");
@@ -314,13 +314,17 @@ public class InvoiceCreateController extends HttpServlet {
                 }
             }
 
-            dao.recalculateInvoice(bookingId);
+           
             session.removeAttribute("checkoutRoomId_" + bookingId);
             session.removeAttribute("checkoutRoomCount_" + bookingId);
 
             session.setAttribute("successMessage", "Cập nhật hóa đơn thành công!");
-            response.sendRedirect(request.getContextPath() + "/BillingList?invoiceId=" + invoice.getInvoiceId());
-
+            if ("checkout_next".equals(request.getParameter("action"))) {
+                // Lưu xong, quay lại ngay màn Checkout để xử lý phòng tiếp theo
+                response.sendRedirect(request.getContextPath() + "/Checkout");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/BillingList?invoiceId=" + invoice.getInvoiceId());
+            }
         } catch (Exception e) {
             e.printStackTrace();
             session.setAttribute("errorMessage", e.getMessage());
