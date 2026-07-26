@@ -52,10 +52,12 @@ public class RoomTypeCreateServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
+            // Lấy đầy đủ dịch vụ hiện có để gán cho các phòng
             RoomServiceDAO serviceDAO = new RoomServiceDAO();
             List<RoomService> availableServices = serviceDAO.getAllRoomServices();
             request.setAttribute("availableServices", availableServices);
 
+            // Lấy đầy đủ tiện nghi hiện có để gán cho các phòng
             RoomAmenityDAO amenityDAO = new RoomAmenityDAO();
             List<RoomAmenity> availableAmenities = amenityDAO.getAllRoomAmenities();
             request.setAttribute("availableAmenities", availableAmenities);
