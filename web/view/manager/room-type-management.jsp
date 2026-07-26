@@ -11,7 +11,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Quản Lý Loại Phòng - La Mer Hotel</title>
+        <title>Quản Lý Loại Phòng</title>
 
         <jsp:include page="/view/staff/header.jsp" />
 
