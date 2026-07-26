@@ -190,7 +190,7 @@
                                 </c:if>
 
                                 <c:if test="${not empty booking.requestType}">
-                                    <div class="special-request-card">
+                                    <div class="special-request-card" style="margin-top: 20px;">
                                         <div class="request-card-header">
                                             <span class="request-title-text">
                                                 Yêu Cầu Đặc Biệt Từ Khách Hàng:

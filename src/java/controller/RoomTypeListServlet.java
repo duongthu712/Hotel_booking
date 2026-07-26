@@ -24,9 +24,10 @@ public class RoomTypeListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        List<RoomType> list = roomTypeDAO.getAllRoomTypesForManager();
+        String searchQuery = request.getParameter("searchQuery");
+        List<RoomType> list = roomTypeDAO.getAllRoomTypesForManager(searchQuery);
         
-        
+        request.setAttribute("searchQuery", searchQuery);
         request.setAttribute("roomTypesList", list);
         
         request.getRequestDispatcher("/view/manager/room-type-management.jsp").forward(request, response);
