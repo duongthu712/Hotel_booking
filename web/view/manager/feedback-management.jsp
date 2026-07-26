@@ -745,145 +745,246 @@
                 </div>
 
                 <c:if test="${totalPages > 1}">
+                    <nav class="simple-pagination" aria-label="Phân trang quản lý đánh giá">
+                        <c:choose>
+                            <c:when test="${totalPages <= 5}">
+                                <c:forEach begin="1" end="${totalPages}" var="pageNumber">
+                                    <c:url var="pageUrl" value="/feedback-management">
+                                        <c:param name="page" value="${pageNumber}"/>
+                                        <c:if test="${not empty keyword}">
+                                            <c:param name="keyword" value="${keyword}"/>
+                                        </c:if>
+                                        <c:if test="${not empty selectedRating}">
+                                            <c:param name="rating" value="${selectedRating}"/>
+                                        </c:if>
+                                        <c:choose>
+                                            <c:when test="${selectedVisible == true}">
+                                                <c:param name="visible" value="visible"/>
+                                            </c:when>
+                                            <c:when test="${selectedVisible == false}">
+                                                <c:param name="visible" value="hidden"/>
+                                            </c:when>
+                                        </c:choose>
+                                        <c:param name="sort" value="${selectedSort}"/>
+                                    </c:url>
 
-                    <div class="feedback-pagination">
+                                    <c:choose>
+                                        <c:when test="${currentPage == pageNumber}">
+                                            <span class="simple-page-link active" aria-current="page">${pageNumber}</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a class="simple-page-link" href="${pageUrl}">${pageNumber}</a>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:forEach>
+                            </c:when>
 
-                        <c:if test="${currentPage > 1}">
-
-                            <c:url var="previousPageUrl"
-                                   value="/feedback-management">
-
-                                <c:param name="page"
-                                         value="${currentPage - 1}"/>
-
-                                <c:if test="${not empty keyword}">
-                                    <c:param name="keyword"
-                                             value="${keyword}"/>
-                                </c:if>
-
-                                <c:if test="${not empty selectedRating}">
-                                    <c:param name="rating"
-                                             value="${selectedRating}"/>
-                                </c:if>
-
-                                <c:choose>
-
-                                    <c:when test="${selectedVisible == true}">
-                                        <c:param name="visible"
-                                                 value="visible"/>
-                                    </c:when>
-
-                                    <c:when test="${selectedVisible == false}">
-                                        <c:param name="visible"
-                                                 value="hidden"/>
-                                    </c:when>
-
-                                </c:choose>
-
-                                <c:param name="sort"
-                                         value="${selectedSort}"/>
-
-                            </c:url>
-
-                            <a href="${previousPageUrl}"
-                               class="pagination-button arrow">
-                                ‹
-                            </a>
-
-                        </c:if>
-
-                        <c:forEach begin="${startPage}"
-                                   end="${endPage}"
-                                   var="pageNumber">
-
-                            <c:url var="pageUrl"
-                                   value="/feedback-management">
-
-                                <c:param name="page"
-                                         value="${pageNumber}"/>
-
-                                <c:if test="${not empty keyword}">
-                                    <c:param name="keyword"
-                                             value="${keyword}"/>
-                                </c:if>
-
-                                <c:if test="${not empty selectedRating}">
-                                    <c:param name="rating"
-                                             value="${selectedRating}"/>
-                                </c:if>
+                            <c:otherwise>
+                                <c:url var="pageOneUrl" value="/feedback-management">
+                                    <c:param name="page" value="1"/>
+                                    <c:if test="${not empty keyword}">
+                                        <c:param name="keyword" value="${keyword}"/>
+                                    </c:if>
+                                    <c:if test="${not empty selectedRating}">
+                                        <c:param name="rating" value="${selectedRating}"/>
+                                    </c:if>
+                                    <c:choose>
+                                        <c:when test="${selectedVisible == true}">
+                                            <c:param name="visible" value="visible"/>
+                                        </c:when>
+                                        <c:when test="${selectedVisible == false}">
+                                            <c:param name="visible" value="hidden"/>
+                                        </c:when>
+                                    </c:choose>
+                                    <c:param name="sort" value="${selectedSort}"/>
+                                </c:url>
 
                                 <c:choose>
-
-                                    <c:when test="${selectedVisible == true}">
-                                        <c:param name="visible"
-                                                 value="visible"/>
+                                    <c:when test="${currentPage == 1}">
+                                        <span class="simple-page-link active" aria-current="page">1</span>
                                     </c:when>
-
-                                    <c:when test="${selectedVisible == false}">
-                                        <c:param name="visible"
-                                                 value="hidden"/>
-                                    </c:when>
-
+                                    <c:otherwise>
+                                        <a class="simple-page-link" href="${pageOneUrl}">1</a>
+                                    </c:otherwise>
                                 </c:choose>
 
-                                <c:param name="sort"
-                                         value="${selectedSort}"/>
-
-                            </c:url>
-
-                            <a href="${pageUrl}"
-                               class="pagination-button ${currentPage == pageNumber ? 'active' : ''}">
-                                ${pageNumber}
-                            </a>
-
-                        </c:forEach>
-
-                        <c:if test="${currentPage < totalPages}">
-
-                            <c:url var="nextPageUrl"
-                                   value="/feedback-management">
-
-                                <c:param name="page"
-                                         value="${currentPage + 1}"/>
-
-                                <c:if test="${not empty keyword}">
-                                    <c:param name="keyword"
-                                             value="${keyword}"/>
-                                </c:if>
-
-                                <c:if test="${not empty selectedRating}">
-                                    <c:param name="rating"
-                                             value="${selectedRating}"/>
-                                </c:if>
+                                <c:url var="pageTwoUrl" value="/feedback-management">
+                                    <c:param name="page" value="2"/>
+                                    <c:if test="${not empty keyword}">
+                                        <c:param name="keyword" value="${keyword}"/>
+                                    </c:if>
+                                    <c:if test="${not empty selectedRating}">
+                                        <c:param name="rating" value="${selectedRating}"/>
+                                    </c:if>
+                                    <c:choose>
+                                        <c:when test="${selectedVisible == true}">
+                                            <c:param name="visible" value="visible"/>
+                                        </c:when>
+                                        <c:when test="${selectedVisible == false}">
+                                            <c:param name="visible" value="hidden"/>
+                                        </c:when>
+                                    </c:choose>
+                                    <c:param name="sort" value="${selectedSort}"/>
+                                </c:url>
 
                                 <c:choose>
-
-                                    <c:when test="${selectedVisible == true}">
-                                        <c:param name="visible"
-                                                 value="visible"/>
+                                    <c:when test="${currentPage == 2}">
+                                        <span class="simple-page-link active" aria-current="page">2</span>
                                     </c:when>
-
-                                    <c:when test="${selectedVisible == false}">
-                                        <c:param name="visible"
-                                                 value="hidden"/>
-                                    </c:when>
-
+                                    <c:otherwise>
+                                        <a class="simple-page-link" href="${pageTwoUrl}">2</a>
+                                    </c:otherwise>
                                 </c:choose>
 
-                                <c:param name="sort"
-                                         value="${selectedSort}"/>
+                                <c:choose>
+                                    <c:when test="${currentPage <= 3}">
+                                        <c:url var="pageThreeUrl" value="/feedback-management">
+                                            <c:param name="page" value="3"/>
+                                            <c:if test="${not empty keyword}">
+                                                <c:param name="keyword" value="${keyword}"/>
+                                            </c:if>
+                                            <c:if test="${not empty selectedRating}">
+                                                <c:param name="rating" value="${selectedRating}"/>
+                                            </c:if>
+                                            <c:choose>
+                                                <c:when test="${selectedVisible == true}">
+                                                    <c:param name="visible" value="visible"/>
+                                                </c:when>
+                                                <c:when test="${selectedVisible == false}">
+                                                    <c:param name="visible" value="hidden"/>
+                                                </c:when>
+                                            </c:choose>
+                                            <c:param name="sort" value="${selectedSort}"/>
+                                        </c:url>
 
-                            </c:url>
+                                        <c:choose>
+                                            <c:when test="${currentPage == 3}">
+                                                <span class="simple-page-link active" aria-current="page">3</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <a class="simple-page-link" href="${pageThreeUrl}">3</a>
+                                            </c:otherwise>
+                                        </c:choose>
 
-                            <a href="${nextPageUrl}"
-                               class="pagination-button arrow">
-                                ›
-                            </a>
+                                        <span class="simple-page-ellipsis">...</span>
 
-                        </c:if>
+                                        <c:forEach begin="${totalPages - 1}" end="${totalPages}" var="pageNumber">
+                                            <c:url var="pageUrl" value="/feedback-management">
+                                                <c:param name="page" value="${pageNumber}"/>
+                                                <c:if test="${not empty keyword}">
+                                                    <c:param name="keyword" value="${keyword}"/>
+                                                </c:if>
+                                                <c:if test="${not empty selectedRating}">
+                                                    <c:param name="rating" value="${selectedRating}"/>
+                                                </c:if>
+                                                <c:choose>
+                                                    <c:when test="${selectedVisible == true}">
+                                                        <c:param name="visible" value="visible"/>
+                                                    </c:when>
+                                                    <c:when test="${selectedVisible == false}">
+                                                        <c:param name="visible" value="hidden"/>
+                                                    </c:when>
+                                                </c:choose>
+                                                <c:param name="sort" value="${selectedSort}"/>
+                                            </c:url>
 
-                    </div>
+                                            <a class="simple-page-link" href="${pageUrl}">${pageNumber}</a>
+                                        </c:forEach>
+                                    </c:when>
 
+                                    <c:when test="${currentPage >= totalPages - 2}">
+                                        <span class="simple-page-ellipsis">...</span>
+
+                                        <c:forEach begin="${totalPages - 2}" end="${totalPages}" var="pageNumber">
+                                            <c:url var="pageUrl" value="/feedback-management">
+                                                <c:param name="page" value="${pageNumber}"/>
+                                                <c:if test="${not empty keyword}">
+                                                    <c:param name="keyword" value="${keyword}"/>
+                                                </c:if>
+                                                <c:if test="${not empty selectedRating}">
+                                                    <c:param name="rating" value="${selectedRating}"/>
+                                                </c:if>
+                                                <c:choose>
+                                                    <c:when test="${selectedVisible == true}">
+                                                        <c:param name="visible" value="visible"/>
+                                                    </c:when>
+                                                    <c:when test="${selectedVisible == false}">
+                                                        <c:param name="visible" value="hidden"/>
+                                                    </c:when>
+                                                </c:choose>
+                                                <c:param name="sort" value="${selectedSort}"/>
+                                            </c:url>
+
+                                            <c:choose>
+                                                <c:when test="${currentPage == pageNumber}">
+                                                    <span class="simple-page-link active" aria-current="page">${pageNumber}</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <a class="simple-page-link" href="${pageUrl}">${pageNumber}</a>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </c:forEach>
+                                    </c:when>
+
+                                    <c:otherwise>
+                                        <span class="simple-page-ellipsis">...</span>
+
+                                        <span class="simple-page-link active" aria-current="page">${currentPage}</span>
+
+                                        <c:url var="nextVisiblePageUrl" value="/feedback-management">
+                                            <c:param name="page" value="${currentPage + 1}"/>
+                                            <c:if test="${not empty keyword}">
+                                                <c:param name="keyword" value="${keyword}"/>
+                                            </c:if>
+                                            <c:if test="${not empty selectedRating}">
+                                                <c:param name="rating" value="${selectedRating}"/>
+                                            </c:if>
+                                            <c:choose>
+                                                <c:when test="${selectedVisible == true}">
+                                                    <c:param name="visible" value="visible"/>
+                                                </c:when>
+                                                <c:when test="${selectedVisible == false}">
+                                                    <c:param name="visible" value="hidden"/>
+                                                </c:when>
+                                            </c:choose>
+                                            <c:param name="sort" value="${selectedSort}"/>
+                                        </c:url>
+
+                                        <a class="simple-page-link" href="${nextVisiblePageUrl}">
+                                            ${currentPage + 1}
+                                        </a>
+
+                                        <c:if test="${currentPage + 1 < totalPages - 1}">
+                                            <span class="simple-page-ellipsis">...</span>
+                                        </c:if>
+
+                                        <c:forEach begin="${totalPages - 1}" end="${totalPages}" var="pageNumber">
+                                            <c:url var="pageUrl" value="/feedback-management">
+                                                <c:param name="page" value="${pageNumber}"/>
+                                                <c:if test="${not empty keyword}">
+                                                    <c:param name="keyword" value="${keyword}"/>
+                                                </c:if>
+                                                <c:if test="${not empty selectedRating}">
+                                                    <c:param name="rating" value="${selectedRating}"/>
+                                                </c:if>
+                                                <c:choose>
+                                                    <c:when test="${selectedVisible == true}">
+                                                        <c:param name="visible" value="visible"/>
+                                                    </c:when>
+                                                    <c:when test="${selectedVisible == false}">
+                                                        <c:param name="visible" value="hidden"/>
+                                                    </c:when>
+                                                </c:choose>
+                                                <c:param name="sort" value="${selectedSort}"/>
+                                            </c:url>
+
+                                            <a class="simple-page-link" href="${pageUrl}">${pageNumber}</a>
+                                        </c:forEach>
+                                    </c:otherwise>
+                                </c:choose>
+                            </c:otherwise>
+                        </c:choose>
+                    </nav>
                 </c:if>
 
             </section>

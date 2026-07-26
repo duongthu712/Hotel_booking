@@ -20,6 +20,7 @@ import java.util.Map;
 import model.Guest;
 import java.sql.ResultSetMetaData;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
 
@@ -33,9 +34,6 @@ public class BookingDAO extends DBContext {
     private static final int MIN_VALID_ROOM_COUNT = 1;
     private static final int NO_ASSIGNED_ROOMS = 0;
     private static final int MONEY_SCALE = 2;
-
-    private static final int CHECKIN_HOUR = 14;
-    private static final int CHECKIN_MINUTE = 0;
 
     private static final long FREE_CANCEL_HOURS = 72L;
     private static final long THIRTY_PERCENT_CANCEL_HOURS = 48L;
@@ -1948,41 +1946,16 @@ public class BookingDAO extends DBContext {
 // COUNTER REQUEST - TẠO & PHÊ DUYỆT TẠI QUẦY
     public Map<String, Object> getCounterRequestBookingInfo(int bookingId) {
         cancelExpiredBookings();
-        StringBuilder sql = new StringBuilder();
 
-        sql.append(" SELECT ");
-        sql.append("     b.booking_id AS bookingId, ");
-        sql.append("     b.booking_code AS bookingCode, ");
-        sql.append("     b.guest_id AS guestId, ");
-        sql.append("     ISNULL(g.full_name, N'Khách vãng lai') AS guestName, ");
-        sql.append("     ISNULL(g.phone, '') AS guestPhone, ");
-        sql.append("     ISNULL(g.email, '') AS guestEmail, ");
-        sql.append("     rt.type_name AS roomTypeName, ");
-        sql.append("     b.room_type_id AS roomTypeId, ");
-        sql.append("     b.num_rooms AS numRooms, ");
-        sql.append("     b.num_guests AS numGuests, ");
-        sql.append("     b.num_children AS numChildren, ");
-        sql.append("     b.booked_price_per_night AS bookedPricePerNight, ");
-        sql.append("     ISNULL(b.deposit_amount, 0) AS depositAmount, ");
-        sql.append("     b.payment_status AS paymentStatus, ");
-        sql.append("     b.[status] AS bookingStatus, ");
-        sql.append("     CONVERT(VARCHAR(10), b.checkin_date, 103) AS checkinDateText, ");
-        sql.append("     CONVERT(VARCHAR(10), b.checkout_date, 103) AS checkoutDateText, ");
-        sql.append("     CONVERT(VARCHAR(10), b.checkin_date, 120) AS checkinDateSql, ");
-        sql.append("     CONVERT(VARCHAR(10), b.checkout_date, 120) AS checkoutDateSql, ");
-        sql.append("     DATEDIFF(DAY, b.checkin_date, b.checkout_date) AS totalNights, ");
-        sql.append("     (b.booked_price_per_night * b.num_rooms * DATEDIFF(DAY, b.checkin_date, b.checkout_date)) AS estimatedRoomAmount, ");
-        sql.append("     ISNULL(( ");
-        sql.append("         SELECT COUNT(1) ");
-        sql.append("         FROM BookingRooms br ");
-        sql.append("         WHERE br.booking_id = b.booking_id ");
-        sql.append("     ), 0) AS assignedRoomCount ");
-        sql.append(" FROM Bookings b ");
-        sql.append(" LEFT JOIN Guests g ON b.guest_id = g.guest_id ");
-        sql.append(" INNER JOIN RoomTypes rt ON b.room_type_id = rt.room_type_id ");
-        sql.append(" WHERE b.booking_id = ? ");
+        String sql = """
+        SELECT b.booking_id AS bookingId, b.booking_code AS bookingCode, b.guest_id AS guestId, ISNULL(g.full_name, N'Khách vãng lai') AS guestName, ISNULL(g.phone, '') AS guestPhone, ISNULL(g.email, '') AS guestEmail, rt.type_name AS roomTypeName, b.room_type_id AS roomTypeId, b.num_rooms AS numRooms, b.num_guests AS numGuests, b.num_children AS numChildren, b.booked_price_per_night AS bookedPricePerNight, ISNULL(b.deposit_amount, 0) AS depositAmount, b.payment_status AS paymentStatus, b.[status] AS bookingStatus, CONVERT(VARCHAR(10), b.checkin_date, 103) AS checkinDateText, CONVERT(VARCHAR(10), b.checkout_date, 103) AS checkoutDateText, CONVERT(VARCHAR(10), b.checkin_date, 120) AS checkinDateSql, CONVERT(VARCHAR(10), b.checkout_date, 120) AS checkoutDateSql, CONVERT(VARCHAR(8), (SELECT TOP 1 hi.checkin_time FROM HotelInfo hi ORDER BY hi.hotel_id), 108) AS hotelCheckinTimeSql, DATEDIFF(DAY, b.checkin_date, b.checkout_date) AS totalNights, (b.booked_price_per_night * b.num_rooms * DATEDIFF(DAY, b.checkin_date, b.checkout_date)) AS estimatedRoomAmount, ISNULL((SELECT COUNT(1) FROM BookingRooms br WHERE br.booking_id = b.booking_id), 0) AS assignedRoomCount
+        FROM Bookings b
+        LEFT JOIN Guests g ON b.guest_id = g.guest_id
+        INNER JOIN RoomTypes rt ON b.room_type_id = rt.room_type_id
+        WHERE b.booking_id = ?
+        """;
 
-        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, bookingId);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -1990,9 +1963,11 @@ public class BookingDAO extends DBContext {
                     return mapCounterRequestRow(rs);
                 }
             }
-
         } catch (Exception e) {
-            System.out.println("getCounterRequestBookingInfo error: " + e.getMessage());
+            System.out.println(
+                    "getCounterRequestBookingInfo error: "
+                    + e.getMessage()
+            );
             e.printStackTrace();
         }
 
@@ -2240,265 +2215,39 @@ public class BookingDAO extends DBContext {
         return (int) ChronoUnit.DAYS.between(checkinDate, checkoutDate);
     }
 
-    public boolean applyCounterExtendStayRequest(
-            int bookingId,
-            Date newCheckoutDate,
-            String note) {
-
-        if (newCheckoutDate == null) {
-            return false;
-        }
-
-        String getBookingSql = """
-                SELECT
-                    booked_price_per_night,
-                    num_rooms,
-                    checkout_date,
-                    LTRIM(RTRIM([status])) AS bookingStatus
-                FROM Bookings WITH (UPDLOCK, ROWLOCK)
-                WHERE booking_id = ?
-                """;
-
-        String updateBookingSql = """
-                UPDATE Bookings
-                SET checkout_date = ?
-                WHERE booking_id = ?
-                  AND LTRIM(RTRIM([status])) IN (
-                      N'Đã xác nhận',
-                      N'Đã nhận phòng'
-                  )
-                  AND checkout_date < ?
-                """;
-
-        String insertRequestSql = """
-                INSERT INTO GuestRequests (
-                    booking_id,
-                    guest_id,
-                    request_type,
-                    request_details,
-                    requested_checkout,
-                    [status],
-                    submitted_at,
-                    processed_at,
-                    response_notes
-                )
-                SELECT
-                    b.booking_id,
-                    b.guest_id,
-                    N'Gia hạn phòng',
-                    ?,
-                    ?,
-                    N'Đã phê duyệt',
-                    GETDATE(),
-                    GETDATE(),
-                    ?
-                FROM Bookings b
-                WHERE b.booking_id = ?
-                """;
-
-        try {
-            connection.setAutoCommit(false);
-
-            BigDecimal pricePerNight = BigDecimal.ZERO;
-            int numRooms = 0;
-            LocalDate oldCheckoutDate = null;
-            String bookingStatus = "";
-
-            try (PreparedStatement statement
-                    = connection.prepareStatement(getBookingSql)) {
-
-                statement.setInt(1, bookingId);
-
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    if (!resultSet.next()) {
-                        connection.rollback();
-                        return false;
-                    }
-
-                    pricePerNight = resultSet.getBigDecimal(
-                            "booked_price_per_night"
-                    );
-                    numRooms = resultSet.getInt("num_rooms");
-                    bookingStatus = resultSet.getNString("bookingStatus");
-
-                    Date oldCheckoutSql = resultSet.getDate("checkout_date");
-                    if (oldCheckoutSql != null) {
-                        oldCheckoutDate = oldCheckoutSql.toLocalDate();
-                    }
-                }
-            }
-
-            LocalDate newCheckoutLocalDate = newCheckoutDate.toLocalDate();
-
-            if (oldCheckoutDate == null
-                    || !newCheckoutLocalDate.isAfter(oldCheckoutDate)
-                    || !("Đã xác nhận".equals(bookingStatus)
-                    || "Đã nhận phòng".equals(bookingStatus))) {
-
-                connection.rollback();
-                return false;
-            }
-
-            long extraNights = ChronoUnit.DAYS.between(
-                    oldCheckoutDate,
-                    newCheckoutLocalDate
-            );
-
-            BigDecimal extraAmount = pricePerNight
-                    .multiply(BigDecimal.valueOf(numRooms))
-                    .multiply(BigDecimal.valueOf(extraNights))
-                    .setScale(MONEY_SCALE, MONEY_ROUNDING_MODE);
-
-            int updatedRows;
-
-            try (PreparedStatement statement
-                    = connection.prepareStatement(updateBookingSql)) {
-
-                statement.setDate(1, newCheckoutDate);
-                statement.setInt(2, bookingId);
-                statement.setDate(3, newCheckoutDate);
-                updatedRows = statement.executeUpdate();
-            }
-
-            if (updatedRows <= 0) {
-                connection.rollback();
-                return false;
-            }
-
-            if (!syncInvoiceFromBooking(bookingId)) {
-                connection.rollback();
-                return false;
-            }
-
-            String detail = "Gia hạn ngày ở từ "
-                    + oldCheckoutDate
-                    + " đến "
-                    + newCheckoutLocalDate
-                    + ". Số đêm tăng thêm: "
-                    + extraNights
-                    + ". Tiền phát sinh: "
-                    + extraAmount
-                    + " đ.";
-
-            if (note != null && !note.trim().isEmpty()) {
-                detail += " Ghi chú: " + note.trim();
-            }
-
-            String responseNote = "Yêu cầu gia hạn được tạo và phê duyệt "
-                    + "tại quầy. Tổng tiền phát sinh: "
-                    + extraAmount
-                    + " đ.";
-
-            int insertedRows;
-
-            try (PreparedStatement statement
-                    = connection.prepareStatement(insertRequestSql)) {
-
-                statement.setNString(1, detail);
-                statement.setDate(2, newCheckoutDate);
-                statement.setNString(3, responseNote);
-                statement.setInt(4, bookingId);
-                insertedRows = statement.executeUpdate();
-            }
-
-            if (insertedRows <= 0) {
-                connection.rollback();
-                return false;
-            }
-
-            connection.commit();
-            return true;
-
-        } catch (Exception e) {
-            rollbackCounterRequestQuietly();
-            System.out.println(
-                    "applyCounterExtendStayRequest error: "
-                    + e.getMessage()
-            );
-            e.printStackTrace();
-            return false;
-
-        } finally {
-            restoreCounterRequestAutoCommit();
-        }
-    }
-
-    // Xử lý hủy toàn bộ hoặc một phần booking tại quầy
     public boolean applyCounterCancelBookingRequest(
             int bookingId,
             int cancelRooms,
             String note) {
 
         String getBookingSql = """
-        SELECT
-            b.booking_id,
-            b.guest_id,
-            b.num_rooms,
-            b.checkin_date,
-            ISNULL(b.deposit_amount, 0) AS depositAmount,
-            LTRIM(RTRIM(b.[status])) AS bookingStatus,
-            ISNULL((
-                SELECT COUNT(*)
-                FROM BookingRooms br
-                WHERE br.booking_id = b.booking_id
-            ), 0) AS assignedRoomCount
+        SELECT b.booking_id, b.guest_id, b.num_rooms, b.checkin_date, ISNULL(b.deposit_amount, 0) AS depositAmount, LTRIM(RTRIM(b.[status])) AS bookingStatus, (SELECT TOP 1 hi.checkin_time FROM HotelInfo hi ORDER BY hi.hotel_id) AS hotelCheckinTime, ISNULL((SELECT COUNT(*) FROM BookingRooms br WHERE br.booking_id = b.booking_id), 0) AS assignedRoomCount
         FROM Bookings b WITH (UPDLOCK, ROWLOCK)
         WHERE b.booking_id = ?
         """;
 
         String updateFullCancelSql = """
         UPDATE b
-        SET
-            b.[status] = N'Đã hủy',
-            b.cancelled_at = GETDATE(),
-            b.cancellation_reason = ?,
-            b.deposit_amount = 0
+        SET b.[status] = N'Đã hủy', b.cancelled_at = GETDATE(), b.cancellation_reason = ?, b.deposit_amount = 0
         FROM Bookings b
         WHERE b.booking_id = ?
           AND LTRIM(RTRIM(b.[status])) = N'Đã xác nhận'
-          AND NOT EXISTS (
-              SELECT 1
-              FROM BookingRooms br
-              WHERE br.booking_id = b.booking_id
-          )
+          AND NOT EXISTS (SELECT 1 FROM BookingRooms br WHERE br.booking_id = b.booking_id)
         """;
 
         String updatePartialCancelSql = """
         UPDATE b
-        SET
-            b.num_rooms = b.num_rooms - ?,
-            b.deposit_amount = ?
+        SET b.num_rooms = b.num_rooms - ?, b.deposit_amount = ?
         FROM Bookings b
         WHERE b.booking_id = ?
           AND b.num_rooms > ?
           AND LTRIM(RTRIM(b.[status])) = N'Đã xác nhận'
-          AND NOT EXISTS (
-              SELECT 1
-              FROM BookingRooms br
-              WHERE br.booking_id = b.booking_id
-          )
+          AND NOT EXISTS (SELECT 1 FROM BookingRooms br WHERE br.booking_id = b.booking_id)
         """;
 
         String insertRequestSql = """
-        INSERT INTO GuestRequests (
-            booking_id,
-            guest_id,
-            request_type,
-            request_details,
-            [status],
-            submitted_at,
-            processed_at,
-            response_notes
-        )
-        SELECT
-            b.booking_id,
-            b.guest_id,
-            N'Yêu cầu khác',
-            ?,
-            N'Đã phê duyệt',
-            GETDATE(),
-            GETDATE(),
-            ?
+        INSERT INTO GuestRequests (booking_id, guest_id, request_type, request_details, [status], submitted_at, processed_at, response_notes)
+        SELECT b.booking_id, b.guest_id, N'Hủy đặt phòng', ?, N'Đã phê duyệt', GETDATE(), GETDATE(), ?
         FROM Bookings b
         WHERE b.booking_id = ?
         """;
@@ -2511,8 +2260,9 @@ public class BookingDAO extends DBContext {
             String bookingStatus;
             BigDecimal currentDeposit;
             LocalDate checkinDate = null;
+            LocalTime hotelCheckinTime = null;
 
-            // Lấy và khóa dữ liệu booking hiện tại
+            // Lấy ngày nhận phòng và giờ nhận phòng hiện tại của khách sạn
             try (PreparedStatement statement
                     = connection.prepareStatement(getBookingSql)) {
 
@@ -2542,15 +2292,25 @@ public class BookingDAO extends DBContext {
                     if (sqlCheckinDate != null) {
                         checkinDate = sqlCheckinDate.toLocalDate();
                     }
+
+                    java.sql.Time sqlHotelCheckinTime
+                            = resultSet.getTime("hotelCheckinTime");
+
+                    if (sqlHotelCheckinTime != null) {
+                        hotelCheckinTime
+                                = sqlHotelCheckinTime.toLocalTime();
+                    }
                 }
             }
 
-            // Kiểm tra booking có đủ điều kiện hủy
+            // Không tính phí nếu không lấy được cấu hình giờ check-in
             if (currentRooms < MIN_VALID_ROOM_COUNT
                     || !"Đã xác nhận".equals(bookingStatus)
                     || assignedRoomCount != NO_ASSIGNED_ROOMS
                     || cancelRooms < MIN_VALID_ROOM_COUNT
-                    || cancelRooms > currentRooms) {
+                    || cancelRooms > currentRooms
+                    || checkinDate == null
+                    || hotelCheckinTime == null) {
 
                 connection.rollback();
                 return false;
@@ -2558,7 +2318,10 @@ public class BookingDAO extends DBContext {
 
             boolean fullCancel = cancelRooms == currentRooms;
 
-            BigDecimal feeRate = getCancelFeeRateByCheckin(checkinDate);
+            BigDecimal feeRate = getCancelFeeRateByCheckin(
+                    checkinDate,
+                    hotelCheckinTime
+            );
 
             // Tính tiền cọc thuộc số phòng bị hủy
             BigDecimal cancelDeposit = currentDeposit
@@ -2568,15 +2331,24 @@ public class BookingDAO extends DBContext {
                             MONEY_SCALE,
                             MONEY_ROUNDING_MODE
                     )
-                    .setScale(MONEY_SCALE, MONEY_ROUNDING_MODE);
+                    .setScale(
+                            MONEY_SCALE,
+                            MONEY_ROUNDING_MODE
+                    );
 
             BigDecimal cancelFee = cancelDeposit
                     .multiply(feeRate)
-                    .setScale(MONEY_SCALE, MONEY_ROUNDING_MODE);
+                    .setScale(
+                            MONEY_SCALE,
+                            MONEY_ROUNDING_MODE
+                    );
 
             BigDecimal refundAmount = cancelDeposit
                     .subtract(cancelFee)
-                    .setScale(MONEY_SCALE, MONEY_ROUNDING_MODE);
+                    .setScale(
+                            MONEY_SCALE,
+                            MONEY_ROUNDING_MODE
+                    );
 
             if (refundAmount.compareTo(BigDecimal.ZERO) < 0) {
                 refundAmount = BigDecimal.ZERO;
@@ -2598,7 +2370,7 @@ public class BookingDAO extends DBContext {
 
             int updatedRows;
 
-            // Cập nhật booking theo loại hủy
+            // Cập nhật booking
             if (fullCancel) {
                 String cancellationReason
                         = note == null || note.trim().isEmpty()
@@ -2606,24 +2378,31 @@ public class BookingDAO extends DBContext {
                         : note.trim();
 
                 try (PreparedStatement statement
-                        = connection.prepareStatement(updateFullCancelSql)) {
+                        = connection.prepareStatement(
+                                updateFullCancelSql
+                        )) {
 
-                    statement.setNString(1, cancellationReason);
-                    statement.setInt(2, bookingId);
+                            statement.setNString(1, cancellationReason);
+                            statement.setInt(2, bookingId);
 
-                    updatedRows = statement.executeUpdate();
-                }
+                            updatedRows = statement.executeUpdate();
+                        }
             } else {
                 try (PreparedStatement statement
-                        = connection.prepareStatement(updatePartialCancelSql)) {
+                        = connection.prepareStatement(
+                                updatePartialCancelSql
+                        )) {
 
-                    statement.setInt(1, cancelRooms);
-                    statement.setBigDecimal(2, remainingActiveDeposit);
-                    statement.setInt(3, bookingId);
-                    statement.setInt(4, cancelRooms);
+                            statement.setInt(1, cancelRooms);
+                            statement.setBigDecimal(
+                                    2,
+                                    remainingActiveDeposit
+                            );
+                            statement.setInt(3, bookingId);
+                            statement.setInt(4, cancelRooms);
 
-                    updatedRows = statement.executeUpdate();
-                }
+                            updatedRows = statement.executeUpdate();
+                        }
             }
 
             if (updatedRows <= 0) {
@@ -2631,7 +2410,7 @@ public class BookingDAO extends DBContext {
                 return false;
             }
 
-            // Ghi khoản hoàn bằng giao dịch âm
+            // Ghi khoản hoàn tiền bằng giao dịch âm
             if (!insertCounterCancelRefundPayment(
                     bookingId,
                     refundAmount,
@@ -2642,7 +2421,7 @@ public class BookingDAO extends DBContext {
                 return false;
             }
 
-            // Cập nhật lại hóa đơn và doanh thu ròng
+            // Đồng bộ hóa đơn và doanh thu ròng
             if (!syncInvoiceAfterCounterCancel(bookingId)) {
                 connection.rollback();
                 return false;
@@ -2671,6 +2450,8 @@ public class BookingDAO extends DBContext {
                     + cancelRooms
                     + "/"
                     + currentRooms
+                    + ". Giờ check-in áp dụng: "
+                    + hotelCheckinTime
                     + ". Phí hủy: "
                     + cancelFee
                     + " đ. Tiền hoàn khách: "
@@ -2679,24 +2460,26 @@ public class BookingDAO extends DBContext {
 
             int insertedRows;
 
-            // Lưu lịch sử yêu cầu đã xử lý
+            // Lưu lịch sử yêu cầu hủy
             try (PreparedStatement statement
-                    = connection.prepareStatement(insertRequestSql)) {
+                    = connection.prepareStatement(
+                            insertRequestSql
+                    )) {
 
-                statement.setNString(1, detail);
-                statement.setNString(2, responseNote);
-                statement.setInt(3, bookingId);
+                        statement.setNString(1, detail);
+                        statement.setNString(2, responseNote);
+                        statement.setInt(3, bookingId);
 
-                insertedRows = statement.executeUpdate();
-            }
+                        insertedRows = statement.executeUpdate();
+                    }
 
-            if (insertedRows <= 0) {
-                connection.rollback();
-                return false;
-            }
+                    if (insertedRows <= 0) {
+                        connection.rollback();
+                        return false;
+                    }
 
-            connection.commit();
-            return true;
+                    connection.commit();
+                    return true;
 
         } catch (Exception e) {
             rollbackCounterRequestQuietly();
@@ -2953,98 +2736,85 @@ public class BookingDAO extends DBContext {
             return true;
         }
     }
-    
-//    Đồng bộ số tiền hóa đơn từ dữ liệu booking hiện tại
-//    Không tạo InvoicePayments mới vì phần chênh lệch chưa đồng nghĩa đã thu tiền
 
+    // Đồng bộ số tiền hóa đơn từ dữ liệu booking hiện tại
     private boolean syncInvoiceFromBooking(int bookingId) throws SQLException {
         String sql = """
-                UPDATE i
-                SET i.room_charges = amountData.roomCharges,
-                    i.consumable_charges = amountData.serviceCharges,
-                    i.amenity_damages = amountData.damageCharges,
-                    i.total_amount = amountData.totalAmount,
-                    i.remaining_amount = CASE
-                        WHEN amountData.totalAmount
-                             - ISNULL(paymentData.paidAmount, 0) > 0
-                        THEN amountData.totalAmount
-                             - ISNULL(paymentData.paidAmount, 0)
-                        ELSE 0
-                    END,
-                    i.payment_status = CASE
-                        WHEN ISNULL(paymentData.paidAmount, 0)
-                             >= amountData.totalAmount
-                        THEN N'Đã thanh toán'
-                        ELSE N'Chưa thanh toán'
-                    END
-                FROM Invoices i
-                INNER JOIN Bookings b
-                    ON b.booking_id = i.booking_id
-                OUTER APPLY (
-                    SELECT SUM(ISNULL(bs.total_price, 0)) AS serviceCharges
-                    FROM BookingServices bs
-                    WHERE bs.booking_id = b.booking_id
-                ) serviceData
-                OUTER APPLY (
-                    SELECT SUM(ISNULL(rad.total_price, 0)) AS damageCharges
-                    FROM RoomAmenityDamages rad
-                    WHERE rad.booking_id = b.booking_id
-                ) damageData
-                OUTER APPLY (
-                    SELECT SUM(ISNULL(ip.amount, 0)) AS paidAmount
-                    FROM InvoicePayments ip
-                    WHERE ip.invoice_id = i.invoice_id
-                ) paymentData
-                CROSS APPLY (
-                    SELECT
-                        CAST(
-                            b.booked_price_per_night
-                            * DATEDIFF(
-                                DAY,
-                                b.checkin_date,
-                                b.checkout_date
-                            )
-                            * b.num_rooms
-                            AS DECIMAL(15,2)
-                        ) AS roomCharges,
-                        CAST(
-                            ISNULL(serviceData.serviceCharges, 0)
-                            AS DECIMAL(15,2)
-                        ) AS serviceCharges,
-                        CAST(
-                            ISNULL(damageData.damageCharges, 0)
-                            AS DECIMAL(15,2)
-                        ) AS damageCharges,
-                        CAST(
-                            (
-                                b.booked_price_per_night
-                                * DATEDIFF(
-                                    DAY,
-                                    b.checkin_date,
-                                    b.checkout_date
-                                )
-                                * b.num_rooms
-                            )
-                            + ISNULL(serviceData.serviceCharges, 0)
-                            + ISNULL(damageData.damageCharges, 0)
-                            AS DECIMAL(15,2)
-                        ) AS totalAmount
-                ) amountData
-                WHERE b.booking_id = ?
-                """;
+        UPDATE i
+        SET i.room_charges = amountData.roomCharges,
+            i.consumable_charges = amountData.serviceCharges,
+            i.amenity_damages = amountData.damageCharges,
+            i.total_amount = amountData.totalAmount,
+            i.remaining_amount = CASE
+                WHEN amountData.totalAmount - ISNULL(paymentData.paidAmount, 0) > 0
+                THEN amountData.totalAmount - ISNULL(paymentData.paidAmount, 0)
+                ELSE 0
+            END,
+            i.payment_status = CASE
+                WHEN ISNULL(paymentData.paidAmount, 0) >= amountData.totalAmount
+                THEN N'Đã thanh toán'
+                ELSE N'Chưa thanh toán'
+            END
+        FROM Invoices i
+        INNER JOIN Bookings b ON b.booking_id = i.booking_id
+
+        OUTER APPLY (
+            SELECT SUM(ISNULL(bs.total_price, 0)) AS serviceCharges
+            FROM BookingServices bs
+            WHERE bs.booking_id = b.booking_id
+        ) serviceData
+
+        OUTER APPLY (
+            SELECT SUM(ISNULL(rad.total_price, 0)) AS damageCharges
+            FROM RoomAmenityDamages rad
+            WHERE rad.booking_id = b.booking_id
+        ) damageData
+
+        OUTER APPLY (
+            SELECT SUM(ISNULL(ip.amount, 0)) AS paidAmount
+            FROM InvoicePayments ip
+            WHERE ip.invoice_id = i.invoice_id
+        ) paymentData
+
+        CROSS APPLY (
+            SELECT
+                CAST(
+                    b.booked_price_per_night
+                    * DATEDIFF(DAY, b.checkin_date, b.checkout_date)
+                    * b.num_rooms
+                    AS DECIMAL(15,2)
+                ) AS roomCharges,
+
+                CAST(
+                    ISNULL(serviceData.serviceCharges, 0)
+                    AS DECIMAL(15,2)
+                ) AS serviceCharges,
+
+                CAST(
+                    ISNULL(damageData.damageCharges, 0)
+                    AS DECIMAL(15,2)
+                ) AS damageCharges,
+
+                CAST(
+                    b.booked_price_per_night
+                    * DATEDIFF(DAY, b.checkin_date, b.checkout_date)
+                    * b.num_rooms
+                    + ISNULL(serviceData.serviceCharges, 0)
+                    + ISNULL(damageData.damageCharges, 0)
+                    AS DECIMAL(15,2)
+                ) AS totalAmount
+        ) amountData
+
+        WHERE b.booking_id = ?
+        """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, bookingId);
-            ps.executeUpdate();
-            return true;
+            return ps.executeUpdate() > 0;
         }
     }
 
-    /**
-     * Khi hủy toàn bộ, tổng hóa đơn chỉ còn phần phí hủy khách sạn giữ lại.
-     * InvoicePayments vẫn được giữ làm lịch sử giao dịch; dashboard phải dùng
-     * Invoice.total_amount cho booking đã hủy hoặc trừ khoản hoàn tiền.
-     */
+    // Đồng bộ hóa đơn sau khi hủy toàn bộ booking
     private boolean syncInvoiceAfterFullCancel(
             int bookingId,
             BigDecimal cancellationFee) throws SQLException {
@@ -3093,24 +2863,40 @@ public class BookingDAO extends DBContext {
         }
     }
 
-    private BigDecimal getCancelFeeRateByCheckin(LocalDate checkinDate) {
-        // Xác định tỷ lệ phí hủy dựa trên thời gian còn lại trước giờ nhận phòng.
-        if (checkinDate == null) {
+    // Tính tỷ lệ phí hủy theo giờ nhận phòng đang cấu hình trong HotelInfo
+    private BigDecimal getCancelFeeRateByCheckin(
+            LocalDate checkinDate,
+            LocalTime hotelCheckinTime) {
+
+        if (checkinDate == null || hotelCheckinTime == null) {
             return SEVENTY_PERCENT_CANCEL_RATE;
         }
 
-        LocalDateTime checkinDeadline = checkinDate.atTime(CHECKIN_HOUR, CHECKIN_MINUTE);
-        long hoursBeforeCheckin = ChronoUnit.HOURS.between(LocalDateTime.now(), checkinDeadline);
+        LocalDateTime checkinDeadline
+                = LocalDateTime.of(
+                        checkinDate,
+                        hotelCheckinTime
+                );
+
+        long hoursBeforeCheckin
+                = ChronoUnit.HOURS.between(
+                        LocalDateTime.now(),
+                        checkinDeadline
+                );
 
         if (hoursBeforeCheckin >= FREE_CANCEL_HOURS) {
             return FREE_CANCEL_RATE;
         }
 
-        if (hoursBeforeCheckin >= THIRTY_PERCENT_CANCEL_HOURS) {
+        if (hoursBeforeCheckin
+                >= THIRTY_PERCENT_CANCEL_HOURS) {
+
             return THIRTY_PERCENT_CANCEL_RATE;
         }
 
-        if (hoursBeforeCheckin >= FIFTY_PERCENT_CANCEL_HOURS) {
+        if (hoursBeforeCheckin
+                >= FIFTY_PERCENT_CANCEL_HOURS) {
+
             return FIFTY_PERCENT_CANCEL_RATE;
         }
 
@@ -3225,6 +3011,210 @@ public class BookingDAO extends DBContext {
         }
 
         return list;
+    }
+    
+
+    public boolean applyCounterExtendStayRequest(
+            int bookingId,
+            Date newCheckoutDate,
+            String note) {
+
+        if (newCheckoutDate == null) {
+            return false;
+        }
+
+        String getBookingSql = """
+                SELECT
+                    booked_price_per_night,
+                    num_rooms,
+                    checkout_date,
+                    LTRIM(RTRIM([status])) AS bookingStatus
+                FROM Bookings WITH (UPDLOCK, ROWLOCK)
+                WHERE booking_id = ?
+                """;
+
+        String updateBookingSql = """
+                UPDATE Bookings
+                SET checkout_date = ?
+                WHERE booking_id = ?
+                  AND LTRIM(RTRIM([status])) IN (
+                      N'Đã xác nhận',
+                      N'Đã nhận phòng'
+                  )
+                  AND checkout_date < ?
+                """;
+
+        String insertRequestSql = """
+                INSERT INTO GuestRequests (
+                    booking_id,
+                    guest_id,
+                    request_type,
+                    request_details,
+                    requested_checkout,
+                    [status],
+                    submitted_at,
+                    processed_at,
+                    response_notes
+                )
+                SELECT
+                    b.booking_id,
+                    b.guest_id,
+                    N'Gia hạn phòng',
+                    ?,
+                    ?,
+                    N'Đã phê duyệt',
+                    GETDATE(),
+                    GETDATE(),
+                    ?
+                FROM Bookings b
+                WHERE b.booking_id = ?
+                """;
+
+        try {
+            connection.setAutoCommit(false);
+
+            BigDecimal pricePerNight = BigDecimal.ZERO;
+            int numRooms = 0;
+            LocalDate oldCheckoutDate = null;
+            String bookingStatus = "";
+
+            try (PreparedStatement statement
+                    = connection.prepareStatement(getBookingSql)) {
+
+                statement.setInt(1, bookingId);
+
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (!resultSet.next()) {
+                        connection.rollback();
+                        return false;
+                    }
+
+                    pricePerNight = resultSet.getBigDecimal(
+                            "booked_price_per_night"
+                    );
+                    numRooms = resultSet.getInt("num_rooms");
+                    bookingStatus = resultSet.getNString("bookingStatus");
+
+                    Date oldCheckoutSql = resultSet.getDate("checkout_date");
+                    if (oldCheckoutSql != null) {
+                        oldCheckoutDate = oldCheckoutSql.toLocalDate();
+                    }
+                }
+            }
+
+            LocalDate newCheckoutLocalDate = newCheckoutDate.toLocalDate();
+
+            if (oldCheckoutDate == null
+                    || !newCheckoutLocalDate.isAfter(oldCheckoutDate)
+                    || !("Đã xác nhận".equals(bookingStatus)
+                    || "Đã nhận phòng".equals(bookingStatus))) {
+
+                connection.rollback();
+                return false;
+            }
+
+            long extraNights = ChronoUnit.DAYS.between(
+                    oldCheckoutDate,
+                    newCheckoutLocalDate
+            );
+
+            BigDecimal extraAmount = pricePerNight
+                    .multiply(BigDecimal.valueOf(numRooms))
+                    .multiply(BigDecimal.valueOf(extraNights))
+                    .setScale(MONEY_SCALE, MONEY_ROUNDING_MODE);
+
+            int updatedRows;
+
+            try (PreparedStatement statement
+                    = connection.prepareStatement(updateBookingSql)) {
+
+                statement.setDate(1, newCheckoutDate);
+                statement.setInt(2, bookingId);
+                statement.setDate(3, newCheckoutDate);
+                updatedRows = statement.executeUpdate();
+            }
+
+            if (updatedRows <= 0) {
+                connection.rollback();
+                return false;
+            }
+
+            if (!syncInvoiceFromBooking(bookingId)) {
+                connection.rollback();
+                return false;
+            }
+
+            String detail = "Gia hạn ngày ở từ "
+                    + oldCheckoutDate
+                    + " đến "
+                    + newCheckoutLocalDate
+                    + ". Số đêm tăng thêm: "
+                    + extraNights
+                    + ". Tiền phát sinh: "
+                    + extraAmount
+                    + " đ.";
+
+            if (note != null && !note.trim().isEmpty()) {
+                detail += " Ghi chú: " + note.trim();
+            }
+
+            String responseNote = "Yêu cầu gia hạn được tạo và phê duyệt "
+                    + "tại quầy. Tổng tiền phát sinh: "
+                    + extraAmount
+                    + " đ.";
+
+            int insertedRows;
+
+            try (PreparedStatement statement
+                    = connection.prepareStatement(insertRequestSql)) {
+
+                statement.setNString(1, detail);
+                statement.setDate(2, newCheckoutDate);
+                statement.setNString(3, responseNote);
+                statement.setInt(4, bookingId);
+                insertedRows = statement.executeUpdate();
+            }
+
+            if (insertedRows <= 0) {
+                connection.rollback();
+                return false;
+            }
+
+            connection.commit();
+            return true;
+
+        } catch (Exception e) {
+            rollbackCounterRequestQuietly();
+            System.out.println(
+                    "applyCounterExtendStayRequest error: "
+                    + e.getMessage()
+            );
+            e.printStackTrace();
+            return false;
+
+        } finally {
+            restoreCounterRequestAutoCommit();
+        }
+    }
+    
+    public LocalTime getHotelCheckinTime() {
+        String sql = "SELECT TOP 1 checkin_time FROM HotelInfo ORDER BY hotel_id";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql); ResultSet resultSet = statement.executeQuery()) {
+
+            if (resultSet.next()) {
+                java.sql.Time checkinTime = resultSet.getTime("checkin_time");
+
+                if (checkinTime != null) {
+                    return checkinTime.toLocalTime();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getHotelCheckinTime error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public List<Map<String, Object>> getPublicBookingRequests(int bookingId) {
