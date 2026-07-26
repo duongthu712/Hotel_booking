@@ -12,7 +12,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Đánh giá khách hàng | La Mer Hotel</title>
+        <title>Đánh giá khách hàng</title>
 
         <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/navbar.css?v=<%= System.currentTimeMillis() %>">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/view/assets/css/feedback-list.css?v=<%= System.currentTimeMillis() %>">
