@@ -51,7 +51,7 @@
                            value="${reqRooms}"
                            min="1"
                            required
-                           placeholder="Số lượng phòng">
+                           placeholder="Số phòng muốn đặt">
 
                     <select name="roomTypeId">
                         <option value="all"

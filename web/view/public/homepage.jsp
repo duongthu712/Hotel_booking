@@ -47,8 +47,12 @@ Purpose: Display the homepage UI, including the room search
             <form class="search-bar" action="${pageContext.request.contextPath}/search" method="GET">
                 <input type="date" name="checkIn" id="checkIn" required>
                 <input type="date" name="checkOut" id="checkOut" required>
-                <input type="number" name="roomQuantity" min="1" value="1" required
-                       placeholder="Số lượng phòng">
+                <input type="number"
+                           name="roomQuantity"
+                           value="${reqRooms}"
+                           min="1"
+                           required
+                           placeholder="Số phòng muốn đặt">
 
                 <select name="roomTypeId">
                     <option value="all" <c:if
