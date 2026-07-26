@@ -94,6 +94,8 @@ public class PolicyListController extends HttpServlet {
             request.setAttribute("keyword", keyword);
             request.setAttribute("filterType", filterType);
             request.setAttribute("policyTypeList", policyTypeList);
+            request.setAttribute("pageNumbers", dal.PaginationUtil.buildPageNumbers(page, totalPages));
+
 
             request.getRequestDispatcher("/view/manager/policy-management.jsp").forward(request, response);
         } catch (Exception e) {

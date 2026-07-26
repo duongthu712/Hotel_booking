@@ -96,6 +96,8 @@ public class StaffAccountListController extends HttpServlet {
             request.setAttribute("roleFilter", roleFilter);
             request.setAttribute("currentPage", page);
             request.setAttribute("totalPages", totalPages);
+            request.setAttribute("pageNumbers", dal.PaginationUtil.buildPageNumbers(page, totalPages));
+
 
             StaffAccount editStaff = (StaffAccount) session.getAttribute("editStaff");
 

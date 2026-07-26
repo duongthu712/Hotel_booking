@@ -7,7 +7,7 @@
         <jsp:include page="/view/staff/header.jsp" />
 
         <meta charset="UTF-8">
-        <title>Quản lý đặt phòng | La Mer Hotel</title>
+        <title>Quản lý đặt phòng</title>
 
         <link rel="stylesheet"
               href="${pageContext.request.contextPath}/view/assets/css/booking-list.css?v=<%= System.currentTimeMillis() %>">

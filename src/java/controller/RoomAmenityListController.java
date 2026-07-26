@@ -78,6 +78,8 @@ public class RoomAmenityListController extends HttpServlet {
             request.setAttribute("currentPage", page);
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("keyword", keyword);
+            request.setAttribute("pageNumbers", dal.PaginationUtil.buildPageNumbers(page, totalPages));
+
             
             request.getRequestDispatcher("/view/manager/room-amenity-management.jsp").forward(request, response);
 

@@ -94,11 +94,20 @@
                     </c:if>
                 </table>
 
-                <div class="pagination">
-                    <c:forEach begin="1" end="${totalPages}" var="i">
-                        <a href="RoomServiceList?page=${i}&keyword=${keyword}" class="${currentPage == i ? 'active' : ''}">${i}</a>
-                    </c:forEach>
-                </div>
+                <c:if test="${totalPages > 1}">
+                    <div class="pagination">
+                        <c:forEach var="p" items="${pageNumbers}">
+                            <c:choose>
+                                <c:when test="${p == 0}">
+                                    <span>...</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <a href="RoomServiceList?page=${p}&keyword=${keyword}" class="${currentPage == p ? 'active' : ''}">${p}</a>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:forEach>
+                    </div>
+                </c:if>
             </div>
         </main>
 

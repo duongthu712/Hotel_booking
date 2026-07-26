@@ -14,8 +14,8 @@ import model.StaffAccount;
 
 /**
  * @author LinhLTHE200306
- * @version 1.1
- * @since 2026-06-09
+ * @version 2.0
+ * @since 2026-07-25
  */
 public class RoomServiceListController extends HttpServlet {
 
@@ -78,7 +78,7 @@ public class RoomServiceListController extends HttpServlet {
             request.setAttribute("currentPage", page);
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("keyword", keyword);
-            
+            request.setAttribute("pageNumbers", dal.PaginationUtil.buildPageNumbers(page, totalPages));
             request.getRequestDispatcher("/view/manager/room-service-management.jsp").forward(request, response);
 
         } catch (Exception e) {
