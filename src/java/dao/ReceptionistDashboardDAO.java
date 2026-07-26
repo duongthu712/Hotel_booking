@@ -24,7 +24,7 @@ public class ReceptionistDashboardDAO extends DBContext {
                 + "(SELECT COUNT(*) FROM DepositPayments WHERE verification_status = N'Chờ xử lý') as pending_deposits "
                 + "FROM Bookings";
 
-        String sqlRooms = "SELECT [status], COUNT(*) as quantity FROM Rooms GROUP BY [status]";
+        String sqlRooms = "SELECT [status], COUNT(*) as quantity FROM Rooms WHERE is_active = 1 GROUP BY [status]";
 
         String sqlRequestsCount = "SELECT COUNT(*) FROM GuestRequests WHERE [status] = N'Chờ xử lý'";
 

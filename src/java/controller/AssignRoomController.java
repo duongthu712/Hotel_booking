@@ -47,8 +47,22 @@ public class AssignRoomController extends HttpServlet {
                     // Mặc định ban đầu: hiển thị theo hạng phòng khách đặt gốc
                     displayRoomTypeId = targetBooking.getRoomTypeId();
 
+                    int assignedRoomsCount = bookingDAO.countRoomsAssigned(bookingId);
+                    request.setAttribute("assignedRoomsCount", assignedRoomsCount);
+
+                    int remainingRoomsToAssign = targetBooking.getNumRooms() - assignedRoomsCount;
+                    int originalAvailableRooms = 0;
+                    List<RoomStatusView> origRooms = roomDAO.getAllRoomStatusViews(targetBooking.getRoomTypeId(), null, null);
+                    for (RoomStatusView r : origRooms) {
+                        if ("Phòng trống".equals(r.getStatus())) {
+                            originalAvailableRooms++;
+                        }
+                    }
+                    boolean canOverride = (originalAvailableRooms == 0 && remainingRoomsToAssign > 0);
+                    request.setAttribute("canOverride", canOverride);
+
                     // NẾU CÓ YÊU CẦU ĐỔI HẠNG (Do phòng hỏng hoặc chủ động upgrade từ lễ tân)
-                    if (overrideTypeParam != null && !overrideTypeParam.trim().isEmpty()) {
+                    if (canOverride && overrideTypeParam != null && !overrideTypeParam.trim().isEmpty()) {
                         displayRoomTypeId = Integer.parseInt(overrideTypeParam);
                         request.setAttribute("isOverriddenType", true);
                         
@@ -67,9 +81,6 @@ public class AssignRoomController extends HttpServlet {
                     request.setAttribute("currentDisplayTypeId", displayRoomTypeId);
                     request.setAttribute("targetBooking", targetBooking);
                     request.setAttribute("targetBookingId", bookingId);
-
-                    int assignedRoomsCount = bookingDAO.countRoomsAssigned(bookingId);
-                    request.setAttribute("assignedRoomsCount", assignedRoomsCount);
                 }
             } catch (Exception e) {
                 System.out.println("Lỗi doGet AssignRoomController: " + e.getMessage());
