@@ -43,30 +43,48 @@ public class SearchRoomServlet extends HttpServlet {
         request.setAttribute("allRoomTypesList", allRoomTypesList);
 
         List<RoomType> list;
+        int roomQuantity = 1;
 
-        if (checkIn == null || checkOut == null
-                || checkIn.trim().isEmpty()
-                || checkOut.trim().isEmpty()) {
+        if (roomQuantityStr != null && !roomQuantityStr.trim().isEmpty()) {
+            try {
+                roomQuantity = Integer.parseInt(roomQuantityStr.trim());
+                if (roomQuantity < 1) roomQuantity = 1;
+            } catch (NumberFormatException e) {
+                roomQuantity = 1;
+            }
+        }
 
-            list = allRoomTypesList;
+        if (roomTypeId == null) {
+            roomTypeId = "all";
+        }
 
-        } else {
-            int roomQuantity = 1;
-
-            if (roomQuantityStr != null
-                    && !roomQuantityStr.trim().isEmpty()) {
-
-                try {
-                    roomQuantity = Integer.parseInt(roomQuantityStr.trim());
-                } catch (NumberFormatException e) {
-                    roomQuantity = 1;
+        // Validate dates
+        boolean validDates = false;
+        if (checkIn != null && checkOut != null && !checkIn.trim().isEmpty() && !checkOut.trim().isEmpty()) {
+            try {
+                java.sql.Date inDate = java.sql.Date.valueOf(checkIn);
+                java.sql.Date outDate = java.sql.Date.valueOf(checkOut);
+                
+                java.time.LocalDate localIn = inDate.toLocalDate();
+                java.time.LocalDate localOut = outDate.toLocalDate();
+                java.time.LocalDate localToday = java.time.LocalDate.now();
+                
+                // CheckIn must not be in the past, and CheckOut must be after CheckIn
+                if (!localIn.isBefore(localToday) && localOut.isAfter(localIn)) {
+                    validDates = true;
+                } else {
+                    validDates = false;
                 }
+            } catch (IllegalArgumentException e) {
+                validDates = false;
             }
+        }
 
-            if (roomTypeId == null) {
-                roomTypeId = "all";
-            }
-
+        if (!validDates) {
+            list = allRoomTypesList;
+            checkIn = null;
+            checkOut = null;
+        } else {
             list = roomTypeDAO.searchRoomTypesByQuantity(
                     checkIn,
                     checkOut,
@@ -76,6 +94,10 @@ public class SearchRoomServlet extends HttpServlet {
         }
 
         request.setAttribute("availableRoomTypes", list);
+        request.setAttribute("validatedCheckIn", checkIn);
+        request.setAttribute("validatedCheckOut", checkOut);
+        request.setAttribute("validatedRoomQuantity", roomQuantity);
+        request.setAttribute("validatedRoomTypeId", roomTypeId);
 
         request.getRequestDispatcher("/view/public/search-result.jsp")
                 .forward(request, response);

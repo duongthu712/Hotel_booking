@@ -99,35 +99,61 @@ public class WalkInBookingServlet extends HttpServlet {
         List<AvailableRoomTypeView> allRoomTypes;
 
         // Điều kiện bắt buộc thực thi filter: Có nhập đầy đủ Ngày đến và Ngày đi
+        boolean validDates = false;
         if (checkIn != null && !checkIn.isEmpty() && checkOut != null && !checkOut.isEmpty()) {
-
-            int roomTypeId = 0;
-            if (roomTypeIdParam != null && !roomTypeIdParam.isEmpty()) {
-                roomTypeId = Integer.parseInt(roomTypeIdParam);
+            try {
+                java.sql.Date inDate = java.sql.Date.valueOf(checkIn);
+                java.sql.Date outDate = java.sql.Date.valueOf(checkOut);
+                
+                java.time.LocalDate localIn = inDate.toLocalDate();
+                java.time.LocalDate localOut = outDate.toLocalDate();
+                java.time.LocalDate localToday = java.time.LocalDate.now();
+                
+                if (!localIn.isBefore(localToday) && localOut.isAfter(localIn)) {
+                    validDates = true;
+                }
+            } catch (IllegalArgumentException e) {
             }
+        }
 
-            // Chuẩn hóa số lượng phòng cần thuê (Mặc định tối thiểu luôn là 1 phòng)
-            int numRooms = 1;
-            if (numRoomsParam != null && !numRoomsParam.isEmpty()) {
-                try {
-                    numRooms = Integer.parseInt(numRoomsParam);
-                    if (numRooms < 1) {
-                        numRooms = 1;
-                    }
-                } catch (NumberFormatException e) {
+        int roomTypeId = 0;
+        if (roomTypeIdParam != null && !roomTypeIdParam.isEmpty()) {
+            try {
+                roomTypeId = Integer.parseInt(roomTypeIdParam);
+            } catch (NumberFormatException e) {
+                roomTypeId = 0;
+            }
+        }
+
+        // Chuẩn hóa số lượng phòng cần thuê (Mặc định tối thiểu luôn là 1 phòng)
+        int numRooms = 1;
+        if (numRoomsParam != null && !numRoomsParam.isEmpty()) {
+            try {
+                numRooms = Integer.parseInt(numRoomsParam);
+                if (numRooms < 1) {
                     numRooms = 1;
                 }
+            } catch (NumberFormatException e) {
+                numRooms = 1;
             }
+        }
 
-            // Gọi hàm xử lý tìm kiếm hạng phòng khả dụng từ dữ liệu database (Đã tối ưu hóa thầu đủ 6 tham số)
+        if (validDates) {
+            // Gọi hàm xử lý tìm kiếm hạng phòng khả dụng từ dữ liệu database
             allRoomTypes = walkinDAO.searchAvailableRooms(checkIn, checkOut, roomTypeId, numRooms, numGuestsSearch, numChildrenSearch);
             request.setAttribute("isSearching", true);
-
         } else {
-            // Lần đầu load trang: Chưa kích hoạt nút bấm tìm kiếm
+            // Lần đầu load trang hoặc ngày không hợp lệ: Chưa kích hoạt nút bấm tìm kiếm
             allRoomTypes = dropdownRoomTypes;
             request.setAttribute("isSearching", false);
+            checkIn = null;
+            checkOut = null;
         }
+
+        request.setAttribute("validatedCheckIn", checkIn);
+        request.setAttribute("validatedCheckOut", checkOut);
+        request.setAttribute("validatedRoomTypeId", roomTypeId);
+        request.setAttribute("validatedNumRooms", numRooms);
 
         request.setAttribute("allRoomTypes", allRoomTypes);
         request.getRequestDispatcher("/view/receptionist/walk-in-booking.jsp").forward(request, response);

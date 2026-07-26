@@ -8,8 +8,8 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
-<c:set var="hasSearch" value="${not empty param.checkIn and not empty param.checkOut}" />
-<c:set var="reqRooms" value="${not empty param.roomQuantity ? param.roomQuantity : 1}" />
+<c:set var="hasSearch" value="${not empty validatedCheckIn and not empty validatedCheckOut}" />
+<c:set var="reqRooms" value="${validatedRoomQuantity}" />
 <c:set var="reqGuests" value="${not empty param.numGuests ? param.numGuests : 1}" />
 
 <!DOCTYPE html>
@@ -37,13 +37,13 @@
                     <input type="date"
                            name="checkIn"
                            id="checkInResult"
-                           value="${param.checkIn}"
+                           value="${validatedCheckIn}"
                            required>
 
                     <input type="date"
                            name="checkOut"
                            id="checkOutResult"
-                           value="${param.checkOut}"
+                           value="${validatedCheckOut}"
                            required>
 
                     <input type="number"
@@ -55,7 +55,7 @@
 
                     <select name="roomTypeId">
                         <option value="all"
-                                <c:if test="${empty param.roomTypeId or param.roomTypeId eq 'all'}">
+                                <c:if test="${empty validatedRoomTypeId or validatedRoomTypeId eq 'all'}">
                                     selected
                                 </c:if>>
                             Tất cả loại phòng
@@ -63,7 +63,7 @@
 
                         <c:forEach var="item" items="${allRoomTypesList}">
                             <option value="${item.roomTypeId}"
-                                    <c:if test="${param.roomTypeId eq item.roomTypeId.toString()}">
+                                    <c:if test="${validatedRoomTypeId eq item.roomTypeId.toString()}">
                                         selected
                                     </c:if>>
                                 ${item.typeName}
@@ -79,8 +79,8 @@
             <div class="search-summary-text">
                 <c:choose>
                     <c:when test="${hasSearch}">
-                        <fmt:parseDate value="${param.checkIn}" pattern="yyyy-MM-dd" var="parsedCheckIn"/>
-                        <fmt:parseDate value="${param.checkOut}" pattern="yyyy-MM-dd" var="parsedCheckOut"/>
+                        <fmt:parseDate value="${validatedCheckIn}" pattern="yyyy-MM-dd" var="parsedCheckIn"/>
+                        <fmt:parseDate value="${validatedCheckOut}" pattern="yyyy-MM-dd" var="parsedCheckOut"/>
 
                         <c:set var="formattedCheckIn">
                             <fmt:formatDate value="${parsedCheckIn}" pattern="dd/MM/yyyy"/>
@@ -91,8 +91,8 @@
                         </c:set>
 
                         <c:choose>
-                            <c:when test="${not empty param.roomTypeId
-                                            and param.roomTypeId ne 'all'
+                            <c:when test="${not empty validatedRoomTypeId
+                                            and validatedRoomTypeId ne 'all'
                                             and not empty availableRoomTypes}">
                                 <c:set var="selectedTypeName" value="${availableRoomTypes[0].typeName}" />
 

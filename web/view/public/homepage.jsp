@@ -76,7 +76,7 @@ Purpose: Display the homepage UI, including the room search
                     <c:forEach var="news" items="${top3News}" varStatus="status">
                         <div class="split-row ${status.index % 2 != 0 ? 'reverse' : ''}">
                             <div class="split-image">
-                                <img src="${not empty news.imageUrl ? news.imageUrl : 'https://owa.bestprice.vn/images/hotels/uploads/vinpearl-resort-spa-ha-long-63351ff6468e4.jpg'}"
+                                <img src="${not empty news.imageUrl ? news.imageUrl : 'https://res.cloudinary.com/dkrhg3g2v/image/upload/v1785074815/%E1%BA%A2nh_ch%E1%BB%A5p_m%C3%A0n_h%C3%ACnh_2026-07-26_210502_eawgol.png'}"
                                      alt="${news.title}">
                             </div>
                             <div class="split-content">
