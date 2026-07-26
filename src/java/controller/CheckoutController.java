@@ -103,19 +103,10 @@ public class CheckoutController extends HttpServlet {
 
             int bookingId = (Integer) roomDetails.get(0).get("bookingId");
 
-            // Lưu roomId đang checkout vào session
+            // CHỈ lưu roomId đang chờ checkout vào session để invoice.jsp biết đang xem phòng nào.
+            // Nếu chọn nhầm phòng, chỉ cần quay lại /Checkout là xong, không có gì phải dọn dẹp.
             session.setAttribute("checkoutRoomId_" + bookingId, roomId);
-
-            try {
-                dao.processCheckout(bookingId, java.util.Collections.singletonList(roomId), staff.getStaffId());
-                session.setAttribute("checkoutRoomCount_" + bookingId, 1);
-                response.sendRedirect(request.getContextPath() + "/InvoiceCreate?bookingId=" + bookingId);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                String bookingCode = dao.getBookingCodeById(bookingId);
-                session.setAttribute("errorMessage", "Lỗi checkout đơn " + bookingCode + ": " + ex.getMessage());
-                response.sendRedirect(request.getContextPath() + "/Checkout");
-            }
+            response.sendRedirect(request.getContextPath() + "/InvoiceCreate?bookingId=" + bookingId);
 
         } catch (Exception e) {
             e.printStackTrace();

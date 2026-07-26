@@ -336,19 +336,19 @@
                             </div>
 
                             <!-- THU TIỀN THÊM (nếu còn nợ) -->
-                                <div class="payment-method">
-                                    <h4 class="sub-title">THU TIỀN TẠI QUẦY (phòng này)</h4>
-                                    <input type="number" name="collectAmount" id="collectAmount"
-                                           class="form-input" style="width:100%;margin-bottom:8px"
-                                           placeholder="Nhập số tiền thanh toán lần này"
-                                           min="0" max="${remainingForThisRoom}">
-                                    <select name="paymentMethod" class="payment-select">
-                                        <option value="">-- Chọn phương thức --</option>
-                                        <option value="Tiền mặt">Tiền mặt</option>
-                                        <option value="Thẻ ngân hàng">Thẻ ngân hàng</option>
-                                        <option value="Chuyển khoản">Chuyển khoản</option>
-                                    </select>
-                                </div>
+                            <div class="payment-method">
+                                <h4 class="sub-title">THU TIỀN TẠI QUẦY (phòng này)</h4>
+                                <input type="number" name="collectAmount" id="collectAmount"
+                                       class="form-input" style="width:100%;margin-bottom:8px"
+                                       placeholder="Nhập số tiền thanh toán lần này"
+                                       min="0" max="${remainingForThisRoom}">
+                                <select name="paymentMethod" class="payment-select">
+                                    <option value="">-- Chọn phương thức --</option>
+                                    <option value="Tiền mặt">Tiền mặt</option>
+                                    <option value="Thẻ ngân hàng">Thẻ ngân hàng</option>
+                                    <option value="Chuyển khoản">Chuyển khoản</option>
+                                </select>
+                            </div>
 
                             <!-- THÔNG TIN CỌC -->
                             <div class="deposit-info">
@@ -396,7 +396,11 @@
 
                             <div class="invoice-actions">
                                 <button type="submit" class="btn-checkout-primary">CẬP NHẬT HÓA ĐƠN</button>
+                                <button type="submit" name="action" value="checkout_next" class="btn-checkout-primary">
+                                    LƯU & CHECKOUT PHÒNG TIẾP THEO
+                                </button>
                             </div>
+
                         </div>
                     </div>
                 </div>
