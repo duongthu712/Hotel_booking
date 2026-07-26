@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.StaffAccount;
+import dao.HotelInfoDAO;
 
 /**
  * @author LinhLTHE200306
@@ -62,7 +63,6 @@ public class MDashboardPDFController extends HttpServlet {
 
         ManagerDashboardDAO dao = new ManagerDashboardDAO();
 
-        
         BigDecimal todayRevenue = dao.getTodayRevenue();
         BigDecimal monthlyRevenue = dao.getMonthlyRevenue(month, year);
         double occupancyRate = dao.getOccupancyRate();
@@ -86,7 +86,8 @@ public class MDashboardPDFController extends HttpServlet {
             Font normalFont = new Font(Font.HELVETICA, 11);
 
             // header
-            document.add(new Paragraph("LA MER HOTEL - BÁO CÁO TỔNG QUAN", titleFont));
+            String hotelName = new HotelInfoDAO().getHotelName();
+            document.add(new Paragraph((hotelName + " - BÁO CÁO TỔNG QUAN").toUpperCase(), titleFont));
             document.add(new Paragraph("Tháng: " + monthYearStr, normalFont));
             document.add(new Paragraph("Người xuất: " + staff.getFullName(), normalFont));
             document.add(new Paragraph("Ngày xuất: " + LocalDate.now().format(DATE_FORMATTER), normalFont));

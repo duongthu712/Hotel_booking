@@ -7,7 +7,7 @@
         <jsp:include page="/view/staff/header.jsp" />
 
         <meta charset="UTF-8">
-        <title>Quản lý đặt phòng | La Mer Hotel</title>
+        <title>Quản lý đặt phòng</title>
 
         <link rel="stylesheet"
               href="${pageContext.request.contextPath}/view/assets/css/booking-list.css?v=<%= System.currentTimeMillis() %>">
@@ -335,78 +335,103 @@
                 </div>
 
                 <c:if test="${totalPages > 1}">
-                    <div class="pagination">
+                    <nav class="booking-pagination" aria-label="Phân trang danh sách đặt phòng">
                         <c:choose>
-                            <c:when test="${currentPage > 1}">
-                                <a class="page-btn"
-                                   href="${ctx}/booking-list?${pagingQuery}&page=${currentPage - 1}">
-                                    ‹ Trước
-                                </a>
+                            <c:when test="${totalPages <= 5}">
+                                <c:forEach begin="1" end="${totalPages}" var="pageNumber">
+                                    <c:choose>
+                                        <c:when test="${currentPage == pageNumber}">
+                                            <span class="booking-page-link active" aria-current="page">${pageNumber}</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a class="booking-page-link" href="${ctx}/booking-list?${pagingQuery}&page=${pageNumber}">${pageNumber}</a>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:forEach>
                             </c:when>
+
                             <c:otherwise>
-                                <span class="page-btn disabled">‹ Trước</span>
-                            </c:otherwise>
-                        </c:choose>
+                                <c:choose>
+                                    <c:when test="${currentPage == 1}">
+                                        <span class="booking-page-link active" aria-current="page">1</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <a class="booking-page-link" href="${ctx}/booking-list?${pagingQuery}&page=1">1</a>
+                                    </c:otherwise>
+                                </c:choose>
 
-                        <c:set var="windowSize" value="${paginationWindowSize}" />
-                        <c:set var="startPage" value="${currentPage - windowSize}" />
-                        <c:set var="endPage" value="${currentPage + windowSize}" />
+                                <c:choose>
+                                    <c:when test="${currentPage == 2}">
+                                        <span class="booking-page-link active" aria-current="page">2</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <a class="booking-page-link" href="${ctx}/booking-list?${pagingQuery}&page=2">2</a>
+                                    </c:otherwise>
+                                </c:choose>
 
-                        <c:if test="${startPage < 1}">
-                            <c:set var="startPage" value="1" />
-                        </c:if>
+                                <c:choose>
+                                    <c:when test="${currentPage <= 3}">
+                                        <c:choose>
+                                            <c:when test="${currentPage == 3}">
+                                                <span class="booking-page-link active" aria-current="page">3</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <a class="booking-page-link" href="${ctx}/booking-list?${pagingQuery}&page=3">3</a>
+                                            </c:otherwise>
+                                        </c:choose>
 
-                        <c:if test="${endPage > totalPages}">
-                            <c:set var="endPage" value="${totalPages}" />
-                        </c:if>
+                                        <span class="booking-page-ellipsis">...</span>
+                                    </c:when>
 
-                        <c:if test="${startPage > 1}">
-                            <a class="page-btn" href="${ctx}/booking-list?${pagingQuery}&page=1">
-                                1
-                            </a>
+                                    <c:when test="${currentPage >= totalPages - 2}">
+                                        <span class="booking-page-ellipsis">...</span>
 
-                            <c:if test="${startPage > 2}">
-                                <span class="page-dot">...</span>
-                            </c:if>
-                        </c:if>
+                                        <c:forEach begin="${totalPages - 2}" end="${totalPages - 1}" var="pageNumber">
+                                            <c:choose>
+                                                <c:when test="${currentPage == pageNumber}">
+                                                    <span class="booking-page-link active" aria-current="page">${pageNumber}</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <a class="booking-page-link" href="${ctx}/booking-list?${pagingQuery}&page=${pageNumber}">${pageNumber}</a>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </c:forEach>
+                                    </c:when>
 
-                        <c:forEach begin="${startPage}" end="${endPage}" var="pageNumber">
-                            <c:choose>
-                                <c:when test="${pageNumber == currentPage}">
-                                    <span class="page-btn active">${pageNumber}</span>
-                                </c:when>
-                                <c:otherwise>
-                                    <a class="page-btn"
-                                       href="${ctx}/booking-list?${pagingQuery}&page=${pageNumber}">
-                                        ${pageNumber}
+                                    <c:otherwise>
+                                        <span class="booking-page-ellipsis">...</span>
+
+                                        <span class="booking-page-link active" aria-current="page">${currentPage}</span>
+
+                                        <a class="booking-page-link" href="${ctx}/booking-list?${pagingQuery}&page=${currentPage + 1}">
+                                            ${currentPage + 1}
+                                        </a>
+
+                                        <c:if test="${currentPage + 1 < totalPages - 1}">
+                                            <span class="booking-page-ellipsis">...</span>
+                                        </c:if>
+                                    </c:otherwise>
+                                </c:choose>
+
+                                <c:if test="${currentPage < totalPages - 2}">
+                                    <a class="booking-page-link" href="${ctx}/booking-list?${pagingQuery}&page=${totalPages - 1}">
+                                        ${totalPages - 1}
                                     </a>
-                                </c:otherwise>
-                            </c:choose>
-                        </c:forEach>
+                                </c:if>
 
-                        <c:if test="${endPage < totalPages}">
-                            <c:if test="${endPage < totalPages - 1}">
-                                <span class="page-dot">...</span>
-                            </c:if>
-
-                            <a class="page-btn"
-                               href="${ctx}/booking-list?${pagingQuery}&page=${totalPages}">
-                                ${totalPages}
-                            </a>
-                        </c:if>
-
-                        <c:choose>
-                            <c:when test="${currentPage < totalPages}">
-                                <a class="page-btn"
-                                   href="${ctx}/booking-list?${pagingQuery}&page=${currentPage + 1}">
-                                    Sau ›
-                                </a>
-                            </c:when>
-                            <c:otherwise>
-                                <span class="page-btn disabled">Sau ›</span>
+                                <c:choose>
+                                    <c:when test="${currentPage == totalPages}">
+                                        <span class="booking-page-link active" aria-current="page">${totalPages}</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <a class="booking-page-link" href="${ctx}/booking-list?${pagingQuery}&page=${totalPages}">
+                                            ${totalPages}
+                                        </a>
+                                    </c:otherwise>
+                                </c:choose>
                             </c:otherwise>
                         </c:choose>
-                    </div>
+                    </nav>
                 </c:if>
             </div>
         </main>

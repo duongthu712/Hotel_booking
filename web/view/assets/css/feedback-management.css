@@ -1155,3 +1155,40 @@ textarea {
         width: 100%;
     }
 }
+
+.simple-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    margin: 34px 0 12px;
+}
+
+.simple-page-link {
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #9a8c78;
+    font-family: 'Cormorant Garamond', 'Lora', serif;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1;
+    text-decoration: none;
+}
+
+.simple-page-link:hover {
+    color: #102a43;
+}
+
+.simple-page-link.active {
+    color: #102a43;
+    font-weight: 700;
+    pointer-events: none;
+}
+
+.simple-page-ellipsis {
+    color: #9a8c78;
+    font-family: 'Cormorant Garamond', 'Lora', serif;
+    font-size: 19px;
+    line-height: 1;
+}

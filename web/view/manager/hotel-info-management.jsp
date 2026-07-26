@@ -337,13 +337,18 @@
                                                         </c:if>
                                                     </table>
 
-                                                    <div class="pagination">
-                                                        <c:forEach begin="1" end="${totalPages}" var="i">
-                                                            <a href="HotelInfo?page=${i}&keyword=${keyword}&status=${status}#news-section"
-                                                                class="${currentPage == i ? 'active' : ''}">${i}</a>
-                                                        </c:forEach>
-                                                    </div>
-                                                </div>
+                <div class="pagination">
+                    <c:forEach var="p" items="${pageNumbers}">
+                        <c:choose>
+                            <c:when test="${p == 0}"><span>...</span></c:when>
+                            <c:otherwise>
+                                <a href="HotelInfo?page=${p}&keyword=${keyword}&status=${status}#news-section"
+                                   class="${currentPage == p ? 'active' : ''}">${p}</a>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:forEach>
+                </div>
+            </div>
 
                                                 <div class="hotel-popup" id="news-detail-modal">
                                                     <div class="popup-content news-detail-content">

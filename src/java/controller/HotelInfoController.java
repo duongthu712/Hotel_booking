@@ -108,6 +108,8 @@ public class HotelInfoController extends HttpServlet {
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("keyword", keyword);
             request.setAttribute("status", status);
+            request.setAttribute("pageNumbers", dal.PaginationUtil.buildPageNumbers(page, totalPages));
+
 
             request.getRequestDispatcher("/view/manager/hotel-info-management.jsp").forward(request, response);
 
