@@ -80,7 +80,7 @@
                         <div class="summary-icon">▣</div>
                         <div>
                             <span>Check-in</span>
-                            <strong>${booking.checkinDateText}</strong>
+                            <strong>${booking.checkinDateText} - ${hotelCheckinTimeText}</strong>
                         </div>
                     </div>
 
@@ -352,6 +352,11 @@
                                         <strong>
                                             <fmt:formatNumber value="${depositPerRoom}" type="number" groupingUsed="true"/> đ
                                         </strong>
+                                    </div>
+
+                                    <div class="cancel-calc-item">
+                                        <span>Giờ check-in áp dụng</span>
+                                        <strong>${hotelCheckinTimeText}</strong>
                                     </div>
 
                                     <div class="cancel-calc-item">

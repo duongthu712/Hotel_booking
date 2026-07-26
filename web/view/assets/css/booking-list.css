@@ -467,62 +467,77 @@ body {
 /* PAGINATION */
 .table-footer {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    gap: 14px;
-    padding: 16px 6px 0;
+    justify-content: center;
+    gap: 18px;
+    padding: 22px 6px 0;
     border-top: 1px solid #d8d2c5;
     color: #34445a;
-    font-size: 14px;
+    font-size: 15px;
+    text-align: center;
 }
 
-.pagination {
+.booking-pagination {
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 28px;
     flex-wrap: wrap;
 }
 
-.page-btn,
-.page-dot {
-    min-width: 34px;
-    height: 34px;
-    padding: 0 10px;
-    border: 1px solid #d9c3a2;
-    border-radius: 6px;
-    background: #fffaf2;
-    color: #003b73;
-    font-size: 14px;
-    font-weight: 800;
-    text-decoration: none;
+.booking-page-link {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    min-width: 28px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #9a8c78;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 1;
+    text-decoration: none;
+    transition: color 0.2s ease;
 }
 
-.page-btn:hover {
-    background: #f7ead8;
-    border-color: #c99a48;
+.booking-page-link:hover {
+    color: #073763;
 }
 
-.page-btn.active {
-    border-color: #073763;
-    background: #073763;
-    color: #ffffff;
-}
-
-.page-btn.disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
+.booking-page-link.active {
+    color: #073763;
+    font-weight: 800;
     pointer-events: none;
 }
 
-.page-dot {
-    min-width: 24px;
-    padding: 0 4px;
-    border: none;
-    background: transparent;
+.booking-page-ellipsis {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #9a8c78;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 30px;
+    line-height: 1;
+}
+
+@media (max-width: 700px) {
+    .table-footer {
+        gap: 14px;
+        padding-top: 18px;
+    }
+
+    .booking-pagination {
+        gap: 18px;
+    }
+
+    .booking-page-link,
+    .booking-page-ellipsis {
+        font-size: 24px;
+    }
 }
 
 /* POPUP */
