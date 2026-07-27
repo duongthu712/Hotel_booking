@@ -1457,42 +1457,10 @@ public class CheckoutDAO extends DBContext {
         }
     }
 
-    public void insertBookingService(int bookingId, int roomId, int roomTypeServiceId,
-            BigDecimal unitPrice, int quantity, BigDecimal totalPrice) throws Exception {
-        String sql = """
-        insert into BookingServices (booking_id, room_id, room_type_service_id, unit_price, quantity_used, total_price)
-        values (?, ?, ?, ?, ?, ?)
-        """;
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, bookingId);
-            stm.setInt(2, roomId);
-            stm.setInt(3, roomTypeServiceId);
-            stm.setBigDecimal(4, unitPrice);
-            stm.setInt(5, quantity);
-            stm.setBigDecimal(6, totalPrice);
-            stm.executeUpdate();
-        } catch (SQLException e) {
-            throw new Exception("Lỗi hệ thống: Không thể thêm dịch vụ.");
-        }
-    }
+    
+    
 
-    public void insertRoomAmenityDamage(int bookingId, int roomId, int amenityId,
-            int quantity, BigDecimal totalPrice) throws Exception {
-        String sql = """
-        insert into RoomAmenityDamages (booking_id, room_id, amenity_id, quantity_damaged, total_price)
-        values (?, ?, ?, ?, ?)
-        """;
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setInt(1, bookingId);
-            stm.setInt(2, roomId);
-            stm.setInt(3, amenityId);
-            stm.setInt(4, quantity);
-            stm.setBigDecimal(5, totalPrice);
-            stm.executeUpdate();
-        } catch (SQLException e) {
-            throw new Exception("Lỗi hệ thống: Không thể thêm hư hỏng.");
-        }
-    }
+    
 
     // ========== BILLING ==========
     public List<Map<String, Object>> searchInvoices(String keyword, LocalDate fromDate,
@@ -1503,8 +1471,9 @@ public class CheckoutDAO extends DBContext {
                        i.room_charges, i.consumable_charges, i.amenity_damages,
                        i.total_amount, i.remaining_amount, i.payment_status,
                        (select isnull(sum(amount), 0) from InvoicePayments 
-                          where invoice_id = i.invoice_id 
-                          and note != N'Tiền đặt cọc') as total_paid
+                           where invoice_id = i.invoice_id 
+                           and note != N'Tiền đặt cọc'
+                           and note != N'Tiền phạt hủy phòng') as total_paid
                 from Invoices i
                 join Bookings b on i.booking_id = b.booking_id
                 where 1 = 1
