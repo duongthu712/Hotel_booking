@@ -1,4 +1,3 @@
-
 package controller;
 
 import com.lowagie.text.Document;
@@ -39,7 +38,8 @@ public class InvoicePDFController extends HttpServlet {
 
     private static final NumberFormat CURRENCY_FORMAT = NumberFormat.getInstance(new Locale("vi", "VN"));
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-
+    private static final String NOTE_CANCEL_PENALTY = "Tiền phạt hủy phòng";
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -73,10 +73,12 @@ public class InvoicePDFController extends HttpServlet {
             List<BookingRoom> bookingRooms = dao.getBookingRoomsByBookingId(bookingId);
             List<InvoicePayment> payments = dao.getInvoicePaymentsByInvoiceId(invoice.getInvoiceId());
 
-            // Tổng đã thu
+            // Tổng đã thu (không tính khoản phạt hủy phòng, vì khoản này không nằm trong Tổng tiền của đơn)
             BigDecimal totalPaid = BigDecimal.ZERO;
             for (InvoicePayment p : payments) {
-                totalPaid = totalPaid.add(p.getAmount());
+                if (!NOTE_CANCEL_PENALTY.equals(p.getNote())) {
+                    totalPaid = totalPaid.add(p.getAmount());
+                }
             }
 
             response.setContentType("application/pdf");
@@ -188,4 +190,3 @@ public class InvoicePDFController extends HttpServlet {
         return CURRENCY_FORMAT.format(amount) + " d";
     }
 }
-
